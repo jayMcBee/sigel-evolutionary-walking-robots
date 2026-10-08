@@ -19,7 +19,7 @@
   You should have received a copy of the GNU General Public License
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 #ifndef SIGEL_GP_SIG_GPMANAGER_H
 #define SIGEL_GP_SIG_GPMANAGER_H
 
@@ -46,296 +46,295 @@
 namespace SIGEL_GP
 {
 
-/**
- * This class manages the genetic-programming algorithm.
- *
- * It uses the class SIG_GPExperiment to organize the data of the
- * different experiments, like the GPParameter, which are used to 
- * store the current genetic-programming-parameters. A nessecary part 
- * of the evolution, the fitnesstrainer, are included, which manages 
- * the use of the fitnessfunctions. The class SIG_GPTournament is included
- * becauses it is needed for the organization of the tournaments of a
- * evolution run. The SIG_Randomizer supplies the system with random seeds.
- */
+	/**
+	 * This class manages the genetic-programming algorithm.
+	 *
+	 * It uses the class SIG_GPExperiment to organize the data of the
+	 * different experiments, like the GPParameter, which are used to
+	 * store the current genetic-programming-parameters. A nessecary part
+	 * of the evolution, the fitnesstrainer, are included, which manages
+	 * the use of the fitnessfunctions. The class SIG_GPTournament is included
+	 * becauses it is needed for the organization of the tournaments of a
+	 * evolution run. The SIG_Randomizer supplies the system with random seeds.
+	 */
 
-  class SIG_GPManager
-    {
+	class SIG_GPManager
+	{
 
-  /**
-   * This flag is set true if the environment that contains this
-   * SIG_GPManager has requested the termination of the evolution.
-   *
-   * The evolution will stop at the next possible moment, independent
-   * from the generation break or the termination type.
-   */
- public:
-  std::atomic<bool> userTerminated;
+		/**
+		 * This flag is set true if the environment that contains this
+		 * SIG_GPManager has requested the termination of the evolution.
+		 *
+		 * The evolution will stop at the next possible moment, independent
+		 * from the generation break or the termination type.
+		 */
+	public:
+		std::atomic<bool> userTerminated;
 
-  /**
-   * Whether PVM has been reported unreachable. Reading it is the only way an
-   * environment can tell a run that cannot continue from one that is merely
-   * slow.
-   */
- public:
-  bool pvmIsLost() const;
+		/**
+		 * Whether PVM has been reported unreachable. Reading it is the only way an
+		 * environment can tell a run that cannot continue from one that is merely
+		 * slow.
+		 */
+	public:
+		bool pvmIsLost() const;
 
-  /**
-   * How many of the current generation's tournaments are finished, out of
-   * how many createTours planned. Both are 0 before the first createTours.
-   */
- public:
-  struct TournamentProgress
-  {
-    int doneCount;
-    int plannedCount;
-  };
+		/**
+		 * How many of the current generation's tournaments are finished, out of
+		 * how many createTours planned. Both are 0 before the first createTours.
+		 */
+	public:
+		struct TournamentProgress
+		{
+			int doneCount;
+			int plannedCount;
+		};
 
- public:
-  TournamentProgress tournamentProgress() const;
+	public:
+		TournamentProgress tournamentProgress() const;
 
-  /**
-   * Two flags to synchronize the main thread and server thread when disconnecting
-   * dynamically registered clients; if 'disconnectClients' is set, the server thread
-   * will disconnect all clients causing them to cleanup temp. files since it'll be
-   * no longer used for computations.
-   * The 'allDisconnected' flag is set to true when all clients have been disconnected,
-   * at which point only atically declared clients -- i.e. declared in the *.exp file --
-   * are known to the SIGEL master application, all dynamic hosts must register again
-   * for the next fitness computation phase.
-   * Has to be volatile of course since the compiler needs to know that these variables
-   * can get changed elsewhere, not just in our local code (local thread).
-   */
-   volatile bool allDisconnected;
-   volatile bool disconnectClients;
+		/**
+		 * Two flags to synchronize the main thread and server thread when disconnecting
+		 * dynamically registered clients; if 'disconnectClients' is set, the server thread
+		 * will disconnect all clients causing them to cleanup temp. files since it'll be
+		 * no longer used for computations.
+		 * The 'allDisconnected' flag is set to true when all clients have been disconnected,
+		 * at which point only atically declared clients -- i.e. declared in the *.exp file --
+		 * are known to the SIGEL master application, all dynamic hosts must register again
+		 * for the next fitness computation phase.
+		 * Has to be volatile of course since the compiler needs to know that these variables
+		 * can get changed elsewhere, not just in our local code (local thread).
+		 */
+		volatile bool allDisconnected;
+		volatile bool disconnectClients;
 
-   /**
-    * Simple flag indicating if the threaded server is up and running, i.e. if we
-    * have to expect dynamic clients participate on the fitness evaluations.
-    */
-    volatile bool serverIsUp;
+		/**
+		 * Simple flag indicating if the threaded server is up and running, i.e. if we
+		 * have to expect dynamic clients participate on the fitness evaluations.
+		 */
+		volatile bool serverIsUp;
 
-    /**
-    * condition variable required to synchronize the threads.
-    */
-    pthread_cond_t cond;
+		/**
+		 * condition variable required to synchronize the threads.
+		 */
+		pthread_cond_t cond;
 
-  void start();
+		void start();
 
- private:
-  /**
-   * Guards 'allDisconnected', 'disconnectClients' and 'cond'.
-   */
-  pthread_mutex_t disconnectMutex;
+	private:
+		/**
+		 * Guards 'allDisconnected', 'disconnectClients' and 'cond'.
+		 */
+		pthread_mutex_t disconnectMutex;
 
- private:
-  /**
-   * This list contains the indices of all tournaments in tours
-   * that are free to start or that are waiting for the calculation
-   * of fitness values for individuals that were created by them.
-   */
-  QList<int> taskCanDoList;
+	private:
+		/**
+		 * This list contains the indices of all tournaments in tours
+		 * that are free to start or that are waiting for the calculation
+		 * of fitness values for individuals that were created by them.
+		 */
+		QList<int> taskCanDoList;
 
-  /**
-   * The experiment object, which contains all the data related to the
-   * current experiment.
-   */
- protected:
-  SIG_GPExperiment &currentExperiment;
+		/**
+		 * The experiment object, which contains all the data related to the
+		 * current experiment.
+		 */
+	protected:
+		SIG_GPExperiment &currentExperiment;
 
- protected:
-  bool stopEvolutionNow;
+	protected:
+		bool stopEvolutionNow;
 
- private:
-  QDateTime startTime;
+	private:
+		QDateTime startTime;
 
-  /**
-   * The fitnesstrainer object, which manages the computation of the
-   * fitnessvalues with PVM.
-   */
- private:
-  SIG_GPFitnessTrainer *trainer;
-  
-  /**
-   * This QList is used to store the randomly created tournaments for one
-   * generation.
-   */
- private:
-  QList<SIG_GPTournament *> tours;
+		/**
+		 * The fitnesstrainer object, which manages the computation of the
+		 * fitnessvalues with PVM.
+		 */
+	private:
+		SIG_GPFitnessTrainer *trainer;
 
-  /**
-   * The randomizer object, used to create randomseeds for the evolution.
-   */
- private:
-  SIGEL_Tools::SIG_Randomizer randomizer;
+		/**
+		 * This QList is used to store the randomly created tournaments for one
+		 * generation.
+		 */
+	private:
+		QList<SIG_GPTournament *> tours;
 
- private:
-  bool fitnessCalculated;
+		/**
+		 * The randomizer object, used to create randomseeds for the evolution.
+		 */
+	private:
+		SIGEL_Tools::SIG_Randomizer randomizer;
 
-  /**
-   * This is the current generation and it starts with 0 every time you restart the evolution.
-   */
- private:
-  int currentGenerationNo;
+	private:
+		bool fitnessCalculated;
 
-  /**
-   * The constructor of a SIG_GPManager object.
-   * @post
-   * A gp-manager was created and the data from the experiment is set to
-   * the values of the GPManager.
-   * @param exp
-   * A reference of the experiment to work with.
-   */
- public:
-  SIG_GPManager(SIG_GPExperiment &experiment);
+		/**
+		 * This is the current generation and it starts with 0 every time you restart the evolution.
+		 */
+	private:
+		int currentGenerationNo;
 
-   /**
-    * The destructor of the SIG_GPManager class.
-   * @pre
-   * One of the terminationcondidtions is fulfilled
-   * @post
-   * The gp-manager is destructed.
-   */
- public:
-  virtual ~SIG_GPManager();
+		/**
+		 * The constructor of a SIG_GPManager object.
+		 * @post
+		 * A gp-manager was created and the data from the experiment is set to
+		 * the values of the GPManager.
+		 * @param exp
+		 * A reference of the experiment to work with.
+		 */
+	public:
+		SIG_GPManager(SIG_GPExperiment &experiment);
 
-  // The destructor deletes the tournaments in tours, so a copy would free them twice.
-  SIG_GPManager( SIG_GPManager const & ) = delete;
-  SIG_GPManager &operator=( SIG_GPManager const & ) = delete;
+		/**
+		 * The destructor of the SIG_GPManager class.
+		 * @pre
+		 * One of the terminationcondidtions is fulfilled
+		 * @post
+		 * The gp-manager is destructed.
+		 */
+	public:
+		virtual ~SIG_GPManager();
 
-   /**
-    * The evolutionLoop is the heart of the genetic programming algorithm.
-    * It determine how the evolution works.
-    * @pre
-    * The GPManager is configured correctly, the population is initialized
-    * and the fitnesstrainer is ready to run. 
-    * @post
-    * The evolution process, which is called genetic programming, has occurred.
-    * It runed until a terminationcondition was fulfilled. 
-    */
- private:
-  void evolutionLoop();
+		// The destructor deletes the tournaments in tours, so a copy would free them twice.
+		SIG_GPManager( SIG_GPManager const & ) = delete;
+		SIG_GPManager &operator=( SIG_GPManager const & ) = delete;
 
-	/*
-	* see above evolutionLoop();
-	* difference: the tournaments are executed by a Classifier   
-	* @pre: there is a Meta Classifier System
-	*/
-  private:
-  void evolutionLoop(MT_Classifier *MetaClassifier);
+		/**
+		 * The evolutionLoop is the heart of the genetic programming algorithm.
+		 * It determine how the evolution works.
+		 * @pre
+		 * The GPManager is configured correctly, the population is initialized
+		 * and the fitnesstrainer is ready to run.
+		 * @post
+		 * The evolution process, which is called genetic programming, has occurred.
+		 * It runed until a terminationcondition was fulfilled.
+		 */
+	private:
+		void evolutionLoop();
 
-  /**
-    * This function creates a set of tournaments.
-    * @pre
-    * The evolutionloop is started and a set of tournaments is needed.
-    * @post
-    * A set of tournaments is created and placed in the QList tours of
-    * the GPManager.
-    * @param quantity
-    * This integer determines how many tournaments will be created.
-    */
- private:
-  void createTours(int quantity);
+		/*
+		 * see above evolutionLoop();
+		 * difference: the tournaments are executed by a Classifier
+		 * @pre: there is a Meta Classifier System
+		 */
+	private:
+		void evolutionLoop(MT_Classifier *MetaClassifier);
 
-   /**
-    * This function checks the actuality of the fitness values of every 
-    * individual in the pool.
-    * @pre
-    * A experiment is loaded and the evulotionloop wants to prefrom the
-    * first loop of the day.
-    * @post
-    * There is no individual with an fitnessvalue, which is not up to date,
-    * in the pool.
-    */
- private:
-  void evalNewIndis();
+		/**
+		 * This function creates a set of tournaments.
+		 * @pre
+		 * The evolutionloop is started and a set of tournaments is needed.
+		 * @post
+		 * A set of tournaments is created and placed in the QList tours of
+		 * the GPManager.
+		 * @param quantity
+		 * This integer determines how many tournaments will be created.
+		 */
+	private:
+		void createTours(int quantity);
 
-  /*
-   * see above evalNewIndis();
-   * difference: only for this Individual i, which is a participant
-   * on a tournament in this generation 
-   */
- private:
-  void evalNeededIndis();
+		/**
+		 * This function checks the actuality of the fitness values of every
+		 * individual in the pool.
+		 * @pre
+		 * A experiment is loaded and the evulotionloop wants to prefrom the
+		 * first loop of the day.
+		 * @post
+		 * There is no individual with an fitnessvalue, which is not up to date,
+		 * in the pool.
+		 */
+	private:
+		void evalNewIndis();
 
-   /**
-    * This functions calculates the order in which the tournaments have to be
-    * played. It is a topological sorting algorithm, used to avoid trouble with
-    * tournament dependencies, caused by the steady state paradigm.
-    * @pre
-    * There is a set of tournaments created and placed in the QList tours.
-    * @return
-    * The returned QList of integer contains the indices of the tournaments
-    * in the QList tours. This tournaments can be played without blocking
-    * dependicies to other tournaments.
-    */
- private:
-  void calcInitTourSet();
+		/*
+		 * see above evalNewIndis();
+		 * difference: only for this Individual i, which is a participant
+		 * on a tournament in this generation
+		 */
+	private:
+		void evalNeededIndis();
 
- private:
-  virtual void processInterfaceEvents();
+		/**
+		 * This functions calculates the order in which the tournaments have to be
+		 * played. It is a topological sorting algorithm, used to avoid trouble with
+		 * tournament dependencies, caused by the steady state paradigm.
+		 * @pre
+		 * There is a set of tournaments created and placed in the QList tours.
+		 * @return
+		 * The returned QList of integer contains the indices of the tournaments
+		 * in the QList tours. This tournaments can be played without blocking
+		 * dependicies to other tournaments.
+		 */
+	private:
+		void calcInitTourSet();
 
- private:
-  virtual void messageEvolutionStop();
+	private:
+		virtual void processInterfaceEvents();
 
- private:
-  virtual void updateIndividualView( int );
+	private:
+		virtual void messageEvolutionStop();
 
-  /**
-   * This operation stops the gp-system.
-   * @pre 
-   * The evolutionloop is running.
-   * @post
-   * The gp-system is stopped.
-   * @param generationBreak
-   * A flag, which indicates, if there are still tournaments to play or not.
-   */
- private:
-  void stopIfNecessary(bool generationBreak);
+	private:
+		virtual void updateIndividualView( int );
 
-  /**
-   * This operation checks the termination status of the gp-system.
-   * @param generationBreak
-   * A flag, which indicates, if there are still tournaments to play or not.
-   */
- private:
-  bool checkTerminationConditions(bool generationBreak);
+		/**
+		 * This operation stops the gp-system.
+		 * @pre
+		 * The evolutionloop is running.
+		 * @post
+		 * The gp-system is stopped.
+		 * @param generationBreak
+		 * A flag, which indicates, if there are still tournaments to play or not.
+		 */
+	private:
+		void stopIfNecessary(bool generationBreak);
 
-   /**
-    * Runs the evolution on the calling thread and returns when it is
-    * finished. Not a thread entry point, despite the name.
-    * @pre
-    * The GPManager object is created.
-    */
- public:
-  void run();
-  
-   /*
-	* see above run();
-	* difference: the tournaments are executed by a Classifier   
-	* @pre: there is a Meta Classifier System
-	*/
- public:
-  void run (MT_Classifier *MetaClassifier);
+		/**
+		 * This operation checks the termination status of the gp-system.
+		 * @param generationBreak
+		 * A flag, which indicates, if there are still tournaments to play or not.
+		 */
+	private:
+		bool checkTerminationConditions(bool generationBreak);
 
-  /**
-   * This operation returns a refernces of the actual experiment.
-   * @return
-   * The actual experiment.
-   */
-private:
-  SIG_GPExperiment& getCurrentExperiment();
+		/**
+		 * Runs the evolution on the calling thread and returns when it is
+		 * finished. Not a thread entry point, despite the name.
+		 * @pre
+		 * The GPManager object is created.
+		 */
+	public:
+		void run();
+
+		/*
+		 * see above run();
+		 * difference: the tournaments are executed by a Classifier
+		 * @pre: there is a Meta Classifier System
+		 */
+	public:
+		void run (MT_Classifier *MetaClassifier);
+
+		/**
+		 * This operation returns a refernces of the actual experiment.
+		 * @return
+		 * The actual experiment.
+		 */
+	private:
+		SIG_GPExperiment& getCurrentExperiment();
 
 
-  /** This method is invoked from the SIGEL master application
-   * when started with the '-de' argument.
-   * It waits for 180 seconds to allow all clients that dynamically
-   * participate on the evolutionary process to register, i.e.
-   * submit their hostname.
-   */
- public:
-  void RegisterDynPVMClients();
-
-};
+		/** This method is invoked from the SIGEL master application
+		 * when started with the '-de' argument.
+		 * It waits for 180 seconds to allow all clients that dynamically
+		 * participate on the evolutionary process to register, i.e.
+		 * submit their hostname.
+		 */
+	public:
+		void RegisterDynPVMClients();
+	};
 
 }
 #endif // SIGEL_GP_SIG_GPMANAGER_H
