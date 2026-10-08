@@ -143,7 +143,6 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	QList<double> *functions = nullptr;
 
 	if(randomizer){
-		
 		randomizer->returnIndividualsValue(&length, &numVar, &constants, &functions);
 		
 		// update the GUI-elements
@@ -193,7 +192,6 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 				receiverObject->setText(valText);
 			}
 		}
-
 	} else
 		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't get randomizer to set/get settings.");
 }
@@ -255,7 +253,6 @@ void MT_IndividualsWidget::slotImportConstants()
 {
 	QStringList files( QFileDialog::getOpenFileNames( this, "Import Constants", QString(), "Constants (*.mcon);;All Files (*)"));
 
-
 	if(files.isEmpty())
 		return;
 	
@@ -264,7 +261,6 @@ void MT_IndividualsWidget::slotImportConstants()
 		QFile file(*it);
 
 		if(file.open(QIODevice::ReadOnly)){
-
 			// file was successfully opened
 			// so read it and fill the datastructures
 			QTextStream stream( &file );
@@ -298,7 +294,6 @@ void MT_IndividualsWidget::slotImportConstants()
 					"The loaded file is not a valid constants file.");
 			}
 			file.close();
-
 		} else {
 			QMessageBox::critical(this, "Import Constants",
 				"Couldn't open file.\n"
@@ -433,7 +428,6 @@ void MT_IndividualsWidget::slotNumConstChanged()
 {
 	numConstantsLCD->display(constantsListBox->count());
 }
-
 
 /********************************
  * instruction set probabilities

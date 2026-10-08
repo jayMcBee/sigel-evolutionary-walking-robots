@@ -129,7 +129,7 @@ Paths are relative to `sigel/`, the source tree.
 
   The change touches only empty lines, so the non-empty lines of each file
   must stay identical. One change covers at most 20 files, also inside one
-  module. Modules still to do: `MT_GUI` from `MT_IndividualWidgetBase`
+  module. Modules still to do: `MT_GUI` from `MT_StatisticsWidgetBase`
   on, in the order of the file names,
   `SIGEL_GP`,
   `SIGEL_MasterGUI`.

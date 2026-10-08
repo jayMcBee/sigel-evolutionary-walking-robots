@@ -24,7 +24,6 @@ protected:
 
 protected slots:
     virtual void languageChange();
-
 };
 
 #endif // MT_GUI_MT_POPULATIONWIDGETBASE_H

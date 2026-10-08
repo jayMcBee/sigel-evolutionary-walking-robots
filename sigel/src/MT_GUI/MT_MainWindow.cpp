@@ -190,7 +190,6 @@ MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, s
 
 	QObject::connect(experimentWidget, SIGNAL( currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*) ), SLOT( slotRaiseWidget(QTreeWidgetItem*) ));
 
-	
 	raiseWidget(0);
 }
 

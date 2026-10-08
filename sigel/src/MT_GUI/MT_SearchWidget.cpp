@@ -182,12 +182,14 @@ void MT_SearchWidget::slotXEditChanged(const QString &valText){
 
 	xOverProbSlider->setValue(iVal);
 }
+
 void MT_SearchWidget::slotMEditChanged(const QString &valText){
 	double dVal = valText.toDouble();
 	int    iVal = static_cast<int>(dVal * 10.0);
 
 	mutProbSlider->setValue(iVal);
 }
+
 void MT_SearchWidget::slotREditChanged(const QString &valText){
 	double dVal = valText.toDouble();
 	int    iVal = static_cast<int>(dVal * 10.0);
@@ -304,6 +306,7 @@ void MT_SearchWidget::disconnectLEs()
 	QObject::disconnect(mutProbEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotMEditChanged(const QString&)));
 	QObject::disconnect(reproProbEdit, SIGNAL(textChanged(const QString&)), this, SLOT(slotREditChanged(const QString&)));
 }
+
 void MT_SearchWidget::reconnectLEs()
 {
 	QObject::connect(xOverProbEdit, SIGNAL(textChanged(const QString&)), SLOT(slotXEditChanged(const QString&)));

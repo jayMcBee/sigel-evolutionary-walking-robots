@@ -20,7 +20,6 @@
 #include "MT_GPSystem/MT_GPManager.h"
 #include "MT_Control/MT_Substitute.h"
 
-
 class MT_Controller;
 
 class MT_MainWindow : public QMainWindow

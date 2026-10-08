@@ -25,7 +25,6 @@ void MT_SelectionWidget::updateTSizeList(int pSize, int oSize)
 		if( (oSize % tSize) == 0){
 			tNum = oSize / tSize;		// possible candidate reaches condition 1
 			if((tNum != 0)&&((pSize % tNum) == 0)){	//     "        "        "        "    1+2
-				
 				// candidate found so insert it into the list
 				tourSizeComboBox->addItem(QString::number(tSize));
 				tourSizeMap.insert(tSize, index++);
@@ -113,17 +112,13 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	// set the fitness function
 	fitnessFunctionComboBox->clear();
 	if(subst->strategy < 3){		// of type evaluator */
-	
 		fitnessFunctionComboBox->addItem("Simple error");
 		fitnessFunctionComboBox->addItem("Square error");
 		fitnessFunctionComboBox->setCurrentIndex(fitFunc - 1);
-
 	} else {						// of type classifier
-
 		fitnessFunctionComboBox->addItem("Simple");
 		fitnessFunctionComboBox->addItem("Weighted");
 		fitnessFunctionComboBox->setCurrentIndex(fitFunc - 3);
-
 	}
 
 	TSetSizeSpinBox->setValue(tsetSize);	// training set size
