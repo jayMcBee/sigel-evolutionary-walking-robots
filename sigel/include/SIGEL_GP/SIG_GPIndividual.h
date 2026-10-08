@@ -312,8 +312,6 @@ class SIG_GPIndividual{
  public:
  SIGEL_Program::SIG_Program& getProgramVar();
 
-  //SIGEL_Program::SIG_Program const& SIGEL_GP::SIG_GPIndividual::getProgram() const{};
-
   /**
  * With this function, the fitness value of a robot control program contained 
  * in the considered individual object, can be set.

@@ -73,8 +73,6 @@ namespace SIGEL_RobotIO {
                                    QString homepath);
                 virtual ~SIG_RobotCompiler() = default;
 
-                // QString prefixFile (QString filename);
-
                 void expect (int symboltype);
                 QString expectWord ();
                 double expectNumber ();

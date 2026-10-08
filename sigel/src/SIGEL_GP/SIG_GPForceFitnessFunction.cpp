@@ -72,9 +72,6 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
 
     double fitnessGes = distance / simulatedSeconds;
 
-// If the fitness value was reset, compute the force
-//  if ( (resetEveryGeneration != 0) && (actGeneration%(resetEveryGeneration*5) < resetEveryGeneration)) {
-
       // The list listForces runs over the individual frames
       // the list holds arrays containing the 6-dimensional vector for each individual joint
       qsizetype forceIdx = 0;
@@ -124,10 +121,6 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
         fitness = 0;
       }
 
-//  } // large if block
-//  else { // otherwise compute the velocity
-// I moved part of this block further up
-
     SIG_Vector *endPosition = new SIG_Vector();
     *endPosition = recorder.endPosition;
 
@@ -158,7 +151,6 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
       actPosition = recorder.positions.value( recIdx );
       actRotation = recorder.rotations.value( recIdx );
     };
-//  }
 
   // now we have to clean up the memory
   // the forces-Array are created with "new" in dmArticulation::getForces()

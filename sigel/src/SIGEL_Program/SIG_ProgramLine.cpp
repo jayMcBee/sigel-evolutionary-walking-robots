@@ -597,8 +597,6 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
 							    SIGEL_Tools::SIG_Randomizer &randomizer,
 							    QList< int > &prob   )
 {
-     // QList<int> instr;
-
      int          maximum = 32000; 
      int          op1 = 0, 
                   op2 = 0, 
@@ -613,8 +611,6 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
      hasCommand.resize( 15 );
      hasCommand.fill( false );
 
-     // getAllowedRobotinstructionsWithProb( instr, languageParameters, prob );
-     
      op1 = randomizer.getRandomInt( maximum );
      op2 = randomizer.getRandomInt( maximum );
 
@@ -745,8 +741,6 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
          n++;
        }
        
-     // iType = instr[randomizer.getRandomInt( instr.size() )]; 
-
      switch( iType )
        {
         case 0: setRobotinstruction( SIGEL_Program::COPY, op1, op2 );

@@ -380,7 +380,6 @@ namespace SIGEL_RobotIO {
 
         void SIG_RobotCompilerObjects::modifierScaleall (double scalingFactor)
         {
-                // target->setOverallScalingFactor (scalingFactor);
         }
 
 }

@@ -309,9 +309,6 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
           default:
             errorText = QString::asprintf("Unknown error occurred.");
         };
-        //errorText = QString::asprintf("pvm_spawn() failed on %s (%d/%d) %s.",hostNameQCString,spawnInfo,taskId,errorText);
-        //QMessageBox warn("Error", errorText ,QMessageBox::Warning, QMessageBox::Retry, QMessageBox::NoButton,QMessageBox::NoButton);
-        //warn.exec();
         SIGEL_Tools::SIG_IO::cerr << "pvm_spawn() failed on \"" << hostNameQCString << "\"   (" << spawnInfo << "/" << taskId << ") - " << errorText.toUtf8() << Qt::endl;
       }
   };

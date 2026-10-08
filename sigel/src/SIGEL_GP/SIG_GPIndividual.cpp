@@ -52,7 +52,6 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIG_GPParameter& gpParameter,
   QString ageTmp     = "Age          : " + str.number(getAge(),10);
   QString fitTmp     = "Fitness Value: " + str.number(getFitness(),'g',6);
 
-  //history.append( "\n--- History of the Individual in the Generation Number: "+ str.number(getAge(),10) + " ---");
   history.append("CREATED NEW INDIVIDUAL:\n======================="); 
   history.append(nameTmp);
   history.append(birthdTmp);
@@ -85,7 +84,6 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual( SIGEL_Program::SIG_Program const& 
 					      QStringList const& hist )
   :prog()
 {
-   // getProgramVar()=prog;
    setName(name1);
    setPoolPos(poolpos);
    setHistory( hist );
@@ -139,7 +137,6 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &random
 
    history.append( "INDIVIDUAL IS CREATED:\n====================" );
    history.append( "Date of Birth: " + cdt.toString() );
-   //history.append( "Poolpos      : " + str.number(getPoolPos(),10) );
 }
 
 SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(QString data)
@@ -164,7 +161,6 @@ void SIGEL_GP::SIG_GPIndividual::generateRandomIndividual(SIGEL_Tools::SIG_Rando
    QString ageTmp     = "Age          : " + str.number(getAge(),10);
    QString fitTmp     = "Fitness Value: " + str.number(getFitness(),'g',6);     
 
-   //history.append( "\n--- History of the Individual in the Generation Number: "+ str.number(getAge(),10) + " ---");
    history.append("INDIVIDUAL IS GENERATED RANDOMLY:\n---------------------------------");
    history.append(nameTmp);
    history.append(birthdTmp);
@@ -597,7 +593,6 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
   
   if((pos=indStr.indexOf("HISTORY BEGIN{", 0, Qt::CaseInsensitive))!=-1)
     {
-       // history.clear();
        histStr=indStr.mid(pos+14,indStr.indexOf("}HISTORY END", pos+15, Qt::CaseInsensitive)-pos-14);
        history.append(histStr);
     }

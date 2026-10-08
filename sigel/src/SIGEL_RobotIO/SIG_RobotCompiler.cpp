@@ -33,19 +33,6 @@ namespace SIGEL_RobotIO {
                   dirprefix (homepath)
         { }
 
-        /* to be deleted 
-        QString SIG_RobotCompiler::prefixFile (QString filename)
-        {
-                if (filename.length () == 0)
-                        throw SIG_SemanticError (__FILE__, __LINE__,
-                                                 "Empty filename");
-		if (filename.isEmpty() || filename.at (0) != '/')
-                        return dirprefix + filename;
-                else
-                        return filename;
-        }
-        */
-
         void SIG_RobotCompiler::expect (int symboltype)
         {
                 int st;

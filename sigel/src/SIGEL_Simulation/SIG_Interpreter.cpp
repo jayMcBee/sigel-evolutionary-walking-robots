@@ -462,7 +462,6 @@ namespace SIGEL_Simulation
 		if ( languageParameters.hasCommand( "DELAY" ) )
 		  {
 		    // do it!
-		    // int readOut = programLine.getInstructionElement(0);
 		    // get the register
 		    int reg = programLine.getInstructionElement(0) % numberOfRegisters;
 		    int readOut = registers[reg].getValue();

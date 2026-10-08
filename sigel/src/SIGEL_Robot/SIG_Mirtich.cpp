@@ -267,15 +267,7 @@ namespace SIGEL_Robot {
                 J[Y][Z] = J[Z][Y] = - density * TP[Y];
                 J[Z][X] = J[X][Z] = - density * TP[Z];
 
-                /* translate inertia tensor to center of mass */
-                /*
-                  J[X][X] -= computedMass * (r[Y]*r[Y] + r[Z]*r[Z]);
-                  J[Y][Y] -= computedMass * (r[Z]*r[Z] + r[X]*r[X]);
-                  J[Z][Z] -= computedMass * (r[X]*r[X] + r[Y]*r[Y]);
-                  J[X][Y] = J[Y][X] += computedMass * r[X] * r[Y]; 
-                  J[Y][Z] = J[Z][Y] += computedMass * r[Y] * r[Z]; 
-                  J[Z][X] = J[X][Z] += computedMass * r[Z] * r[X];
-                */
+                /* The inertia tensor stays about the origin of the geometry; it is not translated to the centre of mass. */
 
                 for (int i = 0; i < 3; i++) {
                         if (isnan (r [i])){

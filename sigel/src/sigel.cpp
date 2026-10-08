@@ -116,7 +116,6 @@ int main( int argc, char *argv[] ) {
   // Register to PVM
   int myTaskId=pvm_mytid();
 
-//  bool guiEnabled = true;
   bool dynClients = false;
 
   // Parse the argument line

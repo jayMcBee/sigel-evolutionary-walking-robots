@@ -40,9 +40,6 @@ namespace SIGEL_GP
     QTreeWidget *listView = guiExperiment.allIndividualsView->individualList->listviewIndividuals;
     QTreeWidgetItemIterator listIter( listView );
 
-    // update generations display (this line looks cool, doesn't it ?!)
-   // guiExperiment.experimentView->lcdnumberGenerations->display(currentExperiment.population.getPoolGeneration());
-
     while ( *listIter )
       {
 	SIGEL_MasterGUI::SIG_IndividualListItem *actItem =
@@ -65,11 +62,10 @@ namespace SIGEL_GP
 
   void SIG_GUIGPManager::messageEvolutionStop()
   {
-    // Sets the flag, stops nothing itself. slotEvolutionStopped() stays
-    // commented out: SIG_GUIGPExperiment calls it after start() returns, and
-    // calling it here too would announce the run finished while it still runs.
+    // Sets the flag, stops nothing itself. SIG_GUIGPExperiment calls
+    // slotEvolutionStopped() after start() returns; calling it here too would
+    // announce the run finished while it still runs.
     stopEvolutionNow = true;
-    //    guiExperiment.slotEvolutionStopped();
   };
 
   void SIG_GUIGPManager::updateIndividualView( int poolPos )

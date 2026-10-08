@@ -129,11 +129,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 		intMin = myRotJ->getMechsMinPos();
 		intMax = myRotJ->getMechsMaxPos();
 
-		// where do we want the servo/joint to point to ?
-		// RELATIVE VALUE ! Add '+ (long double)(myRotJ->getMin())' for a valid SIGEL-Joint position
-		//sigelDestAngle = (absoluteRegisterValue/registerValueRange ) * rjointrange;
-
-    // forget the line above; we want a MOVE -90 in our code turn the servo to
+    // we want a MOVE -90 in our code turn the servo to
     // -90 angle (if it is allowed to turn there) for transparent programs !!
     if (registerValue < myRotJ->getMin())
     {  destAngle = myRotJ->getMin();
