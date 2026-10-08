@@ -1051,6 +1051,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
     them and makes them again at several points during its life, which
     needs a `reset()` at each.
 
+**2026-10-08 — DONE: ITEM 47, THE CAST ON `getprotobyname` IN `manage_dyn_slave.c`.**
+
+- **Before:** `main` in `manage_dyn_slave.c` tested the result of
+  `getprotobyname` through an `(int)` cast. The cast keeps only the low 32
+  bits of the pointer, so a valid pointer could read as a failure. The
+  compiler warned of a cast from pointer to integer of different size.
+- **Now:** `main` stores the result and compares the pointer with `NULL`, as
+  it does for `gethostbyname`. The compiler gives no warning with `-Wall
+  -Wextra`.
+- **Measured:** on one machine, `sigel -de` on a copy of `twoBases.exp` with
+  one `manage_dyn_slave`: the master registered the client, added the host
+  and computed 12 generations with no error line. The client ended when the
+  master stopped. The release of the clients did not run in that test. Two
+  machines are not tested. `check.sh` does not reach this file and was not
+  run.
+- **Open in item 47:** the `Makefile` does not build `manage_dyn_slave`;
+  `sigelDynClient`; section 2.6 of `sigel/README`; the test with two
+  machines.
+
 **2026-10-08 — DONE: ITEM 19, THE LISTS OF DYNAMIC HOSTS HAVE ONE MUTEX.**
 
 - **Before:** the server thread appended to `dynHosts` and `freshDynHosts`

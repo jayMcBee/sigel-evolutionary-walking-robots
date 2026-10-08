@@ -450,9 +450,6 @@ problem; the choice is made before any code is written.
   **Modernise in place, do not replace.** It needs a second machine to prove
   it on; the 1.3 reference machine is not ours to use for tooling, so it waits
   until there is one.
-  - **`manage_dyn_slave.c`, `main`,** tests `getprotobyname` through an
-    `(int)` cast, which keeps only the low 32 bits of the pointer, so a valid
-    pointer can read as a failure.
 
 ---
 
