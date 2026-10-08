@@ -445,8 +445,7 @@ problem; the choice is made before any code is written.
 
 - [ ] **47. `sigelDynClient` and `manage_dyn_slave`.**
   `sigelDynClient` makes a second machine a dynamic slave of `sigel -de`. It
-  is still 1.3's Solaris `tcsh` script with placeholder paths, and it runs
-  `manage_dyn_slave`, which 1.3 built and the port does not.
+  is still 1.3's Solaris `tcsh` script with placeholder paths.
   **Modernise in place, do not replace.** It needs a second machine to prove
   it on; the 1.3 reference machine is not ours to use for tooling, so it waits
   until there is one.

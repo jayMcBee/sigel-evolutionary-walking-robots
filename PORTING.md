@@ -199,7 +199,8 @@ found a real defect.** §0 has the rule; it is not optional.
   `include/compat/q2compat_check.cpp`~~ **Both deleted in D27.** Recover them
   from git history if you need the Qt 2 semantics they recorded — see D27 for
   the four that unported code still depends on.
-- Build: `make` at the repo root builds `sigel` and `sigel_slave` into `build/`
+- Build: `make` at the repo root builds `sigel`, `sigel_slave` and
+  `manage_dyn_slave` into `build/`
   and fills `sigelApp/`, the folder SIGEL is started from:
   `cd sigelApp && ./sigelLauncher`. The checks also need `make guidrive
   sigel_eval`, and `make B=build-asan sigel_eval pvm-link` for the two gates
@@ -1051,6 +1052,29 @@ classes and leave truncation a hard error. **They are not interchangeable.**
     them and makes them again at several points during its life, which
     needs a `reset()` at each.
 
+**2026-10-08 — DONE: ITEM 47, THE `Makefile` BUILDS `manage_dyn_slave`.**
+
+- **Before:** the `Makefile` had no rule for `sigel/src/manage_dyn_slave.c`.
+  `sigelApp/` held the script `sigelDynClient` but not the program that the
+  script starts.
+- **Now:** `programs` builds `build/manage_dyn_slave` with
+  `gcc -std=gnu17 -O1 -g -Wall -Wextra`, and with the sanitizer flags in
+  `build-asan`. `sigelApp` copies it next to `sigel` and `sigel_slave`. The
+  strict modes `-std=c17` and `-std=c23` do not compile the file: they hide
+  `gethostname()` and the member `h_addr`.
+- **Also:** in `main` of `manage_dyn_slave.c` and in
+  `SIG_GPManager::RegisterDynPVMClients` the local `ptrp` is `tcpProtocol`,
+  and in `main` the local `ptrh` is `masterHost`. The object code of both
+  files is the same before and after.
+- **Measured:** the rule gives no warning. On one machine, `sigel -de` on a
+  copy of `twoBases.exp` with the `manage_dyn_slave` that the `Makefile`
+  built: the master registered the client, added the host and computed 11
+  generations with no error line. The client ended when the master stopped.
+  `check.sh`: 819 pass and 0 fail. Compilers other than gcc 15.2.0 are not
+  tested.
+- **Open in item 47:** `sigelDynClient`; section 2.6 of `sigel/README`; the
+  test with two machines.
+
 **2026-10-08 — DONE: ITEM 47, THE CAST ON `getprotobyname` IN `manage_dyn_slave.c`.**
 
 - **Before:** `main` in `manage_dyn_slave.c` tested the result of
@@ -1066,9 +1090,6 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   master stopped. The release of the clients did not run in that test. Two
   machines are not tested. `check.sh` does not reach this file and was not
   run.
-- **Open in item 47:** the `Makefile` does not build `manage_dyn_slave`;
-  `sigelDynClient`; section 2.6 of `sigel/README`; the test with two
-  machines.
 
 **2026-10-08 — DONE: ITEM 19, THE LISTS OF DYNAMIC HOSTS HAVE ONE MUTEX.**
 
