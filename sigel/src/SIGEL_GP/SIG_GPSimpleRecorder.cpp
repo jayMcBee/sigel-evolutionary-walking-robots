@@ -30,7 +30,6 @@ SIGEL_GP::SIG_GPSimpleRecorder::SIG_GPSimpleRecorder()
 		    start(0,0,0),
 		    end(0,0,0)
 {
-  
 };
 
 void SIGEL_GP::SIG_GPSimpleRecorder::init()
@@ -38,7 +37,6 @@ void SIGEL_GP::SIG_GPSimpleRecorder::init()
   // init() runs from SIG_Simulation's constructor, outside every fitness
   // function's try. Without this boundary the master accepts 0.0 as a result.
   try {
-
   		SIG_Recorder::init();
 
   int rootLinkNumber = simulationQueries->getRootNumber();
@@ -46,7 +44,6 @@ void SIGEL_GP::SIG_GPSimpleRecorder::init()
   start = simulationQueries->getLinkPosition( rootLinkNumber );
 
   startRotation = simulationQueries->getLinkOrientation( rootLinkNumber );
-
   }
   catch (SIGEL_Simulation::SIG_RecorderNoQueriesSetException &) { throw; }
   catch (SIGEL_Simulation::SIG_RecorderBadRecordingOrderException &) { throw; }

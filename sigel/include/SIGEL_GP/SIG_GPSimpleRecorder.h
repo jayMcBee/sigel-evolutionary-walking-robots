@@ -35,7 +35,6 @@ namespace SIGEL_GP
    */
   class SIG_GPSimpleRecorder : public SIGEL_Simulation::SIG_Recorder
     {
-
       friend class SIG_GPSimpleFitnessFunction;
 
     public:
@@ -82,6 +81,5 @@ namespace SIGEL_GP
     };
 
 }
-
 
 #endif // SIGEL_GP_SIG_GPSIMPLERECORDER_H

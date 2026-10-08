@@ -28,6 +28,3 @@ SIGEL_GP::SIG_GPTournamentIndividual::SIG_GPTournamentIndividual(int tind)
  successor(-1),
  fitTaskId(-1)
 {};
-
-
-

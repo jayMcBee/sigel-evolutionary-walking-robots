@@ -26,7 +26,6 @@
 #include "SIGEL_Tools/SIG_DialogParent.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
-
 namespace SIGEL_GP
 {
 
@@ -46,7 +45,6 @@ namespace SIGEL_GP
                timeToRun,
                recvPrgLen = 0;
       char     serTxt[48] = "-";
-
 
       // make a textstream object from langParmLines to get the language parameters in the string
       QTextStream lpTs( &langParmLines, QIODeviceBase::WriteOnly );
@@ -187,7 +185,6 @@ namespace SIGEL_GP
       return fitness;
    }
 
-
    /**
    * Set some parameters of the serial device for proper operation with ZORC.
    * Returns -1 in case any error occurred.
@@ -239,7 +236,6 @@ namespace SIGEL_GP
       return fd;
    }
 
-
    /**
     * This method sends all data contained in the QString object over the
     * serial interface specified by the 'serIF' file descriptor.
@@ -267,7 +263,6 @@ namespace SIGEL_GP
       // wait for transmission to be completed, i.e. all data left the buffer
       tcdrain(serIF);
    }
-
 
    /**
     * Wait for input on the specified serial device for 'timeOutSecs' number of seconds.
@@ -305,4 +300,5 @@ namespace SIGEL_GP
    	write(serIF, &inChoice, 1);
 	   usleep(100 * 1000);
 	}
+
 }

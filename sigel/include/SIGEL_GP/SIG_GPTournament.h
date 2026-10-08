@@ -36,7 +36,6 @@ class MT_Classifier;
 namespace SIGEL_GP
 {
 
-
 	/**
 	 * This class is the parent class which all other GPTournament-classes will inherite from. It has a randomizer
 	 * reference, for creation of random number in the genetic operator. The GPTournament-class includes QList

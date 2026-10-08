@@ -23,7 +23,6 @@
 #ifndef SIGEL_GP_SIG_GPSIMPLEFITNESSFUNCTION_H
 #define SIGEL_GP_SIG_GPSIMPLEFITNESSFUNCTION_H
 
-
 #include "SIGEL_GP/SIG_GPFitnessFunction.h"
 
 namespace SIGEL_GP
@@ -36,8 +35,6 @@ namespace SIGEL_GP
  */
 class SIG_GPSimpleFitnessFunction : public SIG_GPFitnessFunction 
 {
-
-
 /**
  * This operation activates the computation of the fitnessvalue. It is virtual, this means 
  * that the implemantation is for every fitnessfunction different. 
@@ -58,8 +55,8 @@ double evalFitness( SIGEL_Program::SIG_Program &program,
 QString serializedId() const { return "SimpleFitnessFunction"; }
 QString name() const { return "Simple"; }
 QString description() const { return "Average speed: the straight-line distance from start to end, divided by the simulated time."; }
-
 };
+
 }
 
 #endif // SIGEL_GP_SIG_GPSIMPLEFITNESSFUNCTION_H

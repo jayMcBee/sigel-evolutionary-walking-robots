@@ -32,7 +32,6 @@ namespace SIGEL_GP
 
   class SIG_GUIGPManager : public SIG_GPManager
     {
-
     public:
       SIG_GUIGPManager( SIGEL_MasterGUI::SIG_GUIGPExperiment &guiExperiment );
 
@@ -46,7 +45,6 @@ namespace SIGEL_GP
       void messageEvolutionStop();
 
       void updateIndividualView( int poolPos );
-
     };
 
 }

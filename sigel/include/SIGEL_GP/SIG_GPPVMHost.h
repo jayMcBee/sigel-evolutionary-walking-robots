@@ -31,7 +31,6 @@ namespace SIGEL_GP
 
   class SIG_GPPVMHost
     {
-
     public:
 
       SIG_GPPVMHost();
@@ -52,7 +51,6 @@ namespace SIGEL_GP
       bool enabled;
 
       QDir executableDir;
-
     };
 
 }

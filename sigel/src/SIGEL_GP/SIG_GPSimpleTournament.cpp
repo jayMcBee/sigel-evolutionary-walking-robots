@@ -54,7 +54,6 @@ bool SIGEL_GP::SIG_GPSimpleTournament::run()
    double var1=ind1.getFitness();
    double var2=ind2.getFitness();
 
-
 // META META META META META META META 
 // ATTENTION !!! Giga-important code !!!
 	if( var1 < -2.0 )
@@ -110,10 +109,8 @@ bool SIGEL_GP::SIG_GPSimpleTournament::run()
     return true; 
  };
  
-
 bool SIGEL_GP::SIG_GPSimpleTournament::run(MT_Classifier *MetaClassifier)
 {
-
   //Positions of the two participants
 
   SIG_GPIndividual &ind1 = gpPool.getIndividual( indis[0]->indNumber );
@@ -127,10 +124,8 @@ bool SIGEL_GP::SIG_GPSimpleTournament::run(MT_Classifier *MetaClassifier)
    double var1=ind1.getFitness();
    double var2=ind2.getFitness();
    
-
 	// Creates a training case in the meta GP system
    MetaClassifier->createNewTCase(&ind1.getProgram(), &ind2.getProgram(),var1-var2);
-
 
    //The tournament action
    
@@ -179,7 +174,6 @@ bool SIGEL_GP::SIG_GPSimpleTournament::classify(MT_Classifier *MetaClassifier)
   int popos1=ind1.getPoolPos();
   int popos2=ind2.getPoolPos();
  
-
     // Determine the tournament winner via the classifier;
    // FitDiff < 0 -> indi2 wins;  FitDiff >= 0 -> indi1 wins
 	double  FitDiff = MetaClassifier->classifier(&ind1.getProgram(), &ind2.getProgram());	
@@ -219,6 +213,4 @@ bool SIGEL_GP::SIG_GPSimpleTournament::classify(MT_Classifier *MetaClassifier)
     gpPool.setIndividual(rind, looserPos);
 
     return true;
-
-
 };

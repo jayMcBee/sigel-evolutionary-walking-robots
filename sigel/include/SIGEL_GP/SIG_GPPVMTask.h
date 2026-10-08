@@ -31,7 +31,6 @@ namespace SIGEL_GP
 
 class SIG_GPPVMTask
   {
-
   public:
 
     SIG_GPPVMTask( SIG_GPActivePVMHost &host,
@@ -53,7 +52,6 @@ class SIG_GPPVMTask
   private:
 
     SIG_GPPVMTask();
-
   };
 
 }

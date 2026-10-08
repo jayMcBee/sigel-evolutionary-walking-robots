@@ -25,11 +25,9 @@
 
 #include "SIGEL_GP/SIG_GPFitnessFunction.h"
 
-
 #include <fcntl.h>
 #include <unistd.h>
 #include <termios.h>
-
 
 namespace SIGEL_GP
 {
@@ -88,7 +86,6 @@ namespace SIGEL_GP
      * This method goes one step into the ZORC menu hierarchy.
      */
 		void 		goZORCMenu(int serIF, char inChoice) const;
-
    };
 
 }

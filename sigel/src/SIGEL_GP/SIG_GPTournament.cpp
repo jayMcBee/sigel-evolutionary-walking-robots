@@ -53,7 +53,6 @@ bool SIGEL_GP::SIG_GPTournament::run(MT_Classifier *MetaClassifier)
 bool SIGEL_GP::SIG_GPTournament::classify(MT_Classifier *MetaClassifier)
 { return true; };
 
-
 void SIGEL_GP::SIG_GPTournament::inhume( SIG_GPIndividual &corps )
 {
   if (gpParameter.getLiveUndead())
@@ -88,4 +87,3 @@ void SIGEL_GP::SIG_GPTournament::inhume( SIG_GPIndividual &corps )
 				  << "!" << Qt::endl;
     };
 };
-

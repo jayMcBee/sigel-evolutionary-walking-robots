@@ -29,7 +29,6 @@
 #include "SIGEL_GP/SIG_GPParameter.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 
-
 namespace SIGEL_GP
 {
 
@@ -42,7 +41,6 @@ namespace SIGEL_GP
 class SIG_GPSimpleTournament : public SIGEL_GP::SIG_GPTournament
 
 { 
-
 /**
 * The constructor of the Simpletournament obejct.
 * @pre
@@ -67,13 +65,11 @@ SIG_GPSimpleTournament( SIGEL_Tools::SIG_Randomizer& randomizer,
 		        int ppos1, 
 		        int ppos2 );
 
-
 /**
 * This virtual method executes the tournament.
 */
  public:
 virtual bool run();
-
 
 /**
 * see above run(); 
@@ -93,15 +89,12 @@ virtual bool run(MT_Classifier *MetaClassifier);
 public:
 virtual bool classify(MT_Classifier *MetaClassifier);
 
-
 private:
  QString name;
-
 };
 
 }
 #endif //  SIGEL_GP_SIG_GPSIMPLETOURNAMENT_H
-
 
  //********************META changes**************************************************
   /*two new methods: 
