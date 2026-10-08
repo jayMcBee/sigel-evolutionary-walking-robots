@@ -90,11 +90,11 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(QString data)
 
 
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
-                                             SIGEL_Tools::SIG_Randomizer &r,
+                                             SIGEL_Tools::SIG_Randomizer &newRandomizer,
                                              SIGEL_GP::SIG_GPParameter& param,
                                              SIGEL_Robot::SIG_LanguageParameters& languageParameters)
 {
-	setRandomizer( &r );
+	setRandomizer( &newRandomizer );
 
 	pool.resize( size );
 
@@ -106,15 +106,15 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
 	for( int x=0; x<getSize(); x++ )
 	{
 		delete pool[ x ];
-		pool[ x ] = new SIGEL_GP::SIG_GPIndividual( r, param, languageParameters );
+		pool[ x ] = new SIGEL_GP::SIG_GPIndividual( newRandomizer, param, languageParameters );
 		getIndividualPointer( x )->setPoolPos( x );
 	}
 }
 
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
-                                             SIGEL_Tools::SIG_Randomizer &r)
+                                             SIGEL_Tools::SIG_Randomizer &newRandomizer)
 {
-	setRandomizer( &r );
+	setRandomizer( &newRandomizer );
 
 	pool.resize( size );
 
@@ -123,7 +123,7 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
 	for( int x=0; x<getSize(); x++ )
 	{
 		delete pool[ x ];
-		pool[ x ] = new SIGEL_GP::SIG_GPIndividual( r );
+		pool[ x ] = new SIGEL_GP::SIG_GPIndividual( newRandomizer );
 		getIndividualPointer( x )->setPoolPos( x );
 	}
 }
@@ -295,9 +295,9 @@ void SIGEL_GP::SIG_GPPopulation::deleteIndividual(int poolpos)
 
 
 
-void SIGEL_GP::SIG_GPPopulation::setRandomizer(SIGEL_Tools::SIG_Randomizer *r)
+void SIGEL_GP::SIG_GPPopulation::setRandomizer(SIGEL_Tools::SIG_Randomizer *newRandomizer)
 {
-	randomizer=r;
+	randomizer=newRandomizer;
 }
 
 

@@ -134,7 +134,7 @@ class SIG_GPPopulation
 
   public:
     SIG_GPPopulation(int size, 
-		     SIGEL_Tools::SIG_Randomizer &r, 
+		     SIGEL_Tools::SIG_Randomizer &newRandomizer, 
 		     SIGEL_GP::SIG_GPParameter& param, 
 		     SIGEL_Robot::SIG_LanguageParameters& languageParameters);
 
@@ -276,7 +276,7 @@ class SIG_GPPopulation
 
 
   public:
-    SIG_GPPopulation(int size, SIGEL_Tools::SIG_Randomizer &r);
+    SIG_GPPopulation(int size, SIGEL_Tools::SIG_Randomizer &newRandomizer);
 
     /**
      * This function returns the pointer to an individual.
@@ -314,7 +314,7 @@ class SIG_GPPopulation
      */    
 
   public:
-    void setRandomizer(SIGEL_Tools::SIG_Randomizer *r);
+    void setRandomizer(SIGEL_Tools::SIG_Randomizer *newRandomizer);
 
     /**
      * This function returns the pointer of the randomizer all random operations are connected with.
