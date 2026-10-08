@@ -30,102 +30,102 @@
 /*------------------------------------------Crossover-----------------------------------------*/
 
 QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL_GP::SIG_GPIndividual& winner1,
-									   int poolPos1,
-									   SIG_GPIndividual& winner2,
-									   int poolPos2,
-									   QString newName1,
-									   QString newName2,
-									   SIGEL_Tools::SIG_Randomizer& randomizer,
-									   SIGEL_GP::SIG_GPParameter& gpParameter,
-									   SIGEL_Robot::SIG_LanguageParameters &languageP)
+                                                                           int poolPos1,
+                                                                           SIG_GPIndividual& winner2,
+                                                                           int poolPos2,
+                                                                           QString newName1,
+                                                                           QString newName2,
+                                                                           SIGEL_Tools::SIG_Randomizer& randomizer,
+                                                                           SIGEL_GP::SIG_GPParameter& gpParameter,
+                                                                           SIGEL_Robot::SIG_LanguageParameters &languageP)
 {
-  SIGEL_GP::SIG_GPIndividual *crossoverInd1 = new SIGEL_GP::SIG_GPIndividual( SIGEL_Program::SIG_Program(),
-									      newName1,
-									      "",
-									      "",
-									      QDateTime(),
-									      poolPos1,
-									      winner1.getHistory() );
+	SIGEL_GP::SIG_GPIndividual *crossoverInd1 = new SIGEL_GP::SIG_GPIndividual( SIGEL_Program::SIG_Program(),
+	                                                                            newName1,
+	                                                                            "",
+	                                                                            "",
+	                                                                            QDateTime(),
+	                                                                            poolPos1,
+	                                                                            winner1.getHistory() );
 
-  SIGEL_GP::SIG_GPIndividual *crossoverInd2 = new SIGEL_GP::SIG_GPIndividual( SIGEL_Program::SIG_Program(),
-									      newName2,
-									      "",
-									      "",
-									      QDateTime(),
-									      poolPos2,
-									      winner2.getHistory() );
+	SIGEL_GP::SIG_GPIndividual *crossoverInd2 = new SIGEL_GP::SIG_GPIndividual( SIGEL_Program::SIG_Program(),
+	                                                                            newName2,
+	                                                                            "",
+	                                                                            "",
+	                                                                            QDateTime(),
+	                                                                            poolPos2,
+	                                                                            winner2.getHistory() );
 
-  double fitness1 = winner1.getFitness();
-  double fitness2 = winner2.getFitness();
+	double fitness1 = winner1.getFitness();
+	double fitness2 = winner2.getFitness();
 
-  long const minLength = gpParameter.getMinIndLength();
-  long const maxLength = gpParameter.getMaxIndLength();
-  int        historyInfo;
+	long const minLength = gpParameter.getMinIndLength();
+	long const maxLength = gpParameter.getMaxIndLength();
+	int        historyInfo;
 
-  SIGEL_Program::SIG_Program &newProgram1 = crossoverInd1->getProgramVar();
-  SIGEL_Program::SIG_Program &newProgram2 = crossoverInd2->getProgramVar();
+	SIGEL_Program::SIG_Program &newProgram1 = crossoverInd1->getProgramVar();
+	SIGEL_Program::SIG_Program &newProgram2 = crossoverInd2->getProgramVar();
 
-  SIGEL_Program::SIG_Program &winnerProgram1 = winner1.getProgramVar();
-  SIGEL_Program::SIG_Program &winnerProgram2 = winner2.getProgramVar();
+	SIGEL_Program::SIG_Program &winnerProgram1 = winner1.getProgramVar();
+	SIGEL_Program::SIG_Program &winnerProgram2 = winner2.getProgramVar();
 
-  // get first crossover points
-  long int crossPoint1 = randomizer.getRandomLong( winnerProgram1.getProgramLength() - 1 ) + 1;
-  long int crossPoint2 = randomizer.getRandomLong( winnerProgram2.getProgramLength() - 1 ) + 1;
+	// get first crossover points
+	long int crossPoint1 = randomizer.getRandomLong( winnerProgram1.getProgramLength() - 1 ) + 1;
+	long int crossPoint2 = randomizer.getRandomLong( winnerProgram2.getProgramLength() - 1 ) + 1;
 
-  // prepare length of segments to be swapped if 2-point-variant is chosen;
-  // max. 1/10 of program length, at least 1 instruction
-  long int segLen1 = randomizer.getRandomLong( (winnerProgram1.getProgramLength()/10) ) + 1;
-  if ((crossPoint1+segLen1) >= winnerProgram1.getProgramLength())
-  {  segLen1 = winnerProgram1.getProgramLength() - crossPoint1 - 1;
-  }
+	// prepare length of segments to be swapped if 2-point-variant is chosen;
+	// max. 1/10 of program length, at least 1 instruction
+	long int segLen1 = randomizer.getRandomLong( (winnerProgram1.getProgramLength()/10) ) + 1;
+	if ((crossPoint1+segLen1) >= winnerProgram1.getProgramLength())
+	{  segLen1 = winnerProgram1.getProgramLength() - crossPoint1 - 1;
+	}
 
-  long int segLen2 = randomizer.getRandomLong( (winnerProgram2.getProgramLength()/10) ) + 1;
-  if ((crossPoint2+segLen2) >= winnerProgram2.getProgramLength())
-  {  segLen2 = winnerProgram2.getProgramLength() - crossPoint2 - 1;
-  }
+	long int segLen2 = randomizer.getRandomLong( (winnerProgram2.getProgramLength()/10) ) + 1;
+	if ((crossPoint2+segLen2) >= winnerProgram2.getProgramLength())
+	{  segLen2 = winnerProgram2.getProgramLength() - crossPoint2 - 1;
+	}
 
 #ifdef SIG_DEBUG
 	SIGEL_Tools::SIG_IO::cerr << "<CrossOver> Info: ProgramLength = " << minLength;
 
 	if( maxLength==0 )
-  {	SIGEL_Tools::SIG_IO::cerr << " - no limit" << Qt::endl;
+	{	SIGEL_Tools::SIG_IO::cerr << " - no limit" << Qt::endl;
 	}
 	else
 	{	SIGEL_Tools::SIG_IO::cerr << " - " << maxLength << Qt::endl;
 	}
 #endif
 
-  // check new program lengths if min. program length was requested
-  if( minLength > 0 &&
-      ( ( crossPoint1 + winnerProgram2.getProgramLength() - crossPoint2 < minLength ) ||
-        ( crossPoint2 + winnerProgram1.getProgramLength() - crossPoint1 < minLength ) ) )
-    {
-      crossPoint1 = winnerProgram1.getProgramLength() / 2;
-      if ((crossPoint1+segLen1) >= winnerProgram1.getProgramLength())
-      {  segLen1 = winnerProgram1.getProgramLength() - crossPoint1 - 1;
-      }
+	// check new program lengths if min. program length was requested
+	if( minLength > 0 &&
+	    ( ( crossPoint1 + winnerProgram2.getProgramLength() - crossPoint2 < minLength ) ||
+	      ( crossPoint2 + winnerProgram1.getProgramLength() - crossPoint1 < minLength ) ) )
+	{
+		crossPoint1 = winnerProgram1.getProgramLength() / 2;
+		if ((crossPoint1+segLen1) >= winnerProgram1.getProgramLength())
+		{  segLen1 = winnerProgram1.getProgramLength() - crossPoint1 - 1;
+		}
 
-      crossPoint2 = winnerProgram2.getProgramLength() / 2;
-      if ((crossPoint2+segLen2) >= winnerProgram2.getProgramLength())
-      {  segLen2 = winnerProgram2.getProgramLength() - crossPoint2 - 1;
-      }
+		crossPoint2 = winnerProgram2.getProgramLength() / 2;
+		if ((crossPoint2+segLen2) >= winnerProgram2.getProgramLength())
+		{  segLen2 = winnerProgram2.getProgramLength() - crossPoint2 - 1;
+		}
 
 #ifdef SIG_DEBUG
 
-      SIGEL_Tools::SIG_IO::cerr << "-> CrossOver points have been set to "
-                                << crossPoint1
-                                << " and "
-                                << crossPoint2
-                                << "\nThe resulting legths are: "
-                                << crossPoint1 + winnerProgram2.getProgramLength() - crossPoint2
-                                << " and "
-                                << crossPoint2 + winnerProgram1.getProgramLength() - crossPoint1 << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "-> CrossOver points have been set to "
+		                          << crossPoint1
+		                          << " and "
+		                          << crossPoint2
+		                          << "\nThe resulting legths are: "
+		                          << crossPoint1 + winnerProgram2.getProgramLength() - crossPoint2
+		                          << " and "
+		                          << crossPoint2 + winnerProgram1.getProgramLength() - crossPoint1 << Qt::endl;
 #endif
-    }
+	}
 
 	// randomly select any recombination type; currently the 2-point-c/o
 	// has a chance of 3:2 to be selected !
-  long const generalRecombinationType = randomizer.getRandomInt(5);
+	long const generalRecombinationType = randomizer.getRandomInt(5);
 
 
 	// Recombination/Crossover, Variant 1:
@@ -137,7 +137,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 		// copy first part of program 1
 		for (long int i = 0; i < crossPoint1; i++)
 		{
-	  	newProgram1.appendLine( winnerProgram1.getLine( i ) );
+			newProgram1.appendLine( winnerProgram1.getLine( i ) );
 		}
 
 		// append second part of program 2
@@ -171,7 +171,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 
 		for( long int j = crossPoint1; j < winnerProgram1.getProgramLength(); j++ )
 		{
-				newProgram2.appendLine( winnerProgram1.getLine( j ) );
+			newProgram2.appendLine( winnerProgram1.getLine( j ) );
 		}
 
 		for( long int k = 0; k < crossPoint1; k++ )
@@ -192,7 +192,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 		// newprog1 -- copy first part of program 1
 		for (long int i = 0; i < crossPoint1; i++)
 		{
-	  	newProgram1.appendLine( winnerProgram1.getLine( i ) );
+			newProgram1.appendLine( winnerProgram1.getLine( i ) );
 		}
 
 		// newprog1 -- append sequence of program 2
@@ -210,7 +210,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 		// newprog2 -- program 2, part A
 		for (long int l = 0; l < crossPoint2; l++)
 		{
-	  	newProgram2.appendLine( winnerProgram2.getLine( l ) );
+			newProgram2.appendLine( winnerProgram2.getLine( l ) );
 		}
 
 		// newprog2 -- program 1 c/o-seq.
@@ -254,7 +254,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 #endif
 
 		for( long int i = maxLength - 1; i < prgLength2; i++ )
-    {	newProgram2.deleteLine( i );
+		{	newProgram2.deleteLine( i );
 		}
 
 #ifdef SIG_DEBUG
@@ -267,49 +267,49 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	SIGEL_Tools::SIG_IO::cerr << "-> new program (2) length = " << newProgram2.getProgramLength() << Qt::endl;
 #endif
 
-  QDateTime actTime = QDateTime::currentDateTime();
+	QDateTime actTime = QDateTime::currentDateTime();
 
-  newProgram1.checkLength( minLength,
-			   maxLength,
-			   randomizer,
-			   languageP,
-			   gpParameter.getInstructionProbabilities(),
-			   historyInfo );
+	newProgram1.checkLength( minLength,
+	                         maxLength,
+	                         randomizer,
+	                         languageP,
+	                         gpParameter.getInstructionProbabilities(),
+	                         historyInfo );
 
-  if( historyInfo > 0 ) crossoverInd1->addLengthIncreasedInfo( actTime, historyInfo );
-  if( historyInfo < 0 ) crossoverInd1->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
+	if( historyInfo > 0 ) crossoverInd1->addLengthIncreasedInfo( actTime, historyInfo );
+	if( historyInfo < 0 ) crossoverInd1->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
 
-  newProgram2.checkLength( minLength,
-			   maxLength,
-			   randomizer,
-			   languageP,
-			   gpParameter.getInstructionProbabilities(),
-			   historyInfo );
+	newProgram2.checkLength( minLength,
+	                         maxLength,
+	                         randomizer,
+	                         languageP,
+	                         gpParameter.getInstructionProbabilities(),
+	                         historyInfo );
 
-  if( historyInfo > 0 ) crossoverInd2->addLengthIncreasedInfo( actTime, historyInfo );
-  if( historyInfo < 0 ) crossoverInd2->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
+	if( historyInfo > 0 ) crossoverInd2->addLengthIncreasedInfo( actTime, historyInfo );
+	if( historyInfo < 0 ) crossoverInd2->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
 
-  crossoverInd1->addCrossOverInfo( winner1.getName(),
-  				   winner2.getName(),
-  				   actTime,
-  				   crossPoint1,
-  				   crossPoint2,
-				   fitness1,
-				   fitness2 );
+	crossoverInd1->addCrossOverInfo( winner1.getName(),
+	                                 winner2.getName(),
+	                                 actTime,
+	                                 crossPoint1,
+	                                 crossPoint2,
+	                                 fitness1,
+	                                 fitness2 );
 
-  crossoverInd2->addCrossOverInfo( winner1.getName(),
-  				   winner2.getName(),
-  				   actTime,
-  				   crossPoint1,
-  				   crossPoint2,
-				   fitness1,
-				   fitness2 );
+	crossoverInd2->addCrossOverInfo( winner1.getName(),
+	                                 winner2.getName(),
+	                                 actTime,
+	                                 crossPoint1,
+	                                 crossPoint2,
+	                                 fitness1,
+	                                 fitness2 );
 
-  QList< SIG_GPIndividual * > crossedInds( 2 );
-  crossedInds[ 0 ] = crossoverInd1;   // insert() into a null slot: no free
-  crossedInds[ 1 ] = crossoverInd2;
+	QList< SIG_GPIndividual * > crossedInds( 2 );
+	crossedInds[ 0 ] = crossoverInd1;   // insert() into a null slot: no free
+	crossedInds[ 1 ] = crossoverInd2;
 
-  return crossedInds;
+	return crossedInds;
 };
 
 
@@ -318,312 +318,312 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 /*------------------------------------------Mutation-----------------------------------------*/
 
 SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_GPIndividual& winner,
-								  int poolPos,
-								  QString newName,
-								  SIGEL_Tools::SIG_Randomizer& randomizer,
-								  SIGEL_GP::SIG_GPParameter& gpParameter,
-								  SIGEL_Robot::SIG_LanguageParameters &languageP)
+                                                                  int poolPos,
+                                                                  QString newName,
+                                                                  SIGEL_Tools::SIG_Randomizer& randomizer,
+                                                                  SIGEL_GP::SIG_GPParameter& gpParameter,
+                                                                  SIGEL_Robot::SIG_LanguageParameters &languageP)
 {
-  double     winnerFitness        = winner.getFitness();
-  int        generalMutationType  = randomizer.getRandomInt( 3 );  // 0: Variation of existing program line
-                                                                   // 1: Add a new random program line
-                                                                   // 2: Delete an existing program line
-  int        specializedMutation  = 0;
-  long const minLength            = gpParameter.getMinIndLength();
-  long const maxLength            = gpParameter.getMaxIndLength();
-  int        op1                  = 0;
-  int        op2                  = 0;
-  SIGEL_Program::Robotinstruction instructionType;
-  long int   mutPoint             = 0;
-  long int   numberOfOperands     = 0;
-  int        historyInfo;
+	double     winnerFitness        = winner.getFitness();
+	int        generalMutationType  = randomizer.getRandomInt( 3 );  // 0: Variation of existing program line
+	                                                                 // 1: Add a new random program line
+	                                                                 // 2: Delete an existing program line
+	int        specializedMutation  = 0;
+	long const minLength            = gpParameter.getMinIndLength();
+	long const maxLength            = gpParameter.getMaxIndLength();
+	int        op1                  = 0;
+	int        op2                  = 0;
+	SIGEL_Program::Robotinstruction instructionType;
+	long int   mutPoint             = 0;
+	long int   numberOfOperands     = 0;
+	int        historyInfo;
 
 #ifdef SIG_DEBUG
 
-  SIGEL_Tools::SIG_IO::cerr << "<MUTATION>" << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "<MUTATION>" << Qt::endl;
 
 #endif            
 
 
-  SIG_GPIndividual *mutatedInd = new SIG_GPIndividual( SIG_GPParameter(),
-						       winner.getHistory(),
-						       newName,
-						       QDateTime(),
-						       poolPos );
+	SIG_GPIndividual *mutatedInd = new SIG_GPIndividual( SIG_GPParameter(),
+	                                                     winner.getHistory(),
+	                                                     newName,
+	                                                     QDateTime(),
+	                                                     poolPos );
 
-  SIGEL_Program::SIG_Program &newProgram = mutatedInd->getProgramVar();
-  newProgram                             = winner.getProgramVar();
+	SIGEL_Program::SIG_Program &newProgram = mutatedInd->getProgramVar();
+	newProgram                             = winner.getProgramVar();
 
-  // Check length of (winner) program if length is greater (or equal) than minLength and
-  // smaller (or equal) than maxLength:
+	// Check length of (winner) program if length is greater (or equal) than minLength and
+	// smaller (or equal) than maxLength:
 
-  newProgram.checkLength( minLength,
-			  maxLength,
-			  randomizer,
-			  languageP,
-			  gpParameter.getInstructionProbabilities(),
-			  historyInfo );
+	newProgram.checkLength( minLength,
+	                        maxLength,
+	                        randomizer,
+	                        languageP,
+	                        gpParameter.getInstructionProbabilities(),
+	                        historyInfo );
 
-  // Compute randomly mutation point:
+	// Compute randomly mutation point:
 
-  mutPoint          = randomizer.getRandomLong( newProgram.getProgramLength() );
+	mutPoint          = randomizer.getRandomLong( newProgram.getProgramLength() );
 
-  // Get instruction type of line that is to be mutated:
+	// Get instruction type of line that is to be mutated:
 
-  instructionType   = newProgram.getLine( mutPoint ).getRobotinstructionType();
+	instructionType   = newProgram.getLine( mutPoint ).getRobotinstructionType();
 
-  // Get number of operands of line that is to be mutated:
+	// Get number of operands of line that is to be mutated:
 
-  numberOfOperands  = newProgram.getLine( mutPoint ).getNumberOfElements();
+	numberOfOperands  = newProgram.getLine( mutPoint ).getNumberOfElements();
 
-  // Get operands (op1, op2) of line that is to be mutated:
+	// Get operands (op1, op2) of line that is to be mutated:
 
-  if( instructionType == SIGEL_Program::NOP )
-    { // If number of operands = 0:
-     op1 = 0;
-     op2 = 0;
-    }
-  else
-    { // Number of operands is >=1:   
-     op1 = newProgram.getLine( mutPoint ).getInstructionElement( 0 );
+	if( instructionType == SIGEL_Program::NOP )
+	{ // If number of operands = 0:
+		op1 = 0;
+		op2 = 0;
+	}
+	else
+	{ // Number of operands is >=1:   
+		op1 = newProgram.getLine( mutPoint ).getInstructionElement( 0 );
 
-     if( numberOfOperands == 2 )
-        // If number of operands = 2: 
-        op2 = newProgram.getLine( mutPoint ).getInstructionElement( 1 );
+		if( numberOfOperands == 2 )
+			// If number of operands = 2: 
+			op2 = newProgram.getLine( mutPoint ).getInstructionElement( 1 );
 
-      else
-	// If number of operands = 1: 
-        op2 = 0;
-    }
-  
-  // -----------------------------------------
-  // An existing program line will be mutated:
-  // -----------------------------------------
+		else
+			// If number of operands = 1: 
+			op2 = 0;
+	}
 
-  if( generalMutationType == 0 )
-    {
+	// -----------------------------------------
+	// An existing program line will be mutated:
+	// -----------------------------------------
+
+	if( generalMutationType == 0 )
+	{
 
 #ifdef SIG_DEBUG
 
-      SIGEL_Tools::SIG_IO::cerr << "<TYPE 0>" << Qt::endl;
-      SIGEL_Tools::SIG_IO::cerr << "line to mutate: [";
-      newProgram.getLine( mutPoint ).print();
-      SIGEL_Tools::SIG_IO::cerr << "]" << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "<TYPE 0>" << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "line to mutate: [";
+		newProgram.getLine( mutPoint ).print();
+		SIGEL_Tools::SIG_IO::cerr << "]" << Qt::endl;
 
 #endif
 
-    specializedMutation  = randomizer.getRandomInt( 3 );  // 0: Replace an existing program line by a new one
-                                                          // 1: Change one of the operands
-                                                          // 2: Change the instruction 
+		specializedMutation  = randomizer.getRandomInt( 3 );  // 0: Replace an existing program line by a new one
+		                                                      // 1: Change one of the operands
+		                                                      // 2: Change the instruction 
 #ifdef SIG_DEBUG
 
-    SIGEL_Tools::SIG_IO::cerr << "<SUBTYPE " << specializedMutation << ">" << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "<SUBTYPE " << specializedMutation << ">" << Qt::endl;
 
 #endif
 
 
-    switch( specializedMutation )
-      {
-      case 0:
-	     // -------------------------------------------------------------------------------
-	     // Generate (randomly) a completely new program line by replacing the old content:
-	     // -------------------------------------------------------------------------------   
-
-             {
-               SIGEL_Program::SIG_ProgramLine mutatedLine;
-               mutatedLine = newProgram.getLine( mutPoint );
-               mutatedLine.randomRobotinstruction( languageP,
-                                                   randomizer,
-                                                   gpParameter.getInstructionProbabilities() );
-               newProgram.setLine( mutPoint, mutatedLine );
-             }
-             break;
-
-      case 1:
-	     // -------------------------------------------------------------------------------
-	     // Mutate a randomly chosen operand. It is important to take care about the
-	     // program line type, because the number of operands is dependent on the program
-	     // line instruction.
-	     // -------------------------------------------------------------------------------   
-            
-             if( numberOfOperands == 2 )
-	        {
-		  // If the number of operands is two, select one randomly, change it randomly,
-                  // and let the other operand untouched:
-
-                 if( randomizer.getRandomInt( 2 ) == 0 )         
-                  {
-                   // Operand 1 will be varied:
-
-                   op1 = randomizer.getRandomInt( 32000 );
-                   if( randomizer.getRandomInt( 2 ) == 1 ) op1 = (-1) * op1;
-                   op2 = newProgram.getLine( mutPoint ).getInstructionElement( 1 );
-                  }
-                 else                                            
-                  {
-                   // Operand 2 will be varied:
-
-                   op1 = newProgram.getLine( mutPoint ).getInstructionElement( 0 );
-                   op2 = randomizer.getRandomInt( 32000 );
-                   if( randomizer.getRandomInt( 2 ) == 1 ) op2 = (-1) * op2;
-                  }
-	        }
-              else
+		switch( specializedMutation )
 		{
-		  if( instructionType != SIGEL_Program::NOP )
-		    {
-                      // The current program line has only one operand that can be changed:
+		case 0:
+			// -------------------------------------------------------------------------------
+			// Generate (randomly) a completely new program line by replacing the old content:
+			// -------------------------------------------------------------------------------   
 
-                      op1 = randomizer.getRandomInt( 32000 );
-                      if( randomizer.getRandomInt( 2 ) == 1 ) op1 = (-1) * op1;
-		    }
-                  else
-		    {
-                      // The current program line has no operands:
+			{
+				SIGEL_Program::SIG_ProgramLine mutatedLine;
+				mutatedLine = newProgram.getLine( mutPoint );
+				mutatedLine.randomRobotinstruction( languageP,
+				                                    randomizer,
+				                                    gpParameter.getInstructionProbabilities() );
+				newProgram.setLine( mutPoint, mutatedLine );
+			}
+			break;
 
-                      op1 = 0;
-                      op2 = 0;
-		    }
-                } 
-             
-             // Set the new program line properties (in this case the operands):
+		case 1:
+			// -------------------------------------------------------------------------------
+			// Mutate a randomly chosen operand. It is important to take care about the
+			// program line type, because the number of operands is dependent on the program
+			// line instruction.
+			// -------------------------------------------------------------------------------   
 
-             {
-               SIGEL_Program::SIG_ProgramLine mutatedLine;
-               mutatedLine = newProgram.getLine( mutPoint );
-               mutatedLine.setRobotinstruction( instructionType,
-                                                op1,
-                                                op2 );
-               newProgram.setLine( mutPoint, mutatedLine );
-             }
-             break;
+			if( numberOfOperands == 2 )
+			{
+				// If the number of operands is two, select one randomly, change it randomly,
+				// and let the other operand untouched:
 
-      case 2:
+				if( randomizer.getRandomInt( 2 ) == 0 )         
+				{
+					// Operand 1 will be varied:
 
-	     // -------------------------------------------------------------------------------
-	     // Change the instruction type. It is very important to take care about the
-	     // following case:
-	     // If an instruction consists of only one operand and is to be mutated
-	     // to an instruction that has to contain two operands, the (new) second operand
-	     // needs to be initialized with a (randomly) value!
-	     // -------------------------------------------------------------------------------
-   
-	     // Create a completely new program line to take the mutated data from:
-    
-             SIGEL_Program::SIG_ProgramLine randomLine( randomizer,
-							languageP,
-							gpParameter.getInstructionProbabilities() );
+					op1 = randomizer.getRandomInt( 32000 );
+					if( randomizer.getRandomInt( 2 ) == 1 ) op1 = (-1) * op1;
+					op2 = newProgram.getLine( mutPoint ).getInstructionElement( 1 );
+				}
+				else                                            
+				{
+					// Operand 2 will be varied:
 
-             if( randomLine.getRobotinstructionType() != SIGEL_Program::NOP )
-	       {
-		 // The number of operands must eventually be increased for the new line, 
-                 // because the new instruction type requires more operands. In this case
-                 // the operand(s) will be taken from the new generated line (s. above):              
+					op1 = newProgram.getLine( mutPoint ).getInstructionElement( 0 );
+					op2 = randomizer.getRandomInt( 32000 );
+					if( randomizer.getRandomInt( 2 ) == 1 ) op2 = (-1) * op2;
+				}
+			}
+			else
+			{
+				if( instructionType != SIGEL_Program::NOP )
+				{
+					// The current program line has only one operand that can be changed:
 
-                if( ( randomLine.getNumberOfElements() >= 1 ) && ( op1 == 0 ) )
+					op1 = randomizer.getRandomInt( 32000 );
+					if( randomizer.getRandomInt( 2 ) == 1 ) op1 = (-1) * op1;
+				}
+				else
+				{
+					// The current program line has no operands:
 
-                    op1 = randomLine.getInstructionElement( 0 );
-   
-                if( ( randomLine.getNumberOfElements() == 2 ) && ( op2 == 0 ) )
-  
-                    op2 = randomLine.getInstructionElement( 1 );
-	       }
-             else
-               {
-                 // No further operands are required in case of a NOP instruction:
- 
-                 op1 = 0;
-                 op2 = 0;
-	       }   
+					op1 = 0;
+					op2 = 0;
+				}
+			} 
 
-             {
-               SIGEL_Program::SIG_ProgramLine mutatedLine;
-               mutatedLine = newProgram.getLine( mutPoint );
-               mutatedLine.setRobotinstruction( randomLine.getRobotinstructionType(),
-                                                op1,
-                                                op2 );
-               newProgram.setLine( mutPoint, mutatedLine );
-             }
-             break;
-      }
+			// Set the new program line properties (in this case the operands):
 
-#ifdef SIG_DEBUG
+			{
+				SIGEL_Program::SIG_ProgramLine mutatedLine;
+				mutatedLine = newProgram.getLine( mutPoint );
+				mutatedLine.setRobotinstruction( instructionType,
+				                                 op1,
+				                                 op2 );
+				newProgram.setLine( mutPoint, mutatedLine );
+			}
+			break;
 
-     SIGEL_Tools::SIG_IO::cerr << "result: [";
-     newProgram.getLine( mutPoint ).print();
-     SIGEL_Tools::SIG_IO::cerr << "]" << Qt::endl;
+		case 2:
 
-#endif
+			// -------------------------------------------------------------------------------
+			// Change the instruction type. It is very important to take care about the
+			// following case:
+			// If an instruction consists of only one operand and is to be mutated
+			// to an instruction that has to contain two operands, the (new) second operand
+			// needs to be initialized with a (randomly) value!
+			// -------------------------------------------------------------------------------
 
-    }
+			// Create a completely new program line to take the mutated data from:
 
-  if( generalMutationType == 1 )
-    {
-      if( newProgram.getProgramLength() + 1 <= maxLength )
-        {
+			SIGEL_Program::SIG_ProgramLine randomLine( randomizer,
+			                                           languageP,
+			                                           gpParameter.getInstructionProbabilities() );
 
-#ifdef SIG_DEBUG
+			if( randomLine.getRobotinstructionType() != SIGEL_Program::NOP )
+			{
+				// The number of operands must eventually be increased for the new line, 
+				// because the new instruction type requires more operands. In this case
+				// the operand(s) will be taken from the new generated line (s. above):              
 
-          SIGEL_Tools::SIG_IO::cerr << "<TYPE 1>" << Qt::endl;
+				if( ( randomLine.getNumberOfElements() >= 1 ) && ( op1 == 0 ) )
 
-#endif
+					op1 = randomLine.getInstructionElement( 0 );
 
-          SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageP, gpParameter.getInstructionProbabilities() );
+				if( ( randomLine.getNumberOfElements() == 2 ) && ( op2 == 0 ) )
 
-          newProgram.insertLine( mutPoint, newProgLine );
+					op2 = randomLine.getInstructionElement( 1 );
+			}
+			else
+			{
+				// No further operands are required in case of a NOP instruction:
 
-        }
-      else
-        generalMutationType = 2;
-    }
-   
+				op1 = 0;
+				op2 = 0;
+			}   
 
-  if( generalMutationType == 2 )
-    {
-      if( newProgram.getProgramLength() - 1 >= minLength )
-        {
-
-#ifdef SIG_DEBUG
-
-          SIGEL_Tools::SIG_IO::cerr << "<TYPE 2>" << Qt::endl;
-
-#endif
-
-          newProgram.deleteLine( mutPoint );
-        }
-      else
-        {
-          if( newProgram.getProgramLength() + 1 <= maxLength )
-            {
+			{
+				SIGEL_Program::SIG_ProgramLine mutatedLine;
+				mutatedLine = newProgram.getLine( mutPoint );
+				mutatedLine.setRobotinstruction( randomLine.getRobotinstructionType(),
+				                                 op1,
+				                                 op2 );
+				newProgram.setLine( mutPoint, mutatedLine );
+			}
+			break;
+		}
 
 #ifdef SIG_DEBUG
 
-              SIGEL_Tools::SIG_IO::cerr << "<TYPE 1>" << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "result: [";
+		newProgram.getLine( mutPoint ).print();
+		SIGEL_Tools::SIG_IO::cerr << "]" << Qt::endl;
 
 #endif
 
-              SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageP, gpParameter.getInstructionProbabilities() );
+	}
 
-              newProgram.insertLine( mutPoint, newProgLine );
-            }
-        }
-    }
+	if( generalMutationType == 1 )
+	{
+		if( newProgram.getProgramLength() + 1 <= maxLength )
+		{
 
 #ifdef SIG_DEBUG
 
-             SIGEL_Tools::SIG_IO::cerr << "\n" << Qt::endl;
+			SIGEL_Tools::SIG_IO::cerr << "<TYPE 1>" << Qt::endl;
+
+#endif
+
+			SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageP, gpParameter.getInstructionProbabilities() );
+
+			newProgram.insertLine( mutPoint, newProgLine );
+
+		}
+		else
+			generalMutationType = 2;
+	}
+
+
+	if( generalMutationType == 2 )
+	{
+		if( newProgram.getProgramLength() - 1 >= minLength )
+		{
+
+#ifdef SIG_DEBUG
+
+			SIGEL_Tools::SIG_IO::cerr << "<TYPE 2>" << Qt::endl;
+
+#endif
+
+			newProgram.deleteLine( mutPoint );
+		}
+		else
+		{
+			if( newProgram.getProgramLength() + 1 <= maxLength )
+			{
+
+#ifdef SIG_DEBUG
+
+				SIGEL_Tools::SIG_IO::cerr << "<TYPE 1>" << Qt::endl;
+
+#endif
+
+				SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageP, gpParameter.getInstructionProbabilities() );
+
+				newProgram.insertLine( mutPoint, newProgLine );
+			}
+		}
+	}
+
+#ifdef SIG_DEBUG
+
+	SIGEL_Tools::SIG_IO::cerr << "\n" << Qt::endl;
 
 #endif
 
 
-  QDateTime actTime = QDateTime::currentDateTime();
+	QDateTime actTime = QDateTime::currentDateTime();
 
-  if( historyInfo > 0 ) mutatedInd->addLengthIncreasedInfo( actTime, historyInfo );
-  if( historyInfo < 0 ) mutatedInd->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
+	if( historyInfo > 0 ) mutatedInd->addLengthIncreasedInfo( actTime, historyInfo );
+	if( historyInfo < 0 ) mutatedInd->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
 
-  mutatedInd->addMutationInfo( winner.getName(), actTime, mutPoint, winnerFitness );
+	mutatedInd->addMutationInfo( winner.getName(), actTime, mutPoint, winnerFitness );
 
-  return  *mutatedInd;
+	return  *mutatedInd;
 };
 
 
@@ -631,53 +631,53 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 /*------------------------------------------Reproduction-----------------------------------------*/
 
 SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::reproduction( SIGEL_GP::SIG_GPIndividual& winner,
-								      QString newName,
-								      int poolPos,
-								      SIGEL_Tools::SIG_Randomizer& randomizer,
-								      SIGEL_GP::SIG_GPParameter& gpParameter,
-								      SIGEL_Robot::SIG_LanguageParameters &languageP )
+                                                                      QString newName,
+                                                                      int poolPos,
+                                                                      SIGEL_Tools::SIG_Randomizer& randomizer,
+                                                                      SIGEL_GP::SIG_GPParameter& gpParameter,
+                                                                      SIGEL_Robot::SIG_LanguageParameters &languageP )
 {
-  SIGEL_GP::SIG_GPIndividual *reproducedInd = new SIGEL_GP::SIG_GPIndividual( SIG_GPParameter(),
-									      winner.getHistory(),
-									      newName,
-									      QDateTime(),
-									      poolPos );
+	SIGEL_GP::SIG_GPIndividual *reproducedInd = new SIGEL_GP::SIG_GPIndividual( SIG_GPParameter(),
+	                                                                            winner.getHistory(),
+	                                                                            newName,
+	                                                                            QDateTime(),
+	                                                                            poolPos );
 
-  reproducedInd->setFitness( winner.getFitness() );
+	reproducedInd->setFitness( winner.getFitness() );
 
-  long const minLength = gpParameter.getMinIndLength();
-  long const maxLength = gpParameter.getMaxIndLength();
-  int  historyInfo;
+	long const minLength = gpParameter.getMinIndLength();
+	long const maxLength = gpParameter.getMaxIndLength();
+	int  historyInfo;
 
 #ifdef SIG_DEBUG
 
-  SIGEL_Tools::SIG_IO::cerr << "<REPRODUCTION>" << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "<REPRODUCTION>" << Qt::endl;
 
-  if (!reproducedInd)
-    {
-      SIGEL_Tools::SIG_IO::cerr << "reproduction: could not create a new individual." << Qt::endl;
-      exit(1);
-    };
+	if (!reproducedInd)
+	{
+		SIGEL_Tools::SIG_IO::cerr << "reproduction: could not create a new individual." << Qt::endl;
+		exit(1);
+	};
 
 #endif
 
-  reproducedInd->getProgramVar() = winner.getProgramVar();
+	reproducedInd->getProgramVar() = winner.getProgramVar();
 
-  reproducedInd->getProgramVar().checkLength( minLength,
-  					      maxLength,
-  					      randomizer,
-  					      languageP,
-  					      gpParameter.getInstructionProbabilities(),
-					      historyInfo );
+	reproducedInd->getProgramVar().checkLength( minLength,
+	                                            maxLength,
+	                                            randomizer,
+	                                            languageP,
+	                                            gpParameter.getInstructionProbabilities(),
+	                                            historyInfo );
 
-  QDateTime actTime = QDateTime::currentDateTime();
+	QDateTime actTime = QDateTime::currentDateTime();
 
-  if( historyInfo > 0 ) reproducedInd->addLengthIncreasedInfo( actTime, historyInfo );
-  if( historyInfo < 0 ) reproducedInd->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
+	if( historyInfo > 0 ) reproducedInd->addLengthIncreasedInfo( actTime, historyInfo );
+	if( historyInfo < 0 ) reproducedInd->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
 
-  reproducedInd->addReproductionInfo( winner.getName(), actTime );
+	reproducedInd->addReproductionInfo( winner.getName(), actTime );
 
-  // The reproduced individual is returned
+	// The reproduced individual is returned
 
-  return *reproducedInd;
+	return *reproducedInd;
 };
