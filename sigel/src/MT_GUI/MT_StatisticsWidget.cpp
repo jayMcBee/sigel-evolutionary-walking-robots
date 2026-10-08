@@ -172,7 +172,6 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 		mutationsDestrTotal->setText(QString::number(mutationsNotImprovingTotal / mutInd * 100.0 , 'f', 2 ));
 	}
 
-
 	/* generational page */
 	metaGenSpinBox->setRange(1, metaGens);
 	metaGenSlider->setRange(1, metaGens);
@@ -188,7 +187,6 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 	}
 
 	if(el && mtGen != -2 && metaGens > 0){
-
 		// Fitness
 		varFitness->setText(QString::number(el->Variance));
 		maxFitness->setText(QString::number(el->MaxFitness));
