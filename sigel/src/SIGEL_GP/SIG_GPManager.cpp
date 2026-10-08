@@ -46,6 +46,7 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
     taskCanDoList(),
     currentExperiment( experiment ),
     stopEvolutionNow( false ),
+    trainer( nullptr ),
     tours(),
     randomizer( currentExperiment.gpParameter.getRandomSeed() ),
     fitnessCalculated( false ),
@@ -53,7 +54,6 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
 {
 	pthread_mutex_init(&disconnectMutex, nullptr);
 
-	trainer = nullptr;
 	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == EVALUATOR_SUBST){
 		trainer = dynamic_cast<SIG_GPFitnessTrainer*>(currentExperiment.mtController->getFitnessTrainer());
 		if(!trainer)
