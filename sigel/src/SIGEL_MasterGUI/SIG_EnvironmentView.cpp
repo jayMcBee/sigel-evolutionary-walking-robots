@@ -37,6 +37,7 @@
 
 namespace SIGEL_MasterGUI
 {
+
 /* 
  *  Constructs a SIG_Environment which is a child of 'parent', with the 
  *  name 'name' and widget flags set to 'f' 
@@ -65,7 +66,6 @@ SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent,  const char* name, Qt
   lineeditNormalDamperConstant->setValidator( new QDoubleValidator(lineeditNormalDamperConstant) );
   lineeditStaticFrictionCoefficient->setValidator( new QDoubleValidator(lineeditStaticFrictionCoefficient) );
   lineeditKineticFrictionCoefficient->setValidator( new QDoubleValidator(lineeditKineticFrictionCoefficient) );
-
 
   // The read-back is QString::toDouble(), which always wants '.'. The C locale
   // alone still takes "0,375" as grouped, so the group separator is rejected.

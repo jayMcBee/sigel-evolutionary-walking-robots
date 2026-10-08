@@ -45,6 +45,7 @@ class QRadioButton;
 
 namespace SIGEL_MasterGUI
 {
+
   /**
    * This is the class of the dialog which is used to edit the commands inside the language parameters.
    */
@@ -73,7 +74,3 @@ protected:
 
 }
 #endif // SIGEL_MASTERGUI_SIG_EDITCOMMANDDIALOG_H
-
-
-
-

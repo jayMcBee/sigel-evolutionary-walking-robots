@@ -53,7 +53,6 @@ namespace SIGEL_MasterGUI
   setRootIsDecorated( true );
   // No sorting: each new experiment goes on top of the list.
   setSortingEnabled( false );
-  
 };
 
 SIG_ExperimentListView::~SIG_ExperimentListView()
@@ -351,7 +350,6 @@ void SIG_ExperimentListView::slotRightButtonClicked( const QPoint & pos )
 	theExperiment->slotRightClick( option, thePoint );
     }
 };
-
 
 void SIG_ExperimentListView::slotSelectionChanged( QTreeWidgetItem * theItem )
 {
@@ -745,4 +743,3 @@ void SIG_ExperimentListView::slotIndividualImport()
 };
 
 } // close namespace
-

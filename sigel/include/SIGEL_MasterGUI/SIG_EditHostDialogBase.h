@@ -27,7 +27,6 @@ protected:
 
 protected slots:
     virtual void languageChange();
-
 };
 
 #endif // SIGEL_MASTERGUI_SIG_EDITHOSTDIALOGBASE_H

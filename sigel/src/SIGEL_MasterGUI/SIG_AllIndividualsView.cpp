@@ -46,7 +46,6 @@
 
 #include <SIGEL_Tools/SIG_IO.h>
 
-
 namespace SIGEL_MasterGUI
 {
   
@@ -111,7 +110,6 @@ SIG_AllIndividualsView::SIG_AllIndividualsView( QWidget * parent, const char * n
 		    this,
 		    SLOT( slotSelectionChanged() ) );
 
-  
   /*
    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
    * Perhaps also enable set AutoDelete!!!
@@ -264,7 +262,6 @@ void SIG_AllIndividualsView::slotDeleteIndividuals()
 	    individualView->clear();
 	}
     } // if( numbeOfSelectedItems != 0 )
-  
 };
 
 void SIG_AllIndividualsView::slotResetAllFitnessValues()
@@ -316,7 +313,6 @@ void SIG_AllIndividualsView::slotVisualize()
   QTreeWidgetItemIterator it( individualList->listviewIndividuals );
   for ( ; *it; ++it ) {
     if( (*it)->isSelected() ) {
-
    	  SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( (*it) );
    	  SIGEL_GP::SIG_GPIndividual *theGPIndividual = individualListItem->theIndividual;
 

@@ -42,6 +42,7 @@ class QSpinBox;
 
 namespace SIGEL_MasterGUI
 {
+
   /**
    * This is the class of the dialog which is used to add individuals to the pool.
    */

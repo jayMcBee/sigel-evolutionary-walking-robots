@@ -41,6 +41,7 @@
 
 namespace SIGEL_MasterGUI
 {
+
   class SIG_GUIGPExperiment;
 
   /**
@@ -171,6 +172,7 @@ namespace SIGEL_MasterGUI
        */
       SIG_GUIGPExperiment &guiExperiment;
     };
+
 }
 
 #endif // SIGEL_MASTERGUI_SIG_ALLINDIVIDUALSVIEW_H

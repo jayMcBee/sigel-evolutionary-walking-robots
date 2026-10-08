@@ -28,6 +28,7 @@
 
 namespace SIGEL_MasterGUI
 {
+
   /**
    * The class representing an experiment in the ListView.
    *
@@ -46,7 +47,6 @@ namespace SIGEL_MasterGUI
        * will get this as its text.
        */
       SIG_ExperimentItem( QTreeWidget * parent, QString name );
-
     };
   
 }
