@@ -854,19 +854,19 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   listenSocket = socket(PF_INET, SOCK_STREAM, ptrp->p_proto);
   if (listenSocket < 0) {
     fprintf(stderr, "ERR:   Can't create socket\n");
-     exit(1);
+    exit(1);
   }
 
   // let's bind local address & socket
   if ( bind(listenSocket, reinterpret_cast<struct sockaddr *>(&sad), sizeof(sad)) < 0 ) {
     fprintf(stderr, "ERR:   Bind reported an error\n");
-     exit(1);
+    exit(1);
   }
 
   // build the queue for incoming requests
   if ( listen(listenSocket, 32) < 0 ) {
     fprintf(stderr, "ERR:   Listen failed\n");
-     exit(1);
+    exit(1);
   }
 
   // (bounded) waiting for requests..
@@ -887,11 +887,11 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
     timeOut.tv_sec  = 10;
     timeOut.tv_usec = 0;
 
-     // pselect returns zero when timeout occurs..
-     select(listenSocket+1, &listenSet, nullptr, nullptr, &timeOut);
+    // pselect returns zero when timeout occurs..
+    select(listenSocket+1, &listenSet, nullptr, nullptr, &timeOut);
 
-     // check what caused pselect() to exit
-     if ( FD_ISSET(listenSocket, &listenSet) ) {
+    // check what caused pselect() to exit
+    if ( FD_ISSET(listenSocket, &listenSet) ) {
       sdRecv = accept(listenSocket, nullptr, nullptr);
 
       if (sdRecv < 0) {
@@ -913,7 +913,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
       fprintf(stderr, "\t(Servertask registered dyn. client \"%s\")\n", clientName);
     }
 
-   // check if computation is finished and clients need to be disconnected
+    // check if computation is finished and clients need to be disconnected
     if (disconnectClients) {
       // now make us running exclusively
       pthread_mutex_lock( &servMutex );
