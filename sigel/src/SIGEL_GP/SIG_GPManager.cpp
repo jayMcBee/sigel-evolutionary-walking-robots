@@ -58,7 +58,9 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
 	{
 		trainer = dynamic_cast<SIG_GPFitnessTrainer*>(currentExperiment.mtController->getFitnessTrainer());
 		if(!trainer)
+		{
 			trainer = new SIG_GPFitnessTrainer(currentExperiment);
+		}
 	}
 	else
 	{
@@ -86,7 +88,9 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop()
 		stopIfNecessary( false );
 
 		if (stopEvolutionNow)
+		{
 			return;
+		}
 
 		// Poll interval, once per pass: long enough not to spin a core, short
 		// enough that finished results do not wait.
@@ -133,6 +137,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop()
 				  << "\n"
 				  << "indis:" << Qt::endl;
 				for (int i = 0; i < actTour.indis.size(); i++)
+				{
 					SIGEL_Tools::SIG_IO::cerr << "  indNumber: "
 					  << (*actTour.indis[ i ]).indNumber
 					  << "\n"
@@ -142,6 +147,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop()
 					  << "    fitTaskId: "
 					  << (*actTour.indis[ i ]).fitTaskId
 					  << Qt::endl;
+				}
 #endif
 
 				if (!actTour.justWaiting)
@@ -215,18 +221,26 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop()
 								{
 									tours[ actSuccessor ]->depNumber -= 1;
 									if (tours[ actSuccessor ]->depNumber == 0)
+									{
 										taskCanDoList << actSuccessor;
+									}
 								}; // if(actSucessor) -condition
 							} // if(actFitness) -condition
 							else
+							{
 								actTour.justWaiting = true;
+							}
 						};
 					};
 				}; // for (int j=0;...) - loop
 				if (!actTour.justWaiting)
+				{
 					taskCanDoList.removeAt( canDoIdx );   // next slides into canDoIdx
+				}
 				else
+				{
 					++canDoIdx;
+				}
 
 				touchsCounter++;
 			};
@@ -375,8 +389,12 @@ namespace
 	bool toursAreEmpty( QList< SIGEL_GP::SIG_GPTournament * > const &tours )
 	{
 		for (SIGEL_GP::SIG_GPTournament *t : tours)
+		{
 			if (t)
+			{
 				return false;
+			}
+		}
 		return true;
 	}
 
@@ -390,7 +408,9 @@ namespace
 		~FitTaskListGuard()
 		{
 			if (tasks)
+			{
 				qDeleteAll( *tasks );
+			}
 		}
 	};
 
@@ -417,7 +437,9 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 		stopIfNecessary( true );
 
 		if (stopEvolutionNow)
+		{
 			return;
+		}
 
 		processInterfaceEvents();
 
@@ -430,7 +452,9 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 		// or have been evaluated by the meta-system
 		// these individuals should be evaluated again
 		if (actInd.getFitness() < 0.0)
+		{
 			upToDate = false;
+		}
 
 		//Update the fitness values for individuals that are not up to date
 		if(!upToDate)
@@ -459,7 +483,9 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 		stopIfNecessary( true );
 
 		if (stopEvolutionNow)
+		{
 			return;
+		}
 
 		processInterfaceEvents();
 
@@ -495,10 +521,14 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 				delete fitTaskList.takeAt( fitCur );
 				// Past the end: step back to the last task. That is prevFitTask, so the pass ends.
 				if (fitCur >= fitTaskList.size())
+				{
 					fitCur = fitTaskList.isEmpty() ? -1 : fitTaskList.size() - 1;
+				}
 				actFitTask = (fitCur < 0) ? nullptr : fitTaskList.at( fitCur );
 				if (actFitTask == prevFitTask)
+				{
 					break;
+				}
 			}
 			else
 			{
@@ -515,7 +545,9 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 					actFitTask = nullptr;
 				}
 				else
+				{
 					actFitTask = fitTaskList.at( fitCur );
+				}
 			};
 		};
 	};
@@ -538,7 +570,9 @@ void SIGEL_GP::SIG_GPManager::calcInitTourSet()
 	QList<int> lastAccesses( pop.getSize() );
 
 	for (int l=0; l < pop.getSize(); l++)
+	{
 		lastAccesses[l] = -1;
+	}
 
 	for(unsigned int i=0; i < tours.size(); i++)
 	{
@@ -585,7 +619,9 @@ void SIGEL_GP::SIG_GPManager::calcInitTourSet()
 		};
 
 		if (actTour.depNumber == 0)
+		{
 			taskCanDoList << i;
+		}
 	};
 };
 
@@ -637,19 +673,27 @@ void SIGEL_GP::SIG_GPManager::stopIfNecessary(bool generationBreak)
 bool SIGEL_GP::SIG_GPManager::checkTerminationConditions(bool generationBreak)
 {
 	if (userTerminated)
+	{
 		return true;
+	}
 
 	if (!fitnessCalculated)
+	{
 		return false;
+	}
 
 	// The termination by time or generation waits for a generation break.
 	if (!generationBreak)
+	{
 		return false;
+	}
 
 	bool timeExpired = false;
 
 	if (currentExperiment.gpParameter.getTerminationUsesDate())
+	{
 		timeExpired =  ( currentExperiment.gpParameter.getTerminationTime() <= QDateTime::currentDateTime() );
+	}
 	else
 	{
 		int durationHours =   ( currentExperiment.gpParameter.getTerminationDurationDays() * 24)
@@ -689,12 +733,18 @@ void SIGEL_GP::SIG_GPManager::start()
 	// The Meta system hands the same trainer to every run, so what the last one
 	// learned about PVM must not end this one.
 	if (trainer)
+	{
 		trainer->pvmLost = false;
+	}
 
 	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == CLASSIFIER_SUBST)
+	{
 		run(dynamic_cast<MT_Classifier*>(currentExperiment.mtController->getClassifier()));
+	}
 	else
+	{
 		run();
+	}
 };
 
 void SIGEL_GP::SIG_GPManager::run()
@@ -702,7 +752,9 @@ void SIGEL_GP::SIG_GPManager::run()
 
 	// start the MT_GP-System only if the SIGEL-GP-System would start
 	if(toursAreEmpty( tours ) && currentExperiment.getPopulation().getSize() > 3)
+	{
 		currentExperiment.mtController->startEvolution();
+	}
 
 	// init the condition variable
 	pthread_cond_init(&cond, nullptr);
@@ -730,7 +782,9 @@ void SIGEL_GP::SIG_GPManager::run()
 		stopIfNecessary( true );
 
 		if (stopEvolutionNow)
+		{
 			return;
+		}
 
 		// Every "resetGeneration" generations all fitness values are set to -1 so that evalNewIndis()
 		// recomputes them. If the fitness function supports it, this allows a different target every "resetGeneration" generations
@@ -738,14 +792,18 @@ void SIGEL_GP::SIG_GPManager::run()
 		// Do not divide by zero
 		if ( currentExperiment.gpParameter.getResetEveryGeneration() != 0
 		     && (currentExperiment.population.getPoolGeneration() % currentExperiment.gpParameter.getResetEveryGeneration()) == 0)
+		{
 			currentExperiment.population.resetAllFitnessValues();
+		}
 		// evaluate the individuals which have no fitness value
 		evalNewIndis();
 
 		stopIfNecessary( true );
 
 		if (stopEvolutionNow)
+		{
 			return;
+		}
 		// creates a set of tournaments
 		createTours( currentExperiment.gpParameter.getTournamentsPerGeneration() * currentExperiment.getPopulation().getSize() );
 		// sorts the tournaments, how they should evolve on the pvm clients
@@ -754,7 +812,9 @@ void SIGEL_GP::SIG_GPManager::run()
 		evolutionLoop();
 
 		if (stopEvolutionNow)
+		{
 			return;
+		}
 
 		// increment the generation, because there is one evolution-loop evolved
 		// this gives us the current generation and it starts with 0 every time we start the evolution
@@ -791,7 +851,9 @@ void SIGEL_GP::SIG_GPManager::run()
 		MT_Evaluator * MetaFitnessTrainer;
 		MetaFitnessTrainer = dynamic_cast<MT_Evaluator*>(trainer);
 		if (MetaFitnessTrainer !=nullptr)
+		{
 			MetaFitnessTrainer->nextSIGGeneration(averageFitness);
+		}
 
 		// if the user wants a poolImage and it the generation where it should generate, then he gets it
 		if ( poolImageGeneration && ((currentGenerationNo % poolImageGeneration) == 0) )
@@ -823,9 +885,11 @@ void SIGEL_GP::SIG_GPManager::run()
 				poolImage.close();
 			}
 			else
+			{
 				SIGEL_Tools::SIG_IO::cerr << "Could not save Pool under "
 				  << poolImageName
 				  << "!" << Qt::endl;
+			}
 		};
 
 		// autosave function
@@ -1048,7 +1112,9 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 	// start the MT_GP-System only if the SIGEL-GP-System would start
 	if(toursAreEmpty( tours ) && currentExperiment.getPopulation().getSize() > 3)
+	{
 		currentExperiment.mtController->startEvolution();
+	}
 
 	/***************************************
 	 *  end of Meta-System specific part
@@ -1081,7 +1147,9 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 		stopIfNecessary( true );
 
 		if (stopEvolutionNow)
+		{
 			return;
+		}
 
 
 		// Find the population position of the best SIGEL individual
@@ -1111,7 +1179,9 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 		evolutionLoop(MetaClassifier);
 
 		if (stopEvolutionNow)
+		{
 			return;
+		}
 
 		currentGenerationNo++;
 		currentExperiment.population.poolGeneration++;
@@ -1147,9 +1217,13 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 			}
 		}
 		if(NumOfCorrectFit > 0.0)
+		{
 			averageFitness = averageFitness / NumOfCorrectFit;
+		}
 		else
+		{
 			averageFitness = -1000.0;
+		}
 
 		MetaClassifier->nextSIGGeneration(averageFitness);
 
@@ -1190,9 +1264,11 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 				poolImage.close();
 			}
 			else
+			{
 				SIGEL_Tools::SIG_IO::cerr << "Could not save Pool under "
 				                          << poolImageName
 				                          << "!" << Qt::endl;
+			}
 		};
 
 		// autosave function
@@ -1263,7 +1339,9 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 		stopIfNecessary( false );
 
 		if (stopEvolutionNow)
+		{
 			return;
+		}
 
 		// Poll interval, once per pass: long enough not to spin a core, short
 		// enough that finished results do not wait.
@@ -1311,6 +1389,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 				                          << "\n"
 				                          << "indis:" << Qt::endl;
 				for (int i = 0; i < actTour.indis.size(); i++)
+				{
 					SIGEL_Tools::SIG_IO::cerr << "  indNumber: "
 					                          << (*actTour.indis[ i ]).indNumber
 					                          << "\n"
@@ -1320,6 +1399,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 					                          << "    fitTaskId: "
 					                          << (*actTour.indis[ i ]).fitTaskId
 					                          << Qt::endl;
+				}
 
 #endif
 
@@ -1399,18 +1479,26 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 								{
 									tours[ actSuccessor ]->depNumber -= 1;
 									if (tours[ actSuccessor ]->depNumber == 0)
+									{
 										taskCanDoList << actSuccessor;
+									}
 								};
 							}
 							else
+							{
 								actTour.justWaiting = true;
+							}
 						};
 					};
 				};
 				if (!actTour.justWaiting)
+				{
 					taskCanDoList.removeAt( canDoIdx );   // next slides into canDoIdx
+				}
 				else
+				{
 					++canDoIdx;
+				}
 
 				touchsCounter++;
 			};
@@ -1435,7 +1523,9 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 	QList<int> ToursParticipant;
 	ToursParticipant.resize(poolSize); // Position i = number of tournaments individual i takes part in
 	for(int l=0; l<poolSize;l++)
+	{
 		ToursParticipant[l]=0;
+	}
 	int DebugInfo =0;
 
 	SIG_GPTournamentIndividual * PresentIndi =nullptr;
@@ -1461,7 +1551,9 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 		stopIfNecessary( true );
 
 		if (stopEvolutionNow)
+		{
 			return;
+		}
 
 		processInterfaceEvents();
 
@@ -1488,7 +1580,9 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 		stopIfNecessary( true );
 
 		if (stopEvolutionNow)
+		{
 			return;
+		}
 
 		processInterfaceEvents();
 
@@ -1512,10 +1606,14 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 				delete fitTaskList.takeAt( fitCur );
 				// Past the end: step back to the last task. That is prevFitTask, so the pass ends.
 				if (fitCur >= fitTaskList.size())
+				{
 					fitCur = fitTaskList.isEmpty() ? -1 : fitTaskList.size() - 1;
+				}
 				actFitTask = (fitCur < 0) ? nullptr : fitTaskList.at( fitCur );
 				if (actFitTask == prevFitTask)
+				{
 					break;
+				}
 			}
 			else
 			{
@@ -1529,7 +1627,9 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 					actFitTask = nullptr;
 				}
 				else
+				{
 					actFitTask = fitTaskList.at( fitCur );
+				}
 			};
 		};
 	};
