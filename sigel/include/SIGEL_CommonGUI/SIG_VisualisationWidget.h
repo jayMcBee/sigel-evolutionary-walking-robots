@@ -263,6 +263,9 @@ using namespace SIGEL_CommonGUI;
        */
       double const mouseSensity;
 
+      /** Samples per pixel that the view asks for. */
+      static constexpr int multisamplingSamples = 4;
+
       QList< SIGEL_CommonGUI::SIG_FloatingTextLabel * > floatingTextWidgets;
 
       QSize floatingTextsSize;

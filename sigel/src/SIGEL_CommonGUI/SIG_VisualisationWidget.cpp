@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <QMouseEvent>
+#include <QSurfaceFormat>
 #include "SIGEL_CommonGUI/SIG_VisualisationWidget.h"
 
 #include <QtMath>
@@ -47,6 +48,10 @@
   {
     if ( name )
       setObjectName( QString::fromUtf8( name ) );
+
+    QSurfaceFormat surfaceFormat = format();
+    surfaceFormat.setSamples( multisamplingSamples );
+    setFormat( surfaceFormat );
   };
 
   SIG_VisualisationWidget::~SIG_VisualisationWidget()
