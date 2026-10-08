@@ -36,12 +36,8 @@ using namespace SIGEL_Tools;
 
 namespace SIGEL_Visualisation
 {
-	// The lighting of GL_LIGHT0 and GL_LIGHT1 with colour material is
-	// computed per vertex. Both lights are positional without attenuation,
-	// have no ambient part, and the material has no specular part, so each
-	// gives only its diffuse term. The sun's diffuse light goes out
-	// separately in the secondary colour, so the fragment shader can shadow
-	// it. Both are colour varyings, so GL_FLAT shading keeps flat mode flat.
+	// Lighting per vertex, as GL_LIGHT0 and GL_LIGHT1 give it. The sun goes
+	// out in the secondary colour, so the fragment shader shadows only it.
 	char const *const SIG_SimulationVisualisation::shadowVertexShaderSource =
 		"#version 120\n"
 		"uniform mat4 shadowMatrix;\n"
@@ -65,12 +61,13 @@ namespace SIGEL_Visualisation
 		"  gl_FrontSecondaryColor = vec4( sun, 1.0 );\n"
 		"  gl_TexCoord[ 0 ] = gl_MultiTexCoord0;\n"
 		"  shadowCoordinate = shadowMatrix * eyePosition;\n"
+		"  gl_FogFragCoord = abs( eyePosition.z );\n"
 		"  gl_Position = ftransform();\n"
 		"}\n";
 
 	// Each of the 16 Poisson disk taps is a hardware 2x2 comparison, as the
 	// shadow map filters linearly. The terrain texture is applied as
-	// GL_DECAL does it.
+	// GL_DECAL does it, and the fog as GL_LINEAR does it.
 	char const *const SIG_SimulationVisualisation::shadowFragmentShaderSource =
 		"#version 120\n"
 		"uniform sampler2D terrainTexture;\n"
@@ -102,6 +99,8 @@ namespace SIGEL_Visualisation
 		"    vec4 texel = texture2D( terrainTexture, gl_TexCoord[ 0 ].st );\n"
 		"    color.rgb = mix( color.rgb, texel.rgb, texel.a );\n"
 		"  }\n"
+		"  float clearness = clamp( (gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale, 0.0, 1.0 );\n"
+		"  color.rgb = mix( gl_Fog.color.rgb, color.rgb, clearness );\n"
 		"  gl_FragColor = color;\n"
 		"}\n";
 

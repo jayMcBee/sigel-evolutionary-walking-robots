@@ -25,6 +25,9 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 
+#include <QtMath>
+#include <cmath>
+
 namespace SIGEL_Visualisation
 {
 
@@ -63,6 +66,9 @@ namespace SIGEL_Visualisation
     GLfloat positionLight1[4] = {0.0,10.0,0.0,1.0};
     glLightfv( GL_LIGHT1, GL_POSITION, positionLight1 );
 
+    glEnable( GL_FOG );
+    glFogi( GL_FOG_MODE, GL_LINEAR );
+
     updateAspectRatio();
   };
 
@@ -72,6 +78,7 @@ namespace SIGEL_Visualisation
     drawSky();
 
     SIG_Vector finalEyePoint = viewSettings.getAbsoluteEyePoint();
+    setFog( finalEyePoint );
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -162,6 +169,29 @@ namespace SIGEL_Visualisation
 		glMatrixMode( GL_MODELVIEW );
 
 		glPopAttrib();
+	};
+
+	void SIG_Visualisation::setFog( SIG_Vector const &eyePoint ) const
+	{
+		double const height = eyePoint.y - viewSettings.lookPoint.y;
+		double const groundDistance = std::hypot( eyePoint.x - viewSettings.lookPoint.x,
+		                                          eyePoint.z - viewSettings.lookPoint.z );
+		double const lookDistance = std::hypot( groundDistance, height );
+		glFogf( GL_FOG_START, static_cast<GLfloat>( lookDistance + fogStart ) );
+		glFogf( GL_FOG_END, static_cast<GLfloat>( lookDistance + fogEnd ) );
+
+		// Straight down, the horizon is not in the view.
+		double horizonHeight = 1;
+		if (groundDistance > 0)
+			horizonHeight = qBound( -1.0,
+			                        (height / groundDistance) / std::tan( qDegreesToRadians( fieldOfView / 2 ) ),
+			                        1.0 );
+
+		// drawSky() goes from the bottom colour at -1 to the top colour at 1.
+		QVector3D const horizonColor = skyBottomColor
+		                             + (skyTopColor - skyBottomColor) * static_cast<float>( (horizonHeight + 1) / 2 );
+		GLfloat const fogColor[4] = { horizonColor.x(), horizonColor.y(), horizonColor.z(), 1 };
+		glFogfv( GL_FOG_COLOR, fogColor );
 	};
 
   void SIG_Visualisation::setAmbientSceneColor( double red,

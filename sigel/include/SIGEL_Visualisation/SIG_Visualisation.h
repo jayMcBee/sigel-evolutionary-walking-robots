@@ -117,7 +117,14 @@ namespace SIGEL_Visualisation
 
       static constexpr QVector3D skyBottomColor = QVector3D( 1.0f, 1.0f, 1.0f );
 
+      /** The fog starts and ends this far behind the look point. */
+      static constexpr float fogStart = 0.0f;
+      static constexpr float fogEnd = 22.0f;
+
       void drawSky() const;
+
+      /** Sets the fog's range and gives it the sky's colour at the horizon. */
+      void setFog( SIG_Vector const &eyePoint ) const;
 
     };
 
