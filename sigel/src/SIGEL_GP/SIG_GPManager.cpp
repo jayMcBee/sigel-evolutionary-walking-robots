@@ -63,12 +63,6 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
 };
 
 
-//Returns a reference to the current experiment's trainer
-SIGEL_GP::SIG_GPFitnessTrainer &SIGEL_GP::SIG_GPManager::getActTrainer()
-{
-  return *trainer;
-};
-
  //Returns a reference to the experiment
 SIGEL_GP::SIG_GPExperiment &SIGEL_GP::SIG_GPManager::getCurrentExperiment()
 {

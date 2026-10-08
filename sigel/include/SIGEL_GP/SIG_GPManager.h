@@ -319,14 +319,6 @@ namespace SIGEL_GP
 private:
   SIG_GPExperiment& getCurrentExperiment();
 
-  /**
-   * This operation returns a refernces of the actual GPFitnessTrainer.
-   * @return
-   * The actual GPFitnessTrainer.
-   */  
-private:
-  SIG_GPFitnessTrainer& getActTrainer();
-
 
   /** This method is invoked from the SIGEL master application
    * when started with the '-de' argument.
