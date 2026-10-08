@@ -35,7 +35,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPIndividual::operator =(SIG_GPIndivid
    }
  
 
-SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIG_GPParameter& param,
+SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIG_GPParameter& gpParameter,
 					     SIGEL_Tools::SIG_Randomizer& randomizer,
 					     QString name, QDateTime birthtime,
 					     int poolpos)
@@ -62,7 +62,7 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIG_GPParameter& param,
   history.append(fitTmp); 
 };
 
-SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual( SIG_GPParameter const& param,
+SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual( SIG_GPParameter const& gpParameter,
 					      QStringList const& hist,
 					      QString name,
 					      QDateTime birthtime,
@@ -127,9 +127,9 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &random
 }
 
 SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &randomizer, 
-                                             SIGEL_GP::SIG_GPParameter& param, 
+                                             SIGEL_GP::SIG_GPParameter& gpParameter, 
                                              SIGEL_Robot::SIG_LanguageParameters& languageParameters)
-  :prog( param, languageParameters,randomizer )
+  :prog( gpParameter, languageParameters,randomizer )
 { 
    setName( "No name" );
    setFitness( -1 );
@@ -150,10 +150,10 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(QString data)
 };
 
 void SIGEL_GP::SIG_GPIndividual::generateRandomIndividual(SIGEL_Tools::SIG_Randomizer& randomizer,
-                                                          SIGEL_GP::SIG_GPParameter& param, 
+                                                          SIGEL_GP::SIG_GPParameter& gpParameter, 
                                                           SIGEL_Robot::SIG_LanguageParameters& languageParameters )
 {
-   prog.generateRandomProgram(param,languageParameters,randomizer);
+   prog.generateRandomProgram(gpParameter,languageParameters,randomizer);
    setName("No Name");
    setPoolPos(0);
    setFitness(-1);

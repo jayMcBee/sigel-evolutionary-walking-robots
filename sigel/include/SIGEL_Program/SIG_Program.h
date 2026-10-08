@@ -97,7 +97,7 @@ class SIG_Program
  */
 
    public:
-   SIG_Program(SIGEL_GP::SIG_GPParameter &param, 
+   SIG_Program(SIGEL_GP::SIG_GPParameter &gpParameter, 
 	       SIGEL_Robot::SIG_LanguageParameters &languageParameters, 
 	       SIGEL_Tools::SIG_Randomizer& randomizer);
 
@@ -253,7 +253,7 @@ class SIG_Program
   */
 
    public:
-   void generateRandomProgram(SIGEL_GP::SIG_GPParameter &param, 
+   void generateRandomProgram(SIGEL_GP::SIG_GPParameter &gpParameter, 
                               SIGEL_Robot::SIG_LanguageParameters &languageParameters, 
 			      SIGEL_Tools::SIG_Randomizer& randomizer);
 

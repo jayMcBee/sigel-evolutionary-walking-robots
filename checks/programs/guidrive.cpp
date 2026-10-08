@@ -4442,13 +4442,13 @@ static int guidriveMain(int argc, char **argv)
         // original ends in 2001 and still starts and ends at once.
         if (wantGens <= 0 && qgetenv("SIGEL_RUN_LONGER") != "1") {
             SIG_GUIGPExperiment *ex = lv->currentlySelectedExperiment();
-            const SIGEL_GP::SIG_GPParameter *par = ex ? &ex->gpExperiment.gpParameter : nullptr;
-            if (par && par->getTerminationModel() == SIGEL_GP::SIG_GPParameter::byTime
-                    && par->getTerminationUsesDate()
-                    && par->getTerminationTime() > QDateTime::currentDateTime()) {
+            const SIGEL_GP::SIG_GPParameter *gpParameter = ex ? &ex->gpExperiment.gpParameter : nullptr;
+            if (gpParameter && gpParameter->getTerminationModel() == SIGEL_GP::SIG_GPParameter::byTime
+                    && gpParameter->getTerminationUsesDate()
+                    && gpParameter->getTerminationTime() > QDateTime::currentDateTime()) {
                 printf("!! set SIGEL_GENERATIONS=N or SIGEL_RUN_LONGER=1: this"
                        " experiment runs until %s\n",
-                       qPrintable(par->getTerminationTime().toString(Qt::ISODate)));
+                       qPrintable(gpParameter->getTerminationTime().toString(Qt::ISODate)));
                 fflush(stdout);
                 return 1;
             }

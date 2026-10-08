@@ -259,11 +259,11 @@ static int selfcheck()
   {   // SIG_GPPopulation owns its individuals. The run under LeakSanitizer
       // judges every free in setIndividual, deleteIndividual and the
       // destructor; the checks below pin positions and values.
-    SIGEL_GP::SIG_GPParameter param;
+    SIGEL_GP::SIG_GPParameter gpParameter;
     SIGEL_Robot::SIG_LanguageParameters languageParameters;
 
     SIGEL_GP::SIG_GPPopulation pop;
-    pop.addRandomIndividuals( 4, param, languageParameters );
+    pop.addRandomIndividuals( 4, gpParameter, languageParameters );
     SIG_WANT(pop.getSize() == 4);
 
     // deleteIndividual frees one individual and shifts the rest down.

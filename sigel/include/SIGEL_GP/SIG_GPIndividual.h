@@ -106,7 +106,7 @@ class SIG_GPIndividual{
  * @post
  * The individual object is created correctly, the history is updated and the individual 
  * is placed in the right place.
- * @param param
+ * @param gpParameter
  * The parameter which contains the probabilities and datas about the individual.
  * @param randomizer
  * A reference to the randomizer module.
@@ -123,7 +123,7 @@ class SIG_GPIndividual{
 
 
  public:
- SIG_GPIndividual( SIG_GPParameter& param, 
+ SIG_GPIndividual( SIG_GPParameter& gpParameter, 
 		   SIGEL_Tools::SIG_Randomizer& randomizer, 
 		   QString name, 
 		   QDateTime birthtime, 
@@ -136,7 +136,7 @@ class SIG_GPIndividual{
  * @post
  * An individual object is created correctly and it is placed in the correct position of the pool. The
  * history is composed of the birthtime and the constant reference to the history of the forefather.
- * @param param
+ * @param gpParameter
  * The constant reference to the gp parameters, needed for the correct creation of the individual.
  * @param history
  * The history of the forefather.
@@ -148,7 +148,7 @@ class SIG_GPIndividual{
  * The position of the individual in the pool.
  */
  public:
- SIG_GPIndividual( SIG_GPParameter const& param, 
+ SIG_GPIndividual( SIG_GPParameter const& gpParameter, 
 		   QStringList const& hist, 
 		   QString name, 
 		   QDateTime birthtime, 
@@ -166,7 +166,7 @@ class SIG_GPIndividual{
 
  public:
  SIG_GPIndividual( SIGEL_Tools::SIG_Randomizer &randomizer,
-		   SIGEL_GP::SIG_GPParameter& param, 
+		   SIGEL_GP::SIG_GPParameter& gpParameter, 
 		   SIGEL_Robot::SIG_LanguageParameters& languageParameters );
 
  /**
@@ -571,7 +571,7 @@ class SIG_GPIndividual{
 
  public:
  void generateRandomIndividual(SIGEL_Tools::SIG_Randomizer& randomizer,
-                               SIGEL_GP::SIG_GPParameter& param, 
+                               SIGEL_GP::SIG_GPParameter& gpParameter, 
                                SIGEL_Robot::SIG_LanguageParameters& languageParameters);
 /**
   * This function append new Information about the current increased Age 

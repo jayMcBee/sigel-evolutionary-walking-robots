@@ -284,27 +284,27 @@ void SIGEL_Program::SIG_Program::checkLength( long minimumLength,
     }
 }
 
-SIGEL_Program::SIG_Program::SIG_Program( SIGEL_GP::SIG_GPParameter &param, 
+SIGEL_Program::SIG_Program::SIG_Program( SIGEL_GP::SIG_GPParameter &gpParameter, 
                                          SIGEL_Robot::SIG_LanguageParameters &languageParameters, 
                                          SIGEL_Tools::SIG_Randomizer& randomizer )
   : lines()
 {
-  generateRandomProgram( param, languageParameters, randomizer );
+  generateRandomProgram( gpParameter, languageParameters, randomizer );
 }
 
-void SIGEL_Program::SIG_Program::generateRandomProgram( SIGEL_GP::SIG_GPParameter &param, 
+void SIGEL_Program::SIG_Program::generateRandomProgram( SIGEL_GP::SIG_GPParameter &gpParameter, 
                                                         SIGEL_Robot::SIG_LanguageParameters &languageParameters, 
 						        SIGEL_Tools::SIG_Randomizer& randomizer )
 {
     lines.clear();
 
-    long n = param.getMinIndLength() + 
-             randomizer.getRandomInt( param.getMaxIndLength() - param.getMinIndLength() );
+    long n = gpParameter.getMinIndLength() + 
+             randomizer.getRandomInt( gpParameter.getMaxIndLength() - gpParameter.getMinIndLength() );
 
 
     for( long x=0; x<n; x++ )
       {
-        SIGEL_Program::SIG_ProgramLine newLine( randomizer, languageParameters, param.getInstructionProbabilities() );
+        SIGEL_Program::SIG_ProgramLine newLine( randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
 
         appendLine( newLine );
 

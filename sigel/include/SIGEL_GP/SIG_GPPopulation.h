@@ -135,7 +135,7 @@ class SIG_GPPopulation
   public:
     SIG_GPPopulation(int size, 
 		     SIGEL_Tools::SIG_Randomizer &newRandomizer, 
-		     SIGEL_GP::SIG_GPParameter& param, 
+		     SIGEL_GP::SIG_GPParameter& gpParameter, 
 		     SIGEL_Robot::SIG_LanguageParameters& languageParameters);
 
     /**
@@ -382,7 +382,7 @@ class SIG_GPPopulation
 
   public:
     int addRandomIndividuals(int quantity, 
-			      SIGEL_GP::SIG_GPParameter& param, 
+			      SIGEL_GP::SIG_GPParameter& gpParameter, 
 			      SIGEL_Robot::SIG_LanguageParameters& languageParameters);
     
     /** 
