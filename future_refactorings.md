@@ -147,15 +147,6 @@ touched, because changing one changes behaviour against the reference binary.
   tested.** It may use servo drives, and a naive change may break existing
   experiments.
 
-- [ ] **121. Make the dynamic-client handshake share one mutex.**
-  `SIG_GPManager::run`, both overloads, waits on the member `cond` with its
-  own local `mutex`; `SIG_GPManager::RegisterDynPVMClients` broadcasts under
-  its own local `servMutex`. The two threads never lock the same mutex, so the
-  flags `disconnectClients` and `allDisconnected` race, and a broadcast that
-  lands between the check and the wait is lost, which leaves the master
-  waiting for good. Latent: only the dynamic-client thread reaches it, which
-  only `sigel.cpp` starts. Item 19 is the same kind of fault elsewhere.
-
 - [ ] **118. Check the GP parameters when a file loads.**
   `SIG_GPParameter::readFromFile` accepts any value, including ones the
   dialog does not allow, such as a minimum length below 5; the setters check
@@ -421,7 +412,7 @@ problem; the choice is made before any code is written.
   the dynamic-client server thread and their locks use `pthread_create`,
   `pthread_mutex_*` and `pthread_cond_*` directly. Research what should
   replace them, for example what C++20 offers natively, before any code
-  changes. Items 19, 121 and 122 are faults in this code.
+  changes. Items 19 and 122 are faults in this code.
 
 - [ ] **116. Let drives hold a torque until the program changes it.**
   `SIG_DynaMechsCommandInterface::moveDrive` applies the torque from R0 for

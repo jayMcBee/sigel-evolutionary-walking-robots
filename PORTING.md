@@ -1051,6 +1051,27 @@ classes and leave truncation a hard error. **They are not interchangeable.**
     them and makes them again at several points during its life, which
     needs a `reset()` at each.
 
+**2026-10-08 — DONE: ITEM 121, THE RELEASE OF THE CLIENTS USES ONE MUTEX.**
+
+- **Before:** at the end of a generation `SIG_GPManager::run`, both
+  overloads, set `disconnectClients` and waited on `cond` with a local
+  mutex. `SIG_GPManager::RegisterDynPVMClients` disconnected the clients,
+  set `allDisconnected` and broadcast under its own local mutex. The two
+  threads never locked the same mutex, so the server could act between the
+  two assignments of the main thread, or broadcast before the wait began.
+  In both cases the master waited for good.
+- **Now:** the member `disconnectMutex` guards the two flags and `cond`.
+  The main thread holds it while it sets the flags and waits. The server
+  takes it before it tests `disconnectClients` and holds it until after the
+  broadcast. It is set up in the constructor and never destroyed, because
+  the server thread is never joined. It is a pthread mutex; item 124 moves
+  all pthread code to C++20 in one step.
+- **Measured:** on one machine, `sigel -de` on a copy of `twoBases.exp`
+  with one `manage_dyn_slave` at a time, 47 generations: the releases at
+  generations 20 and 40 each disconnected one client, and a second client
+  registered between them. A lost wake-up does not show in such a run; the
+  review of the locking is the evidence that it is closed.
+
 **2026-10-08 — DONE: ITEM 18, A HOST REMOVED WITH A LIVE TASK IS REPORTED.**
 
 - **The concern:** a `SIG_GPPVMTask` holds a reference to its host, and
