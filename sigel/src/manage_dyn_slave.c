@@ -74,7 +74,8 @@ int main (int argc, char *argv[])
   memcpy(&sad.sin_addr, ptrh->h_addr, ptrh->h_length);
 
   /* map TCP protocol number */
-  if (((int)(ptrp = getprotobyname("tcp"))) == 0)
+  ptrp = getprotobyname("tcp");
+  if (ptrp == NULL)
   { fprintf(stderr, "ERR:   Can't map 'tcp' to a protocol number\n");
     exit(1);
   }
