@@ -47,8 +47,8 @@ namespace SIGEL_Robot {
     SIG_RotationalJoint (SIG_Robot *par, QString n, int nr = -1);
     SIG_RotationalJoint (SIG_Robot *par, QTextStream & tx);
     virtual JointType getJointType () const;
-    void setLeftPoints (SIG_Vector _winportB, SIG_Vector _winportD, SIG_Vector _winportH);
-    void setRightPoints (SIG_Vector _winportB, SIG_Vector _winportD, SIG_Vector _winportH);
+    void setLeftPoints (SIG_Vector base, SIG_Vector dir, SIG_Vector hand);
+    void setRightPoints (SIG_Vector base, SIG_Vector dir, SIG_Vector hand);
     void setRange (double mn, double mx, double ii);
     SIG_Vector getLeftBase () const;
     SIG_Vector getLeftDir () const;

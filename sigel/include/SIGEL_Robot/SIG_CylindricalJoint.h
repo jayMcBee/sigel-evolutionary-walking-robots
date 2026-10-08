@@ -52,8 +52,8 @@ namespace SIGEL_Robot
     SIG_CylindricalJoint (SIG_Robot *par, QTextStream & tx);
     virtual JointType getJointType () const;
 
-    void setLeftPoints (SIG_Vector VB, SIG_Vector VD, SIG_Vector VH);
-    void setRightPoints (SIG_Vector VB, SIG_Vector VD, SIG_Vector VH);
+    void setLeftPoints (SIG_Vector base, SIG_Vector dir, SIG_Vector hand);
+    void setRightPoints (SIG_Vector base, SIG_Vector dir, SIG_Vector hand);
     void setRotationalRange (double mn, double mx, double ii);
     void setTranslationalRange (double mn, double mx, double ii);
     

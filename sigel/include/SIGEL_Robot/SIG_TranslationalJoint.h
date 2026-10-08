@@ -48,8 +48,8 @@ namespace SIGEL_Robot
     SIG_TranslationalJoint (SIG_Robot *par, QString n, int nr = -1);
     SIG_TranslationalJoint (SIG_Robot *par, QTextStream & tx);
     virtual JointType getJointType () const;
-    void setLeftPoints (SIG_Vector _winportB, SIG_Vector _winportD, SIG_Vector _winportF);
-    void setRightPoints (SIG_Vector _winportB, SIG_Vector _winportD, SIG_Vector _winportF);
+    void setLeftPoints (SIG_Vector base, SIG_Vector dir, SIG_Vector fix);
+    void setRightPoints (SIG_Vector base, SIG_Vector dir, SIG_Vector fix);
     void setRange (double mn, double mx, double ii);
     SIG_Vector getLeftBase () const;
     SIG_Vector getLeftDir () const;

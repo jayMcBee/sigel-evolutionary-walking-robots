@@ -132,11 +132,11 @@ namespace SIGEL_Simulation
 
 			normalizeQuat( q.data() );
 
-			RotationMatrix _winport_R;
+			RotationMatrix rotation;
 
-			buildRotMat( q.data(), _winport_R );
+			buildRotMat( q.data(), rotation );
 
-			transformation.SubMatrix( 1, 3, 1, 3 ) = SIG_TypeConverter::toMatrix( _winport_R );
+			transformation.SubMatrix( 1, 3, 1, 3 ) = SIG_TypeConverter::toMatrix( rotation );
 		}
 		else
 		{

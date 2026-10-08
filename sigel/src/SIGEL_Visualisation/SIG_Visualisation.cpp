@@ -215,13 +215,13 @@ namespace SIGEL_Visualisation
   void SIG_Visualisation::updateAspectRatio()
   {
     GLdouble const fovy = fieldOfView;
-    GLdouble const _winport_near = 0.01;
-    GLdouble const _winport_far = 50;
+    GLdouble const nearPlane = 0.01;
+    GLdouble const farPlane = 50;
     GLdouble const aspectRatio = static_cast<GLdouble>(viewSettings.aspectRatio);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective( fovy, aspectRatio, _winport_near, _winport_far );
+    gluPerspective( fovy, aspectRatio, nearPlane, farPlane );
   };
 
 }

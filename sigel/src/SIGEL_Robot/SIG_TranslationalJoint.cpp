@@ -47,18 +47,18 @@ namespace SIGEL_Robot {
                 return tTranslationalJoint;
         }
         
-        void SIG_TranslationalJoint::setLeftPoints (SIG_Vector _winportB, SIG_Vector _winportD, SIG_Vector _winportF)
+        void SIG_TranslationalJoint::setLeftPoints (SIG_Vector base, SIG_Vector dir, SIG_Vector fix)
         {
-                leftBase = _winportB;
-                leftDir = _winportD;
-                leftFix = _winportF;
+                leftBase = base;
+                leftDir = dir;
+                leftFix = fix;
         }
         
-        void SIG_TranslationalJoint::setRightPoints (SIG_Vector _winportB, SIG_Vector _winportD, SIG_Vector _winportF)
+        void SIG_TranslationalJoint::setRightPoints (SIG_Vector base, SIG_Vector dir, SIG_Vector fix)
         {
-                rightBase = _winportB;
-                rightDir = _winportD;
-                rightFix = _winportF;
+                rightBase = base;
+                rightDir = dir;
+                rightFix = fix;
         }
 
         void SIG_TranslationalJoint::setRange (double mn, double mx, double ii)
