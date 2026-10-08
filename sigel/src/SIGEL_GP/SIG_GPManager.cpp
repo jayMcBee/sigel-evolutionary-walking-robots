@@ -83,9 +83,9 @@ void SIGEL_GP::SIG_GPManager::advanceToNextTournament( int tournament )
 		return;
 	}
 
-	tours[ tournament ]->depNumber -= 1;
+	tours[ tournament ]->waitCounter -= 1;
 
-	if (tours[ tournament ]->depNumber == 0)
+	if (tours[ tournament ]->waitCounter == 0)
 	{
 		taskCanDoList << tournament;
 	}
@@ -179,8 +179,8 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop()
 				  << "justWaiting: "
 				  << actTour.justWaiting
 				  << "\n"
-				  << "depNumber: "
-				  << actTour.depNumber
+				  << "waitCounter: "
+				  << actTour.waitCounter
 				  << "\n"
 				  << "indis:" << Qt::endl;
 				for (int i = 0; i < actTour.indis.size(); i++)
@@ -621,12 +621,12 @@ void SIGEL_GP::SIG_GPManager::calcInitTourSet()
 					};
 				};
 
-				actTour.depNumber += 1;
+				actTour.waitCounter += 1;
 			};
 			lastAccesses[ actInd.indNumber ] = i;
 		};
 
-		if (actTour.depNumber == 0)
+		if (actTour.waitCounter == 0)
 		{
 			taskCanDoList << i;
 		}
@@ -644,7 +644,7 @@ SIGEL_GP::SIG_GPManager::TournamentProgress SIGEL_GP::SIG_GPManager::tournamentP
 	// is in taskCanDoList: not played yet, or waiting for its results.
 	const int plannedCount = int( tours.size() );
 	const int waitingCount = int( std::count_if( tours.cbegin(), tours.cend(),
-	    []( const SIG_GPTournament *t ) { return t && t->depNumber > 0; } ) );
+	    []( const SIG_GPTournament *t ) { return t && t->waitCounter > 0; } ) );
 	const int queuedCount = int( taskCanDoList.size() );
 	return { plannedCount - waitingCount - queuedCount, plannedCount };
 };
@@ -1392,8 +1392,8 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 				                          << "justWaiting: "
 				                          << actTour.justWaiting
 				                          << "\n"
-				                          << "depNumber: "
-				                          << actTour.depNumber
+				                          << "waitCounter: "
+				                          << actTour.waitCounter
 				                          << "\n"
 				                          << "indis:" << Qt::endl;
 				for (int i = 0; i < actTour.indis.size(); i++)

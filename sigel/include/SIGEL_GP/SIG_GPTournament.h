@@ -43,8 +43,8 @@ namespace SIGEL_GP
 * reference, for creation of random number in the genetic operator. It has an fitnesstrainer reference for 
 * controlling the fitnesscomputation preformed by pvm. The GPTournament-class includes QList for a datastructure
 * of the envolved tournamentindividuals. The class has a reference of the actual individual pool, a flag for 
-* indicating if the tournament is ready to play and an integer value, which shows how many tournament are to 
-* play before this tournament can be played.
+* indicating if the tournament is ready to play and an integer value, which shows how many of its individuals
+* are still in an earlier tournament.
 */
 
 class SIG_GPTournament
@@ -85,11 +85,11 @@ QList<SIG_GPTournamentIndividual *> indis;
 bool justWaiting ;
 
   /**
-   * The number of tournaments which have to be played first, before this tournament can be played.
-   *
+   * The number of individuals of this tournament that are still in an earlier tournament.
+   * The tournament can be played when it is 0.
    */
  public:
-int depNumber;
+int waitCounter;
 
   /**
    * The actual individual pool.

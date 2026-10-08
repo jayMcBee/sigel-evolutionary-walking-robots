@@ -32,7 +32,7 @@ SIGEL_GP::SIG_GPTournament::SIG_GPTournament(SIGEL_Tools::SIG_Randomizer& random
   trainer(trainer),
   indis(),
   justWaiting(false),
-  depNumber(0),
+  waitCounter(0),
   gpPool(actPool),
   gpParameter(gpParameter)
 {   
