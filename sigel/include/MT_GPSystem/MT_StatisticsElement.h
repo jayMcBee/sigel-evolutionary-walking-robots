@@ -1,17 +1,13 @@
 #ifndef MT_GPSYSTEM_MT_STATISTICSELEMENT_H
 #define MT_GPSYSTEM_MT_STATISTICSELEMENT_H
 
-
-
 #include <QTextStream>
 #include <QList>
 #include <qstring.h>
 #include <qtextstream.h>
 
-
 /* This class contain all Information, that could be arise from the GP-System 
 * in a generation and which is needed for evaluation a Meta experiment */
-
 
 
 class MT_StatisticsElement  
@@ -29,14 +25,12 @@ public:
 	double AverageFitness;
 	double MaxFitness; 
 
-	
  	int NumOfCrossoverEvent; // Parents by crossover  
 
 	int NumOfElementMutationParent; 
 	int NumOfMutateIndividuals;   // Parents by mutation 
 	
 	int NumOfSimpleCopyParent;  // Parents by simple copy
-
 
 	/**************** only this parameter of the offspring population ****************/
 	
@@ -55,8 +49,6 @@ public:
 	int NumOfMutateImprovingIndividuals; 
 		
 	int NumOfSimpleCopyOffspring;
-
-
 };
 
 #endif // MT_GPSYSTEM_MT_STATISTICSELEMENT_H

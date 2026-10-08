@@ -20,7 +20,6 @@ MT_TrainingCase::MT_TrainingCase(QTextStream &File)
 
 MT_TrainingCase::MT_TrainingCase()
 {
-	
 	Name = -1;
 	Fitness = -1.0;
 	Boundary = 0;
@@ -33,14 +32,11 @@ MT_TrainingCase::~MT_TrainingCase()
 
 MT_TrainingCase::MT_TrainingCase(double Fit, MT_TranslatedIndividual *TransIndi, int Na, int boun)
 {
-
 	Name = Na;
 	Fitness = Fit;
 	TranslateIndividual = TransIndi;
 	Boundary = boun;
-
 }
-
 
 void MT_TrainingCase::writeToFileTCase(QTextStream &File)
 {
@@ -57,36 +53,27 @@ double MT_TrainingCase::getFitness()
 	return Fitness; 
 }
 
-
 void MT_TrainingCase::setBoundary(int NewBoundary)
 {
-
 	Boundary = NewBoundary;
 }
 
 void MT_TrainingCase::setName(int NewName)
 {
-
 	Name = NewName;
 }
 
 MT_TranslatedIndividual * MT_TrainingCase::getIndividual()
 {
-
 	return TranslateIndividual;
 }
 
-
-
-
 int MT_TrainingCase::getName()
 {
-
 	return Name;
 }
 
 void MT_TrainingCase::setFitness(double Fit)
 {
 	Fitness=Fit;
-
 }

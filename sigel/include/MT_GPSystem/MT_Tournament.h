@@ -1,8 +1,6 @@
 #ifndef MT_GPSYSTEM_MT_TOURNAMENT_H
 #define MT_GPSYSTEM_MT_TOURNAMENT_H
 
-
-
 #include "MT_GPSystem/MT_Population.h"
 
 

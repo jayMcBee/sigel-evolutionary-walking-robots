@@ -51,7 +51,6 @@ public:
 	*/
 	QList<int> * T_Operand2;
 
-
 	/* An array of integer represent the MetaData
 	* about a SIGEL robot control program
 	* Metadata are the lenght of the Sigel Program and the 
@@ -60,7 +59,6 @@ public:
 	*/
 	QList<int> * MetaData;
 
-	
 	/* constructor
 	*/
 	MT_TranslatedIndividual();
@@ -78,7 +76,6 @@ public:
  	*/
 	MT_TranslatedIndividual(QTextStream &File);
 	
-
 	/* the destructor
 	*	the three array must destroy 
 	*/
@@ -89,8 +86,6 @@ public:
 	* @post: The individual is written to the given QTextStream.
 	*/
 	void writeToFileTransIndi (QTextStream &File);
-	
-	
 };
 
 #endif // MT_GPSYSTEM_MT_TRANSLATEDINDIVIDUAL_H

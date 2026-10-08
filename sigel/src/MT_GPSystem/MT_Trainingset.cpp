@@ -9,7 +9,6 @@ MT_Trainingset::MT_Trainingset()
 	FreePosition=0;
 	for(int i=0; i<TSize; i++)
 		TCases[i]=nullptr;
-
 }
 
 MT_Trainingset::~MT_Trainingset()
@@ -20,7 +19,6 @@ MT_Trainingset::~MT_Trainingset()
 
 MT_Trainingset::MT_Trainingset(QTextStream &File)
 {
-
 	QString TSetString("Trainingset:" );
 	QString PresentLine = File.readLine();
 
@@ -44,7 +42,6 @@ MT_Trainingset::MT_Trainingset(QTextStream &File)
 		if (FreePosition >=TSize)
 			FreePosition=FreePosition-TSize;
 	}
-
 }
 
 MT_Trainingset::MT_Trainingset(int TSi, int TNa)
@@ -56,14 +53,12 @@ MT_Trainingset::MT_Trainingset(int TSi, int TNa)
 	FreePosition= 0;
 	for(int i=0; i<TSize; i++)
 		TCases[i]=nullptr;
-
 }
 
 // further methods
 
 void MT_Trainingset::writeToFileTSet(QTextStream &File)
 {
-	
 	File << ("Trainingset:\n");
 	File << TSetName << Qt::endl;
 	File << TSize << Qt::endl;
@@ -76,7 +71,6 @@ void MT_Trainingset::writeToFileTSet(QTextStream &File)
 
 void MT_Trainingset::changeTSize(int NewTSize)
 {
-
 	if ((NewTSize<TSize)&&(PresentTSize>NewTSize))
 	{
 		for (int i=NewTSize; i<PresentTSize; i++)
@@ -95,7 +89,6 @@ void MT_Trainingset::changeTSize(int NewTSize)
 			TCases[i] =nullptr;
 
 	TSize=NewTSize;
-
 }
 
 void MT_Trainingset::updateTSet(QQueue<MT_TrainingCase *> *NewTCases)
@@ -115,12 +108,10 @@ void MT_Trainingset::updateTSet(QQueue<MT_TrainingCase *> *NewTCases)
 		for (int i=0; i<NumOfNew; i++)
 			insertTCase(NewTCases->dequeue());
 	}
-
 }
 
 void MT_Trainingset::insertTCase(MT_TrainingCase *Tcase)
 {
-
 	if (TCases[FreePosition]==nullptr)
 	{
 		TCases[FreePosition]= Tcase;
@@ -128,7 +119,6 @@ void MT_Trainingset::insertTCase(MT_TrainingCase *Tcase)
 		FreePosition++;
 		if (FreePosition >=TSize)
 			FreePosition=0;
-
 	}
 	else 
 	{
@@ -137,14 +127,11 @@ void MT_Trainingset::insertTCase(MT_TrainingCase *Tcase)
 		FreePosition++;
 		if (FreePosition >=TSize)
 			FreePosition=0;
-
 	}
-
 }
 
 MT_TrainingCase *MT_Trainingset::getTCase(int PositionTcase)
 {
-
 	return 	TCases[PositionTcase];
 }
 
@@ -155,6 +142,5 @@ int MT_Trainingset::getPresentTSize()
 
 int MT_Trainingset::getName()
 {
-
 	return TSetName;
 }

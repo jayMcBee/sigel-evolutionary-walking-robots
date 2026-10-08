@@ -3,7 +3,6 @@
 
 MT_Search::MT_Search()
 {
-
 }
 
 MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_Randomizer *_Randi)
@@ -16,7 +15,6 @@ MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_R
 	ChildTwo =nullptr;
 	Parent=nullptr;
 	FirstXOverParent=nullptr;
-
 }
 
 MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_Randomizer *_Randi, QTextStream &File)
@@ -41,12 +39,10 @@ MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_R
 		BrutSize = (File.readLine()).toInt();
 	else
 		LastError =410;
-
 }
 
 int MT_Search::getBrutSize()
 {
-
 	return BrutSize; 
 }
 
@@ -62,7 +58,6 @@ void MT_Search::setBrutSize(int SizeOfBrut)
 
 MT_Individual * MT_Search::mutate(MT_Individual * Progenitor)
 {
-	
 	MT_Individual * Child = (new MT_Individual(Progenitor->getProgram(),true));
 	
 	MT_Program * ChildProgram = Child->getProgram();
@@ -76,7 +71,6 @@ MT_Individual * MT_Search::mutate(MT_Individual * Progenitor)
 			//Iterate over the program line
 			for(int k=0; k<3; k++)
 			{
-				
 				if (Randi->answerMutateElement())
 				{
 					NumOfMutation++;
@@ -93,7 +87,6 @@ MT_Individual * MT_Search::mutate(MT_Individual * Progenitor)
 						{
 							// Mutate Variable - 1.Operand
 							(ChildProgram->getProgramLine(i))->setOperandA(Randi->getRandomVariable());
-						
 						}
 						break;
 
@@ -101,7 +94,6 @@ MT_Individual * MT_Search::mutate(MT_Individual * Progenitor)
 						{
 							// Mutate 2. Operand!
 							(ChildProgram->getProgramLine(i))->setOperandB(Randi->getRandomOperand());
-						
 						}
 						break;
 					}
@@ -113,14 +105,10 @@ MT_Individual * MT_Search::mutate(MT_Individual * Progenitor)
 	Child->setTypOfGenesis(100+NumOfMutation);
 
 	return Child;
-
 }
-
-
 
 void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 {
-
 /* ************************* Initialisations  **************************/
 
 	MT_Program * POneProgram = ParentOne->getProgram();
@@ -150,12 +138,10 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 	ChildOne = new MT_Individual(ChildOneProgram, false);
 	ChildTwo = new MT_Individual(ChildTwoProgram, false);
 
-
 /* ************************* The remaining program fragment(s) are appended to ChildOne and ChildTwo **************************/
 
 	switch (XPoints[0])
 	{
-
 	// Only 1 crossover point was chosen
 	case 0:
 		{
@@ -167,7 +153,6 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 
 			ChildOne->setTypOfGenesis(1);
 			ChildTwo->setTypOfGenesis(1);
-
 		}
 		break;
 	
@@ -188,8 +173,6 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 
 			ChildOne->setTypOfGenesis(2);
 			ChildTwo->setTypOfGenesis(2);
-
-			
 		}
 		break;
 
@@ -216,23 +199,18 @@ void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
 
 			ChildOne->setTypOfGenesis(3);
 			ChildTwo->setTypOfGenesis(3);
-
 		}
 		break;
-
 	}
 }
 
 MT_Individual*  MT_Search::reproduce(MT_Individual * Progenitor)
 {
-
 	return (new MT_Individual(Progenitor->getProgram(), true));
-
 }
 
 int MT_Search::startMatingProcess()
 {
-
 /* ************************* Initialisations  **************************/
 	int ParentSize = SourcePop->getSize();
 	int OffspringSize = TargetPop->getSize();
@@ -276,7 +254,6 @@ int MT_Search::startMatingProcess()
 	{
 		switch (Randi->getRandomSOperator())
 		{
-		
 		/* Reproduction of the parent*/
 		case 3 :
 			{
@@ -294,10 +271,8 @@ int MT_Search::startMatingProcess()
 					ChildOne = nullptr;
 					FreePos++;
 				}
-
 			}
 			break;
-		
 		
 		/* Mutation of the parent */
 		case 2 :
@@ -315,7 +290,6 @@ int MT_Search::startMatingProcess()
 					ChildOne = nullptr;
 					FreePos++;
 				}
-
 			}
 			break;
 		
@@ -351,7 +325,6 @@ int MT_Search::startMatingProcess()
 							ChildTwo =nullptr;
 							FreePos++;
 						}
-					
 					}
 				
 					CrossOver = false;
@@ -381,9 +354,4 @@ int MT_Search::startMatingProcess()
 		return TargetPop->getLastError();
 
 	return 0;
-
-
 }
-
-
-

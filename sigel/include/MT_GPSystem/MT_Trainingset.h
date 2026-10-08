@@ -1,14 +1,12 @@
 #ifndef MT_GPSYSTEM_MT_TRAININGSET_H
 #define MT_GPSYSTEM_MT_TRAININGSET_H
 
-
 #include <QQueue>
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 #include "MT_GPSystem/MT_TrainingCase.h"
 #include <qstring.h>
 #include <qtextstream.h>
  
-
 
 /* The class MT_Trainingset (stenographic T-set) administer the 
 * training - cases for the GP-System.
@@ -32,7 +30,6 @@ public:
 	*/
 	MT_TrainingCase* getTCase(int PositionTcase);
 	
-
 	/* updateTSet receive a pointer of a QQueue, which contain new T-cases. 
 	*The new T-cases result from the MT_Substitute. 
 	*/
@@ -75,7 +72,6 @@ private:
 	* @post: the first num Tcases will delete
 	*/
 	
-
 	/* indicate the present number of T-cases in the Array*/ 
 	int PresentTSize;
 	/* The name serve for identification of the T-Set by fitness estimation*/ 

@@ -10,7 +10,6 @@ MT_TranslatedIndividual::MT_TranslatedIndividual()
 	T_length = 0;
 	Boundary = -1;
 	MetaData = nullptr;
-
 }
 
 MT_TranslatedIndividual::~MT_TranslatedIndividual()
@@ -19,12 +18,10 @@ MT_TranslatedIndividual::~MT_TranslatedIndividual()
 	delete T_Operand2;
 	delete T_Instruktion;
 	delete MetaData;
-		
 }
 
 MT_TranslatedIndividual::MT_TranslatedIndividual(QList<int> *T_Instruk, QList<int> *T_OperOne, QList<int> *T_OperTwo, QList<int> *MData )
 {
-
 	T_Instruktion= T_Instruk;
 	T_Operand1 = T_OperOne;
 	T_Operand2 = T_OperTwo;
@@ -90,7 +87,6 @@ MT_TranslatedIndividual::MT_TranslatedIndividual(QTextStream &File)
 					(*MetaData)[k] = PresentLine.toInt();
 				}
 					
-
 		else
 			// Generate metadata .... 
 		{
@@ -112,7 +108,6 @@ MT_TranslatedIndividual::MT_TranslatedIndividual(QTextStream &File)
 				(*MetaData)[16] = T_length-Boundary;
 				for (int k=Boundary; k< T_Instruktion->size(); k++)
 					(*MetaData)[16+(*T_Instruktion)[k]] ++;
-
 			}
 		}
 	}
@@ -128,7 +123,6 @@ void MT_TranslatedIndividual::writeToFileTransIndi(QTextStream &File)
 
 	// Line layout, e.g. "123 123456 1234567" <- length 18 
 
-
 	for (int i=0; i<T_length;i++)
 	{
 		PartOfLine.setNum((*T_Instruktion)[i]);
@@ -139,14 +133,11 @@ void MT_TranslatedIndividual::writeToFileTransIndi(QTextStream &File)
 		
 		PartOfLine.setNum((*T_Operand2)[i]);
 		File<<PartOfLine.leftJustified(7,' ', true) << Qt::endl;
-		
 	}
 	File << "MetaData:" << Qt::endl;
 	
 	for (int i=0; i< MetaData->size(); i++)
 		File << (*MetaData)[i] << Qt::endl;
 	
-	
 	File<<Qt::endl;
-
 }

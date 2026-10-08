@@ -12,7 +12,6 @@
 
 class MT_TrainingCase  
 {
-
 private:		
 	/* The translated SIGEL Individual (respectively the robot control program)
 	*/
@@ -69,7 +68,6 @@ public:
 	* @post: The individual is written to the given QTextStream.
 	*/
 	void writeToFileTCase(QTextStream &File);
-
 };
 
 #endif // MT_GPSYSTEM_MT_TRAININGCASE_H

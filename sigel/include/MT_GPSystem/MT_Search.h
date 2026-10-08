@@ -1,7 +1,6 @@
 #ifndef MT_GPSYSTEM_MT_SEARCH_H
 #define MT_GPSYSTEM_MT_SEARCH_H
 
-
 #include <QTextStream>
 #include "MT_GPSystem/MT_Population.h"
 #include "MT_GPSystem/MT_Randomizer.h"	
@@ -15,7 +14,6 @@ class MT_Search
 {
 public:
 
-	
 	/*start the search process, it's determinate or 
 	* create new individuals with regard to the search parameters.
 	* @pre: there are a corrcet parent, offspring population
@@ -60,8 +58,6 @@ private:
 	MT_Individual *ChildTwo;
 	MT_Individual * Parent;
 	MT_Individual * FirstXOverParent;
-
-
 };
 
 #endif // MT_GPSYSTEM_MT_SEARCH_H

@@ -2,14 +2,11 @@
 
 MT_Statistics::MT_Statistics()
 {
-
 	TotalCrossoverEvent.resize(6);
-
 }
 
 MT_Statistics::MT_Statistics(QTextStream & File)
 {
-	
 	TotalCrossoverEvent.resize(6);
 
 	QString Statistics( "Statistics:" );
@@ -41,14 +38,12 @@ MT_Statistics::MT_Statistics(QTextStream & File)
 
 			for (int i=0;i<NumOfEntry;i++ )
 				addStatisticElement(new MT_StatisticsElement(File)); 
-						
 		}
 	}
 }
 
 void MT_Statistics::writeToFileMT_Statistics(QTextStream & File)
 {
-
 	File << ("Statistics:\n");
 	File << (StatisticsOfGeneration.size()) <<Qt::endl;
 	File << NumOfSimpleCopyParent <<Qt::endl;
@@ -65,21 +60,16 @@ void MT_Statistics::writeToFileMT_Statistics(QTextStream & File)
 	for (int i=0; i<(StatisticsOfGeneration.size());i++)
 		if (getStatisticElement(i) != nullptr)
 			getStatisticElement(i)->writeToFileElement(File);
-	
 }
 
 void MT_Statistics::addStatisticElement(MT_StatisticsElement *Element)
 {
-
 	StatisticsOfGeneration.append(Element);	
-
 }
 
 MT_StatisticsElement * MT_Statistics::getStatisticElement(int ElementOfGeneration)
 {
-
 	return StatisticsOfGeneration.value(ElementOfGeneration);
-
 }
 
 int MT_Statistics::updateStatistics()
@@ -95,10 +85,8 @@ int MT_Statistics::updateStatistics()
 
 	MT_StatisticsElement * PresentSElement;
 
-
 	for (int i=1; i<StatisticsOfGeneration.size(); i++)
 	{
-	
 		PresentSElement= StatisticsOfGeneration.value(i);
 	
 		NumOfSimpleCopyParent = NumOfSimpleCopyParent + PresentSElement->NumOfSimpleCopyOffspring;
@@ -109,9 +97,7 @@ int MT_Statistics::updateStatistics()
 
 		for (int k=0; k<6;k++)
 			TotalCrossoverEvent[k]=TotalCrossoverEvent[k]+PresentSElement->CrossoverEventParent[k];
-			
 	}
 
 	return Error;
 }
-	

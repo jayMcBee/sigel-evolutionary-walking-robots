@@ -4,7 +4,6 @@
 
 MT_TournamentManager::MT_TournamentManager()
 {
-
 }
 
 MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *OPop, MT_Randomizer * _Randi, int Method, int TSize)
@@ -17,7 +16,6 @@ MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *O
 	NameForNewParent =PPop->getSize();
 		
 	setTournamentSize(TSize);
-	
 }
 
 MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *OPop, MT_Randomizer *_Randi, QTextStream &File)
@@ -32,7 +30,6 @@ MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *O
 	QString TManager ( "TournamentManager:");
 	QString PresentLine = File.readLine();
 
-
 	while ((PresentLine != TManager) && !(File.atEnd()))
 		PresentLine = File.readLine();
 
@@ -44,7 +41,6 @@ MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *O
 	else
 		LastError=510;
 }
-
 
 MT_TournamentManager::~MT_TournamentManager()
 {
@@ -60,8 +56,6 @@ MT_TournamentManager::~MT_TournamentManager()
 	}
 }
 
-
-
 // get/set method
 int MT_TournamentManager::getLastError()
 {
@@ -70,16 +64,13 @@ int MT_TournamentManager::getLastError()
 
 int MT_TournamentManager::getTournamentSize()
 {
-
 	return TournamentSize;
 }
 
 int MT_TournamentManager::getSelectionMethod()
 {
-
 	return SMethod;
 }
-
 
 void MT_TournamentManager::setSelectionMethod(int Method)
 {
@@ -91,10 +82,8 @@ void MT_TournamentManager::setNameForParent(int Na)
 	NameForNewParent = Na;
 }
 
-
 void MT_TournamentManager::setTournamentSize(int SizeOfT)
 {
-
 	if(TournamentSize !=0)
 	{
 		for(int i=0; i<TournamentNumber; i++)
@@ -103,7 +92,6 @@ void MT_TournamentManager::setTournamentSize(int SizeOfT)
 		// Tournaments must always be deleted completely
 		// even though TournamentSize may not have changed 
 		// but ParentSize or OffspringSize may well have changed
-
 	}
 
 	TournamentSize = SizeOfT;
@@ -117,7 +105,6 @@ void MT_TournamentManager::setTournamentSize(int SizeOfT)
 	WinnerLoser.resize(TournamentSize);
 	
 	createTournaments();
-
 }
 
 void MT_TournamentManager::setTypOfIndividual(int Typ)
@@ -125,7 +112,6 @@ void MT_TournamentManager::setTypOfIndividual(int Typ)
 	for(int i=0; i<TournamentNumber; i++)
 		Tournaments[i]->setTypOfIndividual(Typ);
 }
-
 
 // special method
 
@@ -135,10 +121,8 @@ void MT_TournamentManager::createTournaments()
 		Tournaments[i] = new MT_Tournament(TournamentSize, WinnerNumber);	
 }
 
-
 void MT_TournamentManager::performTournaments()
 {
-
 // ************************ Prepare and distribute the offspring individuals into tournaments ************************ //
 	int OffspringSize = OffspringPop->getSize();
 
@@ -159,7 +143,6 @@ void MT_TournamentManager::performTournaments()
 	{
 //		DebugIndi = OffspringPop->getIndividual(i); 
 		Tournaments[Partition->at(i)]->insertIndividual(OffspringPop->getIndividual(i));
-	
 	}
 
 //DebugIndi =0;
@@ -170,8 +153,6 @@ void MT_TournamentManager::performTournaments()
 //		for (g=0; g<WinnerLoser.size();g++)
 //			DebugIndi= Tournaments[i]->getIndividual(g);
 
-
-		
 // ************************ Run the tournaments / update the parents  ************************ //
 
 	int ParentPos =0;
@@ -213,7 +194,6 @@ void MT_TournamentManager::performTournaments()
 					// increase the Index for insert 
 					ParentPos++;
 				}
-				
 			}
 
 			for(int k=0;k<WinnerLoser.size();k++)
@@ -222,7 +202,6 @@ void MT_TournamentManager::performTournaments()
 				delete Winner; 
 			}
 		
-
 			(Tournaments[i])->flush();
 		}
 
@@ -238,7 +217,6 @@ void MT_TournamentManager::performTournaments()
 			{
 				if (WinnerLoser[k]==0)
 				{
-
 					delete (Tournaments[i]->getIndividual(k));
 				}
 				else
@@ -263,7 +241,6 @@ void MT_TournamentManager::performTournaments()
 			}
 
 			(Tournaments[i])->flush();
-
 		}
 		
 		ParentPop->setFreePos(ParentPop->getSize());
@@ -273,17 +250,11 @@ double DebugFitness = 0.0;
 
 	for ( int g=0; g< ParentPop->getFreePos(); g++)
 		DebugFitness = ParentPop->getIndividual(g)->getFitness();
-
-
-
 }
-
 
 void MT_TournamentManager::writeToFileSetup(QTextStream &File)
 {
-
 	File << ("TournamentManager:\n");
 	File << SMethod << Qt::endl;
 	File << TournamentSize << Qt::endl << Qt::endl;
-
 }

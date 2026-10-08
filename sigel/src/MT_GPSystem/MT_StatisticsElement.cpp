@@ -2,7 +2,6 @@
 
 MT_StatisticsElement::MT_StatisticsElement(QTextStream &File)
 {
-
 	QString StatisticsE( "StatisticsElement:" );
 	QString PresentLine = File.readLine();
 
@@ -33,15 +32,11 @@ MT_StatisticsElement::MT_StatisticsElement(QTextStream &File)
 		int Buffer =(File.readLine()).toInt();
 		if (Buffer != 0)
 			NumOfMutateOffspring =Buffer;
-
 	}
-
 }
-
 
 MT_StatisticsElement::MT_StatisticsElement()
 {
-
 	Generation = 0;
 	Variance =0.0 ;
 	AverageFitness= 0.0;
@@ -61,12 +56,10 @@ MT_StatisticsElement::MT_StatisticsElement()
 	NumOfSimpleCopyOffspring=0; 
 	NumOfCrossoverEvent=0;
 	NumOfMutateOffspring =0;
-
 }
 
 void MT_StatisticsElement::writeToFileElement(QTextStream &File)
 {
-	
 	File << ("StatisticsElement:\n");
 	File << Generation <<Qt::endl;
 	File << Variance <<Qt::endl;
@@ -87,5 +80,4 @@ void MT_StatisticsElement::writeToFileElement(QTextStream &File)
 	File << NumOfCrossoverEvent <<Qt::endl;
 	File << NumOfMutateOffspring <<Qt::endl;
 	File << Qt::endl;
-
 }

@@ -5,7 +5,6 @@
 #include "MT_GPSystem/MT_StatisticsElement.h"
 
 
-
 /* manage the accrued Information of the run. It's include a QList of MT_StatisicsElement 
 * and a QList with the Information of crossover events so far.*/
 class MT_Statistics  
@@ -40,12 +39,9 @@ public:
 	unsigned int NumOfMutateIndividuals; 
 	unsigned int NumOfMutateImprovingIndividuals; 
 
-
 	/* This QList is a recording of  MT_StatisicsElement per Generation;
 	* the first Element of the List belonging to the first Generation, and so on*/
 	QList<MT_StatisticsElement *>  StatisticsOfGeneration;
-
-
 };
 
 #endif // MT_GPSYSTEM_MT_STATISTICS_H

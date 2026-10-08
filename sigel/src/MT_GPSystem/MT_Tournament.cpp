@@ -2,7 +2,6 @@
 
 MT_Tournament::MT_Tournament()
 {
-
 }
 
 MT_Tournament::MT_Tournament(int Size, int num)
@@ -18,7 +17,6 @@ MT_Tournament::MT_Tournament(int Size, int num)
 	TypOfIndividual = 0;
 }
 
-
 // further method
 
 void MT_Tournament::setTypOfIndividual(int Typ)
@@ -32,7 +30,6 @@ void MT_Tournament::ranking(QList<int> * WinnerLoser)
 
 	for (int i=0; i<WinnerLoseSize; i++)
 		(*WinnerLoser)[i]=0;
-
 
 	double PresentFit =0.0;
 	double SmallestFit =0.0;
@@ -79,11 +76,8 @@ void MT_Tournament::ranking(QList<int> * WinnerLoser)
 		(*WinnerLoser)[Position[k]]=1;
 }
 
-
-
 void MT_Tournament::fitnessProp(MT_Randomizer* Randi, QList<int> * WinnerLoser)
 {
-
 	int WinnerLoseSize = WinnerLoser->size();
 	for (int i=0; i<WinnerLoseSize; i++)
 		(*WinnerLoser)[i]=0;
@@ -119,16 +113,13 @@ int DebugIn = 1;
 	
 			ProporFit[i]= 	ProporFit[i]-500; 
 			
-		
 	DebugIn = ProporFit[i];
 
 			if (ProporFit[i]<=0)
 				ProporFit[i]=1;
 		}
-				
 	}
 
-	
 	// Determine the winners using the randomizer
 int DebugNumber = 0;
 QList<int> DebugArray;
@@ -152,7 +143,4 @@ QList<int> DebugArray;
 	{
 			DebugNumber =DebugNumber;
 	}
-		
-
-
 }

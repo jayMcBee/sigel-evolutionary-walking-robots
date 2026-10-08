@@ -1,13 +1,10 @@
 #ifndef MT_GPSYSTEM_MT_TOURNAMENTMANAGER_H
 #define MT_GPSYSTEM_MT_TOURNAMENTMANAGER_H
 
-
 #include <QList>
 #include <QTextStream>
 #include "MT_GPSystem/MT_Population.h"
 #include "MT_GPSystem/MT_Tournament.h"
-
-
 
 
 /* This class manage the GP tournament;
@@ -51,7 +48,6 @@ public:
 
 private:
 	
-
 	/* ATTENTION: relation between TournamentSize, TournamentNumber, WinnerNumber, ParentSize and OffspringSize is:
 	* @pre: TournamentNumber *WinnerNumber = ParentSize !
 	* @pre: TournamentNumber *TournamentSize = OffspringSize !
@@ -83,7 +79,6 @@ private:
 	
 	/* create the adequate Tournaments*/
 	void createTournaments();
-
 };
 
 #endif // MT_GPSYSTEM_MT_TOURNAMENTMANAGER_H
