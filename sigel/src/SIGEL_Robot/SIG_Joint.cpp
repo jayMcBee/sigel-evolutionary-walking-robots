@@ -729,11 +729,12 @@ namespace SIGEL_Robot {
 		       else if ( std::abs( mdh_theta - mechsMaxPos ) <= minimalAngleDistance ){
 			 mdh_theta = mechsMaxPos;}
 
-		       if ( mechsMaxPos < mechsMinPos )
+		       if ( mechsMaxPos < mechsMinPos ) {
 			 if ( mdh_theta <= mechsMaxPos )
 			   mechsMinPos -= 2 * std::numbers::pi;
 			 else
 			   mechsMaxPos += 2 * std::numbers::pi;
+		       }
 
 #ifdef SIG_DEBUG
 		       SIGEL_Tools::SIG_IO::cerr << "New mechsMinPos: "

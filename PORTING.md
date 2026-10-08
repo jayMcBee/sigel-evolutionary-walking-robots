@@ -917,6 +917,18 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   and `build/coredrive`. Older entries in this file keep the name
   `sigel_eval`; they mean this program.
 
+**2026-10-08 — `-Wdangling-else` IS GONE, AND ONE OF THE TWO `-Wsequence-point` WARNINGS.**
+
+- **`-Wdangling-else`:** three places had an `if` with an `else` directly
+  inside an `if` without braces: two in `SIG_GPOperations::mutation` and one
+  in `SIG_Joint.cpp`. Each inner `if` with its `else` is in braces now. The
+  `else` belongs to the same `if` as before, so no behaviour changes.
+- **`-Wsequence-point`:** `SIG_GPFitnessTrainer::getNextHost` wrote
+  `nextHostNumber = ++nextHostNumber % size`. It is
+  `(nextHostNumber + 1) % size` now, with the same result.
+- **Left:** the other `-Wsequence-point` warning, the autosave counter in
+  `MT_Controller::writeToFile`. It is a defect and belongs to item 132.
+
 **2026-10-08 — TWO KINDS OF COMPILER WARNING ARE GONE: `-Wunused-value` AND `-Wendif-labels`.**
 
 - **`-Wunused-value`:** the two loops in `MT_StatisticsWidget::updateGUI`

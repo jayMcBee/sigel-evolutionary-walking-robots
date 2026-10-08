@@ -558,52 +558,56 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
     }
 
   if( generalMutationType == 1 )
-    if( newProgram.getProgramLength() + 1 <= maxLength )
-      {
+    {
+      if( newProgram.getProgramLength() + 1 <= maxLength )
+        {
 
 #ifdef SIG_DEBUG
 
-        SIGEL_Tools::SIG_IO::cerr << "<TYPE 1>" << Qt::endl;
+          SIGEL_Tools::SIG_IO::cerr << "<TYPE 1>" << Qt::endl;
 
 #endif
 
-        SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageP, gpParameter.getInstructionProbabilities() );
+          SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageP, gpParameter.getInstructionProbabilities() );
 
-        newProgram.insertLine( mutPoint, newProgLine );
+          newProgram.insertLine( mutPoint, newProgLine );
 
-      }
-    else
-      generalMutationType = 2;
+        }
+      else
+        generalMutationType = 2;
+    }
    
 
   if( generalMutationType == 2 )
-    if( newProgram.getProgramLength() - 1 >= minLength )
-      {
+    {
+      if( newProgram.getProgramLength() - 1 >= minLength )
+        {
 
 #ifdef SIG_DEBUG
 
-        SIGEL_Tools::SIG_IO::cerr << "<TYPE 2>" << Qt::endl;
+          SIGEL_Tools::SIG_IO::cerr << "<TYPE 2>" << Qt::endl;
 
 #endif
 
-        newProgram.deleteLine( mutPoint );
-      }
-    else
-      {
-        if( newProgram.getProgramLength() + 1 <= maxLength )
-          {
+          newProgram.deleteLine( mutPoint );
+        }
+      else
+        {
+          if( newProgram.getProgramLength() + 1 <= maxLength )
+            {
 
 #ifdef SIG_DEBUG
 
-            SIGEL_Tools::SIG_IO::cerr << "<TYPE 1>" << Qt::endl;
+              SIGEL_Tools::SIG_IO::cerr << "<TYPE 1>" << Qt::endl;
 
 #endif
 
-            SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageP, gpParameter.getInstructionProbabilities() );
+              SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageP, gpParameter.getInstructionProbabilities() );
 
-            newProgram.insertLine( mutPoint, newProgLine );
-          }
-      }
+              newProgram.insertLine( mutPoint, newProgLine );
+            }
+        }
+    }
 
 #ifdef SIG_DEBUG
 
