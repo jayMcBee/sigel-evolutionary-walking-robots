@@ -103,14 +103,6 @@ namespace SIGEL_SlaveGUI
       QAction *fForwardAction;
 
       /**
-       * The recording action.
-       *
-       * This action indicated whether the simualtion shall be recorded or not.
-       */
-
-      QAction *recordAction;
-
-      /**
        * The alter movie settings action.
        */
       QAction *alterMovieSettingsAction;
@@ -142,11 +134,6 @@ namespace SIGEL_SlaveGUI
        */
       QIcon fForwardIcons;
 
-      /**
-       * The iconset for the record button.
-       */
-      QIcon recordIcons;
-      
       /**
        * The icon for the action with which the movie settings can be alter.
        */
