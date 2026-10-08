@@ -209,7 +209,7 @@ SIGEL_Program::SIG_Program::SIG_Program()
 
 void SIGEL_Program::SIG_Program::checkLength( long minimumLength, 
 					      long maximumLength, 
-					      SIGEL_Tools::SIG_Randomizer &r, 
+					      SIGEL_Tools::SIG_Randomizer &randomizer, 
 					      SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 					      QList< int > &prob,
 					      int &historyInfo )
@@ -233,7 +233,7 @@ void SIGEL_Program::SIG_Program::checkLength( long minimumLength,
 
      for( long i = 0; i < minimumLength - prgLength; i++ )
        {
-        SIGEL_Program::SIG_ProgramLine newLine( r, languageParameters, prob );
+        SIGEL_Program::SIG_ProgramLine newLine( randomizer, languageParameters, prob );
 
         // If there is a problem during the evolution, try to delete the following
         // instruction:
@@ -286,25 +286,25 @@ void SIGEL_Program::SIG_Program::checkLength( long minimumLength,
 
 SIGEL_Program::SIG_Program::SIG_Program( SIGEL_GP::SIG_GPParameter &param, 
                                          SIGEL_Robot::SIG_LanguageParameters &languageParameters, 
-                                         SIGEL_Tools::SIG_Randomizer& random )
+                                         SIGEL_Tools::SIG_Randomizer& randomizer )
   : lines()
 {
-  generateRandomProgram( param, languageParameters, random );
+  generateRandomProgram( param, languageParameters, randomizer );
 }
 
 void SIGEL_Program::SIG_Program::generateRandomProgram( SIGEL_GP::SIG_GPParameter &param, 
                                                         SIGEL_Robot::SIG_LanguageParameters &languageParameters, 
-						        SIGEL_Tools::SIG_Randomizer& random )
+						        SIGEL_Tools::SIG_Randomizer& randomizer )
 {
     lines.clear();
 
     long n = param.getMinIndLength() + 
-             random.getRandomInt( param.getMaxIndLength() - param.getMinIndLength() );
+             randomizer.getRandomInt( param.getMaxIndLength() - param.getMinIndLength() );
 
 
     for( long x=0; x<n; x++ )
       {
-        SIGEL_Program::SIG_ProgramLine newLine( random, languageParameters, param.getInstructionProbabilities() );
+        SIGEL_Program::SIG_ProgramLine newLine( randomizer, languageParameters, param.getInstructionProbabilities() );
 
         appendLine( newLine );
 

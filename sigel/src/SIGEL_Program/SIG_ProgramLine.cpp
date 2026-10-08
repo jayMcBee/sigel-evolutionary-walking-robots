@@ -48,11 +48,11 @@ void SIGEL_Program::SIG_ProgramLine::clearLine()
   element.resize(0);
 }
 
-SIGEL_Program::SIG_ProgramLine::SIG_ProgramLine(SIGEL_Tools::SIG_Randomizer &r, 
+SIGEL_Program::SIG_ProgramLine::SIG_ProgramLine(SIGEL_Tools::SIG_Randomizer &randomizer, 
 					        SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 						QList< int > &prob )
 {
-   generateRandomRobotInstruction(languageParameters, r, prob );
+   generateRandomRobotInstruction(languageParameters, randomizer, prob );
 }
 
 void SIGEL_Program::SIG_ProgramLine::setRobotinstructionType( Robotinstruction instr )
@@ -608,7 +608,7 @@ void  SIGEL_Program::SIG_ProgramLine::writeToFile(QTextStream &file) const
 
 
 void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_LanguageParameters &languageParameters,
-							    SIGEL_Tools::SIG_Randomizer &r,
+							    SIGEL_Tools::SIG_Randomizer &randomizer,
 							    QList< int > &prob   )
 {
      // QList<int> instr;
@@ -629,11 +629,11 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
 
      // getAllowedRobotinstructionsWithProb( instr, languageParameters, prob );
      
-     op1 = r.getRandomInt( maximum );
-     op2 = r.getRandomInt( maximum );
+     op1 = randomizer.getRandomInt( maximum );
+     op2 = randomizer.getRandomInt( maximum );
 
-     if( r.getRandomInt(2) == 1 ) op1 = (-1) * op1;
-     if( r.getRandomInt(2) == 1 ) op2 = (-1) * op2;
+     if( randomizer.getRandomInt(2) == 1 ) op1 = (-1) * op1;
+     if( randomizer.getRandomInt(2) == 1 ) op2 = (-1) * op2;
 
      if( languageParameters.hasCommand("COPY") )
        {
@@ -728,7 +728,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
      if( maximumValue == 0 )
         SIGEL_Tools::SIG_IO::cerr << "\nERROR: If no instructions are allowed, no instructions can be used !" << Qt::endl;
 
-     randomValue = r.getRandomLong( maximumValue );
+     randomValue = randomizer.getRandomLong( maximumValue );
   
      while( cont )
        { 
@@ -761,7 +761,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
        
      
 
-     // iType = instr[r.getRandomInt( instr.size() )]; 
+     // iType = instr[randomizer.getRandomInt( instr.size() )]; 
 
      switch( iType )
        {
@@ -800,10 +800,10 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
 }
 
 void SIGEL_Program::SIG_ProgramLine::generateRandomRobotInstruction(SIGEL_Robot::SIG_LanguageParameters &languageParameters,
-								    SIGEL_Tools::SIG_Randomizer &r,
+								    SIGEL_Tools::SIG_Randomizer &randomizer,
 								    QList< int > &prob   )
 {
-     randomRobotinstruction(languageParameters, r, prob);
+     randomRobotinstruction(languageParameters, randomizer, prob);
 }
 
 

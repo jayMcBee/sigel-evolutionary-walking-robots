@@ -118,7 +118,7 @@ class SIG_ProgramLine
  */  
 
    public:
-   SIG_ProgramLine( SIGEL_Tools::SIG_Randomizer &r, 
+   SIG_ProgramLine( SIGEL_Tools::SIG_Randomizer &randomizer, 
 		    SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 		    QList< int > &prob );
  
@@ -139,7 +139,7 @@ class SIG_ProgramLine
 
    public:
    void generateRandomRobotInstruction( SIGEL_Robot::SIG_LanguageParameters &languageParameters,
-				        SIGEL_Tools::SIG_Randomizer &r,
+				        SIGEL_Tools::SIG_Randomizer &randomizer,
                                         QList< int > &prob  );
           
 /**
@@ -171,7 +171,7 @@ class SIG_ProgramLine
  
    public:
    void randomRobotinstruction( SIGEL_Robot::SIG_LanguageParameters &languageParameters,
-			        SIGEL_Tools::SIG_Randomizer &r,
+			        SIGEL_Tools::SIG_Randomizer &randomizer,
 			        QList< int > &prob );
 /**
  * This function is only for test purposes and prints a program line.

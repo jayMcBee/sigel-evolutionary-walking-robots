@@ -108,7 +108,7 @@ class SIG_GPIndividual{
  * is placed in the right place.
  * @param param
  * The parameter which contains the probabilities and datas about the individual.
- * @param random
+ * @param randomizer
  * A reference to the randomizer module.
  * @param name
  * The name of the new individual.
@@ -124,7 +124,7 @@ class SIG_GPIndividual{
 
  public:
  SIG_GPIndividual( SIG_GPParameter& param, 
-		   SIGEL_Tools::SIG_Randomizer& random, 
+		   SIGEL_Tools::SIG_Randomizer& randomizer, 
 		   QString name, 
 		   QDateTime birthtime, 
 		   int poolpos );
@@ -162,10 +162,10 @@ class SIG_GPIndividual{
  */  
 
  public:
- SIG_GPIndividual( SIGEL_Tools::SIG_Randomizer& random );
+ SIG_GPIndividual( SIGEL_Tools::SIG_Randomizer& randomizer );
 
  public:
- SIG_GPIndividual( SIGEL_Tools::SIG_Randomizer &random,
+ SIG_GPIndividual( SIGEL_Tools::SIG_Randomizer &randomizer,
 		   SIGEL_GP::SIG_GPParameter& param, 
 		   SIGEL_Robot::SIG_LanguageParameters& languageParameters );
 
@@ -570,7 +570,7 @@ class SIG_GPIndividual{
  SIGEL_GP::SIG_GPIndividual& operator =(SIGEL_GP::SIG_GPIndividual& ind); 
 
  public:
- void generateRandomIndividual(SIGEL_Tools::SIG_Randomizer& random,
+ void generateRandomIndividual(SIGEL_Tools::SIG_Randomizer& randomizer,
                                SIGEL_GP::SIG_GPParameter& param, 
                                SIGEL_Robot::SIG_LanguageParameters& languageParameters);
 /**

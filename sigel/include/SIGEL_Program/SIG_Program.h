@@ -99,7 +99,7 @@ class SIG_Program
    public:
    SIG_Program(SIGEL_GP::SIG_GPParameter &param, 
 	       SIGEL_Robot::SIG_LanguageParameters &languageParameters, 
-	       SIGEL_Tools::SIG_Randomizer& random);
+	       SIGEL_Tools::SIG_Randomizer& randomizer);
 
 /**
  * This destructor deletes all program lines and all data that belongs to the current program.
@@ -242,7 +242,7 @@ class SIG_Program
  * A randomly generated program will exist.
  */
    public:
-   SIG_Program(int length, int nop, SIGEL_Tools::SIG_Randomizer &r);
+   SIG_Program(int length, int nop, SIGEL_Tools::SIG_Randomizer &randomizer);
 
 
 /**
@@ -255,7 +255,7 @@ class SIG_Program
    public:
    void generateRandomProgram(SIGEL_GP::SIG_GPParameter &param, 
                               SIGEL_Robot::SIG_LanguageParameters &languageParameters, 
-			      SIGEL_Tools::SIG_Randomizer& random);
+			      SIGEL_Tools::SIG_Randomizer& randomizer);
 
 /**
  * This function imports a complete program from an existing file.
@@ -281,7 +281,7 @@ class SIG_Program
    public:
    void checkLength( long minimum,
 		     long maximum,
-		     SIGEL_Tools::SIG_Randomizer &r, 
+		     SIGEL_Tools::SIG_Randomizer &randomizer, 
 		     SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 		     QList< int > &prob,
 		     int &historyInfo );

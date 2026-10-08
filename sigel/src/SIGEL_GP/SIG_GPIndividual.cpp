@@ -36,7 +36,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPIndividual::operator =(SIG_GPIndivid
  
 
 SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIG_GPParameter& param,
-					     SIGEL_Tools::SIG_Randomizer& random,
+					     SIGEL_Tools::SIG_Randomizer& randomizer,
 					     QString name, QDateTime birthtime,
 					     int poolpos)
   : prog()
@@ -102,7 +102,7 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual():prog()
    setAge(0);
 }
 
-SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &random):
+SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &randomizer):
   prog()
 { 
    setName("No Name");
@@ -126,10 +126,10 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &random
 
 }
 
-SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &random, 
+SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &randomizer, 
                                              SIGEL_GP::SIG_GPParameter& param, 
                                              SIGEL_Robot::SIG_LanguageParameters& languageParameters)
-  :prog( param, languageParameters,random )
+  :prog( param, languageParameters,randomizer )
 { 
    setName( "No name" );
    setFitness( -1 );
@@ -149,11 +149,11 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(QString data)
    loadIndividual(data);
 };
 
-void SIGEL_GP::SIG_GPIndividual::generateRandomIndividual(SIGEL_Tools::SIG_Randomizer& random,
+void SIGEL_GP::SIG_GPIndividual::generateRandomIndividual(SIGEL_Tools::SIG_Randomizer& randomizer,
                                                           SIGEL_GP::SIG_GPParameter& param, 
                                                           SIGEL_Robot::SIG_LanguageParameters& languageParameters )
 {
-   prog.generateRandomProgram(param,languageParameters,random);
+   prog.generateRandomProgram(param,languageParameters,randomizer);
    setName("No Name");
    setPoolPos(0);
    setFitness(-1);
