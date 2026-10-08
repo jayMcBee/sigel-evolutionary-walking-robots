@@ -259,15 +259,13 @@ namespace SIGEL_Robot {
                 r[Y] = T1[Y] / T0;
                 r[Z] = T1[Z] / T0;
 
-                /* compute inertia tensor */
+                /* compute inertia tensor about the origin of the geometry's coordinates; it is not translated to the centre of mass */
                 J[X][X] = density * (T2[Y] + T2[Z]);
                 J[Y][Y] = density * (T2[Z] + T2[X]);
                 J[Z][Z] = density * (T2[X] + T2[Y]);
                 J[X][Y] = J[Y][X] = - density * TP[X];
                 J[Y][Z] = J[Z][Y] = - density * TP[Y];
                 J[Z][X] = J[X][Z] = - density * TP[Z];
-
-                /* The inertia tensor stays about the origin of the geometry; it is not translated to the centre of mass. */
 
                 for (int i = 0; i < 3; i++) {
                         if (isnan (r [i])){

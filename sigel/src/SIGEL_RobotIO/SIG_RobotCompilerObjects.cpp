@@ -380,6 +380,7 @@ namespace SIGEL_RobotIO {
 
         void SIG_RobotCompilerObjects::modifierScaleall (double scalingFactor)
         {
+                // The scaling factor is read from the robot file and not applied.
         }
 
 }

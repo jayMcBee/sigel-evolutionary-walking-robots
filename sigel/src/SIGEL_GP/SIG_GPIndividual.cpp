@@ -84,6 +84,7 @@ SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual( SIGEL_Program::SIG_Program const& 
 					      QStringList const& hist )
   :prog()
 {
+   // The program argument is not copied: the individual starts with an empty program.
    setName(name1);
    setPoolPos(poolpos);
    setHistory( hist );
