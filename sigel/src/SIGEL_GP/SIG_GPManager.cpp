@@ -91,6 +91,38 @@ void SIGEL_GP::SIG_GPManager::advanceToNextTournament( int tournament )
 	}
 }
 
+void SIGEL_GP::SIG_GPManager::gatherFitnessResults( SIG_GPTournament &tournament )
+{
+	SIG_GPPopulation &population = currentExperiment.population;
+
+	tournament.justWaiting = false;
+
+	for (int i = 0; i < tournament.indis.size(); i++)
+	{
+		SIG_GPTournamentIndividual &tournamentIndividual = *tournament.indis[i];
+
+		if (tournamentIndividual.fitTaskId == -1)
+		{
+			continue;
+		}
+
+		double fitness = trainer->checkTask( tournamentIndividual.fitTaskId );
+		if (fitness != -1)
+		{
+			SIG_GPIndividual &individual = population.getIndividual( tournamentIndividual.indNumber );
+			individual.setFitness( fitness );
+			updateIndividualView( tournamentIndividual.indNumber );
+			tournamentIndividual.fitTaskId = -1;
+
+			advanceToNextTournament( tournamentIndividual.successor );
+		}
+		else
+		{
+			tournament.justWaiting = true;
+		}
+	}
+}
+
 void SIGEL_GP::SIG_GPManager::evolutionLoop()
 {
 	int maxTouchsPerLoop = currentExperiment.gpParameter.getMaxTouchsPerLoop();
@@ -207,31 +239,8 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop()
 				}
 				else
 				{
-					actTour.justWaiting = false;
-
-					for (int j=0; j<actIndiNumber; j++)
-					{
-						SIG_GPTournamentIndividual &actTourInd = *actTour.indis[j];
-
-						if (actTourInd.fitTaskId != -1)
-						{
-							double actFitness = trainer->checkTask( actTourInd.fitTaskId );
-							if (actFitness != -1)
-							{
-								SIG_GPIndividual &actInd = pop.getIndividual( actTourInd.indNumber );
-								actInd.setFitness( actFitness );
-								updateIndividualView( actTourInd.indNumber );
-								actTourInd.fitTaskId = -1;
-
-								advanceToNextTournament( actTourInd.successor );
-							} // if(actFitness) -condition
-							else
-							{
-								actTour.justWaiting = true;
-							}
-						};
-					};
-				}; // for (int j=0;...) - loop
+					gatherFitnessResults( actTour );
+				};
 				if (!actTour.justWaiting)
 				{
 					taskCanDoList.removeAt( canDoIdx );   // next slides into canDoIdx
@@ -1448,31 +1457,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 				}
 				else
 				{
-					actTour.justWaiting = false;
-
-					for (int j=0; j<actIndiNumber; j++)
-					{
-						SIG_GPTournamentIndividual &actTourInd = *actTour.indis[j];
-
-						if (actTourInd.fitTaskId != -1)
-						{
-							double actFitness = trainer->checkTask( actTourInd.fitTaskId );
-							if (actFitness != -1)
-							{
-
-								SIG_GPIndividual &actInd = pop.getIndividual( actTourInd.indNumber );
-								actInd.setFitness( actFitness );
-								updateIndividualView( actTourInd.indNumber );
-								actTourInd.fitTaskId = -1;
-
-								advanceToNextTournament( actTourInd.successor );
-							}
-							else
-							{
-								actTour.justWaiting = true;
-							}
-						};
-					};
+					gatherFitnessResults( actTour );
 				};
 				if (!actTour.justWaiting)
 				{

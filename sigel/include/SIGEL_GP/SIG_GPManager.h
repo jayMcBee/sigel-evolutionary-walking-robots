@@ -211,6 +211,15 @@ namespace SIGEL_GP
 		void advanceToNextTournament( int tournament );
 
 		/**
+		 * Gathers the fitness results that have arrived for the individuals of a
+		 * played tournament. An individual that has its result advances to its
+		 * next tournament. 'justWaiting' of the tournament is true afterwards
+		 * while a result is still missing.
+		 */
+	private:
+		void gatherFitnessResults( SIG_GPTournament &tournament );
+
+		/**
 		 * The evolutionLoop is the heart of the genetic programming algorithm.
 		 * It determine how the evolution works.
 		 * @pre
