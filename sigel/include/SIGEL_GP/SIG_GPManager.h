@@ -123,6 +123,12 @@ namespace SIGEL_GP
 
  private:
   /**
+   * Guards 'allDisconnected', 'disconnectClients' and 'cond'.
+   */
+  pthread_mutex_t disconnectMutex;
+
+ private:
+  /**
    * This list contains the indices of all tournaments in tours
    * that are free to start or that are waiting for the calculation
    * of fitness values for individuals that were created by them.

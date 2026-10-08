@@ -51,6 +51,8 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
     fitnessCalculated( false ),
     currentGenerationNo(0)
 {
+	pthread_mutex_init(&disconnectMutex, nullptr);
+
 	trainer = nullptr;
 	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == EVALUATOR_SUBST){
 		trainer = dynamic_cast<SIG_GPFitnessTrainer*>(currentExperiment.mtController->getFitnessTrainer());
@@ -653,8 +655,6 @@ void SIGEL_GP::SIG_GPManager::run() {
 	if(toursAreEmpty( tours ) && currentExperiment.getPopulation().getSize() > 3)
 		currentExperiment.mtController->startEvolution();
 
-  pthread_mutex_t     mutex = PTHREAD_MUTEX_INITIALIZER;
-
   // init the condition variable
    pthread_cond_init(&cond, nullptr);
 
@@ -794,7 +794,7 @@ void SIGEL_GP::SIG_GPManager::run() {
        fprintf(stderr, " Releasing Dynamic SIGEL-Clients:\n");
 
        // make the main thread running exclusively
-      pthread_mutex_lock( &mutex );
+      pthread_mutex_lock( &disconnectMutex );
       fprintf(stderr, "\t- Flushing all dynamic clients from PVM-Hosts list\n");
       trainer->flushAllDynHosts();
 
@@ -804,9 +804,9 @@ void SIGEL_GP::SIG_GPManager::run() {
 
       // let's wait for server thread
       while ( ! allDisconnected ) {
-       pthread_cond_wait(&cond, &mutex);
+       pthread_cond_wait(&cond, &disconnectMutex);
       }
-      pthread_mutex_unlock( &mutex );
+      pthread_mutex_unlock( &disconnectMutex );
 
       fprintf(stderr, "\n");
     }
@@ -822,7 +822,6 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
   QList<int> clientSockets(0);
   struct protoent *ptrp;
   int listenSocket, sdRecv;
-  pthread_mutex_t servMutex = PTHREAD_MUTEX_INITIALIZER;
   char clientName[256];
   QString client;
 
@@ -912,10 +911,9 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
     }
 
     // check if computation is finished and clients need to be disconnected
-    if (disconnectClients) {
-      // now make us running exclusively
-      pthread_mutex_lock( &servMutex );
+    pthread_mutex_lock( &disconnectMutex );
 
+    if (disconnectClients) {
       // iterate through list of connected sockets and cut connection;
       // be sure all clients have been removed from the pvmHost list !
       const int disconnectMessage = kSuicidalRequest;
@@ -932,8 +930,9 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients() {
       allDisconnected = true;
 
       pthread_cond_broadcast(&cond);
-      pthread_mutex_unlock( &servMutex );
     }
+
+    pthread_mutex_unlock( &disconnectMutex );
   }
 
   fprintf(stderr, "SIGEL_GP::SIG_GPManager::RegisterDynPVMClients -- The server is exiting ! This should never ever happen ! !");
@@ -979,8 +978,6 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	 *  end of Meta-System specific part
 	 ****/
 
-
-  pthread_mutex_t     mutex = PTHREAD_MUTEX_INITIALIZER;
 
    // init the condition variable
    pthread_cond_init(&cond, nullptr);
@@ -1141,7 +1138,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
            fprintf(stderr, " Releasing Dynamic SIGEL-Clients:\n");
 
            // make the main thread running exclusively
-           pthread_mutex_lock( &mutex );
+           pthread_mutex_lock( &disconnectMutex );
            fprintf(stderr, "\t- Flushing all dynamic clients from PVM-Hosts list\n");
            trainer->flushAllDynHosts();
 
@@ -1151,9 +1148,9 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
            // let's wait for server thread..
            while ( ! allDisconnected )
-           { pthread_cond_wait(&cond, &mutex);
+           { pthread_cond_wait(&cond, &disconnectMutex);
            }
-           pthread_mutex_unlock( &mutex );
+           pthread_mutex_unlock( &disconnectMutex );
 
            fprintf(stderr, "\n");
         }
