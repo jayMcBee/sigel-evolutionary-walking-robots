@@ -1051,6 +1051,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
     them and makes them again at several points during its life, which
     needs a `reset()` at each.
 
+**2026-10-08 — DONE: ITEM 125, `accept()` FOR DYNAMIC CLIENTS GETS NO UNSET SIZE.**
+
+- **Before:** `SIG_GPManager::RegisterDynPVMClients` passed the local `alen`
+  to `accept()` without a value. `accept()` reads it as the size of the
+  address buffer. With an invalid value `accept()` fails, and the server
+  thread prints "accept() failed" and ends the program.
+- **Now:** `accept()` gets a null pointer for the address and for its size,
+  which POSIX allows when the caller does not need the address of the peer.
+  The locals `caddr` and `alen` are gone. Nothing read the address.
+- **Measured:** on one machine, `sigel -de` on a copy of `twoBases.exp` with
+  one `manage_dyn_slave`: the master registered the client, added the host
+  and computed 19 generations with no failed `accept()` and no failed
+  `pvm_spawn()`. The release of the clients did not run in that test. Two
+  machines are not tested. `check.sh` does not reach this line and was not
+  run.
+
 **2026-10-07 — DONE: ITEM 141, `main` IN `sigel_slave.cpp` IS SPLIT BY JOB.**
 
 - **Before:** one `main` did three jobs: it showed the first individual of an

@@ -147,13 +147,6 @@ touched, because changing one changes behaviour against the reference binary.
   tested.** It may use servo drives, and a naive change may break existing
   experiments.
 
-- [ ] **125. Give `accept()` a buffer size in
-  `SIG_GPManager::RegisterDynPVMClients`.** `alen` is passed to `accept()`
-  without being set, so `accept()` reads an arbitrary buffer size. If that
-  value is invalid, `accept()` fails, and the server prints "accept() failed"
-  and exits the program. Latent: only the dynamic-client thread reaches it,
-  like item 121.
-
 - [ ] **121. Make the dynamic-client handshake share one mutex.**
   `SIG_GPManager::run`, both overloads, waits on the member `cond` with its
   own local `mutex`; `SIG_GPManager::RegisterDynPVMClients` broadcasts under
