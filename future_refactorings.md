@@ -120,14 +120,17 @@ Paths are relative to `sigel/`, the source tree.
     or of a class, struct or enum.
   - Exactly one empty line after the `{` and before the `}` of a namespace.
   - Never two empty lines in a row, inside a function body or outside one.
+    The one exception: two empty lines may stand above a class declaration
+    and above the first method of a class in a `.cpp` file.
   - No empty line at the end of a file.
-  - Two functions with no empty line between them stay as they are.
+  - One empty line between two functions. Add it where there is none.
   - Empty lines next to a comment and inside a class body stay as they are,
     apart from the rule on two in a row.
 
   The change touches only empty lines, so the non-empty lines of each file
-  must stay identical. Modules still to do: `MT_Control`, `MT_GPSystem`,
-  `MT_GUI`, `SIGEL_CommonGUI`, `SIGEL_Environment`, `SIGEL_GP`,
+  must stay identical. One change covers at most 20 files, also inside one
+  module. Modules still to do: `MT_Control`, `MT_GPSystem`, `MT_GUI`,
+  `SIGEL_Environment`, `SIGEL_GP`,
   `SIGEL_MasterGUI`, `SIGEL_Program`, `SIGEL_RealInterface`, `SIGEL_Robot`,
   `SIGEL_RobotCheck`, `SIGEL_RobotIO`, `SIGEL_Simulation`, `SIGEL_SlaveGUI`,
   `SIGEL_Tools`, `SIGEL_Visualisation`, and `sigel.cpp`, `sigel_slave.cpp`,

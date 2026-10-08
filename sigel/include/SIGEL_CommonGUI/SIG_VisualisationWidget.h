@@ -271,8 +271,6 @@ using namespace SIGEL_CommonGUI;
       QSize floatingTextsSize;
 
       int showAncorPointsState;
-
     };
-
 
 #endif // SIGEL_COMMONGUI_SIG_VISUALISATIONWIDGET_H

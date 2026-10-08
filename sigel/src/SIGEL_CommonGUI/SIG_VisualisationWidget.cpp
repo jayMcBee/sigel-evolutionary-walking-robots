@@ -29,7 +29,6 @@
 #include <numbers>
 
 
-
   SIG_VisualisationWidget::SIG_VisualisationWidget( QWidget *parent,
 						    char const *name,
 						    Qt::WindowFlags f )
@@ -225,7 +224,6 @@
   {
     glClearColor( 1, 1, 1, 1 );
   };
-
 
   void SIG_VisualisationWidget::resizeGL(int width, int height)
   {

@@ -30,14 +30,12 @@ namespace SIGEL_CommonGUI
 
   class SIG_FloatingTextLabel : public QLabel
     {
-
     public:
       SIG_FloatingTextLabel( QWidget * parent,
 			     const char * name=nullptr );
 
     private:
       void mousePressEvent( QMouseEvent *e );
-
     };
 
 }
