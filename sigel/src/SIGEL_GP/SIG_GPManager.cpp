@@ -91,6 +91,86 @@ void SIGEL_GP::SIG_GPManager::advanceToNextTournament( int tournament )
 	}
 }
 
+void SIGEL_GP::SIG_GPManager::runTournament( SIG_GPTournament &tournament )
+{
+	SIG_GPPopulation &population = currentExperiment.population;
+
+	tournament.run();
+
+	for (int i = 0; i < tournament.indis.size(); i++)
+	{
+		SIG_GPTournamentIndividual &tournamentIndividual = *tournament.indis[i];
+		SIG_GPIndividual &individual = population.getIndividual( tournamentIndividual.indNumber );
+
+		if (individual.upToDate())
+		{
+#ifdef SIG_DEBUG
+			SIGEL_Tools::SIG_IO::cerr << "Individual "
+			  << individual.getPoolPos()
+			  << " is up to date." << Qt::endl;
+#endif
+
+			advanceToNextTournament( tournamentIndividual.successor );
+		}
+		else
+		{
+#ifdef SIG_DEBUG
+			SIGEL_Tools::SIG_IO::cerr << "Individual "
+			  << individual.getPoolPos()
+			  << " is not up to date." << Qt::endl;
+#endif
+
+			tournament.justWaiting = true;
+			tournamentIndividual.fitTaskId = trainer->spawnTask( individual );
+			updateIndividualView( tournamentIndividual.indNumber );
+		}
+
+		updateIndividualView( tournamentIndividual.indNumber );
+	}
+}
+
+void SIGEL_GP::SIG_GPManager::runTournament( SIG_GPTournament &tournament, MT_Classifier *metaClassifier )
+{
+	SIG_GPPopulation &population = currentExperiment.population;
+
+	tournament.run( metaClassifier );
+
+	for (int i = 0; i < tournament.indis.size(); i++)
+	{
+		SIG_GPTournamentIndividual &tournamentIndividual = *tournament.indis[i];
+		SIG_GPIndividual &individual = population.getIndividual( tournamentIndividual.indNumber );
+
+		if (individual.upToDate())
+		{
+#ifdef SIG_DEBUG
+			SIGEL_Tools::SIG_IO::cerr << "Individual "
+			  << individual.getPoolPos()
+			  << " is up to date." << Qt::endl;
+#endif
+
+			advanceToNextTournament( tournamentIndividual.successor );
+		}
+		else
+		{
+#ifdef SIG_DEBUG
+			SIGEL_Tools::SIG_IO::cerr << "Individual "
+			  << individual.getPoolPos()
+			  << " is not up to date." << Qt::endl;
+#endif
+
+			// An individual without a next tournament gets no fitness task.
+			if (tournamentIndividual.successor != -1)
+			{
+				tournament.justWaiting = true;
+				tournamentIndividual.fitTaskId = trainer->spawnTask( individual );
+				updateIndividualView( tournamentIndividual.indNumber );
+			}
+		}
+
+		updateIndividualView( tournamentIndividual.indNumber );
+	}
+}
+
 void SIGEL_GP::SIG_GPManager::gatherFitnessResults( SIG_GPTournament &tournament )
 {
 	SIG_GPPopulation &population = currentExperiment.population;
@@ -127,8 +207,6 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop()
 {
 	int maxTouchsPerLoop = currentExperiment.gpParameter.getMaxTouchsPerLoop();
 	int toDoSweepsPerLoop = currentExperiment.gpParameter.getToDoSweepsPerLoop();
-
-	SIG_GPPopulation &pop = currentExperiment.population;
 
 	while ( !taskCanDoList.isEmpty() )
 	{
@@ -170,7 +248,6 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop()
 				}
 
 				SIG_GPTournament &actTour=*tours[ taskCanDoList.at( canDoIdx ) ];
-				int actIndiNumber = actTour.indis.size();
 
 #ifdef SIG_DEBUG
 				SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager inspecting tournament No. "
@@ -205,37 +282,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop()
 					  << Qt::endl;
 #endif
 
-					actTour.run();
-
-					for (int i = 0; i < actIndiNumber; i++)
-					{
-						SIG_GPIndividual &actInd = pop.getIndividual( actTour.indis[i]->indNumber );
-
-						if (actInd.upToDate())
-						{
-#ifdef SIG_DEBUG
-							SIGEL_Tools::SIG_IO::cerr << "Individual "
-							  << actInd.getPoolPos()
-							  << " is up to date." << Qt::endl;
-#endif
-
-							advanceToNextTournament( actTour.indis[i]->successor );
-						}
-						else
-						{
-#ifdef SIG_DEBUG
-							SIGEL_Tools::SIG_IO::cerr << "Individual "
-							  << actInd.getPoolPos()
-							  << " is not up to date." << Qt::endl;
-#endif
-
-							actTour.justWaiting = true;
-							actTour.indis[i]->fitTaskId = trainer->spawnTask( actInd );
-							updateIndividualView( actTour.indis[i]->indNumber );
-						};
-
-						updateIndividualView( actTour.indis[i]->indNumber );
-					};
+					runTournament( actTour );
 				}
 				else
 				{
@@ -1340,8 +1387,6 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 	int maxTouchsPerLoop = currentExperiment.gpParameter.getMaxTouchsPerLoop();
 	int toDoSweepsPerLoop = currentExperiment.gpParameter.getToDoSweepsPerLoop();
 
-	SIG_GPPopulation &pop = currentExperiment.population;
-
 	while ( !taskCanDoList.isEmpty() )
 	{
 		stopIfNecessary( false );
@@ -1383,7 +1428,6 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 				}
 
 				SIG_GPTournament &actTour=*tours[ taskCanDoList.at( canDoIdx ) ];
-				int actIndiNumber = actTour.indis.size();
 
 #ifdef SIG_DEBUG
 				SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager inspecting tournament No. "
@@ -1418,42 +1462,8 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop(MT_Classifier *MetaClassifier)
 					                          << taskCanDoList.at( canDoIdx )
 					                          << Qt::endl;
 #endif
-					//*********************** META change 1)
-					actTour.run(MetaClassifier);
 
-					for (int i = 0; i < actIndiNumber; i++)
-					{
-						SIG_GPIndividual &actInd = pop.getIndividual( actTour.indis[i]->indNumber );
-
-						if (actInd.upToDate())
-						{
-#ifdef SIG_DEBUG
-							SIGEL_Tools::SIG_IO::cerr << "Individual "
-							                          << actInd.getPoolPos()
-							                          << " is up to date." << Qt::endl;
-#endif
-
-							advanceToNextTournament( actTour.indis[i]->successor );
-						}
-						else
-						{
-#ifdef SIG_DEBUG
-							SIGEL_Tools::SIG_IO::cerr << "Individual "
-							                          << actInd.getPoolPos()
-							                          << " is not up to date." << Qt::endl;
-#endif
-
-							//*********************** META change 2) :=  if(actTour.indis[i]->successor != -1)
-							if(actTour.indis[i]->successor != -1)
-							{
-								actTour.justWaiting = true;
-								actTour.indis[i]->fitTaskId = trainer->spawnTask( actInd );
-								updateIndividualView( actTour.indis[i]->indNumber );
-							}
-						};
-
-						updateIndividualView( actTour.indis[i]->indNumber );
-					};
+					runTournament( actTour, MetaClassifier );
 				}
 				else
 				{

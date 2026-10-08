@@ -181,6 +181,20 @@ namespace SIGEL_GP
 		void advanceToNextTournament( int tournament );
 
 		/**
+		 * Runs a tournament. An individual that has its fitness advances to its
+		 * next tournament. A fitness task is started for each new individual, and
+		 * 'justWaiting' of the tournament is then true.
+		 */
+		void runTournament( SIG_GPTournament &tournament );
+
+		/**
+		 * Runs a tournament with the classifier of the Meta system. It does what
+		 * the other runTournament does, but a new individual without a next
+		 * tournament gets no fitness task.
+		 */
+		void runTournament( SIG_GPTournament &tournament, MT_Classifier *metaClassifier );
+
+		/**
 		 * Gathers the fitness results that have arrived for the individuals of a
 		 * played tournament. An individual that has its result advances to its
 		 * next tournament. 'justWaiting' of the tournament is true afterwards
