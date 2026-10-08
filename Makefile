@@ -2,8 +2,9 @@
 #
 # Two halves: the vendored third-party libraries, then SIGEL's own code.
 #
-#   make            sigel and sigel_slave, then sigelApp/ -- the folder SIGEL is
-#                   started from: cd sigelApp && ./sigelLauncher
+#   make            sigel, sigel_slave and manage_dyn_slave, then sigelApp/ --
+#                   the folder SIGEL is started from:
+#                   cd sigelApp && ./sigelLauncher
 #   make coredrive build/coredrive -- one fitness evaluation, for the checks
 #   make vendor     the five vendored libraries only
 #   make pvm        libpvm3.a and pvmd3, built by PVM's own make
@@ -526,7 +527,7 @@ $(B)/pvm_link: checks/programs/pvm_link.cpp $(PVM_OBJS) $(MOC_OBJS_CORE) $(CORE_
 	    echo "$$bad" >&2; exit 1; }
 
 # ---------------------------------------------------------------------------
-# The two programs -- PORTING.md Phase C, step C9.
+# sigel and sigel_slave -- PORTING.md Phase C, step C9.
 #
 # Nothing built these before C9: they are src/*.cpp, outside every module list,
 # and check.sh only ever ran them through -fsyntax-only. Linking is what proves
@@ -543,7 +544,7 @@ $(B)/pvm_link: checks/programs/pvm_link.cpp $(PVM_OBJS) $(MOC_OBJS_CORE) $(CORE_
 # Clean variant instead, so that object is named explicitly ahead of the
 # archives, exactly as coredrive does it. Both are asserted after the link.
 .PHONY: programs
-programs: $(B)/sigel $(B)/sigel_slave
+programs: $(B)/sigel $(B)/sigel_slave $(B)/manage_dyn_slave
 
 SIGLIBS = $(PVM_LIB) -ltirpc \
           -L$(QTLIB) -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core \
@@ -568,9 +569,15 @@ $(B)/sigel_slave: $(SRC)/src/sigel_slave.cpp $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(CL
 	   echo "sigel_slave linked the WRONG SIG_GPExperiment: constructor is $$got," \
 	        "Clean's is $$want -- see PORTING.md section 9." >&2; exit 1; }
 
+# manage_dyn_slave is C and needs only the C library. -std=gnu17, not c17: the
+# strict modes hide gethostname() and the member h_addr of struct hostent.
+$(B)/manage_dyn_slave: $(SRC)/src/manage_dyn_slave.c
+	@mkdir -p $(dir $@)
+	gcc -std=gnu17 -O1 -g -Wall -Wextra $(SIGSAN) $< -o $@
+
 # ---------------------------------------------------------------------------
 # sigelApp/ -- the folder SIGEL is started from, as 1.3's README describes it:
-# the two programs, the three scripts, Terrain.ter, stdConf.mt, pixmaps/,
+# the three programs, the three scripts, Terrain.ter, stdConf.mt, pixmaps/,
 # textures/ and supportingLibs/pvm3. Start SIGEL there with ./sigelLauncher.
 #
 # The data are copies, not links: SIGEL rewrites Terrain.ter and writes movie/
@@ -585,10 +592,10 @@ APP_DATA := sigelLauncher povrayLauncher sigelDynClient Terrain.ter stdConf.mt \
             $(patsubst $(SRC)/%,%,$(wildcard $(SRC)/pixmaps/* $(SRC)/textures/*))
 
 .PHONY: sigelApp
-sigelApp: $(APP)/sigel $(APP)/sigel_slave $(addprefix $(APP)/,$(APP_DATA)) \
-          $(APP)/supportingLibs/pvm3
+sigelApp: $(APP)/sigel $(APP)/sigel_slave $(APP)/manage_dyn_slave \
+          $(addprefix $(APP)/,$(APP_DATA)) $(APP)/supportingLibs/pvm3
 
-$(APP)/sigel $(APP)/sigel_slave: $(APP)/%: build/%
+$(APP)/sigel $(APP)/sigel_slave $(APP)/manage_dyn_slave: $(APP)/%: build/%
 	@mkdir -p $(dir $@)
 	cp $< $@.tmp && mv -f $@.tmp $@
 
