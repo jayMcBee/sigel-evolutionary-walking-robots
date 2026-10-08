@@ -1,8 +1,6 @@
 #ifndef MT_CONTROL_MT_SUBSTITUTE_H
 #define MT_CONTROL_MT_SUBSTITUTE_H
 
-
-
 #include <QQueue>
 #include <memory>
 #include "MT_GPSystem/MT_Program.h"
@@ -31,7 +29,6 @@ struct subst_cache {
 
 class MT_Substitute  
 {
-
 public:
 	
 	// get/set method for Parameter update
@@ -123,7 +120,6 @@ protected:
 	// different variable for count; 
 	QList<unsigned int> NumOfCorrectEstimation;
 	QList<unsigned int> NumOfMetaEstimation;
-
 };
 
 #endif // MT_CONTROL_MT_SUBSTITUTE_H

@@ -73,7 +73,6 @@ void MT_Controller::startSingleEvolution()
 	startWOSigel = true;
 
 		pthread_create(&meta_thread, nullptr, reinterpret_cast<void*(*)(void*)>(&StartMetaEvolution), this);
-
 }
 
 /***
@@ -117,7 +116,6 @@ bool MT_Controller::startEvolution()
 	startWOSigel = false;
 
 	if(metaOn){
-
 		if(!createGPSystem())	// create the gp system if not created so far
 			return false;
 
@@ -173,19 +171,16 @@ void MT_Controller::stopEvolution()
  ***/
 bool MT_Controller::switchSystem(int wantedSystem)
 {
-
 	// the wanted system equals the used system -> nothing to do so leave here
 	if(usedSystem == wantedSystem)
 		return true;
 
 	// if we have constructed a substituter or a gpmanager yet, we have to destroy them
 	if(gpManager || substCache.inUse || substitution){
-
 		if(QMessageBox::warning(SIGEL_Tools::dialogParent(), "Switching the MetaGP System", 
 			"Switching the system requires deleting the current\n"
 			"GP system. Do you want to delete it?",
 			QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes){
-
 			if(mainWindow){
 				QObject::disconnect(mainWindow->mtStartEvolutionAction, SIGNAL( triggered() ), this, SLOT( startSingleEvolution() ));
 				QObject::disconnect(mainWindow->mtStopEvolutionAction, SIGNAL( triggered() ), this, SLOT( stopEvolution() ));
@@ -399,13 +394,10 @@ bool MT_Controller::readFromFile(QString fileName)
 	}
 
 	if(confFile.open(QIODevice::ReadOnly)){
-
 		if(!stdConf)
 			saveName = fileName;		// remember where to save the system
 		else
 			saveName = QString();
-
-
 	} else {
 		if(guiEnabled){
 			QMessageBox box(QMessageBox::Critical, "Loading Experiment",
@@ -424,7 +416,6 @@ bool MT_Controller::readFromFile(QString fileName)
 				saveName = QString();
 				confFile.setFileName(defConfFileName);
 				if(!confFile.open(QIODevice::ReadOnly)){
-
 					// oops, couldn't open default configuration file
 					SIGEL_Tools::SIG_IO::cerr << "Loading experiment: couldn't load default settings. "
 						"The meta system will be disabled." << Qt::endl;
@@ -504,7 +495,6 @@ bool MT_Controller::readFromFile(QString fileName)
 void MT_Controller::writeToFile(QTextStream &file, QString name, int autoSave)
 {
 	if(metaOn){
-		
 		// wait for the evolution to end before saving the system
 		// to prevent problems with the concurrent threads
 		if(gpManager)
@@ -524,7 +514,6 @@ void MT_Controller::writeToFile(QTextStream &file, QString name, int autoSave)
 		if(gpManager)
 			pthread_mutex_unlock(&gpManager->evolutionMutex);
 
-		
 		file << "MetaInUse\n";					// write the file name for the meta experiment
 		file << "fileName=" << saveName << "\n";// into the sigel experiment file
 		file << "#####\n";
@@ -586,7 +575,6 @@ bool MT_Controller::saveSystem(QString sigExpName)
 		else
 		{	
 			if(stdConf){
-
 				// system uses the default configuration
 				// therefore copy the default configuration file
 				QFile stdFile(defConfFileName);
@@ -613,18 +601,15 @@ bool MT_Controller::saveSystem(QString sigExpName)
 	return true;
 }
 
-
 int MT_Controller::UsedSystem()
 {
 	return usedSystem;
 }
 
-
 bool MT_Controller::IsEnabled()
 {
 	return metaOn;
 }
-
 
 MT_Substitute* MT_Controller::getFitnessTrainer()
 {
@@ -693,9 +678,7 @@ void MT_Controller::loadCache(QTextStream &File)
 			substCache.numCorrectEst = &correctEst;
 			substCache.numMetaEst = &metaEst;
 		}
-
 	} else {		// default setup
-
 		QFile defFile(defConfFileName);
 		QTextStream defStrm(&defFile);
 		defFile.open(QIODevice::ReadOnly);
@@ -781,7 +764,6 @@ void MT_Controller::slotLoadDefault()
 {
 	QFile file(defConfFileName);
 	if(file.open(QIODevice::ReadOnly)){
-
 		QTextStream strm(&file);
 		delete substitution;
 		substitution = nullptr;
@@ -812,7 +794,6 @@ void MT_Controller::slotLoadDefault()
 
 		mainWindow->enforceUpdate(true);
 		file.close();
-
 	} else {		// read error
 		SIGEL_Tools::SIG_IO::cerr << "Load setup: couldn't load default setup. Aborting operation." << Qt::endl;
 	}
@@ -827,7 +808,6 @@ void MT_Controller::slotLoadSetup()
 
 	QFile file(fileName);
 	if(file.open(QIODevice::ReadOnly)){
-
 		QTextStream strm(&file);
 		delete substitution;
 		substitution = nullptr;
@@ -858,7 +838,6 @@ void MT_Controller::slotLoadSetup()
 
 		mainWindow->enforceUpdate(true);
 		file.close();
-
 	} else {		// read error
 		SIGEL_Tools::SIG_IO::cerr << "Load setup: couldn't open specified file. Aborting operation." << Qt::endl;
 	}
@@ -876,7 +855,6 @@ void MT_Controller::slotSaveSetup()
 
 	QFile file(fileName);
 	if(file.open(QIODevice::WriteOnly)){
-
 		QTextStream strm(&file);
 
 		strm << "usedSystem=" << usedSystem << "\n";		// remember the used type of system
@@ -898,7 +876,6 @@ void MT_Controller::slotSaveSetup()
 		file.close();
 
 		mainWindow->enforceUpdate(true);		// enforce an update of the GUI
-
 	} else {
 		SIGEL_Tools::SIG_IO::cerr << "Load setup: couldn't open specified file. Aborting operation." << Qt::endl;
 	}

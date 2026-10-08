@@ -20,7 +20,9 @@ class QWidget;
 #define CLASSIFIER_SUBST 2
 
 namespace SIGEL_GP {
+
 	class SIG_GPExperiment;
+
 };
 
 class MT_Controller : public QObject
@@ -47,7 +49,6 @@ public:
 	int UsedSystem();
 	MT_Substitute* getFitnessTrainer();
 	MT_Substitute* getClassifier();
-
 
 private:
 	bool withGUI;

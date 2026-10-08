@@ -60,7 +60,6 @@ extern "C"
   }
 
   void sigelStandardSignalHandler(int signal) {
-
     int result = 1;
 
     switch ( signal ) {

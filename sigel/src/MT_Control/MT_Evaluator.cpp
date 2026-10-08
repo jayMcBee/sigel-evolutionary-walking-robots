@@ -4,12 +4,10 @@
 #include <memory>
 #include "MT_Control/MT_Evaluator.h"
 
-
 // administrative method
 
 MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File) : MT_Substitute(), SIGEL_GP::SIG_GPFitnessTrainer(exp) 
 {
-	
 	Typ=1;
 	AverageSigelFitness = 0.01; 
 	CorrectFitness.resize(0);
@@ -23,7 +21,6 @@ MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File) :
 		MT_ResultBuffer[i]=-1;
 	NextFreePos =0;
 
-	
 	QString Evaluator( "Evaluator:" );
 	QString PresentLine = File.readLine();
 
@@ -58,13 +55,9 @@ MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File) :
 				NumOfCorrectEstimation[i] = 0;
 				NumOfMetaEstimation[i] = 0;
 			}
-
-		
 		}
-
 	}	
 }
-
 
 void MT_Evaluator::writeToFile(QTextStream & File)
 {
@@ -81,7 +74,6 @@ void MT_Evaluator::writeToFile(QTextStream & File)
 		}
 }
 
-
 void MT_Evaluator::writeToFileSetup(QTextStream & File)
 {
 	File << ("Evaluator:\n");
@@ -94,7 +86,6 @@ void MT_Evaluator::writeToFileSetup(QTextStream & File)
 	
 void MT_Evaluator::loadSetup(QTextStream &File)
 {
-	
 	QString Evaluator( "Evaluator:" );
 	QString PresentLine = File.readLine();
 
@@ -106,9 +97,7 @@ void MT_Evaluator::loadSetup(QTextStream &File)
 		Tolerance = (File.readLine()).toDouble();
 		RefreshInterval = (File.readLine()).toInt();
 	}
-
 }
-
 
 // functionally method
 
@@ -121,7 +110,6 @@ MT_TrainingCase * MT_Evaluator::createNewTCase(SIGEL_Program::SIG_Program const 
  
 	return NewTCase;
 }
-
 
 bool MT_Evaluator::evaluationTactic()
 {
@@ -145,7 +133,6 @@ bool MT_Evaluator::evaluationTactic()
 
 			if(MetaProgError< Tolerance)
 
-
 			{
 				if(NumOfMeta<RefreshInterval)
 				{
@@ -157,15 +144,12 @@ bool MT_Evaluator::evaluationTactic()
 					UseMeta =false;
 					NumOfMeta =0;
 				}
-
 			}
 			else
 			{
 				UseMeta =false;
 				NumOfMeta =0;
-
 			}
-		
 		} break;
 
 	case 2: 
@@ -184,7 +168,6 @@ bool MT_Evaluator::evaluationTactic()
 				for (int i=0; i<NumOfWorseError; i++)
 					WorseError[i] = 0.0;
 				
-
 				for (int i=0; i<CorrectFitness.size();i++)
 				{
 					PresentError = fabs(AssumedFitness[i]-CorrectFitness[i]);
@@ -213,7 +196,6 @@ bool MT_Evaluator::evaluationTactic()
 				MetaProgError = (MetaProgError-PresentError)/ (CorrectFitness.size()-NumOfWorseError);
 			}
 
-
 			if(MetaProgError< Tolerance)
 			{
 				if(NumOfMeta<RefreshInterval)
@@ -226,7 +208,6 @@ bool MT_Evaluator::evaluationTactic()
 					UseMeta =false;
 					NumOfMeta =0;
 				}
-
 			}
 			else
 			{
@@ -246,7 +227,6 @@ bool MT_Evaluator::evaluationTactic()
 				MetaProgError = MetaProgError/ CorrectFitness.size();
 			}
 
-		
 			double ToleranceNew = Tolerance*10000.0;  // 1 < ToleranceNew < 10000
 			double SigelGeneration = GenerationNumber;
 			if (SigelGeneration <1.0)
@@ -276,20 +256,16 @@ bool MT_Evaluator::evaluationTactic()
 					UseMeta =false;
 					NumOfMeta =0;
 				}
-
 			}
 			else
 			{
 				UseMeta =false;
 				NumOfMeta =0;
-
 			}
-		
 		} break;
 
 	case 10:
 		{
-
 		if(MetaProgError == -1.0)
 			{
 				MetaProgError=0.0;
@@ -326,26 +302,19 @@ bool MT_Evaluator::evaluationTactic()
 					UseMeta =false;
 					NumOfMeta =0;
 				}
-
 			}
 			else
 			{
 				UseMeta =false;
 				NumOfMeta =0;
-
 			}
-
 		} break;
 
-
-	
 	case 13: UseMeta=false; break;
 	}
 
 	return UseMeta;
-
 }
-
 
 int MT_Evaluator::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind)
 {
@@ -375,7 +344,6 @@ int MT_Evaluator::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind)
 
 		MetaEstimationResult = (MetaEstimationResult + 2.0) * -1.0;
 
-	
 		if(MT_ResultBuffer[NextFreePos] !=-1)
 		{
 			qsizetype freeSlot = MT_ResultBuffer.indexOf(-1);
@@ -396,7 +364,6 @@ int MT_Evaluator::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind)
 		if (NextFreePos == MT_ResultSize)
 			NextFreePos =0;
 
-
 		NumOfMetaEstimation[GenerationNumber]=NumOfMetaEstimation[GenerationNumber]+1 ;
 
 		return MetaTaskID;	
@@ -408,11 +375,9 @@ int MT_Evaluator::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind)
 		TmpBuffer.append(createNewTCase(&ind.getProgram(), MetaTaskID));
 	
 		return MetaTaskID;
-
 	}
 }
 
-	
 double MT_Evaluator::checkTask(int taskId)
 {
 	double MetaFitness =0.0;
@@ -440,7 +405,6 @@ double MT_Evaluator::checkTask(int taskId)
 
 			for (int i=0; i< TmpBufferSize; i++) 
 			{
-
 //DebugInfo= TmpBuffer.count();
 				TCases=TmpBuffer.takeAt(i);
 //DebugInfo= TmpBuffer.count();
@@ -462,16 +426,12 @@ double MT_Evaluator::checkTask(int taskId)
 				}
 				else
 					TmpBuffer.insert(i,TCases);		
-				
 			}
 
-
-	
 //DebugInfo= TmpBuffer.count();
 		}
 //DebugInfo= TmpBuffer.count();
 	
 	return MetaFitness;
-
 	}
 }

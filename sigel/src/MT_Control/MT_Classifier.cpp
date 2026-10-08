@@ -51,10 +51,8 @@ MT_Classifier::MT_Classifier(QTextStream &File) : MT_Substitute()
 	}
 }
 
-
 void MT_Classifier::loadSetup(QTextStream &File)
 {
-	
 	QString Classifier( "Classifier:" );
 	QString PresentLine = File.readLine();
 
@@ -66,7 +64,6 @@ void MT_Classifier::loadSetup(QTextStream &File)
 		Tolerance = (File.readLine()).toDouble();
 		RefreshInterval = (File.readLine()).toInt();
 	}
-
 }
 
 void MT_Classifier::writeToFile(QTextStream &File)
@@ -82,7 +79,6 @@ void MT_Classifier::writeToFile(QTextStream &File)
 			File << NumOfCorrectEstimation[i] <<Qt::endl;
 			File << NumOfMetaEstimation[i] << Qt::endl;
 		}
-
 }
 
 void MT_Classifier::writeToFileSetup(QTextStream &File)
@@ -93,7 +89,6 @@ void MT_Classifier::writeToFileSetup(QTextStream &File)
 	File << RefreshInterval <<Qt::endl;
 	int GenNum =0;
 	File << GenNum <<Qt::endl;
-
 }
 
 // functionally method
@@ -107,7 +102,6 @@ double MT_Classifier::classifier(SIGEL_Program::SIG_Program const * SigProgOne, 
 
 void MT_Classifier::createNewTCase(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo, double FitDifference)
 {
-
 	MT_TranslatedIndividual * TransIndi = createDoubleTransIndi(SigProgOne, SigProgTwo);
 
 // lock the TCaseBuffer so that no TCases could be taken from it
@@ -119,12 +113,9 @@ void MT_Classifier::createNewTCase(SIGEL_Program::SIG_Program const * SigProgOne
 					TransIndi = createDoubleTransIndi(SigProgTwo, SigProgOne);
 					TCaseBuffer.enqueue (new MT_TrainingCase(-1.0 * FitDifference, TransIndi, NumOfCorrectEstimation[GenerationNumber], TransIndi->Boundary));
 
-
 // unlock the TCaseBuffer
 					pthread_mutex_unlock(&tCaseBufferMutex);
-
 }
-
 
 int MT_Classifier::evaluationTactic(int ToursSize)
 {
@@ -134,10 +125,8 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 	if (SigelGeneration <1.0)
 		SigelGeneration =1.0;
 
-		
 	if (BestMETAProgram ==nullptr)
 		return NumOfClassi;
-
 
 	switch (EstimationStrategy)
 	{
@@ -163,7 +152,6 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 
 				NumOfClassi = ToursSize-NumOfMeta;
 			}
-	
 		}break;
 	
 	case 4: 
@@ -200,7 +188,6 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 
 				NumOfClassi = ToursSize-NumOfMeta;
 			}
-
 		}break;
 	case 5: 
 		{
@@ -229,7 +216,6 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 					ToleranceNew = 0.0;
 			}
 
-
 			if(MetaProgError < ToleranceNew)
 			{
 				Num = ToursSize/RefreshInterval;
@@ -240,12 +226,10 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 
 				NumOfClassi = ToursSize-NumOfMeta;
 			}
-
 		}break;
 	case 8: 
 		{
 			NumOfClassi =0;
-
 		}break;
 
 	case 6: 
@@ -262,17 +246,14 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 			
 			if(MetaProgError< Tolerance)
 				NumOfClassi =-1;
-			
 		}break;
 	}
 	
 return NumOfClassi; 
 }
 
-
 MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo)
 {
-
 	int SigProgOneSize = SigProgOne->getProgramLength();
 	int SigProgTwoSize = SigProgTwo->getProgramLength();
 	int TransIndiSize = SigProgOneSize + SigProgTwoSize;
@@ -292,18 +273,15 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		(*MData)[k] =0;
 	(*MData)[16] = SigProgTwoSize;
 	
-
 // First SIGEL program is translated 
 	for (int i=0; i<SigProgOneSize;i++)
 	{
-
 		// WARNING: if the SIGEL instruction from SIGProg is JMP X, NOP, Sense ...
 		// a 0 is substituted for the missing operand(s). Any alternative?
 
 		SIGEL_Program::SIG_ProgramLine const &programLine = SigProgOne->getLine(i);
 		(*OperandOne)[i]= programLine.getElement(0);
 		(*OperandTwo)[i]= programLine.getElement(1);
-
 
 		switch( programLine.getRobotinstructionType() )
 		{
@@ -342,7 +320,6 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		case SIGEL_Program::MOD: (*MData)[14] ++; break;
 		case SIGEL_Program::NOP: (*MData)[15] ++; break;
 		}
-
 	}
 
 // Second SIGEL program is translated 
@@ -354,7 +331,6 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		SIGEL_Program::SIG_ProgramLine const &programLine = SigProgTwo->getLine(i);
 		(*OperandOne)[i+SigProgOneSize]= programLine.getElement(0);
 		(*OperandTwo)[i+SigProgOneSize]= programLine.getElement(1);
-
 
 		switch( programLine.getRobotinstructionType() )
 		{
@@ -393,16 +369,13 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		case SIGEL_Program::MOD: (*MData)[30] ++; break;
 		case SIGEL_Program::NOP: (*MData)[31] ++; break;
 		}
-
 	}
-
 
 	MT_TranslatedIndividual * NewTransIndi = new MT_TranslatedIndividual(Instruktion,OperandOne,OperandTwo, MData);
 	
 	NewTransIndi->Boundary = SigProgOneSize;
 
 	return NewTransIndi;
-
 }
 
 bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int PosBest)
@@ -412,18 +385,14 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 	bool Change = false;
 	int TourSize = tours->size();
 
-
 	pthread_mutex_lock(&fitnessMutex);
-
 
 	int NumOfClassi = evaluationTactic(TourSize);
 
 	pthread_mutex_unlock(&fitnessMutex);
 
-
 	if (NumOfClassi > 0)  // NumOfClassi tournament will run by the Classifier
 	{
-
 		pthread_mutex_lock(&interpreterMutex);
 		for(int i=0; i<NumOfClassi; i++)
 		{	
@@ -432,7 +401,6 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 			Tourna->classify(this);
 			delete Tourna;
 			NumOfMetaEstimation[GenerationNumber] += 1;
-
 		}
 
 // unlock the interpreter so that the program can be updated
@@ -453,7 +421,6 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 		tours->resize(TourSize-NumOfClassi);
 		Change = true;
 	}
-
 
 // only  tournament, which haven't the best Sig Individual inside 
 // will run by the Classifier
@@ -480,7 +447,6 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 				delete Tourna;
 				NumOfMetaEstimation[GenerationNumber] += 1;
 			}
-
 		}
 
 // unlock the interpreter so that the program can be updated
@@ -501,10 +467,8 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 						if (i < tours->size()) { delete (*tours)[i]; (*tours)[i] = Tourna; }
 						break;
 					}
-
 				}
 			}
-		
 		}
 
 		// Every slot in the tail is null here, so this delete loop frees nothing.
@@ -520,20 +484,14 @@ for(int d=0; d < tours->size();d++)
 		{
 			int DeugInfo= tours->size();
 		}
-
 }
 		
 //*************************************************************
 		Change = true;
 	}
 
-
 	NumOfCorrectEstimation[GenerationNumber]= tours->size();
 	return Change;
-
-		
-
-
 }
 
 int MT_Classifier::evalNeededTours(QList<SIGEL_GP::SIG_GPTournament *> *  tours, QList<int> * ToursWBestIndi, int PosBest)
@@ -555,9 +513,7 @@ int MT_Classifier::evalNeededTours(QList<SIGEL_GP::SIG_GPTournament *> *  tours,
 
 		if(ToursWBestIndi->at(i) == 0)
 			NumClassi ++;
-
 	}
-
 
 	// If the best SIGEL individual rarely takes part in tournaments, 
 	// further tournaments are used for calibration
@@ -583,12 +539,9 @@ int MT_Classifier::evalNeededTours(QList<SIGEL_GP::SIG_GPTournament *> *  tours,
 					(*ToursWBestIndi)[l] = 1;
 					NumClassi--;
 					break;
-
 				}
 			}
 		}
-	
-	
 	}
 
 	return NumClassi;

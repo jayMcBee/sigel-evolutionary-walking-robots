@@ -35,14 +35,12 @@
 #include "SIGEL_MasterGUI/SIG_MainWindow.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
-
 // The headless run, while it evolves. The first SIGINT or SIGTERM stops it
 // the way the Stop button does, so it saves; a second one ends it at once.
 static SIGEL_GP::SIG_GPManager *headlessManager = nullptr;
 
 extern "C"
 {
-
   // signal handler to be installed from main()
   void sigelStandardSignalHandler(int signal) {
     // The first signal stops the run so that it saves; a second one, while
@@ -80,14 +78,12 @@ extern "C"
     exit( result );
   }
 
-
   // simple wrapper to call experiment.RegisterDynPVMClients()
   // this C function is launched as a thread
   void MeJustCallingRegisterDynPVMClients(void *inRawGPM) {
     SIGEL_GP::SIG_GPManager *gpm = static_cast<SIGEL_GP::SIG_GPManager *>(inRawGPM);
     gpm->RegisterDynPVMClients();
   }
-
 }
 
 bool guiEnabled = true;
@@ -197,12 +193,9 @@ int main( int argc, char *argv[] ) {
       pthread_t serv_thread;
       // The function returns void, not void *; nothing reads the thread's result.
       pthread_create(&serv_thread, nullptr, reinterpret_cast<void *(*)(void *)>(&MeJustCallingRegisterDynPVMClients), &gpManager);
-
-
     }
 
 	if(mtEvolve){
-	
 		// This path has no GUI. It uses QCoreApplication, so no QWidget may be
 		// created here.
 		QCoreApplication app( argc, argv );
@@ -225,9 +218,7 @@ int main( int argc, char *argv[] ) {
 		experiment.mtController->startTimedEvolution(minutes);
 
 		app.exec();	// enter event-loop
-
 	} else {
-
 		// start() runs the evolution on this thread and returns when it is done
 		headlessManager = &gpManager;
 		gpManager.start();

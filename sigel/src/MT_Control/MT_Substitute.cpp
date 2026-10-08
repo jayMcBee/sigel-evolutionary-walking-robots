@@ -45,8 +45,6 @@ void MT_Substitute::changeErrorInfo(QList<double> * OutCome, QList<double> * Cor
 	MetaProgError = -1.0;
 }
 
-
-
 MT_TranslatedIndividual * MT_Substitute::translatedSIGProg(SIGEL_Program::SIG_Program const *SIGProg)
 {
 	int ProgSize = SIGProg->getProgramLength();
@@ -65,7 +63,6 @@ MT_TranslatedIndividual * MT_Substitute::translatedSIGProg(SIGEL_Program::SIG_Pr
 	for (int k=1; k<16; k++)
 		(*MData)[k] =0;
 	
-		
 	for (int i=0; i<ProgSize;i++)
 	{
 		// WARNING: if the SIGEL instruction from SIGProg is JMP X, NOP, Sense ...
@@ -74,7 +71,6 @@ MT_TranslatedIndividual * MT_Substitute::translatedSIGProg(SIGEL_Program::SIG_Pr
 		SIGEL_Program::SIG_ProgramLine const &programLine = SIGProg->getLine(i);
 		(*OperandOne)[i]= programLine.getElement(0);
 		(*OperandTwo)[i]= programLine.getElement(1);
-
 
 		switch( programLine.getRobotinstructionType() )
 		{
@@ -94,15 +90,12 @@ MT_TranslatedIndividual * MT_Substitute::translatedSIGProg(SIGEL_Program::SIG_Pr
 		case SIGEL_Program::MOD: (*Instruktion)[i]= 14; (*MData)[14]++; break;
 		case SIGEL_Program::NOP: (*Instruktion)[i]= 15; (*MData)[15]++; break;
 		}
-
 	}
 
 	MT_TranslatedIndividual * NewTransIndi = new MT_TranslatedIndividual(Instruktion,OperandOne,OperandTwo, MData);
 
 	return NewTransIndi;
-
 }
-
 
 void MT_Substitute::setInterpreter(int NumOfVariable, int TimeToInter)
 {
@@ -126,7 +119,6 @@ void MT_Substitute::setEstimationParameter(int EStrategy, double Tol, int ReInte
 	EstimationStrategy =EStrategy;
 	Tolerance =Tol;
 	RefreshInterval=ReInterval;
-
 }
 
 void MT_Substitute::getEstimationParameter(int *EStrategy, double *Tol, int *ReInterval)
@@ -136,18 +128,15 @@ void MT_Substitute::getEstimationParameter(int *EStrategy, double *Tol, int *ReI
 	*ReInterval =RefreshInterval;
 }
 
-
 void MT_Substitute::getNumOfEstimation(QList<unsigned int> *MetaEstimation, QList<unsigned int> *CorrectEstimation)
 {
 	MetaEstimation = &NumOfMetaEstimation;
 	CorrectEstimation =  &NumOfCorrectEstimation;
 }
 
-
 void MT_Substitute::loadSetup(QTextStream &File)
 {
 	// overloaded method
-
 }
 
 void MT_Substitute::writeToFile(QTextStream &File)
@@ -158,7 +147,6 @@ void MT_Substitute::writeToFile(QTextStream &File)
 void MT_Substitute::writeToFileSetup(QTextStream &File)
 {	
 	// overloaded method
-
 }
 
 int MT_Substitute::getTyp()
@@ -180,7 +168,4 @@ void MT_Substitute::nextSIGGeneration(double AverageSigelFit)
 			NumOfMetaEstimation[i]=0;
 		}
 	}
-
 }
-
-

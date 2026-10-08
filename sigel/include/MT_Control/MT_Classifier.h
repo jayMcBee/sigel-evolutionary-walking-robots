@@ -14,12 +14,10 @@
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 
 
-
 class MT_Classifier : public MT_Substitute  
 {
 public:
 
-	
 	// administrative method 
 	MT_Classifier(QTextStream &File);
 	virtual ~MT_Classifier() = default;
@@ -43,7 +41,6 @@ public:
 	*/
 	double classifier(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo);	
 	
-
 private:
 
 	MT_TranslatedIndividual* createDoubleTransIndi(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo);
@@ -51,7 +48,6 @@ private:
 	// Return value indicates how many SIGEL tournaments should be classified rather than run by exact fitness
 	//  
 	int evaluationTactic(int ToursSize);
-
 
 	// Determines which tournaments the best SIGEL individual takes part in 
 	// Modifies ToursWBestIndi; ToursWBestIndi[i] == 1 exactly when the best SIGEL individual appears

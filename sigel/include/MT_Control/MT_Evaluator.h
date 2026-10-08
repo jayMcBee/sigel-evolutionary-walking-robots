@@ -1,7 +1,6 @@
 #ifndef MT_CONTROL_MT_EVALUATOR_H
 #define MT_CONTROL_MT_EVALUATOR_H
 
-
 #include <QList>
 #include "MT_Control/MT_Substitute.h"
 #include "SIGEL_GP/SIG_GPFitnessTrainer.h"
@@ -33,7 +32,6 @@ private:
 	int MT_ResultSize;
 	int NextFreePos;
 
-	
 	/* Create a training case from a SIG_Program.  Fitness is a -1 placeholder
 	* until checkTask() gets the PVM result; it matches this case by getName(),
 	* which is why PVMTaskID is stored as the Name.
@@ -47,7 +45,6 @@ private:
 	* false = the normal SIGEL method will be used to estimate the fitness
 	*/
 	bool evaluationTactic();
-
 };
 
 #endif // MT_CONTROL_MT_EVALUATOR_H

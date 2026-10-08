@@ -33,11 +33,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-
 enum { kSigelMasterRegPort = 6789,
        kSuicidalRequest    = 13
      };
-
 
 int main (int argc, char *argv[])
 { struct sockaddr_in   sad;
@@ -102,7 +100,6 @@ int main (int argc, char *argv[])
    */
   recv(masterSocket, &msg, sizeof(msg), 0);
   close(masterSocket);
-
 
   fprintf(stderr, "<manage_dyn_slave> is exiting.\n\n");
 
