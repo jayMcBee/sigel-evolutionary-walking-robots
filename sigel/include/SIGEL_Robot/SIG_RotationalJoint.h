@@ -31,6 +31,7 @@ namespace SIGEL_Robot { class SIG_RotationalJoint; }
 #include "SIGEL_Robot/SIG_Joint.h"
 
 namespace SIGEL_Robot {
+
   /**
    * SIG_RotationalJoint models a joint, at which the
    * adjacent links can rotate around a common axis.
@@ -70,6 +71,7 @@ namespace SIGEL_Robot {
 			 double & screwD, double & screwTheta);
     virtual void writeToFileTransfer (QTextStream & tx);
   };
+
 }
 
 #endif // SIGEL_ROBOT_SIG_ROTATIONALJOINT_H

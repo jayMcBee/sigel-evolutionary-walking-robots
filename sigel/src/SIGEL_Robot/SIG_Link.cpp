@@ -34,10 +34,10 @@
 #include <numbers>
 #include <cstdio>
 
-
 using namespace SIGEL_Tools;
 
 namespace SIGEL_Robot {
+
         SIG_Link::SIG_Link(SIG_Robot *par, QString n, int nr)
                 : parent (par),
                   name (n),
@@ -399,7 +399,6 @@ namespace SIGEL_Robot {
 		    SIGEL_Tools::SIG_IO::cerr << " " << newZAxis.get( i );
 		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
-
 		};
 
 	      if (transformX)
@@ -454,7 +453,6 @@ namespace SIGEL_Robot {
 		    SIGEL_Tools::SIG_IO::cerr << " " << newOrigin.get( i );
 		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
-
 		}
 	      else if (transformZ)
 		{
@@ -488,7 +486,6 @@ namespace SIGEL_Robot {
 		    SIGEL_Tools::SIG_IO::cerr << " " << newOrigin.get( i );
 		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
-
 		};
 
 	      newXAxis.normalize();
@@ -598,7 +595,6 @@ namespace SIGEL_Robot {
 		    SIGEL_Tools::SIG_IO::cerr << " " << debugRotatedYAxis.get( i );
 		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
-
 		};
 
 	      if (actSuccessor)
@@ -651,7 +647,6 @@ namespace SIGEL_Robot {
 		      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 		    };
 #endif
-
 		};
 
 	      geometry->translate( SIG_TypeConverter::toSIG_Vector( translation ) );
@@ -838,4 +833,5 @@ namespace SIGEL_Robot {
 	      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 	}
+
 }

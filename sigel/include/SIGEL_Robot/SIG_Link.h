@@ -129,8 +129,7 @@ namespace SIGEL_Robot
       SIG_Matrix initialOrientation;
       bool initiated, mdh_visited;
     };
+
 }
 
 #endif // SIGEL_ROBOT_SIG_LINK_H
-
-

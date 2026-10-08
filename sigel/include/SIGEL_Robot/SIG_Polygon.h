@@ -31,6 +31,7 @@ namespace SIGEL_Robot { class SIG_Polygon; }
 #include "SIGEL_Robot/SIG_Geometry.h"
 
 namespace SIGEL_Robot {
+
         /**
          * A polygon class.
          */
@@ -91,6 +92,7 @@ namespace SIGEL_Robot {
                  */
                 void writeToFileTransfer (QTextStream & tx) const;
         };
+
 }
 
 #endif

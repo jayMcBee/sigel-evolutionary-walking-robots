@@ -30,6 +30,7 @@ namespace SIGEL_Robot { class SIG_JointSensor; }
 #include "SIGEL_Robot/SIG_Joint.h"
 
 namespace SIGEL_Robot {
+
   /**
    * SIG_JointSensor models a sensor that is attached to a
    * joint. It measures the position of the joint. If the
@@ -49,6 +50,7 @@ namespace SIGEL_Robot {
     SIG_Joint const *getJoint () const;
     virtual void writeToFileTransfer (QTextStream & tx);
   };
+
 }
 
 #endif

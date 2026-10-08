@@ -31,6 +31,7 @@
 using SIGEL_Tools::SIG_Exception;
 
 namespace SIGEL_Robot {
+
         /*
         class SIG_MultipleRootsError : public SIG_Exception {
 	public:
@@ -85,6 +86,7 @@ namespace SIGEL_Robot {
                                          linkname + "\".")
                         { }
         };
+
 }
 
 #endif

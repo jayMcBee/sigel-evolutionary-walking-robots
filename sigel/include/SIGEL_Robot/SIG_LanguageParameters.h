@@ -31,6 +31,7 @@ namespace SIGEL_Robot { class SIG_LanguageParameters; }
 #include "SIGEL_Robot/SIG_CommandParameters.h"
 
 namespace SIGEL_Robot {
+
   /**
    * This class describes the possibilities and limitations
    * of the robot control language.
@@ -149,6 +150,7 @@ namespace SIGEL_Robot {
                  */
                 void writeToFileTransfer (QTextStream & tx) const;
         };
+
 }
 
 #endif

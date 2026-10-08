@@ -146,4 +146,5 @@ namespace SIGEL_Robot {
                 SIG_Robot::vectorToStream (tx, colour);
                 tx << '\n';
         }
+
 }

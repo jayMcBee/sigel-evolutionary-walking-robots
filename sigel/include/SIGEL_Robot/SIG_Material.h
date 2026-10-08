@@ -33,6 +33,7 @@ namespace SIGEL_Robot { class SIG_Material; }
 
 namespace SIGEL_Robot
 {
+
   /**
    * SIG_Material models properties of the material
    * used to form links.
@@ -127,6 +128,7 @@ namespace SIGEL_Robot
            */
           void writeToFileTransfer (QTextStream & tx) const;
   };
+
 }
 
 #endif // SIGEL_ROBOT_SIG_MATERIAL_H

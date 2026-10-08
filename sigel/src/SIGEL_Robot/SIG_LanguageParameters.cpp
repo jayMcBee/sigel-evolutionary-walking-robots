@@ -25,6 +25,7 @@
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
 
 namespace SIGEL_Robot {
+
         SIG_LanguageParameters::SIG_LanguageParameters ()
                 : allowedCommands (),
                   bitsPerRegister (8),
@@ -92,7 +93,6 @@ namespace SIGEL_Robot {
 	  commandParameters = new SIG_CommandParameters();
 	  commandParameters->setDuration( 0.001 );
 	  this->addCommand( "MAX", commandParameters );
-
 	}
 
         SIG_LanguageParameters::SIG_LanguageParameters (QTextStream & tx,
@@ -128,8 +128,6 @@ namespace SIGEL_Robot {
 		// This class owns the SIG_CommandParameters it inserted.
 		for (const NamedCommand &c : allowedCommands) delete c.value;
 		allowedCommands.clear ();
-
-	  
         }
 
         void SIG_LanguageParameters::addCommand (QString name, SIG_CommandParameters *cmdP)
@@ -210,4 +208,5 @@ namespace SIGEL_Robot {
                         c.value->writeToFileTransfer (tx);
                 }
         }
+
 }

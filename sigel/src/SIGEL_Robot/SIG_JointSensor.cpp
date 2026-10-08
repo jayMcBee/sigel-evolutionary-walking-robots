@@ -24,6 +24,7 @@
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
 
 namespace SIGEL_Robot {
+
         SIG_JointSensor::SIG_JointSensor (SIG_Robot *par, QString n, int nr)
                 : SIG_Sensor (par, n, nr),
                   theJoint (nullptr)
@@ -60,4 +61,5 @@ namespace SIGEL_Robot {
                 SIG_Sensor::writeToFileTransfer (tx);
                 tx << theJoint->getName () << '\n';
         }
+
 }

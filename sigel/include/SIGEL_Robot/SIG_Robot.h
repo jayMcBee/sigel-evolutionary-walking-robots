@@ -41,6 +41,7 @@ namespace SIGEL_Robot { class SIG_Robot; }
  */
 namespace SIGEL_Robot
 {
+
   /**
    * SIG_Robot is the root class of the robot model.
    *
@@ -302,6 +303,7 @@ namespace SIGEL_Robot
      */
     QList<double> getLinkMasses () const;
   };
+
 }
 
 #endif // SIGEL_ROBOT_SIG_ROBOT_H

@@ -26,6 +26,7 @@
 #include <stdio.h>
 
 namespace SIGEL_Robot {
+
         SIG_Polygon::SIG_Polygon (SIG_Geometry *within, SIG_Polygon *other)
                 : myGeometry (within),
                   vertices (0)
@@ -88,6 +89,6 @@ namespace SIGEL_Robot {
                         tx << ' ' << vertices [i];
                 }
                 tx << '\n';
-                        
         }
+
 }

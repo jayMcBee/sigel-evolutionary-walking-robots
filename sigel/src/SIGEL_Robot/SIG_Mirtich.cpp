@@ -132,7 +132,6 @@ namespace SIGEL_Robot {
                         = TP[X] = TP[Y] = TP[Z] = 0;
                 
                 for (i = 0; i < p->numFaces; i++) {
-
                         f = &p->faces[i];
 
                         nx = fabs(f->norm[X]);

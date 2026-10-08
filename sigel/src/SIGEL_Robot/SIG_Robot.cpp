@@ -30,7 +30,6 @@
 #include "SIGEL_Robot/SIG_PitchRollSensor.h"
 #include "SIGEL_Robot/SIG_ContactSensor.h"
 
-
 namespace SIGEL_Robot {
 
         SIG_Robot::SIG_Robot ()

@@ -30,6 +30,7 @@ namespace SIGEL_Robot { class SIG_PitchRollSensor; }
 #include "SIGEL_Robot/SIG_Joint.h"
 
 namespace SIGEL_Robot {
+
   /**
    * SIG_PitchRollSensor models a sensor attached to a link.
    * It measures the pitch or roll angle of the joint.
@@ -68,8 +69,8 @@ namespace SIGEL_Robot {
 	*/
 	bool  IsPitchType()	{ return isPitch; }
 	bool  IsRollType()	{ return isRoll; }
-
   };
+
 }
 
 #endif
