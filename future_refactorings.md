@@ -428,6 +428,16 @@ problem; the choice is made before any code is written.
   `SIG_GPFitnessFunctionRegistry::fitnessFunctions()`. No file format
   changes.
 
+- [ ] **154. Dynamic clients stay for the whole evolution, and can leave.**
+  `SIG_GPManager::run()` releases all dynamic clients at every 20th
+  generation, and `run(MT_Classifier *)` after every generation. A released
+  client does not come back by itself. The release was made for a batch
+  system that lent machines for a limited time; there is none now. To do:
+  remove the release in the middle of a run. To design with it: a client
+  that leaves or dies must come off the master's list. Today the release is
+  the only thing that removes a dead client, the master cannot release one
+  client, and it does not notice a client that closed its connection.
+
 ---
 
 ## 8 · Removals
