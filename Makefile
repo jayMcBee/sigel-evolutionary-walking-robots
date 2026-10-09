@@ -484,11 +484,35 @@ $(B)/coredrive: checks/programs/coredrive.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CO
 
 # The unit tests, with Qt Test. They link as coredrive does: the core modules,
 # the Clean SIG_GPExperiment and no GUI archive.
+#
+# sigel/tests/ has main.cpp and one folder for each module. Each test class
+# there has a header with Q_OBJECT, so each header goes through moc.
 test: $(B)/sigel_tests
 	$(B)/sigel_tests
 
-$(B)/sigel_tests: $(SRC)/tests/main.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS)
-	$(SIGCXX) $(SIGINC) -isystem $(QTINC)/QtTest $< $(MOC_OBJS_CORE) $(CLEAN_OBJ) -o $@ \
+TESTINC   := $(SIGINC) -I$(SRC)/tests -isystem $(QTINC)/QtTest
+TEST_SRCS := $(SRC)/tests/main.cpp $(sort $(wildcard $(SRC)/tests/*/*.cpp))
+TEST_HDRS := $(sort $(wildcard $(SRC)/tests/*/*.h))
+TEST_OBJS := $(patsubst $(SRC)/tests/%.cpp,$(OBJ)/tests/%.o,$(TEST_SRCS)) \
+             $(patsubst $(SRC)/tests/%.h,$(OBJ)/tests/%.moc.o,$(TEST_HDRS))
+
+# Kept for the reason given at the other moc files above.
+.SECONDARY: $(patsubst $(SRC)/tests/%.h,$(B)/moc/tests/%.cpp,$(TEST_HDRS))
+
+$(B)/moc/tests/%.cpp: $(SRC)/tests/%.h
+	@mkdir -p $(dir $@)
+	$(MOC) $(subst -isystem ,-I,$(TESTINC)) $< -o $@   # moc rejects -isystem
+
+$(OBJ)/tests/%.moc.o: $(B)/moc/tests/%.cpp $(STAMP) | $(UI_HDRS)
+	@mkdir -p $(dir $@)
+	$(SIGCXX) -MMD -MP $(TESTINC) -c $< -o $@
+
+$(OBJ)/tests/%.o: $(SRC)/tests/%.cpp $(STAMP) | $(UI_HDRS)
+	@mkdir -p $(dir $@)
+	$(SIGCXX) -MMD -MP $(TESTINC) -c $< -o $@
+
+$(B)/sigel_tests: $(TEST_OBJS) $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS)
+	$(SIGCXX) $(TEST_OBJS) $(MOC_OBJS_CORE) $(CLEAN_OBJ) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  -L$(QTLIB) -lQt6Test -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
 

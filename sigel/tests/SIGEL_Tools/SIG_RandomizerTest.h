@@ -21,19 +21,36 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_Tools/SIG_RandomizerTest.h"
+#ifndef SIGEL_TOOLS_SIG_RANDOMIZERTEST_H
+#define SIGEL_TOOLS_SIG_RANDOMIZERTEST_H
 
-#include <QCoreApplication>
-#include <QtTest>
+#include <QObject>
 
-// Runs each test class. Returns 1 if a test function failed, else 0.
-int main( int argc, char *argv[] ) {
-  QCoreApplication application( argc, argv );
+namespace SIGEL_Tools
+{
 
-  int failures = 0;
+  /**
+   * The unit tests of SIG_Randomizer.
+   */
+  class SIG_RandomizerTest : public QObject
+  {
+    Q_OBJECT
 
-  SIGEL_Tools::SIG_RandomizerTest randomizerTest;
-  failures += QTest::qExec( &randomizerTest, argc, argv );
+  private slots:
 
-  return failures == 0 ? 0 : 1;
+    void sameSeedGivesSameNumbers();
+
+    void setNewSeedStartsTheNumbersAgain();
+
+    void numberIsBelowMaximum();
+
+    void maximumZeroGivesZero();
+
+    void getRandomLongGivesTheNumberOfGetRandomInt();
+
+    void seedOneGivesKnownFirstNumber();
+  };
+
 }
+
+#endif // SIGEL_TOOLS_SIG_RANDOMIZERTEST_H

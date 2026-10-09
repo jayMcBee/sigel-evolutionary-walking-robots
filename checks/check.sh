@@ -75,6 +75,16 @@ for m in $MODULES; do
     fail=$((fail+mf)); warn=$((warn+mw))
 done
 
+# The unit tests are SIGEL code too, so their warnings count.
+tf=0; tw=0
+for f in "$SRC"/tests/*.cpp "$SRC"/tests/*/*.cpp; do
+    [ -e "$f" ] || continue
+    g++ $FLAGS $INCS -I"$SRC/tests" -isystem "$QTINC/QtTest" "$f" 2>/tmp/chk.$$ || tf=$((tf+1))
+    tw=$((tw + $(command grep -ac "$SRC.*warning:" /tmp/chk.$$ || true)))
+done
+printf '%-22s %2d fail  %3d warnings\n' "tests" "$tf" "$tw"
+fail=$((fail+tf)); warn=$((warn+tw))
+
 # Headers are otherwise only checked when some .cpp happens to include them.
 hp=0; hf=0
 for m in $MODULES; do
