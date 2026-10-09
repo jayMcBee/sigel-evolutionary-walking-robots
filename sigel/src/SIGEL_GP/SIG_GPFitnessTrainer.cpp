@@ -141,7 +141,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::addDynHost(QString newHost) {
 
   pthread_mutex_lock( &dynHostsMutex );
 
-  // need to remember that this host is dynamic to delete/free it after evaluation
+  // remember that this host is dynamic
   dynHosts.append( new QString(newHost) );
 
   // the freshDynHost list just contains hosts not yet added to the pvmHosts

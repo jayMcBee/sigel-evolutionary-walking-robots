@@ -7,7 +7,7 @@
 #
 # The master starts sigel_slave from /tmp/_SIGEL_EVOLUTION_TEMP on
 # this host. The script puts a copy of sigel_slave there and
-# deletes the folder when the master releases its dynamic clients.
+# deletes the folder when the master ends.
 
 # The SIGEL folder: run the script there, or modify the next line.
 SIGEL_ROOT=$PWD
@@ -17,7 +17,7 @@ rm -rf /tmp/_SIGEL_EVOLUTION_TEMP
 mkdir /tmp/_SIGEL_EVOLUTION_TEMP
 cp "$SIGEL_ROOT/sigel_slave" /tmp/_SIGEL_EVOLUTION_TEMP
 
-# Registers this host with the master and returns when the master releases it.
+# Registers this host with the master and returns when the master ends.
 "$SIGEL_ROOT/manage_dyn_slave" "$1"
 
 cd "$SIGEL_ROOT"

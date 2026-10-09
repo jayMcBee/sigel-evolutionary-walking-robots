@@ -159,7 +159,7 @@ namespace SIGEL_GP
 		QList< SIG_GPActivePVMHost * > pvmHosts;
 
 		/**
-		 * Names of all dynamic hosts, which are valid for a single evaluation period
+		 * Names of all dynamic hosts
 		 */
 		QList< QString * > dynHosts;
 

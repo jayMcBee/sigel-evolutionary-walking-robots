@@ -134,6 +134,6 @@ For each fitness value the master prints the host that sent it:
 
 	Score from <host>
 
-At every 20th generation the master releases all dynamic clients. The script then
-removes the directory "/tmp/_SIGEL_EVOLUTION_TEMP" and ends. Start it again to join
-again. The PVM daemon on the client ends when the master ends.
+A dynamic client stays until the master ends. The script then removes the directory
+"/tmp/_SIGEL_EVOLUTION_TEMP" and ends. The PVM daemon on the client ends when the
+master ends.

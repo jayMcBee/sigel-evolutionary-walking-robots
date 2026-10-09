@@ -2,7 +2,7 @@
  *
  *  This little program has two purposes:
  *     1)  Register the local host.
- *     2)  Wait until the sigel master releases it.
+ *     2)  Wait until the sigel master ends.
  *
  *  If the sigel master is launched in dynamic-evolve mode it listens to
  *  incoming connections on port 6789.
@@ -14,7 +14,7 @@
  *  The sigelDynClient script makes sure the latter is the case, and then
  *  starts this program.
  *
- *  When the sigel master releases its dynamic clients, this program exits,
+ *  When the sigel master ends, this program exits,
  *  and sigelDynClient removes the /tmp/_SIGEL_EVOLUTION_TEMP directory.
  *
  *  Author:  Jan Barnholt  <jan-b@uni.de>, <jan.barnholt@epost.de>
