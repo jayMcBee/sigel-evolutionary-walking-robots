@@ -116,42 +116,26 @@ to Povray, which has of course to be found in a directory given in your PATH-var
 
 2.6 Dynamic clients and sigelDynClient
 
-This script is used in combination with the dynamic client facility of Kdesigel. It uses the
-program "manage_dyn_slave" which registers itself as a client over a socket to
-a Kdesigel-master, which was started with the argument "-devolve ...". The usage is
+A dynamic client is a host that joins an evolution while it runs. Start the
+master with the argument "-devolve":
 
-sigelDynClient <host name of the master>
+./sigelLauncher -devolve <experiment>
 
-The script first copies the Kdesigel-binary Distribution to "/tmp/_SIGEL_EVOLUTION_TEMP". After
-that it registers itself  to the master (manage_dyn_slave) and waits for jobs to calculate the fitness.
-After every generation the master disconnects all dynamic clients, thus the master and pvm could reschedule
-the fitness calculation. At the end the script removes the directory "/tmp/_SIGEL_EVOLUTION_TEMP".
+The master prints "Server is awaiting requests from dynamic clients on port 6789.."
+and starts the evolution. From then on a client can join. On the client, in the
+SIGEL folder:
 
-To get this working you have to do the following:
+./sigelDynClient <host name of the master>
 
-1) First of all you should have compiled Kdesigel (described in section 1).
+The script copies "sigel_slave" to "/tmp/_SIGEL_EVOLUTION_TEMP". Then it runs the
+program "manage_dyn_slave", which sends the host name of the client to the master
+over a socket. The master starts its slaves on the client from that folder, one
+at a time.
 
-2) Now it is important to set the environment variables as described in section 2.1. But you must
-    set SIGEL_ROOT to "/tmp/_SIGEL_EVOLUTION_TEMP", because there must be the binary Distribution
-     located.
+At every 20th generation the master releases all dynamic clients. The script then
+removes the directory "/tmp/_SIGEL_EVOLUTION_TEMP" and ends. Start it again to
+join again.
 
-3) Set the .rhosts or the PVM_RSH variable appropiate (section 2.2).
-
-4) Copy the binary Distribution to your local directory (/home/"your name") on the clients (section 2). Rename the
-    directory to "_SIGEL_EVOLUTION_TEMP". [You get the binary distribution either by downloading it from sourceforge
-    or using the script "makeBinary", which creates a tar.gz-file in /tmp (you have to unpack it into your home directory).]
-
-5) Copy "manage_dyn_slave" and "sigelDynClient" to your local directory.
-
-6) Set up your experiment. The static host of this experiments must have the same
-    directory path as the script (thus "/tmp/_SIGEL_EVOLUTION_TEMP") and the host is the computer you
-    want to start the master.
-
-7) Start Kdesigel on your local host, where the static host is defined (see above 6) with
-     "sigel -devolve <EXPERIMENT>".
-
-8) As soon as "awaiting clients" is shown, you could start the dynamic clients. Either
-    manually with the "sigelDynClient"-script on every client or more comfortable
-    with a batch system:
-    "bsub -o /dev/null -q normal -m "<YOURHOSTS>" "sigelDynClient <MASTERHOST>" "
-
+These steps were run with the master and the client on one machine. A client on
+a second machine is not tested. The master starts PVM on it through a remote
+shell, so sections 2.1 and 2.2 apply to it.
