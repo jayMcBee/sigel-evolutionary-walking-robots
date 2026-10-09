@@ -30,30 +30,29 @@
 
 #include <QtTest>
 
+#include <cstdio>
+#include <memory>
+#include <vector>
+
 // Runs each test class. Returns 1 if a test function failed, else 0.
 //
 // There is no application object: with one, SIG_GPPopulation::addRandomIndividuals
 // makes a progress dialog.
 int main( int argc, char *argv[] ) {
+  std::vector<std::unique_ptr<QObject>> testClasses;
+  testClasses.push_back( std::make_unique<SIGEL_GP::SIG_GPPopulationTest>() );
+  testClasses.push_back( std::make_unique<SIGEL_Robot::SIG_LanguageParametersTest>() );
+  testClasses.push_back( std::make_unique<SIGEL_Robot::SIG_LinkTest>() );
+  testClasses.push_back( std::make_unique<SIGEL_Robot::SIG_MaterialTest>() );
+  testClasses.push_back( std::make_unique<SIGEL_Robot::SIG_RobotTest>() );
+  testClasses.push_back( std::make_unique<SIGEL_Tools::SIG_RandomizerTest>() );
+
   int failures = 0;
+  for ( const std::unique_ptr<QObject> &testClass : testClasses )
+    failures += QTest::qExec( testClass.get(), argc, argv );
 
-  SIGEL_GP::SIG_GPPopulationTest populationTest;
-  failures += QTest::qExec( &populationTest, argc, argv );
-
-  SIGEL_Robot::SIG_LanguageParametersTest languageParametersTest;
-  failures += QTest::qExec( &languageParametersTest, argc, argv );
-
-  SIGEL_Robot::SIG_LinkTest linkTest;
-  failures += QTest::qExec( &linkTest, argc, argv );
-
-  SIGEL_Robot::SIG_MaterialTest materialTest;
-  failures += QTest::qExec( &materialTest, argc, argv );
-
-  SIGEL_Robot::SIG_RobotTest robotTest;
-  failures += QTest::qExec( &robotTest, argc, argv );
-
-  SIGEL_Tools::SIG_RandomizerTest randomizerTest;
-  failures += QTest::qExec( &randomizerTest, argc, argv );
+  // Qt Test gives a total for each test class only.
+  printf( "%d test classes, %d failures\n", static_cast<int>( testClasses.size() ), failures );
 
   return failures == 0 ? 0 : 1;
 }

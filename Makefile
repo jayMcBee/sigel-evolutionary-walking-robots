@@ -493,7 +493,7 @@ $(B)/coredrive: checks/programs/coredrive.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CO
 # class is built and never run, and the tests pass without it.
 test: $(B)/sigel_tests
 	@for h in $(TEST_HDRS); do c=`basename $$h .h`; \
-	   grep -q "::$$c " $(SRC)/tests/main.cpp || { \
+	   grep -q "push_back( std::make_unique<.*::$$c>() )" $(SRC)/tests/main.cpp || { \
 	     echo "$(SRC)/tests/main.cpp does not run the test class $$c" >&2; exit 1; }; done
 	$(B)/sigel_tests
 
