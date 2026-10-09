@@ -9,7 +9,7 @@
  *
  *  Once connected this program transmits the name of the local host,
  *  that's all. Thus the sigel master knows our local host has a sigel_slave
- *  binary (and supporting files) installed in /tmp/_SIGEL_EVOLUTION_TEMP
+ *  binary installed in /tmp/_SIGEL_EVOLUTION_TEMP
  *
  *  The sigelDynClient script makes sure the latter is the case, and then
  *  starts this program.
