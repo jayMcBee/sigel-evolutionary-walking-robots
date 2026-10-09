@@ -352,13 +352,13 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 {
   // One pass over toSpawnList: each task gets one spawn try, and a spawned task
   // is removed.
-  qsizetype cur = 0;
+  qsizetype toSpawnIndex = 0;
 
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cerr << "Sweeping to spawn!" << Qt::endl;
 #endif
 
-  while (cur < toSpawnList.size())
+  while (toSpawnIndex < toSpawnList.size())
     {
 #ifdef SIG_DEBUG
       SIGEL_Tools::SIG_IO::cerr << "Entering spawn loop!" << Qt::endl;
@@ -397,8 +397,8 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 	    {
 	      success = true;
 
-	      int internalId = toSpawnList.at( cur ).internalId;
-	      int individualNumber = toSpawnList.at( cur ).individualPosition;
+	      int internalId = toSpawnList.at( toSpawnIndex ).internalId;
+	      int individualNumber = toSpawnList.at( toSpawnIndex ).individualPosition;
 
 	      SIG_GPIndividual &ind = exp.population.getIndividual( individualNumber );
 
@@ -424,9 +424,9 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 	};
 
       if (success)
-	toSpawnList.removeAt( cur );
+	toSpawnList.removeAt( toSpawnIndex );
       else
-	cur++;
+	toSpawnIndex++;
     };
 };
 
