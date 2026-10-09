@@ -106,7 +106,7 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 /***
  * reads information from the gp-system and displays it
  ***/
-void MT_PopulationWidget::onShow(MT_GPManager *manager, MT_EstimationState *subst)
+void MT_PopulationWidget::onShow(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
 	gpManager = manager;
 
@@ -146,7 +146,7 @@ void MT_PopulationWidget::onShow(MT_GPManager *manager, MT_EstimationState *subs
  * checks contradictions and solves them
  * returns true if the widget can be savely closed/changed
  ***/
-bool MT_PopulationWidget::onHide(MT_GPManager *manager, MT_EstimationState *subst)
+bool MT_PopulationWidget::onHide(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
 	int popSize = individualListView->topLevelItemCount();
 

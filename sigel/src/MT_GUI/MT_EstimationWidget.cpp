@@ -93,7 +93,7 @@ void MT_EstimationWidget::slotStrategyChanged(int index)
 	}
 }
 
-bool MT_EstimationWidget::onHide(MT_GPManager *manager, MT_EstimationState *subst)
+bool MT_EstimationWidget::onHide(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
 	int strategy, refInt;
 	double tolerance;
@@ -130,10 +130,10 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, MT_EstimationState *subs
 	if(saveBestCheckBox->isChecked())
 		strategy *= -1;
 
-	if(subst){
-		subst->strategy = strategy;
-		subst->tolerance = tolerance;
-		subst->refreshInterval = refInt;
+	if(estimationState){
+		estimationState->strategy = strategy;
+		estimationState->tolerance = tolerance;
+		estimationState->refreshInterval = refInt;
 	}
 	else
 		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't set the information for the current MetaGP system.");
@@ -141,17 +141,17 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, MT_EstimationState *subs
 	return true;
 }
 
-void MT_EstimationWidget::onShow(MT_GPManager *manager, MT_EstimationState *subst)
+void MT_EstimationWidget::onShow(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
 	int strategy = 0;
 	int refInt = 0;
 	double tolerance = 0.0;
 
 	// read in the values
-	if(subst){
-		strategy = subst->strategy;
-		refInt = subst->refreshInterval;
-		tolerance = subst->tolerance;
+	if(estimationState){
+		strategy = estimationState->strategy;
+		refInt = estimationState->refreshInterval;
+		tolerance = estimationState->tolerance;
 	}
 	else {
 		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't retrieve the information for the current MetaGP system.");
@@ -167,8 +167,8 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, MT_EstimationState *subs
 
 	// build new dropdownlist depending on the used substituter
 	strategyComboBox->clear();
-	if(subst->strategy < 3 ||
-		subst->strategy > 8)
+	if(estimationState->strategy < 3 ||
+		estimationState->strategy > 8)
 	{
 		// of type evaluator */
 		estimationGroupBox->setTitle("Evaluation");

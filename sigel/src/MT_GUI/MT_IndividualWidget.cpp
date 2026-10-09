@@ -133,7 +133,7 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt
 	connect(editor, SIGNAL(newText(const QString &)), SLOT(slotChangeConstant(const QString &)));
 }
 
-void MT_IndividualsWidget::onShow(MT_GPManager *manager, MT_EstimationState *subst)
+void MT_IndividualsWidget::onShow(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
 	randomizer = manager->getRandomizer();
 
@@ -196,7 +196,7 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, MT_EstimationState *sub
 		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't get randomizer to set/get settings.");
 }
 
-bool MT_IndividualsWidget::onHide(MT_GPManager *manager, MT_EstimationState *subst)
+bool MT_IndividualsWidget::onHide(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
 	int *length = nullptr;
 	int *numVar = nullptr;

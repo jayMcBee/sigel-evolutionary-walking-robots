@@ -13,8 +13,8 @@ public:
 	MT_WidgetBase(QWidget *parent);
 	virtual ~MT_WidgetBase() = default;
 
-	virtual bool onHide(MT_GPManager *manager, MT_EstimationState *subst);
-	virtual void onShow(MT_GPManager *manager, MT_EstimationState *subst);
+	virtual bool onHide(MT_GPManager *manager, MT_EstimationState *estimationState);
+	virtual void onShow(MT_GPManager *manager, MT_EstimationState *estimationState);
 
 protected:
 	QWidget *parentWindow;

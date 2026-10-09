@@ -78,15 +78,15 @@ private:
 
 	QString saveName;
 	QString baseName;
-	MT_EstimationState substCache;
+	MT_EstimationState estimationState;
 
 	bool createGPSystem();
 	bool saveSystem(QString sigExpName);
 	void callMetaEvolutionLoop();
 	void callMetaEvolutionLoopWOSigel();
 
-	void loadCache(QTextStream &File);
-	void saveCache(QTextStream &File);
+	void loadEstimationState(QTextStream &File);
+	void saveEstimationState(QTextStream &File);
 	void writeEstimationSettings();
 
 public slots:

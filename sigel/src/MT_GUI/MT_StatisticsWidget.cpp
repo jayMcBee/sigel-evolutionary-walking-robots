@@ -59,13 +59,13 @@ MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, const char* name, 
 	QObject::connect(searchEffectsPSButton, SIGNAL(clicked()), SLOT(slotSearchEffectsPSExport()));
 }
 
-void MT_StatisticsWidget::onShow(MT_GPManager *manager, MT_EstimationState *subst)
+void MT_StatisticsWidget::onShow(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
 	statToolbar->show();
 
 	mng = manager;
 	stat = manager->getGPStatistics();
-	sigStat = subst;
+	this->estimationState = estimationState;
 
 	if(evolRunning && autoUpdateCheckBox->isChecked()){
 		intervalSpinBox->setEnabled(false);
@@ -76,7 +76,7 @@ void MT_StatisticsWidget::onShow(MT_GPManager *manager, MT_EstimationState *subs
 	updateGUI(-1, -1);
 }
 
-bool MT_StatisticsWidget::onHide(MT_GPManager *manager, MT_EstimationState *subst)
+bool MT_StatisticsWidget::onHide(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
 	if(evolRunning)
 		return false;
@@ -100,8 +100,8 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 	/* total page */
 	// Simulation/Estimation
 	int sigIdx = 0;
-	if(sigStat && sigGen != -2){
-		int numSIGGenerations = sigStat->generationCount;
+	if(estimationState && sigGen != -2){
+		int numSIGGenerations = estimationState->generationCount;
 		SIGGenSpinBox->setRange(1, numSIGGenerations);
 		SIGGenSlider->setRange(1, numSIGGenerations);
 		if(sigGen == -1){
@@ -116,14 +116,14 @@ void MT_StatisticsWidget::updateGUI(int mtGen, int sigGen)
 
 		numSIGGen->setText(QString::number(numSIGGenerations));
 		if(numSIGGenerations != 0){
-			numSimulations->setText(QString::number(sigStat->simulationCounts->at(sigIdx)));
-			numEstimations->setText(QString::number(sigStat->estimationCounts->at(sigIdx)));
+			numSimulations->setText(QString::number(estimationState->simulationCounts->at(sigIdx)));
+			numEstimations->setText(QString::number(estimationState->estimationCounts->at(sigIdx)));
 
 			// calculate the total numbers of Sim/Est
 			// soFarSigIdx is a member: the loop adds the generations not yet in the totals, through generation sigGen; it adds nothing when sigGen is -1.
 			while(soFarSigIdx < sigGen){
-				totalSim += sigStat->simulationCounts->at(soFarSigIdx);
-				totalEst += sigStat->estimationCounts->at(soFarSigIdx);
+				totalSim += estimationState->simulationCounts->at(soFarSigIdx);
+				totalEst += estimationState->estimationCounts->at(soFarSigIdx);
 				soFarSigIdx++;
 			}
 		}
@@ -310,7 +310,7 @@ void MT_StatisticsWidget::evolutionRunning(bool running)
  **/
 void MT_StatisticsWidget::slotEstGButton()
 {
-	if(sigStat->generationCount < 2){
+	if(estimationState->generationCount < 2){
 		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.");
 		return;
 	}
@@ -350,7 +350,7 @@ void MT_StatisticsWidget::slotSearchEffectsGButton()
  **/
 void MT_StatisticsWidget::slotEstDButton()
 {
-	if(sigStat->generationCount < 2){
+	if(estimationState->generationCount < 2){
 		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.");
 		return;
 	}
@@ -368,10 +368,10 @@ void MT_StatisticsWidget::slotEstDButton()
 
 	// write data
 	pipeStream << "# SIGEL-Generation\t\tnum of simulations\t\tnum of estimations\n#\n";
-	for(int i=0; i<sigStat->generationCount; i++){
+	for(int i=0; i<estimationState->generationCount; i++){
 		pipeStream << i << " " 
-			<< sigStat->simulationCounts->at(i) << " "
-			<< sigStat->estimationCounts->at(i) << "\n";
+			<< estimationState->simulationCounts->at(i) << " "
+			<< estimationState->estimationCounts->at(i) << "\n";
 	}
 
 	file.close();
@@ -469,7 +469,7 @@ void MT_StatisticsWidget::slotSearchEffectsDButton()
  **/
 void MT_StatisticsWidget::slotEstPSExport()
 {
-	if(sigStat->generationCount < 2){
+	if(estimationState->generationCount < 2){
 		QMessageBox::information(this, "View Graph", "There's not enough data to plot a graph.");
 		return;
 	}
@@ -547,14 +547,14 @@ void MT_StatisticsWidget::plotEstimation(QString fileName)
 	}
 
 	pipeStream << "set data style lines\n"
-		<< "set yrange[0:" << sigStat->estimationCounts->at(0) + sigStat->simulationCounts->at(0) << "]\n"
+		<< "set yrange[0:" << estimationState->estimationCounts->at(0) + estimationState->simulationCounts->at(0) << "]\n"
 		<< "set title \"Simulation - Estimation Relationship\"\n"
 		<< "set xlabel 'Generation'\n"
 		<< "set ylabel\n"
 		<< "plot '-' title 'estimations'\n";
 
-	for(int j=0; j<sigStat->generationCount; j++){
-		pipeStream << j << " " << sigStat->estimationCounts->at(j) << "\n";
+	for(int j=0; j<estimationState->generationCount; j++){
+		pipeStream << j << " " << estimationState->estimationCounts->at(j) << "\n";
 	}
 	pipeStream << "e\nquit\n";
 

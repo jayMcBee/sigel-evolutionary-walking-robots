@@ -5,11 +5,11 @@ MT_WidgetBase::MT_WidgetBase(QWidget *parent)
 	parentWindow = parent;
 }
 
-void MT_WidgetBase::onShow(MT_GPManager *manager, MT_EstimationState *subst)
+void MT_WidgetBase::onShow(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
 }
 
-bool MT_WidgetBase::onHide(MT_GPManager *manager, MT_EstimationState *subst)
+bool MT_WidgetBase::onHide(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
 	return true;
 }

@@ -18,8 +18,8 @@ class MT_IndividualsWidget : public MT_IndividualsWidgetBase, public MT_WidgetBa
 	friend class MT_AddConstantsWidget;
 
 public:
-	virtual bool onHide(MT_GPManager *manager, MT_EstimationState *subst);
-	virtual void onShow(MT_GPManager *manager, MT_EstimationState *subst);
+	virtual bool onHide(MT_GPManager *manager, MT_EstimationState *estimationState);
+	virtual void onShow(MT_GPManager *manager, MT_EstimationState *estimationState);
 
 	MT_IndividualsWidget(QWidget* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 

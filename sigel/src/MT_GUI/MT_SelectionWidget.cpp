@@ -64,7 +64,7 @@ int MT_SelectionWidget::calculateTournSize(int pSize, int oSize, int oTSize)
 	return lastSize;
 }
 
-void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *subst)
+void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
 	int offspringSize;
 	int tournSize;
@@ -110,7 +110,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *subst
 
 	// set the fitness function
 	fitnessFunctionComboBox->clear();
-	if(subst->strategy < 3){		// of type evaluator */
+	if(estimationState->strategy < 3){		// of type evaluator */
 		fitnessFunctionComboBox->addItem("Simple error");
 		fitnessFunctionComboBox->addItem("Square error");
 		fitnessFunctionComboBox->setCurrentIndex(fitFunc - 1);
@@ -127,7 +127,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *subst
 	QObject::connect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
 }
 
-bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *subst)
+bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
 	int offspringSize=0;
 	int tournSize=0;
@@ -140,7 +140,7 @@ bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *subst
 	tournSize = tourSizeComboBox->currentText().toInt();
 	selMethod = selectionMethodComboBox->currentIndex() + 1;
 
-	if(subst->strategy < 3){		// of type evaluator */
+	if(estimationState->strategy < 3){		// of type evaluator */
 		fitFunc = fitnessFunctionComboBox->currentIndex() + 1;
 	} else {						// of type classifier
 		fitFunc = fitnessFunctionComboBox->currentIndex() + 3;

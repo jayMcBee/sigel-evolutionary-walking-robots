@@ -4,8 +4,8 @@
 #include "MT_GUI/MT_MainWindow.h"
 #include "MT_Control/MT_Controller.h"
 
-MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, MT_EstimationState *substCache, QWidget * parent, const char * name, Qt::WindowFlags f )
- : QMainWindow( parent, f ), gpManager(manager), subst(substCache)
+MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, MT_EstimationState *estimationState, QWidget * parent, const char * name, Qt::WindowFlags f )
+ : QMainWindow( parent, f ), gpManager(manager), estimationState(estimationState)
 {
 	if ( name )
 		setObjectName( QString::fromUtf8( name ) );
@@ -235,7 +235,7 @@ void MT_MainWindow::closeEvent(QCloseEvent *e)
 	int topID = (actWidgetID == -1) ? 0 : actWidgetID;	// get widget position of the widget on top of the widgetstack
 	MT_WidgetBase *topWidget = widgets[topID];			// get the top widget
 
-	if(topWidget->onHide(gpManager, subst)){		// can we close the window savely ?
+	if(topWidget->onHide(gpManager, estimationState)){		// can we close the window savely ?
 		QObject::disconnect(gpManager, SIGNAL( metaEvolutionRunning(bool) ), this, SLOT( slotEvolutionStatus(bool) ));
 
 		QObject::disconnect(mtStartEvolutionAction, SIGNAL( triggered() ), controller, SLOT( startSingleEvolution() ));
@@ -265,8 +265,8 @@ void MT_MainWindow::slotRaiseWidget(QTreeWidgetItem *item)
 	if(nextWidget){
 		if(actWidgetID != -1){
 			actWidget = widgets[actWidgetID];
-			if(actWidget->onHide(gpManager, subst)){
-				nextWidget->onShow(gpManager, subst);
+			if(actWidget->onHide(gpManager, estimationState)){
+				nextWidget->onShow(gpManager, estimationState);
 				widgetStack->setCurrentIndex(pos);
 				experimentWidget->slotCurrentChanged(item);
 				actWidgetID = pos;
@@ -274,7 +274,7 @@ void MT_MainWindow::slotRaiseWidget(QTreeWidgetItem *item)
 				experimentWidget->lastSelected();
 			}
 		} else {
-			nextWidget->onShow(gpManager, subst);
+			nextWidget->onShow(gpManager, estimationState);
 			widgetStack->setCurrentIndex(pos);
 			actWidgetID = pos;
 		}
@@ -292,15 +292,15 @@ void MT_MainWindow::raiseWidget(int pos)
 	if(nextWidget){
 		if(actWidgetID != -1){
 			actWidget = widgets[actWidgetID];
-			if(actWidget->onHide(gpManager, subst)){
-				nextWidget->onShow(gpManager, subst);
+			if(actWidget->onHide(gpManager, estimationState)){
+				nextWidget->onShow(gpManager, estimationState);
 				widgetStack->setCurrentIndex(pos);
 				actWidgetID = pos;
 			} else {
 				experimentWidget->lastSelected();
 			}
 		} else {
-			nextWidget->onShow(gpManager, subst);
+			nextWidget->onShow(gpManager, estimationState);
 			widgetStack->setCurrentIndex(pos);
 			actWidgetID = pos;
 		}
@@ -319,9 +319,9 @@ void MT_MainWindow::enforceUpdate(bool GUI)
 	if(actWidgetID != -1){
 		actWidget = widgets[actWidgetID];
 		if(GUI){
-			actWidget->onShow(gpManager, subst);
+			actWidget->onShow(gpManager, estimationState);
 		} else {
-			actWidget->onHide(gpManager, subst);
+			actWidget->onHide(gpManager, estimationState);
 		}
 	}
 }

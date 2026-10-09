@@ -14,8 +14,8 @@ class MT_SelectionWidget : public MT_SelectionWidgetBase, public MT_WidgetBase
 public:
 	MT_SelectionWidget(QWidget* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 
-	void onShow(MT_GPManager *manager, MT_EstimationState *subst);
-	bool onHide(MT_GPManager *manager, MT_EstimationState *subst);
+	void onShow(MT_GPManager *manager, MT_EstimationState *estimationState);
+	bool onHide(MT_GPManager *manager, MT_EstimationState *estimationState);
 
 	int calculateTournSize(int pSize, int oSize, int oTSize);
 

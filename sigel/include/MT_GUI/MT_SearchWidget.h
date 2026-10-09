@@ -14,8 +14,8 @@ class MT_SearchWidget : public MT_SearchWidgetBase, public MT_WidgetBase
 public:
 	MT_SearchWidget(QWidget* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 
-	void onShow(MT_GPManager *manager, MT_EstimationState *subst);
-	bool onHide(MT_GPManager *manager, MT_EstimationState *subst);
+	void onShow(MT_GPManager *manager, MT_EstimationState *estimationState);
+	bool onHide(MT_GPManager *manager, MT_EstimationState *estimationState);
 
 private slots:
 	void slotXOverChanged(int nvalue);

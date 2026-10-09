@@ -19,15 +19,15 @@ class MT_StatisticsWidget : public MT_StatisticsWidgetBase, public MT_WidgetBase
 public:
 	MT_StatisticsWidget(QMainWindow* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 
-	void onShow(MT_GPManager *manager, MT_EstimationState *subst);
-	bool onHide(MT_GPManager *manager, MT_EstimationState *subst);
+	void onShow(MT_GPManager *manager, MT_EstimationState *estimationState);
+	bool onHide(MT_GPManager *manager, MT_EstimationState *estimationState);
 	void evolutionRunning(bool running);
 
 private:
 	bool evolRunning;
 	MT_Statistics *stat;
 	MT_GPManager *mng;
-	MT_EstimationState *sigStat;
+	MT_EstimationState *estimationState;
 
 	// toolbar
 	QToolBar *statToolbar;

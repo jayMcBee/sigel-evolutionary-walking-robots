@@ -42,13 +42,13 @@ MT_Controller::MT_Controller(SIGEL_GP::SIG_GPExperiment &exp)
 	selectedSystem = EVALUATOR_SUBST;
 	metaOn = false;
 
-	substCache.inUse = false;
-	substCache.generationCount = 0;
-	substCache.simulationCounts = nullptr;
-	substCache.estimationCounts = nullptr;
-	substCache.refreshInterval = 0;
-	substCache.strategy = -1;
-	substCache.tolerance = 0;
+	estimationState.inUse = false;
+	estimationState.generationCount = 0;
+	estimationState.simulationCounts = nullptr;
+	estimationState.estimationCounts = nullptr;
+	estimationState.refreshInterval = 0;
+	estimationState.strategy = -1;
+	estimationState.tolerance = 0;
 
 	defConfFileName = std::getenv("SIGEL_ROOT");
 	defConfFileName.append("/stdConf.mt");
@@ -176,7 +176,7 @@ bool MT_Controller::switchSystem(int wantedSystem)
 		return true;
 
 	// if we have constructed a substituter or a gpmanager yet, we have to destroy them
-	if(gpManager || substCache.inUse || substitution){
+	if(gpManager || estimationState.inUse || substitution){
 		if(QMessageBox::warning(SIGEL_Tools::dialogParent(), "Switching the MetaGP System", 
 			"Switching the system requires deleting the current\n"
 			"GP system. Do you want to delete it?",
@@ -193,7 +193,7 @@ bool MT_Controller::switchSystem(int wantedSystem)
 			delete mainWindow;
 			delete gpManager;
 			delete substitution;
-			substCache.inUse = false;
+			estimationState.inUse = false;
 			mainWindow = nullptr;
 			gpManager = nullptr;
 			substitution = nullptr;
@@ -256,7 +256,7 @@ bool MT_Controller::useMeta(bool state)
 				delete gpManager;
 				delete mainWindow;
 				delete substitution;
-				substCache.inUse = false;
+				estimationState.inUse = false;
 				gpManager = nullptr;
 				mainWindow = nullptr;
 				substitution = nullptr;
@@ -302,9 +302,9 @@ bool MT_Controller::createGPSystem()
 		confFile.open(QIODevice::ReadOnly);
 	}
 
-	// fill the substituter cache
-	if(substCache.inUse == false)
-		loadCache(confStrm);
+	// fill the estimation state
+	if(estimationState.inUse == false)
+		loadEstimationState(confStrm);
 
 	// make sure we have a gp-manager
 	if(!gpManager){
@@ -329,7 +329,7 @@ bool MT_Controller::createGPSystem()
  ***/
 void MT_Controller::configureSystem(QWidget *owner)
 {
-	// if there is an up to date substituter, fill the substCache with 
+	// if there is an up to date substituter, fill the estimation state with 
 	// the data from this substituter
 	if(substitution){
 		QBuffer buffer;					// create a buffered stream
@@ -339,19 +339,19 @@ void MT_Controller::configureSystem(QWidget *owner)
 		substitution->writeToFile(inStrm);
 		buffer.close();
 
-		buffer.open(QIODevice::ReadOnly);		// load the cache from the stream
-		loadCache(inStrm);
+		buffer.open(QIODevice::ReadOnly);		// load the estimation state from the stream
+		loadEstimationState(inStrm);
 		buffer.close();
 	}
 
-	if(!gpManager || !substCache.inUse){
+	if(!gpManager || !estimationState.inUse){
 		if(!createGPSystem()){
 			SIGEL_Tools::SIG_IO::cerr << "Configure meta system: couldn't create the GP system." << Qt::endl;
 			return;
 		}
 	}
 	if(!mainWindow){
-		if(!(mainWindow = new MT_MainWindow(this, gpManager, &substCache, owner, "MTMainWindow"))){
+		if(!(mainWindow = new MT_MainWindow(this, gpManager, &estimationState, owner, "MTMainWindow"))){
 			SIGEL_Tools::SIG_IO::cerr << "Configure meta system: couldn't open the configuration window." << Qt::endl;
 			return;
 		}
@@ -469,7 +469,7 @@ bool MT_Controller::readFromFile(QString fileName)
 		default:
 			error = true;
 		}
-		loadCache(confStrm);
+		loadEstimationState(confStrm);
 	} else {
 		// we are in trouble; loaded file has incorrect syntax
 		// this should never happen;
@@ -564,8 +564,8 @@ bool MT_Controller::saveSystem(QString sigExpName)
 		// save the substituter / the substituter settings
 		if(substitution){
 			substitution->writeToFile(fileStr);
-		} else if(substCache.inUse){
-			saveCache(fileStr);
+		} else if(estimationState.inUse){
+			saveEstimationState(fileStr);
 		}
 
 		// save the gp system
@@ -640,9 +640,9 @@ MT_Substitute* MT_Controller::getClassifier()
 }
 
 /***
- * all the functions for the substituter cache
+ * all the functions for the estimation state
  **/
-void MT_Controller::loadCache(QTextStream &File)
+void MT_Controller::loadEstimationState(QTextStream &File)
 {
 	QString Classifier( "Classifier:" );
 	QString Evaluator( "Evaluator:" );
@@ -659,24 +659,24 @@ void MT_Controller::loadCache(QTextStream &File)
 		savedSystem = EVALUATOR_SUBST;
 	}
 
-	substCache.simulationCounts = nullptr;
-	substCache.estimationCounts = nullptr;
+	estimationState.simulationCounts = nullptr;
+	estimationState.estimationCounts = nullptr;
 	if(usedSystem == savedSystem){
-		substCache.strategy = (File.readLine()).toInt();
-		substCache.tolerance = (File.readLine()).toDouble();
-		substCache.refreshInterval = (File.readLine()).toInt();
-		substCache.generationCount = (File.readLine()).toUInt();
-		if(substCache.generationCount != 0){
-			correctEst.resize(substCache.generationCount);
-			metaEst.resize(substCache.generationCount);
+		estimationState.strategy = (File.readLine()).toInt();
+		estimationState.tolerance = (File.readLine()).toDouble();
+		estimationState.refreshInterval = (File.readLine()).toInt();
+		estimationState.generationCount = (File.readLine()).toUInt();
+		if(estimationState.generationCount != 0){
+			correctEst.resize(estimationState.generationCount);
+			metaEst.resize(estimationState.generationCount);
 						
-			for(int i=0; i< substCache.generationCount; i++)
+			for(int i=0; i< estimationState.generationCount; i++)
 			{
 				correctEst[i] = (File.readLine()).toUInt();
 				metaEst[i] = (File.readLine()).toUInt();
 			}
-			substCache.simulationCounts = &correctEst;
-			substCache.estimationCounts = &metaEst;
+			estimationState.simulationCounts = &correctEst;
+			estimationState.estimationCounts = &metaEst;
 		}
 	} else {		// default setup
 		QFile defFile(defConfFileName);
@@ -690,10 +690,10 @@ void MT_Controller::loadCache(QTextStream &File)
 			while ((PresentLine != Classifier) && !(defStrm.atEnd()))
 				PresentLine = defStrm.readLine();
 			if ((PresentLine == Classifier) && !(defStrm.atEnd())){
-				substCache.strategy = (defStrm.readLine()).toInt();
-				substCache.tolerance = (defStrm.readLine()).toDouble();
-				substCache.refreshInterval = (defStrm.readLine()).toInt();
-				substCache.generationCount = (defStrm.readLine()).toUInt();
+				estimationState.strategy = (defStrm.readLine()).toInt();
+				estimationState.tolerance = (defStrm.readLine()).toDouble();
+				estimationState.refreshInterval = (defStrm.readLine()).toInt();
+				estimationState.generationCount = (defStrm.readLine()).toUInt();
 			}
 			break;
 
@@ -703,18 +703,18 @@ void MT_Controller::loadCache(QTextStream &File)
 			while ((PresentLine != Evaluator) && !(defStrm.atEnd()))
 				PresentLine = defStrm.readLine();
 			if ((PresentLine == Evaluator) && !(defStrm.atEnd())){
-				substCache.strategy = (defStrm.readLine()).toInt();
-				substCache.tolerance = (defStrm.readLine()).toDouble();
-				substCache.refreshInterval = (defStrm.readLine()).toInt();
-				substCache.generationCount = (defStrm.readLine()).toUInt();
+				estimationState.strategy = (defStrm.readLine()).toInt();
+				estimationState.tolerance = (defStrm.readLine()).toDouble();
+				estimationState.refreshInterval = (defStrm.readLine()).toInt();
+				estimationState.generationCount = (defStrm.readLine()).toUInt();
 			}
 			break;
 		}
 	}
-	substCache.inUse = true;
+	estimationState.inUse = true;
 }
 
-void MT_Controller::saveCache(QTextStream &File)
+void MT_Controller::saveEstimationState(QTextStream &File)
 {
 	switch(usedSystem){
 	case CLASSIFIER_SUBST :
@@ -725,12 +725,12 @@ void MT_Controller::saveCache(QTextStream &File)
 		File << ("Evaluator:\n");
 		break;
 	}
-	File << substCache.strategy <<Qt::endl;
-	File << substCache.tolerance <<Qt::endl;
-	File << substCache.refreshInterval <<Qt::endl;
-	File << substCache.generationCount <<Qt::endl;
-	if(substCache.generationCount != 0){
-		for(int i=0; i< substCache.generationCount; i++){
+	File << estimationState.strategy <<Qt::endl;
+	File << estimationState.tolerance <<Qt::endl;
+	File << estimationState.refreshInterval <<Qt::endl;
+	File << estimationState.generationCount <<Qt::endl;
+	if(estimationState.generationCount != 0){
+		for(int i=0; i< estimationState.generationCount; i++){
 			File << correctEst[i] << "\n";
 			File << metaEst[i] << "\n";
 		}
@@ -744,12 +744,12 @@ void MT_Controller::writeEstimationSettings()
 	} else {
 		estimationSettingsText = "Classifier:\n";
 	}
-	estimationSettingsText.append(QString("%1\n").arg(substCache.strategy));
-	estimationSettingsText.append(QString("%1\n").arg(substCache.tolerance));
-	estimationSettingsText.append(QString("%1\n").arg(substCache.refreshInterval));
-	estimationSettingsText.append(QString("%1\n").arg(substCache.generationCount));
-	if(substCache.generationCount != 0){
-		for(int i=0; i<substCache.generationCount; i++){
+	estimationSettingsText.append(QString("%1\n").arg(estimationState.strategy));
+	estimationSettingsText.append(QString("%1\n").arg(estimationState.tolerance));
+	estimationSettingsText.append(QString("%1\n").arg(estimationState.refreshInterval));
+	estimationSettingsText.append(QString("%1\n").arg(estimationState.generationCount));
+	if(estimationState.generationCount != 0){
+		for(int i=0; i<estimationState.generationCount; i++){
 			estimationSettingsText.append(QString("%1\n%2\n").arg(correctEst[i]).arg(metaEst[i]));
 		}
 	}
@@ -789,7 +789,7 @@ void MT_Controller::slotLoadDefault()
 		}
 
 		// load substituter and gp system setup
-		loadCache(strm);
+		loadEstimationState(strm);
 		gpManager->loadSetup(strm);
 
 		mainWindow->enforceUpdate(true);
@@ -833,7 +833,7 @@ void MT_Controller::slotLoadSetup()
 		}
 
 		// load substituter and gp system setup
-		loadCache(strm);
+		loadEstimationState(strm);
 		gpManager->loadSetup(strm);
 
 		mainWindow->enforceUpdate(true);
@@ -862,8 +862,8 @@ void MT_Controller::slotSaveSetup()
 		mainWindow->enforceUpdate(false);		// enforce an update of the gp-system
 
 		// save the substituter / the substituter settings
-		if(substCache.inUse){
-			saveCache(strm);
+		if(estimationState.inUse){
+			saveEstimationState(strm);
 		}
 
 		// save the gp system
