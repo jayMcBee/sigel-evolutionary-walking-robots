@@ -1092,10 +1092,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   master with an ssh key, `SIGEL_ROOT` and `PVM_ROOT` in `.bashrc` above its
   guard for shells that are not interactive, and on the master a host name
   that does not resolve to 127.0.1.1.
-- **Seen and not changed:** a client that the master cannot add is not
-  reported; the master prints `new host added` and then `pvm_spawn() failed`
-  until the release (423 lines in about 90 seconds with a client behind
-  NAT). After a release the `pvmd3` on the client stays until the master
+- **Now, a client that PVM cannot add:** `SIG_GPFitnessTrainer::getNextHost`
+  reads the answer of `pvm_addhosts` before it puts a new dynamic host on
+  its list. On a failure other than `PvmDupHost` it prints
+  `PVM cannot add the dynamic host "<name>" (error <n>); it is not used.`
+  and leaves the host out. Before, the master printed `new host added` and
+  then `pvm_spawn() failed` until the release (423 lines in about 90 seconds
+  with a client behind NAT). Measured on one machine: a client with a name
+  that does not exist got the line and no spawn was tried on it; a real
+  client in the same run was added and sent scores. `check.sh`: 821 pass
+  and 0 fail.
+- **Seen and not changed:** after a release the `pvmd3` on the client stays until the master
   ends; a second join uses it again.
 - **Not run:** a second machine as a fixed host of the experiment, rsh, the
   cron entry of section 2.3.

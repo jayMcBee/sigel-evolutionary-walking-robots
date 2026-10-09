@@ -549,15 +549,21 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
     // get the next new host to be added to our pvmHost list
     freshHost = freshDynHosts.at(i);
 
-    pvmHosts.resize( pvmHosts.size() + 1 );
-    delete pvmHosts[ pvmHosts.size()-1 ];
-    pvmHosts[ pvmHosts.size()-1 ] = new SIG_GPActivePVMHost(*freshHost);
-
     const QByteArray freshHostNameQCString = freshHost->name.toLatin1();
     char const *freshHostNameCString = freshHostNameQCString.constData();
 
     int singleInfo = 0;
     int info = pvm_addhosts( const_cast< char** >(&freshHostNameCString), 1, &singleInfo );
+
+    // PvmDupHost: the host is still in PVM from an earlier join.
+    if (info < 1 && singleInfo != PvmDupHost) {
+      SIGEL_Tools::SIG_IO::cerr << "\tPVM cannot add the dynamic host \"" << freshHost->name << "\" (error " << singleInfo << "); it is not used." << Qt::endl;
+      continue;
+    }
+
+    pvmHosts.resize( pvmHosts.size() + 1 );
+    delete pvmHosts[ pvmHosts.size()-1 ];
+    pvmHosts[ pvmHosts.size()-1 ] = new SIG_GPActivePVMHost(*freshHost);
 
     fprintf(stderr, "\to new host added to pvmHosts: \"%s\"\n", freshHostNameCString);
   }
