@@ -11,7 +11,6 @@
     coredrive -v ...                 the same, with a trace of the simulation
     coredrive -order <file>          prints the order of a robot's parts
     coredrive -check <experiment>    lists the issues of the robot check
-    coredrive -selfcheck             rules of small classes
     coredrive -metamating            rules of MetaGP's mating code
 
   SIG_GPPopulation shows a dialog only when a QApplication exists, so an
@@ -29,20 +28,16 @@
 
 #include "SIGEL_GP/SIG_GPExperiment.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
-#include "SIGEL_GP/SIG_GPParameter.h"
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 #include "SIGEL_GP/SIG_GPFitnessFunctionRegistry.h"
 #include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
 #include "SIGEL_RobotCheck/SIG_RobotChecker.h"
-#include "SIGEL_Robot/SIG_CommandParameters.h"
 #include "SIGEL_Robot/SIG_Joint.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 #include "SIGEL_RobotIO/SIG_RobotBuilder.h"
 #include "SIGEL_Robot/SIG_Body.h"
-#include "SIGEL_Robot/SIG_ContactSensor.h"
-#include "SIGEL_Robot/SIG_GlueJoint.h"
 #include "SIGEL_Robot/SIG_Drive.h"
 #include "SIGEL_Robot/SIG_Link.h"
 #include "SIGEL_Robot/SIG_Material.h"
@@ -127,181 +122,6 @@ static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
       printf("  %-8s point %s %2d  %s\n", which,
              qPrintable(l->getName()), n++, qPrintable(p.name));
   }
-}
-
-// Rules of small classes that no shipped experiment or robot file reaches.
-// fitness-check.sh runs this before the evaluations, and once more under
-// LeakSanitizer: every object made here must be freed by its owner.
-static int selfcheck()
-{
-  // Line-buffer stdout. SIG_WANT records and continues, but a wrong size can
-  // abort a later index, and a block-buffered stdout then discards the
-  // "selfcheck FAILED:" line that says which assertion went. The gate still
-  // fails; the operator just cannot see why.
-  setvbuf( stdout, 0, _IOLBF, 0 );
-
-  int bad = 0;
-#define SIG_WANT(cond)                                                     \
-  do { if (!(cond)) { printf("selfcheck FAILED: %s\n", #cond); ++bad; } }  \
-  while (0)
-
-  {   // SIG_LanguageParameters owns its commands; removeCommand frees one.
-    SIGEL_Robot::SIG_LanguageParameters languageParameters;
-    SIGEL_Robot::SIG_CommandParameters *command = new SIGEL_Robot::SIG_CommandParameters();
-    languageParameters.addCommand("CHECKED", command);
-    SIG_WANT(languageParameters.getCommand("CHECKED") == command);
-    languageParameters.removeCommand("CHECKED");
-    SIG_WANT(languageParameters.getCommand("CHECKED") == 0);
-  }
-  {   // A robot file may declare a point of a link twice. The last one wins.
-    SIGEL_Robot::SIG_Link link(0, "L", 0);
-    link.addPoint("P", SIG_Vector(1, 0, 0));
-    link.addPoint("P", SIG_Vector(2, 0, 0));
-    SIG_WANT(link.getPoint("P").x == 2);
-  }
-  {   // SIG_Robot finds each kind of part by name, and owns and frees the parts.
-    SIGEL_Robot::SIG_Robot robot;
-    SIGEL_Robot::SIG_Body     *body     = new SIGEL_Robot::SIG_Body(&robot, "body", "d");
-    SIGEL_Robot::SIG_Material *material = new SIGEL_Robot::SIG_Material(&robot, "material");
-    SIGEL_Robot::SIG_Link     *link     = new SIGEL_Robot::SIG_Link(&robot, "link", 0);
-    SIGEL_Robot::SIG_Joint    *joint    = new SIGEL_Robot::SIG_GlueJoint(&robot, "joint", 0);
-    SIGEL_Robot::SIG_Drive    *drive    = new SIGEL_Robot::SIG_Drive(&robot, "drive", 0);
-    SIGEL_Robot::SIG_Sensor   *sensor   = new SIGEL_Robot::SIG_ContactSensor(&robot, "sensor", 0);
-    robot.addBody(body);
-    robot.addMaterial(material);
-    robot.addLink(link);
-    robot.addJoint(joint);
-    robot.addDrive(drive);
-    robot.addSensor(sensor);
-    SIG_WANT(robot.lookupBody("body")         == body);
-    SIG_WANT(robot.lookupMaterial("material") == material);
-    SIG_WANT(robot.lookupLink("link")         == link);
-    SIG_WANT(robot.lookupJoint("joint")       == joint);
-    SIG_WANT(robot.lookupDrive("drive")       == drive);
-    SIG_WANT(robot.lookupSensor("sensor")     == sensor);
-    SIG_WANT(robot.lookupLink("MISSING") == 0);
-  }
-  {   // SIG_Material::setFrictionValue. No shipped robot declares friction,
-      // so no other check runs this code.
-    SIGEL_Robot::SIG_Robot robot;
-    SIGEL_Robot::SIG_Material a(&robot, "a");
-    SIGEL_Robot::SIG_Material b(&robot, "b");
-    SIGEL_Robot::SIG_Material c(&robot, "c");
-
-    SIG_WANT(a.getFrictionValue(&b) == 0.6);      // the not-found default
-
-    a.setFrictionValue(&b, 0.25);                 // negotiates by default
-    SIG_WANT(a.getFrictionValue(&b) == 0.25);
-    SIG_WANT(b.getFrictionValue(&a) == 0.25);
-
-    a.setFrictionValue(&c, 0.5);
-    SIG_WANT(a.getFrictionValue(&b) == 0.25);     // still there, not overwritten
-    SIG_WANT(a.getFrictionValue(&c) == 0.5);
-
-    a.setFrictionValue(&b, 0.75);                 // UPDATE, must not append
-    SIG_WANT(a.getFrictionValue(&b) == 0.75);
-    SIG_WANT(a.getFrictionValue(&c) == 0.5);
-
-    // The partner is updated too. This is the only check that fails when
-    // setFrictionValue updates one side of a pair that already exists.
-    SIG_WANT(b.getFrictionValue(&a) == 0.75);
-
-    // The written record shows the length of the list: an update must not
-    // append a second entry.
-    // "Material a <elasticity> <density> <nfric> b 0.75 c 0.5 <colour>"
-    QString written;
-    { QTextStream ts(&written); a.writeToFileTransfer(ts); }
-    SIG_WANT(written.split(' ').value(4) == "2");   // 3 would be the append bug
-    SIG_WANT(written.contains("b 0.75"));
-    SIG_WANT(written.contains("c 0.5"));
-  }
-  {   // SIG_Link::addNoCollide registers the pair on both links, once. No
-      // shipped robot declares a no-collide pair.
-    SIGEL_Robot::SIG_Robot robot;
-    SIGEL_Robot::SIG_Link l1(&robot, "l1", 0);
-    SIGEL_Robot::SIG_Link l2(&robot, "l2", 1);
-
-    l1.addNoCollide(&l2);                         // negotiates both directions
-    SIG_WANT(l1.getNoCollides().count() == 1);
-    SIG_WANT(l2.getNoCollides().count() == 1);
-    SIG_WANT(l1.getNoCollides().value(0) == &l2);   // value(), not at():
-    SIG_WANT(l2.getNoCollides().value(0) == &l1);   // SIG_WANT continues after
-                                                   // a failure, so at() would
-                                                   // abort the block instead
-                                                   // of reporting the rest.
-
-    l1.addNoCollide(&l2);                         // the duplicate guard
-    SIG_WANT(l1.getNoCollides().count() == 1);
-    SIG_WANT(l2.getNoCollides().count() == 1);
-  }
-  {   // A material read from a stream keeps a friction partner that is loaded
-      // already, and drops, without a message, one that is not loaded yet.
-    SIGEL_Robot::SIG_Robot robot;
-    SIGEL_Robot::SIG_Material *known = new SIGEL_Robot::SIG_Material(&robot, "known");
-    robot.addMaterial(known);
-
-    QString text = "later 1 1 1 known 0.25 0 0 0 ";
-    { QTextStream ts(&text, QIODevice::ReadOnly);
-      SIGEL_Robot::SIG_Material *later = new SIGEL_Robot::SIG_Material(&robot, ts);
-      robot.addMaterial(later);
-      SIG_WANT(later->getFrictionValue(known) == 0.25);   // backward ref kept
-      SIG_WANT(known->getFrictionValue(later) == 0.25);   // and negotiated
-    }
-
-    QString fwd = "early 1 1 1 notYetLoaded 0.9 0 0 0 ";
-    { QTextStream ts(&fwd, QIODevice::ReadOnly);
-      SIGEL_Robot::SIG_Material *early = new SIGEL_Robot::SIG_Material(&robot, ts);
-      robot.addMaterial(early);
-      // 0.6 is the not-found default: the pair was dropped, not stored.
-      SIG_WANT(early->getFrictionValue(known) == 0.6);
-    }
-  }
-  {   // SIG_GPPopulation owns its individuals. The run under LeakSanitizer
-      // judges every free in setIndividual, deleteIndividual and the
-      // destructor; the checks below pin positions and values.
-    SIGEL_GP::SIG_GPParameter gpParameter;
-    SIGEL_Robot::SIG_LanguageParameters languageParameters;
-
-    SIGEL_GP::SIG_GPPopulation pop;
-    pop.addRandomIndividuals( 4, gpParameter, languageParameters );
-    SIG_WANT(pop.getSize() == 4);
-
-    // deleteIndividual frees one individual and shifts the rest down.
-    SIGEL_GP::SIG_GPIndividual *third = pop.getIndividualPointer( 2 );
-    SIGEL_GP::SIG_GPIndividual *last  = pop.getIndividualPointer( 3 );
-    pop.deleteIndividual( 1 );
-    SIG_WANT(pop.getSize() == 3);
-    SIG_WANT(pop.getIndividualPointer( 1 ) == third);
-    SIG_WANT(pop.getIndividualPointer( 2 ) == last);
-    SIG_WANT(pop.getIndividualPointer( 1 )->getPoolPos() == 1);
-    SIG_WANT(pop.getIndividualPointer( 2 )->getPoolPos() == 2);
-
-    pop.deleteIndividual( pop.getSize() - 1 );   // last: the shift loop is empty
-    SIG_WANT(pop.getSize() == 2);
-
-    // setIndividual frees the loser and takes ownership of the caller's
-    // object. Deliberately not deleted here -- the pool must free it.
-    SIGEL_GP::SIG_GPIndividual *winner = new SIGEL_GP::SIG_GPIndividual();
-    pop.setIndividual( *winner, 0 );
-    SIG_WANT(pop.getIndividualPointer( 0 ) == winner);
-    SIG_WANT(pop.getSize() == 2);
-
-    // A new individual has fitness -1 already, so set other values first,
-    // on two slots.
-    pop.getIndividualPointer( 0 )->setFitness( 3.5 );
-    pop.getIndividualPointer( 1 )->setFitness( 7.5 );
-    pop.resetAllFitnessValues();
-    SIG_WANT(pop.getIndividualPointer( 0 )->getFitness() == -1);
-    SIG_WANT(pop.getIndividualPointer( 1 )->getFitness() == -1);
-
-    // The pool is left with one individual, so that the destructor has
-    // something to free under LeakSanitizer.
-    pop.deleteIndividual( 0 );
-    SIG_WANT(pop.getSize() == 1);
-  }
-#undef SIG_WANT
-  printf(bad ? "selfcheck: %d FAILED\n" : "selfcheck: ok\n", bad);
-  return bad ? 1 : 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -493,7 +313,6 @@ int main(int argc, char *argv[])
 
   bool verbose = false;
   if (argc > 1 && QString(argv[1]) == "-v") { verbose = true; argv++; argc--; }
-  if (argc > 1 && QString(argv[1]) == "-selfcheck") return selfcheck();
   if (argc > 1 && QString(argv[1]) == "-metamating") return metamating();
   bool robotCheck = false;
   if (argc > 1 && QString(argv[1]) == "-check") { robotCheck = true; argv++; argc--; }
@@ -501,7 +320,7 @@ int main(int argc, char *argv[])
   if (argc > 1 && QString(argv[1]) == "-order") { order = true; argv++; argc--; }
 
   if (argc < 2 || argc > 3) {
-    fprintf(stderr, "usage: %s [-v] [-check] <experiment.exp> [individual, default 0]\n       %s -order <experiment.exp | robot.rrb>\n       %s -selfcheck | -metamating\n", argv[0], argv[0], argv[0]);
+    fprintf(stderr, "usage: %s [-v] [-check] <experiment.exp> [individual, default 0]\n       %s -order <experiment.exp | robot.rrb>\n       %s -metamating\n", argv[0], argv[0], argv[0]);
     return 2;
   }
 

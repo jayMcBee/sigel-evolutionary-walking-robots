@@ -487,7 +487,14 @@ $(B)/coredrive: checks/programs/coredrive.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CO
 #
 # sigel/tests/ has main.cpp and one folder for each module. Each test class
 # there has a header with Q_OBJECT, so each header goes through moc.
+#
+# main.cpp names the test classes by hand, and the files are found by
+# wildcard. So `make test' stops if main.cpp does not name a class: such a
+# class is built and never run, and the tests pass without it.
 test: $(B)/sigel_tests
+	@for h in $(TEST_HDRS); do c=`basename $$h .h`; \
+	   grep -q "::$$c " $(SRC)/tests/main.cpp || { \
+	     echo "$(SRC)/tests/main.cpp does not run the test class $$c" >&2; exit 1; }; done
 	$(B)/sigel_tests
 
 TESTINC   := $(SIGINC) -I$(SRC)/tests -isystem $(QTINC)/QtTest
