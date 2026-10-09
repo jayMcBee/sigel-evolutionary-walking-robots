@@ -1072,7 +1072,9 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   the scores per host and printed `Scores from <host>: <count>` before each
   generation line (commit e99f1e0); it was more code than the purpose needs
   and is replaced.
-- **Now, commit eb4850f:** `sigel/README` section 2 is rewritten as steps: one
+- **Now, commit eb4850f:** `sigel/README` (since renamed to
+  `sigel/GETTING_STARTED`, with a link on the front page `README.md`)
+  section 2 is rewritten as steps: one
   machine, several hosts over ssh, dynamic clients. It says that the
   experiment exists on the master only.
 - **Measured, two machines:** master on aarch64, client on x86_64 with SIGEL
@@ -1096,7 +1098,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   NAT). After a release the `pvmd3` on the client stays until the master
   ends; a second join uses it again.
 - **Not run:** a second machine as a fixed host of the experiment, rsh, the
-  cron entry of README 2.3.
+  cron entry of section 2.3.
 
 **2026-10-09 — DONE: THE SERVER FOR DYNAMIC CLIENTS IS THE CLASS `SIG_GPPVMDynamicClientServer`.**
 

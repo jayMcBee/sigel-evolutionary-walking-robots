@@ -6,6 +6,8 @@ It is not made, maintained or endorsed by SIGEL's original authors.
 SIGEL evolves control programs for walking robots by genetic programming and
 tests each program in a physics simulator.
 
+To build and run it, see [Getting started](sigel/GETTING_STARTED).
+
 ## Origin
 
 - **SIGEL 1.0 (2001):** written by project group PG 368 at the University of
