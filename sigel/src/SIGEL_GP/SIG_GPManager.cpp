@@ -914,12 +914,6 @@ void SIGEL_GP::SIG_GPManager::run()
 				std::cerr << "could not autosave the experiment!" << endl;
 			}
 		}
-
-		// do we have a threaded server running for dyn. clients ?
-		if (dynamicClientServer.isRunning() && runGenerationCounter%20==0)
-		{
-			dynamicClientServer.releaseAllClients(trainer);
-		}
 	};
 }
 
@@ -1132,12 +1126,6 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 			{
 				std::cerr << "could not autosave the experiment!" << endl;
 			}
-		}
-
-		// do we have a threaded server running for dyn. clients ?
-		if (dynamicClientServer.isRunning())
-		{
-			dynamicClientServer.releaseAllClients(trainer);
 		}
 	}
 }
