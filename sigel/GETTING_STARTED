@@ -3,7 +3,8 @@ Getting started with SIGEL v1.4
 
 SIGEL was written in 2001 by project group PG 368 at the University of Dortmund:
 https://sigel.sourceforge.net/seiten/einleitung_en.html
-Versions 1.1 to 1.3 added MetaGP, after research by Jens Ziegler and Wolfgang Banzhaf.
+Versions 1.1 to 1.3 added MetaGP, which is based on the research of Jens Ziegler and
+Wolfgang Banzhaf.
 
 This is an independent fork of the SIGEL project. It is not made, maintained
 or endorsed by SIGEL's original authors.
