@@ -19,35 +19,11 @@ cd /tmp
 rm -rf /tmp/_SIGEL_EVOLUTION_TEMP
 cp -R /home/user/_SIGEL_EVOLUTION_TEMP /tmp
 
-# setup environment
-#setenv QTDIR /app/unido-inf/sun4_56/libqt/2.30/
-#setenv LD_LIBRARY_PATH "${QTDIR}lib:${LD_LIBRARY_PATH}:."
-
-# pvm may not have exited gracefully..
-#rm -f /tmp/pvm*
-
 # Environment is set up, let's register with master.
 # Actually that's it -- 'manage_dyn_slave' waits until the 
 # SIGEL master is terminating, thus we can delete our temp.
 # stuff after exiting the program
 /home/user/manage_dyn_slave $1
-
-# to be on the save side: kill all pending sigel_slaves and pvms
-#ps -e > /tmp/.a.proc                                                          
-#grep pvm /tmp/.a.proc | dm s1 > /tmp/.s.proc
-#if (`test -r /tmp/.s.proc`) then
-#	foreach i (`more /tmp/.s.proc`)
-#		kill -15 $i
-#	end
-#endif
-
-#ps -e > /tmp/.a.proc                                              
-#grep sigel /tmp/.a.proc | dm s1 > /tmp/.s.proc
-#if (`test -r /tmp/.s.proc`) then
-#	foreach i ( `more /tmp/.s.proc` )
-#		kill -9 $i
-#	end
-#endif
 
 # cleanup /tmp files
 cd /home/user
