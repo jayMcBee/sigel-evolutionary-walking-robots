@@ -1,34 +1,24 @@
 #!/bin/sh
 #
-# This script makes any host running it a dynamic
-# client of the host running the SIGEL master program.
-# Required parameters are:
-# 
+# This script makes the host running it a dynamic client of a
+# SIGEL master program started with 'sigel -de':
+#
 #    sigelDynClient <MasterHostName>
 #
-# Where <MasterHostName> is the name of the host running the
-# SIGEL master program in dynamicSlave mode ('sigel -de')
-#
-# We need to make sure all SIGEL related files exist and
-# the SIGEL master program knows our hostname.
-# PVM will manage the rest for us, just clean up after the
-# SIGEL master terminates, i.e. we're no longer useful.
+# The master starts sigel_slave from /tmp/_SIGEL_EVOLUTION_TEMP on
+# this host. The script puts a copy of the SIGEL folder there and
+# deletes it when the master releases its dynamic clients.
 
 # The SIGEL folder: run the script there, or modify the next line.
 SIGEL_ROOT=$PWD
 
-# Get all the files we need
 cd /tmp
 rm -rf /tmp/_SIGEL_EVOLUTION_TEMP
 cp -R "$SIGEL_ROOT" /tmp/_SIGEL_EVOLUTION_TEMP
 
-# Environment is set up, let's register with master.
-# Actually that's it -- 'manage_dyn_slave' waits until the 
-# SIGEL master is terminating, thus we can delete our temp.
-# stuff after exiting the program
+# Registers this host with the master and returns when the master releases it.
 "$SIGEL_ROOT/manage_dyn_slave" "$1"
 
-# cleanup /tmp files
 cd "$SIGEL_ROOT"
 rm -rf /tmp/_SIGEL_EVOLUTION_TEMP
 
