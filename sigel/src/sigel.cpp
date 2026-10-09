@@ -175,24 +175,26 @@ int main( int argc, char *argv[] ) {
       return 1;
     }
 
-    SIGEL_GP::SIG_GPExperiment experiment;
+    // The trainer's destructor calls pvm_delhosts, so the experiment and the manager end before pvm_halt().
+    {
+      SIGEL_GP::SIG_GPExperiment experiment;
 
-    experiment.experimentName = experimentName;
-    // sets the autosave path
-    experiment.setPath(experimentName);
-    QTextStream experimentLoadStream( &experimentFile );
-    experiment.loadExperiment( experimentLoadStream );
-    experimentFile.close();
+      experiment.experimentName = experimentName;
+      // sets the autosave path
+      experiment.setPath(experimentName);
+      QTextStream experimentLoadStream( &experimentFile );
+      experiment.loadExperiment( experimentLoadStream );
+      experimentFile.close();
 
-    SIGEL_GP::SIG_GPManager gpManager( experiment );
+      SIGEL_GP::SIG_GPManager gpManager( experiment );
 
-    // launch the server thread, thus enabling the
-    // clients to register all the time while we're running
-    if (dynClients) {
-      pthread_t serv_thread;
-      // The function returns void, not void *; nothing reads the thread's result.
-      pthread_create(&serv_thread, nullptr, reinterpret_cast<void *(*)(void *)>(&MeJustCallingRegisterDynPVMClients), &gpManager);
-    }
+      // launch the server thread, thus enabling the
+      // clients to register all the time while we're running
+      if (dynClients) {
+        pthread_t serv_thread;
+        // The function returns void, not void *; nothing reads the thread's result.
+        pthread_create(&serv_thread, nullptr, reinterpret_cast<void *(*)(void *)>(&MeJustCallingRegisterDynPVMClients), &gpManager);
+      }
 
 	if(mtEvolve){
 		// This path has no GUI. It uses QCoreApplication, so no QWidget may be
@@ -223,19 +225,20 @@ int main( int argc, char *argv[] ) {
 		gpManager.start();
 	}
 
-    // A signal during the save would leave the file cut short.
-    std::signal( SIGINT, SIG_IGN );
-    std::signal( SIGTERM, SIG_IGN );
+      // A signal during the save would leave the file cut short.
+      std::signal( SIGINT, SIG_IGN );
+      std::signal( SIGTERM, SIG_IGN );
 
-    if (!experimentFile.open( QIODevice::WriteOnly )) {
-      SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentName << "!" << Qt::endl;
-      pvm_halt();
-      return 1;
+      if (!experimentFile.open( QIODevice::WriteOnly )) {
+        SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentName << "!" << Qt::endl;
+        pvm_halt();
+        return 1;
+      }
+
+      QTextStream experimentSaveStream( &experimentFile );
+      experiment.saveExperiment( experimentSaveStream );
+      experimentFile.close();
     }
-
-    QTextStream experimentSaveStream( &experimentFile );
-    experiment.saveExperiment( experimentSaveStream );
-    experimentFile.close();
 
     pvm_halt();
 
