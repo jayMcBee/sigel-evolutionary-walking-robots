@@ -47,6 +47,18 @@ namespace SIGEL_GP
 		void run(SIG_GPFitnessTrainer *trainer);
 
 		/**
+		 * Called by the main thread. It removes the dynamic hosts from 'trainer'
+		 * and waits until the server thread has disconnected all clients.
+		 */
+		void releaseAllClients(SIG_GPFitnessTrainer *trainer);
+
+		/**
+		 * True when the server thread runs.
+		 */
+		bool isRunning() const;
+
+	private:
+		/**
 		 * Two flags to synchronize the main thread and server thread when disconnecting
 		 * dynamically registered clients; if 'disconnectClients' is set, the server thread
 		 * will disconnect all clients causing them to cleanup temp. files since it'll be

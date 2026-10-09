@@ -763,9 +763,6 @@ void SIGEL_GP::SIG_GPManager::run()
 		currentExperiment.mtController->startEvolution();
 	}
 
-	// init the condition variable
-	pthread_cond_init(&dynamicClientServer.cond, nullptr);
-
 	if (!toursAreEmpty( tours ))
 	{
 		SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() was called more than once!" << Qt::endl;
@@ -919,27 +916,9 @@ void SIGEL_GP::SIG_GPManager::run()
 		}
 
 		// do we have a threaded server running for dyn. clients ?
-		if (dynamicClientServer.serverIsUp && currentGenerationNo%20==0)
+		if (dynamicClientServer.isRunning() && currentGenerationNo%20==0)
 		{
-			fprintf(stderr, " Releasing Dynamic SIGEL-Clients:\n");
-
-			// make the main thread running exclusively
-			pthread_mutex_lock( &dynamicClientServer.disconnectMutex );
-			fprintf(stderr, "\t- Flushing all dynamic clients from PVM-Hosts list\n");
-			trainer->flushAllDynHosts();
-
-			fprintf(stderr, "\t- Asking server to disconnect the clients\n");
-			dynamicClientServer.disconnectClients = true;
-			dynamicClientServer.allDisconnected = false;
-
-			// let's wait for server thread
-			while ( ! dynamicClientServer.allDisconnected )
-			{
-				pthread_cond_wait(&dynamicClientServer.cond, &dynamicClientServer.disconnectMutex);
-			}
-			pthread_mutex_unlock( &dynamicClientServer.disconnectMutex );
-
-			fprintf(stderr, "\n");
+			dynamicClientServer.releaseAllClients(trainer);
 		}
 	};
 }
@@ -990,9 +969,6 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	/***************************************
 	 *  end of Meta-System specific part
 	 ****/
-
-	// init the condition variable
-	pthread_cond_init(&dynamicClientServer.cond, nullptr);
 
 	if (!toursAreEmpty( tours ))
 	{
@@ -1159,27 +1135,9 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 		}
 
 		// do we have a threaded server running for dyn. clients ?
-		if (dynamicClientServer.serverIsUp)
+		if (dynamicClientServer.isRunning())
 		{
-			fprintf(stderr, " Releasing Dynamic SIGEL-Clients:\n");
-
-			// make the main thread running exclusively
-			pthread_mutex_lock( &dynamicClientServer.disconnectMutex );
-			fprintf(stderr, "\t- Flushing all dynamic clients from PVM-Hosts list\n");
-			trainer->flushAllDynHosts();
-
-			fprintf(stderr, "\t- Asking server to disconnect the clients\n");
-			dynamicClientServer.disconnectClients = true;
-			dynamicClientServer.allDisconnected = false;
-
-			// let's wait for server thread..
-			while ( ! dynamicClientServer.allDisconnected )
-			{
-				pthread_cond_wait(&dynamicClientServer.cond, &dynamicClientServer.disconnectMutex);
-			}
-			pthread_mutex_unlock( &dynamicClientServer.disconnectMutex );
-
-			fprintf(stderr, "\n");
+			dynamicClientServer.releaseAllClients(trainer);
 		}
 	}
 }

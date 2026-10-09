@@ -44,6 +44,7 @@ SIGEL_GP::SIG_GPPVMDynamicClientServer::SIG_GPPVMDynamicClientServer()
 	  serverIsUp( false )
 {
 	pthread_mutex_init(&disconnectMutex, nullptr);
+	pthread_cond_init(&cond, nullptr);
 }
 
 void SIGEL_GP::SIG_GPPVMDynamicClientServer::run(SIG_GPFitnessTrainer *trainer)
@@ -199,4 +200,32 @@ void SIGEL_GP::SIG_GPPVMDynamicClientServer::run(SIG_GPFitnessTrainer *trainer)
 
 		pthread_mutex_unlock( &disconnectMutex );
 	}
+}
+
+void SIGEL_GP::SIG_GPPVMDynamicClientServer::releaseAllClients(SIG_GPFitnessTrainer *trainer)
+{
+	fprintf(stderr, " Releasing Dynamic SIGEL-Clients:\n");
+
+	// make the main thread running exclusively
+	pthread_mutex_lock( &disconnectMutex );
+	fprintf(stderr, "\t- Flushing all dynamic clients from PVM-Hosts list\n");
+	trainer->flushAllDynHosts();
+
+	fprintf(stderr, "\t- Asking server to disconnect the clients\n");
+	disconnectClients = true;
+	allDisconnected = false;
+
+	// let's wait for server thread
+	while ( ! allDisconnected )
+	{
+		pthread_cond_wait(&cond, &disconnectMutex);
+	}
+	pthread_mutex_unlock( &disconnectMutex );
+
+	fprintf(stderr, "\n");
+}
+
+bool SIGEL_GP::SIG_GPPVMDynamicClientServer::isRunning() const
+{
+	return serverIsUp;
 }
