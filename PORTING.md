@@ -1052,6 +1052,33 @@ classes and leave truncation a hard error. **They are not interchangeable.**
     them and makes them again at several points during its life, which
     needs a `reset()` at each.
 
+**2026-10-09 — DONE: A SILENT OR WRONG PROGRAM ON THE PORT FOR DYNAMIC CLIENTS DOES NOT STOP THE SERVER THREAD.**
+
+- **Before:** `SIG_GPManager::RegisterDynPVMClients` read the host name of a
+  client with a `recv` that had no time limit. A program that connected and
+  sent nothing held the server thread there. The main thread then waited
+  for the release of the clients, and the evolution stood still with no
+  message. The server also read the name up to the first zero byte and did
+  not look at where the received bytes ended.
+- **Now:** the accepted socket gets a receive time limit of 10 seconds. When
+  it runs out, the branch for a client that sent no host name closes the
+  connection. A name with no zero byte among the received bytes is refused
+  with its own message. The last `fprintf` of the method, which stood after
+  the endless loop, is gone.
+- **Measured, before:** on one machine, `sigel -de` on a copy of
+  `twoBases.exp` with one connection that sent nothing: the step at
+  generation 20 stood for 128 seconds, and went on only when the connection
+  was closed.
+- **Measured, now:** the same run with the connection held for 300 seconds:
+  the message came in the first 10 seconds, and the step at generation 20
+  took 16 seconds. With one `manage_dyn_slave`: registered, released at
+  generation 20, and the run went on. A connection that sent `abc` with no
+  zero byte was refused with the new message, and a `manage_dyn_slave`
+  after it was registered. Two machines are not tested. `check.sh` does not
+  reach this code and was not run.
+- **Limit:** the thread still takes one client at a time. Each silent
+  connection can hold it for up to 10 seconds.
+
 **2026-10-08 — DONE: ITEM 47, THE `Makefile` BUILDS `manage_dyn_slave`.**
 
 - **Before:** the `Makefile` had no rule for `sigel/src/manage_dyn_slave.c`.
