@@ -210,7 +210,7 @@ found a real defect.** §0 has the rule; it is not optional.
   *This said "it runs no code", which was true between D27 and Phase C.* It now
   runs `sigel_slave`, a headless GUI structure probe, and `guidrive` through
   eleven scenarios plus two locale re-runs. Further execution is in
-  `./checks/fitness-check.sh`, which runs `sigel_eval -selfcheck`.
+  `./checks/fitness-check.sh`, and in the unit tests, `make test`.
 - PVM: `make pvm && make B=build-asan pvm-link`, then `./checks/pvm-check.sh` starts a daemon
   and runs both round trips. It has no baseline: it is PASS/FAIL.
 - **After every step, an independent agent reviews the diff with fresh eyes.**
@@ -220,10 +220,10 @@ found a real defect.** §0 has the rule; it is not optional.
   this document or its siblings, a decision number, a step, a test program or
   script, a review, the oracle, a date, or the deleted shim. This document cites
   SIGEL code by file and function name; SIGEL code never cites this document.
-- When adding an assertion to `sigel_eval -selfcheck`, break the code it covers
-  and confirm the check aborts. Nine assertions have passed on broken code.
-  *This rule was written for the shim self-check, deleted in D27; it applies
-  unchanged to its successor.*
+- When adding a unit test, break the code it covers and confirm that the test
+  fails. Nine assertions have passed on broken code. *This rule was written
+  for the shim self-check, deleted in D27; it applies unchanged to the unit
+  tests in `sigel/tests/`.*
 - **This file is the only log of what was done, besides git.** Decided 2026-09-20.
   Anything that records finished work belongs here, not in a new file.
   `future_refactorings.md` holds the to-do list and nothing else.
@@ -246,7 +246,8 @@ sigel/                                      the repo root
 │   │                                       runs the interface. The gate
 │   ├── dictorder-dump.sh                   prints the container order; the
 │   │                                       check is the diff vs its baseline
-│   ├── fitness-check.sh                    21 fitness values, and -selfcheck
+│   ├── fitness-check.sh                    21 fitness values; on the sanitized
+│   │                                       build also the unit tests
 │   ├── pvm-check.sh                        does PVM run? Phase P, P3 and P4
 │   ├── baselines/                          the four files the gates diff against
 │   └── programs/
@@ -258,6 +259,7 @@ sigel/                                      the repo root
 ├── sigel/                                  the 2003 source and its data
 │   ├── src/       15 module dirs           ~40k LOC
 │   ├── include/   15 module dirs           ~25k LOC
+│   ├── tests/                              the unit tests, with Qt Test
 │   ├── ui/        20 .ui files             Qt 2 Designer format
 │   ├── pixmaps/  textures/                 loaded at run time by name
 │   ├── Terrain.ter  stdConf.mt             run-time data
@@ -1072,6 +1074,38 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   rose from 821 to 823: the new header is one more standalone header and
   one more tracked text file.
 - **Not done:** `strategy` stays an `int`; that is item 148.
+
+**2026-10-10 — DONE: UNIT TESTS WITH QT TEST, IN `sigel/tests/`.**
+
+- **Before:** SIGEL had no unit tests of its own. Two hand-made sets of
+  rules were options of the check program: `coredrive -selfcheck` (small
+  classes of `SIGEL_Robot` and `SIG_GPPopulation`) and
+  `coredrive -metamating` (the mating code of MetaGP). `fitness-check.sh`
+  ran both, and both again under LeakSanitizer.
+- **Now:** `make test` builds `build/sigel_tests` and runs it. The tests
+  are in `sigel/tests/`, one folder for each module and one test class for
+  each class under test, named after it: `SIG_RandomizerTest`,
+  `SIG_LanguageParametersTest`, `SIG_LinkTest`, `SIG_RobotTest`,
+  `SIG_MaterialTest`, `SIG_GPPopulationTest` and `MT_SearchTest`. A test
+  uses public methods only, and nothing in `sigel/src/` changed for the
+  tests. `main.cpp` runs each class with `QTest::qExec`, prints one summary
+  line and has no application object, because with one
+  `SIG_GPPopulation::addRandomIndividuals` makes a progress dialog.
+  `make test` stops if `main.cpp` does not name a test class.
+  `-selfcheck` and `-metamating` are deleted from `coredrive.cpp`; every
+  rule, seed and value of both is in the test classes.
+- **Checks:** `check.sh` has the row `unit tests`, which runs `make test`,
+  and the row `tests`, which counts the compiler warnings of the test code.
+  On the sanitized build `fitness-check.sh` runs `make test` with leak
+  detection on and fails on a sanitizer report.
+- **Tested:** each step passed `check.sh` with 0 fail; the pass count rose
+  from 823 to 839. The steps that changed `coredrive.cpp` also passed
+  `fitness-check.sh` on both builds. A wrong expected value, a leak in a
+  test and a test class that `main.cpp` does not name were each made on
+  purpose once, and each one failed as it must.
+- **Not done:** with `-o file`, each test class writes the same file
+  again, so the file holds the last class only. `make test` does not use
+  `-o`.
 
 **2026-10-09 — DONE: ITEM 153, `toSpawnList` HOLDS ITS TASKS BY VALUE.**
 
