@@ -119,10 +119,8 @@ bool SIGEL_GP::SIG_GPPVMDynamicClientServer::waitForClient()
 	FD_ZERO(&listenSet);
 	FD_SET(listenSocket, &listenSet);
 
-	// accept() is blocking, but we want to wait in 10 sec. chunks;
-	// this allows the main thread to adjust it's active-pvm-host list based on
-	// our freshly registered clients. Also check all 10 seconds if the main
-	// thread wants us to cancel all connections.
+	// Wait for a client, but at most 10 seconds. The server thread then checks
+	// whether the main thread has asked it to disconnect all clients.
 	struct timeval timeOut;
 	timeOut.tv_sec  = 10;
 	timeOut.tv_usec = 0;
