@@ -28,8 +28,6 @@
 
 #include <QList>
 
-#include <pthread.h>
-
 namespace SIGEL_GP
 {
 
@@ -43,27 +41,14 @@ namespace SIGEL_GP
 
 		/**
 		 * The body of the server thread. It runs until the program ends.
-		 * It registers each client that submits its hostname with 'trainer',
-		 * and it disconnects all clients when the main thread asks for it.
+		 * It registers each client that submits its hostname with 'trainer'.
 		 */
 		void run(SIG_GPFitnessTrainer *trainer);
-
-		/**
-		 * Called by the main thread. It removes the dynamic hosts from 'trainer'
-		 * and waits until the server thread has disconnected all clients.
-		 */
-		void releaseAllClients(SIG_GPFitnessTrainer *trainer);
-
-		/**
-		 * True when the server thread runs.
-		 */
-		bool isRunning() const;
 
 	private:
 		enum
 		{
-			kSigelMasterRegPort = 6789,
-			kSuicidalRequest   = 13
+			kSigelMasterRegPort = 6789
 		};
 
 		/**
@@ -80,37 +65,6 @@ namespace SIGEL_GP
 		 * Accepts one client and registers its host with 'trainer', or refuses it.
 		 */
 		void acceptClient(SIG_GPFitnessTrainer *trainer);
-
-		/**
-		 * Disconnects all clients if the main thread has asked for it.
-		 */
-		void disconnectClientsOnRequest();
-
-		/**
-		 * The main thread sets 'disconnectClients' to ask the server thread to disconnect
-		 * all clients; each client then removes its temporary files.
-		 * The server thread sets 'allDisconnected' when that is done. The master then knows
-		 * only the hosts declared in the *.exp file, and a dynamic client must register again.
-		 * Both are volatile, because two threads change them.
-		 */
-		volatile bool allDisconnected;
-		volatile bool disconnectClients;
-
-		/**
-		 * Simple flag indicating if the threaded server is up and running, i.e. if we
-		 * have to expect dynamic clients participate on the fitness evaluations.
-		 */
-		volatile bool serverIsUp;
-
-		/**
-		 * condition variable required to synchronize the threads.
-		 */
-		pthread_cond_t allDisconnectedCondition;
-
-		/**
-		 * Guards 'allDisconnected', 'disconnectClients' and 'allDisconnectedCondition'.
-		 */
-		pthread_mutex_t disconnectMutex;
 
 		/**
 		 * The socket that listens on the port. Only the server thread uses it.

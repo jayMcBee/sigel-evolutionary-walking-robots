@@ -38,19 +38,12 @@
 #include <unistd.h>
 
 SIGEL_GP::SIG_GPPVMDynamicClientServer::SIG_GPPVMDynamicClientServer()
-	: allDisconnected( false ),
-	  disconnectClients( false ),
-	  serverIsUp( false ),
-	  listenSocket( -1 )
+	: listenSocket( -1 )
 {
-	pthread_mutex_init(&disconnectMutex, nullptr);
-	pthread_cond_init(&allDisconnectedCondition, nullptr);
 }
 
 void SIGEL_GP::SIG_GPPVMDynamicClientServer::run(SIG_GPFitnessTrainer *trainer)
 {
-	serverIsUp = true;
-
 	openPort();
 
 	// the (almost) endless server loop
@@ -60,8 +53,6 @@ void SIGEL_GP::SIG_GPPVMDynamicClientServer::run(SIG_GPFitnessTrainer *trainer)
 		{
 			acceptClient(trainer);
 		}
-
-		disconnectClientsOnRequest();
 	}
 }
 
@@ -117,8 +108,7 @@ bool SIGEL_GP::SIG_GPPVMDynamicClientServer::waitForClient()
 	FD_ZERO(&listenSet);
 	FD_SET(listenSocket, &listenSet);
 
-	// Wait for a client, but at most 10 seconds. The server thread then checks
-	// whether the main thread has asked it to disconnect all clients.
+	// Wait for a client, but at most 10 seconds.
 	struct timeval timeOut;
 	timeOut.tv_sec  = 10;
 	timeOut.tv_usec = 0;
@@ -171,71 +161,13 @@ void SIGEL_GP::SIG_GPPVMDynamicClientServer::acceptClient(SIG_GPFitnessTrainer *
 		return;
 	}
 
-	// store socket for later disconnect
+	// the connection stays open
 	clientSockets.resize( clientSockets.count()+1 );
 	clientSockets[clientSockets.count()-1] = sdRecv;
 
-	// remember client locally for later disconnect
 	client = clientName;
 
 	// tell the fitnesstrainer there's a fresh host
 	trainer->addDynHost(client);
 	fprintf(stderr, "\t(Servertask registered dyn. client \"%s\")\n", clientName);
-}
-
-void SIGEL_GP::SIG_GPPVMDynamicClientServer::disconnectClientsOnRequest()
-{
-	// check if computation is finished and clients need to be disconnected
-	pthread_mutex_lock( &disconnectMutex );
-
-	if (disconnectClients)
-	{
-		// iterate through list of connected sockets and cut connection;
-		// be sure all clients have been removed from the pvmHost list !
-		const int disconnectMessage = kSuicidalRequest;
-
-		for (int i=0; i<clientSockets.count(); i++)
-		{
-			send( clientSockets[i], &disconnectMessage, sizeof(disconnectMessage), 0);
-			close(clientSockets[i]);
-		}
-		fprintf(stderr, "\t(Servertask disconnected %d clients)\n", static_cast< int >(clientSockets.count()));
-		clientSockets.resize(0);
-
-		// tell main thread to continue !
-		disconnectClients = false;
-		allDisconnected = true;
-
-		pthread_cond_broadcast(&allDisconnectedCondition);
-	}
-
-	pthread_mutex_unlock( &disconnectMutex );
-}
-
-void SIGEL_GP::SIG_GPPVMDynamicClientServer::releaseAllClients(SIG_GPFitnessTrainer *trainer)
-{
-	fprintf(stderr, " Releasing Dynamic SIGEL-Clients:\n");
-
-	// make the main thread running exclusively
-	pthread_mutex_lock( &disconnectMutex );
-	fprintf(stderr, "\t- Flushing all dynamic clients from PVM-Hosts list\n");
-	trainer->flushAllDynHosts();
-
-	fprintf(stderr, "\t- Asking server to disconnect the clients\n");
-	disconnectClients = true;
-	allDisconnected = false;
-
-	// let's wait for server thread
-	while ( ! allDisconnected )
-	{
-		pthread_cond_wait(&allDisconnectedCondition, &disconnectMutex);
-	}
-	pthread_mutex_unlock( &disconnectMutex );
-
-	fprintf(stderr, "\n");
-}
-
-bool SIGEL_GP::SIG_GPPVMDynamicClientServer::isRunning() const
-{
-	return serverIsUp;
 }

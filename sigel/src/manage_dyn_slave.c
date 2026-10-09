@@ -31,9 +31,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-enum { kSigelMasterRegPort = 6789,
-       kSuicidalRequest    = 13
-     };
+enum { kSigelMasterRegPort = 6789 };
 
 int main (int argc, char *argv[])
 { struct sockaddr_in   sad;
@@ -95,8 +93,7 @@ int main (int argc, char *argv[])
   fprintf(stderr, "Registered local host \"%s\" with SIGEL master server \"%s\".\n", locHostName, sigHostName);
   fprintf(stderr, "Waiting for answer from server to exit..\n\n");
 
-  /* now wait for some message; we'll quit automatically when the server has sent something to us
-   */
+  /* wait until the master ends; recv returns when the connection closes */
   recv(masterSocket, &msg, sizeof(msg), 0);
   close(masterSocket);
 

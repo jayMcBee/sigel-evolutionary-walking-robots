@@ -42,8 +42,8 @@ Paths are relative to `sigel/`, the source tree.
   members, held by value, drops the `new`, the `delete` and the unnamed `[0]`
   and `[1]`. `sweepToSpawn` ends its pass by comparing two pointers; the new
   loop must still give each job one try per pass, because each try calls
-  `getNextHost`. `fitTaskList` in `evalNewIndis` and `evalNeededIndis`, and
-  `dynHosts`, have the same form.
+  `getNextHost`. `fitTaskList` in `evalNewIndis` and `evalNeededIndis` has
+  the same form.
 
 ---
 

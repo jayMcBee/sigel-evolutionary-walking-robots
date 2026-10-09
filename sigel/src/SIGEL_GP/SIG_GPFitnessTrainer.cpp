@@ -34,7 +34,6 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
    exp(exp),
    pvmTasks( exp.population.getSize() ),
    pvmHosts(),
-   dynHosts(),
    freshDynHosts(),
    nextHostNumber(0),
    toSpawnList(),
@@ -85,27 +84,11 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
   };
 };
 
-namespace {
-
-// Deletes the hosts past the new size, then shortens the list. QList::resize() deletes nothing.
-void resizeOwningHosts( QList< SIGEL_GP::SIG_GPActivePVMHost * > &v, qsizetype want )
-{
-  if (want < 0)
-    want = 0;
-  for (qsizetype i = want; i < v.size(); i++)
-    delete v[ i ];
-  v.resize( want );
-}
-
-}
-
 SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
-  // This class owns its dynamic host lists and its pending-spawn jobs.
+  // This class owns its dynamic host list and its pending-spawn jobs.
   qDeleteAll( toSpawnList );
   toSpawnList.clear();
 
-  qDeleteAll( dynHosts );
-  dynHosts.clear();
   qDeleteAll( freshDynHosts );
   freshDynHosts.clear();
 
@@ -141,69 +124,9 @@ void SIGEL_GP::SIG_GPFitnessTrainer::addDynHost(QString newHost) {
 
   pthread_mutex_lock( &dynHostsMutex );
 
-  // remember that this host is dynamic
-  dynHosts.append( new QString(newHost) );
-
   // the freshDynHost list just contains hosts not yet added to the pvmHosts
   // list; this is the job of SIGEL_GP::SIG_GPFitnessTrainer::getNextHost()
   freshDynHosts.append(newPVMHost);
-
-  pthread_mutex_unlock( &dynHostsMutex );
-}
-
-void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts() {
-  QString        dHostQstr;
-  bool           res;
-  int            i,dynDelNum;
-  SIG_GPActivePVMHost *pHost;
-
-  pthread_mutex_lock( &dynHostsMutex );
-
-  // are there any dynHosts ?
-  if (dynHosts.count() > 0) {
-    i = pvmHosts.size()-1;
-    dynDelNum = 0;
-
-    while (!pvmHosts.isEmpty()) {
-      pHost = pvmHosts[i];
-
-      // check next host if it's dynamic !
-      res = false;
-
-      for (unsigned int d=0; d<dynHosts.count(); d++) {
-        dHostQstr = *dynHosts.at(d);
-
-        if (dHostQstr == pHost->name) {
-          res = true;
-        }
-      }
-
-      // delete the dynamic host from our list; it stays in PVM
-      if (res) {
-        if (pHost->noOfSlaves > 0)
-          SIGEL_Tools::SIG_IO::cerr << "Dynamic host \"" << pHost->name << "\" is removed while " << pHost->noOfSlaves << " of its slaves still run." << Qt::endl;
-
-        resizeOwningHosts( pvmHosts, pvmHosts.size()-1 );
-        dynDelNum++;
-        i--;
-      }
-
-      // host wasn't deleted, dynamic hosts are always at the end, that's it
-      else {
-        break;
-      }
-    }
-    // dynHosts has become obsolete
-    qDeleteAll( dynHosts );
-    dynHosts.clear();
-
-    // unfortunately that's it also for our new hosts, else we have a conflict
-    // with our server thread cutting _all_ connections, known or unknown to dynHosts
-    qDeleteAll( freshDynHosts );
-    freshDynHosts.clear();
-
-    SIGEL_Tools::SIG_IO::cerr << "\t(all " << dynDelNum << " dynamic hosts removed | " <<  pvmHosts.size() << " static hosts remaining)\n" << Qt::endl;
-  }
 
   pthread_mutex_unlock( &dynHostsMutex );
 }

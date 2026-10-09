@@ -128,13 +128,6 @@ namespace SIGEL_GP
 		void addDynHost(QString newHost);
 
 		/**
-		 * This method is called to delete all dynamic hosts from our
-		 * internal list of PVM hosts (pvmHosts). After flushing the dynamic hosts
-		 * they'll be no longer used for fitness evaluations.
-		 */
-		void flushAllDynHosts();
-
-		/**
 		 * True once PVM has reported that it can no longer be reached. checkTask is
 		 * the only place that sees this, because pvm_probe is the only call on the
 		 * run path that touches the daemon. Nothing here acts on it: the environment
@@ -159,17 +152,12 @@ namespace SIGEL_GP
 		QList< SIG_GPActivePVMHost * > pvmHosts;
 
 		/**
-		 * Names of all dynamic hosts
-		 */
-		QList< QString * > dynHosts;
-
-		/**
 		 * New dynamic hosts that have registered but were not yet added to 'pvmHosts'.
 		 */
 		QList< SIG_GPPVMHost * > freshDynHosts;
 
 		/**
-		 * Guards 'dynHosts' and 'freshDynHosts'.
+		 * Guards 'freshDynHosts'.
 		 */
 		pthread_mutex_t dynHostsMutex;
 
