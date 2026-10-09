@@ -1052,6 +1052,31 @@ classes and leave truncation a hard error. **They are not interchangeable.**
     them and makes them again at several points during its life, which
     needs a `reset()` at each.
 
+**2026-10-09 — DONE: ITEM 154, DYNAMIC CLIENTS STAY FOR THE WHOLE EVOLUTION.**
+
+- **Before:** `SIG_GPManager::run()` released all dynamic clients at every
+  20th generation, and `run(MT_Classifier *)` after every generation. A
+  released client did not come back by itself.
+- **Now:** the two calls are gone, and with them the code that only they
+  reached: `releaseAllClients`, `disconnectClientsOnRequest`, `isRunning`
+  and the flags, mutex and condition of `SIG_GPPVMDynamicClientServer`;
+  `flushAllDynHosts`, `dynHosts` and `resizeOwningHosts` of
+  `SIG_GPFitnessTrainer`; `kSuicidalRequest` on both sides. A client stays
+  until the master ends: the connection closes, `manage_dyn_slave` returns
+  from `recv`, and `sigelDynClient` deletes its folder. Entries above and
+  below that name the deleted code describe the state of their date.
+- **Tested:** one machine, `sigel -de` with one `manage_dyn_slave`: 32
+  generations with no release, 1109 of 2230 scores from the client, the
+  client ended with the master. `check.sh`: 821 pass and 0 fail, for each of
+  the two code commits.
+- **Not done:** a client that leaves in the middle of a run. No fault is
+  known there, so nothing was built. Not run: two machines; the change is
+  on the master only.
+- **Seen and not changed:** `sweepToSpawn` prints nothing when a spawn
+  fails and tries the same host again for every waiting job. Measured with
+  the client's `sigel_slave` removed by hand: 19 scores in 30 seconds
+  against about 400 before.
+
 **2026-10-09 — DONE: ITEM 47, `sigelDynClient` WORKS ON A SECOND MACHINE.**
 
 - **Before:** `sigelDynClient` was the Solaris `tcsh` script of 1.3 with the

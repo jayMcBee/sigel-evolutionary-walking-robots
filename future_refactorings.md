@@ -427,12 +427,6 @@ problem; the choice is made before any code is written.
   `SIG_GPFitnessFunctionRegistry::fitnessFunctions()`. No file format
   changes.
 
-- [ ] **154. Dynamic clients stay for the whole evolution, and can leave.**
-  A dynamic client stays until the master ends. To do: a client that
-  leaves or dies must come off the master's list. Today the master does not
-  notice a client that closed its connection, and it keeps the host on its
-  list until the run ends.
-
 - [ ] **155. The master refuses a `sigel_slave` built from other source.**
   Nothing checks that the master and a slave are the same SIGEL. A slave of
   another state can read a job differently or simulate differently, and the
