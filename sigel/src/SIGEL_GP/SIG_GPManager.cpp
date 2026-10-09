@@ -826,6 +826,7 @@ void SIGEL_GP::SIG_GPManager::run()
 		// this is the total amount of generations evolved, since the project is created
 		currentExperiment.population.poolGeneration++;
 
+		trainer->printScoresReceivedByHost();
 		SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentExperiment.population.poolGeneration << " (" << currentGenerationNo << " in this run)\t(" << (QDateTime::currentDateTime()).toString() << ")" << Qt::endl;
 
 		// increment the age of the individuals
@@ -1030,6 +1031,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 		currentGenerationNo++;
 		currentExperiment.population.poolGeneration++;
 
+		trainer->printScoresReceivedByHost();
 		SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentExperiment.population.poolGeneration << " (" << currentGenerationNo << " in this run)\t(" << (QDateTime::currentDateTime()).toString() << ")" << Qt::endl;
 
 		for (int i=0; i < currentExperiment.population.getSize(); i++)

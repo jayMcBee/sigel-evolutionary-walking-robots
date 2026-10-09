@@ -24,6 +24,7 @@
 #define SIGEL_GP_SIG_GPFITNESSTRAINER_H
 
 #include <QList>
+#include <QMap>
 #include <QString>
 #include <pthread.h>
 #include "SIGEL_GP/SIG_GPExperiment.h"
@@ -142,6 +143,9 @@ namespace SIGEL_GP
 		 */
 		bool pvmLost;
 
+		/** Prints the number of scores each host sent since the last call. */
+		void printScoresReceivedByHost();
+
 	private:
 		/**
 		 * A refernce to the actual experiment datas.
@@ -174,6 +178,8 @@ namespace SIGEL_GP
 		pthread_mutex_t dynHostsMutex;
 
 		int nextHostNumber;
+
+		QMap< QString, int > scoresReceivedByHost;
 
 		/**
 		 * The array of indices, representing the position of the individual in the pool, which is to simulate.
