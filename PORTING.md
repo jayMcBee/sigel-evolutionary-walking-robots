@@ -1052,6 +1052,51 @@ classes and leave truncation a hard error. **They are not interchangeable.**
     them and makes them again at several points during its life, which
     needs a `reset()` at each.
 
+**2026-10-09 — DONE: ITEM 47, `sigelDynClient` WORKS ON A SECOND MACHINE.**
+
+- **Before:** `sigelDynClient` was the Solaris `tcsh` script of 1.3 with the
+  paths `/home/user/...` and three blocks that were commented out. A dynamic
+  client on a second machine was never run. Every run without the interface
+  ended with `pvm_delhosts(): Can't contact local daemon`. The master's
+  output did not say which host sent a score. `sigel/README` section 2 named
+  `PVM_ARCHDIR`, which nothing reads, and described rsh and `.rhosts`.
+- **Now, commits a3df6ac to 0f56a07:** `sigelDynClient` is a `/bin/sh` script.
+  It takes the SIGEL folder from where it is run and copies `sigel_slave`
+  alone to `/tmp/_SIGEL_EVOLUTION_TEMP`. `sigel/kdesigel.doxygen` is gone.
+- **Now, commit 748f85d:** in `main` in `sigel.cpp` the experiment and the
+  manager are in a block that ends before the last `pvm_halt()`, so the
+  destructor of `SIG_GPFitnessTrainer` calls `pvm_delhosts` on a live daemon.
+  The three `return 1` paths inside the block still call `pvm_halt()` first.
+- **Now, commit e99f1e0:** `SIG_GPFitnessTrainer::checkTask` counts the scores
+  by host name. `SIG_GPFitnessTrainer::printScoresReceivedByHost` prints one
+  line `Scores from <host>: <count>` per host and sets the counts to zero.
+  Both `SIG_GPManager::run` methods call it before the `Computing Generation`
+  line. The scores of the last generation before a stop are not printed.
+- **Now, commit eb4850f:** `sigel/README` section 2 is rewritten as steps: one
+  machine, several hosts over ssh, dynamic clients. It says that the
+  experiment exists on the master only.
+- **Measured, two machines:** master on aarch64, client on x86_64 with SIGEL
+  at 0f56a07, the master started with `./sigelLauncher -devolve` and
+  `PVM_RSH=/usr/bin/ssh` on a copy of `twoBases.exp`. The master registered
+  the client and added the host. `Scores from` named the client in 39 of 41
+  generations, with 4 to 42 scores each. The master released the client at
+  generation 20; the client joined again and was released at generation 40.
+  `sigelDynClient` returned by itself both times with exit status 0. The
+  master ended on one SIGINT with exit 0 and no `pvm_delhosts` line.
+  `check.sh`: 821 pass and 0 fail, on 748f85d and on e99f1e0.
+- **What the second machine needed:** an address the master reaches (not
+  behind NAT), a host name that resolves on the master, a login from the
+  master with an ssh key, `SIGEL_ROOT` and `PVM_ROOT` in `.bashrc` above its
+  guard for shells that are not interactive, and on the master a host name
+  that does not resolve to 127.0.1.1.
+- **Seen and not changed:** a client that the master cannot add is not
+  reported; the master prints `new host added` and then `pvm_spawn() failed`
+  until the release (423 lines in about 90 seconds with a client behind
+  NAT). After a release the `pvmd3` on the client stays until the master
+  ends; a second join uses it again.
+- **Not run:** a second machine as a fixed host of the experiment, rsh, the
+  cron entry of README 2.3.
+
 **2026-10-09 — DONE: THE SERVER FOR DYNAMIC CLIENTS IS THE CLASS `SIG_GPPVMDynamicClientServer`.**
 
 - **Before:** `SIG_GPManager::RegisterDynPVMClients` was one method with four

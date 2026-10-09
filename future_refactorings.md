@@ -463,13 +463,6 @@ problem; the choice is made before any code is written.
   (the `Makefile` or a header), and what an experiment file naming
   "RemoteZORCFitnessFunction" does when the switch is off.
 
-- [ ] **47. `sigelDynClient` and `manage_dyn_slave`.**
-  `sigelDynClient` makes a second machine a dynamic slave of `sigel -de`. It
-  is still 1.3's Solaris `tcsh` script with placeholder paths.
-  **Modernise in place, do not replace.** It needs a second machine to prove
-  it on; the 1.3 reference machine is not ours to use for tooling, so it waits
-  until there is one.
-
 ---
 
 ## Watch out
