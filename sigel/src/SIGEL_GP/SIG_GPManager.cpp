@@ -47,7 +47,7 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
 	  tours(),
 	  randomizer( currentExperiment.gpParameter.getRandomSeed() ),
 	  fitnessCalculated( false ),
-	  currentGenerationNo(0)
+	  runGenerationCounter(0)
 {
 	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == EVALUATOR_SUBST)
 	{
@@ -717,7 +717,7 @@ bool SIGEL_GP::SIG_GPManager::checkTerminationConditions(bool generationBreak)
 		timeExpired = ( terminationTime <= QDateTime::currentDateTime() );
 	}
 
-	bool generationsReached = ( currentExperiment.gpParameter.getTerminationGenerationNo() <= currentGenerationNo );
+	bool generationsReached = ( currentExperiment.gpParameter.getTerminationGenerationNo() <= runGenerationCounter );
 
 	switch (currentExperiment.gpParameter.getTerminationModel())
 	{
@@ -822,11 +822,11 @@ void SIGEL_GP::SIG_GPManager::run()
 
 		// increment the generation, because there is one evolution-loop evolved
 		// this gives us the current generation and it starts with 0 every time we start the evolution
-		currentGenerationNo++;
+		runGenerationCounter++;
 		// this is the total amount of generations evolved, since the project is created
 		currentExperiment.population.poolGeneration++;
 
-		SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentExperiment.population.poolGeneration << " (" << currentGenerationNo << " in this run)\t(" << (QDateTime::currentDateTime()).toString() << ")" << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentExperiment.population.poolGeneration << " (" << runGenerationCounter << " in this run)\t(" << (QDateTime::currentDateTime()).toString() << ")" << Qt::endl;
 
 		// increment the age of the individuals
 		for (int i=0; i < currentExperiment.population.getSize(); i++)
@@ -860,7 +860,7 @@ void SIGEL_GP::SIG_GPManager::run()
 		}
 
 		// if the user wants a poolImage and it the generation where it should generate, then he gets it
-		if ( poolImageGeneration && ((currentGenerationNo % poolImageGeneration) == 0) )
+		if ( poolImageGeneration && ((runGenerationCounter % poolImageGeneration) == 0) )
 		{
 			QDir poolImageDir = currentExperiment.getGPParameter().getPoolImageDirectory();
 
@@ -872,8 +872,8 @@ void SIGEL_GP::SIG_GPManager::run()
 			                        + ".pol";
 
 #ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager saving poolImage, currentGenerationNo: "
-			    << currentGenerationNo
+			SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager saving poolImage, runGenerationCounter: "
+			    << runGenerationCounter
 			    << ", filename: "
 			    << poolImageName
 			    << Qt::endl;
@@ -916,7 +916,7 @@ void SIGEL_GP::SIG_GPManager::run()
 		}
 
 		// do we have a threaded server running for dyn. clients ?
-		if (dynamicClientServer.isRunning() && currentGenerationNo%20==0)
+		if (dynamicClientServer.isRunning() && runGenerationCounter%20==0)
 		{
 			dynamicClientServer.releaseAllClients(trainer);
 		}
@@ -1027,10 +1027,10 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 			return;
 		}
 
-		currentGenerationNo++;
+		runGenerationCounter++;
 		currentExperiment.population.poolGeneration++;
 
-		SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentExperiment.population.poolGeneration << " (" << currentGenerationNo << " in this run)\t(" << (QDateTime::currentDateTime()).toString() << ")" << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentExperiment.population.poolGeneration << " (" << runGenerationCounter << " in this run)\t(" << (QDateTime::currentDateTime()).toString() << ")" << Qt::endl;
 
 		for (int i=0; i < currentExperiment.population.getSize(); i++)
 		{
@@ -1079,7 +1079,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 		currentExperiment.experimentHistory.append( newExpHistEntry );
 
-		if ( poolImageGeneration && ((currentGenerationNo % poolImageGeneration) == 0) )
+		if ( poolImageGeneration && ((runGenerationCounter % poolImageGeneration) == 0) )
 		{
 			QDir poolImageDir = currentExperiment.getGPParameter().getPoolImageDirectory();
 
@@ -1091,8 +1091,8 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 			                        + ".pol";
 
 #ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager saving poolImage, currentGenerationNo: "
-			                          << currentGenerationNo
+			SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager saving poolImage, runGenerationCounter: "
+			                          << runGenerationCounter
 			                          << ", filename: "
 			                          << poolImageName
 			                          << Qt::endl;

@@ -289,7 +289,7 @@ namespace SIGEL_GP
 		/**
 		 * This is the current generation and it starts with 0 every time you restart the evolution.
 		 */
-		int currentGenerationNo;
+		int runGenerationCounter;
 	};
 
 }
