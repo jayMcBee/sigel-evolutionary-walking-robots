@@ -52,11 +52,12 @@ void SIGEL_Tools::SIG_RandomizerTest::numberIsBelowMaximum()
 {
   SIG_Randomizer randomizer( 42 );
 
-  for ( int i = 0; i < 1000; i++ ) {
-    int number = randomizer.getRandomInt( 10 );
-    QVERIFY( number >= 0 );
-    QVERIFY( number < 10 );
-  }
+  for ( int i = 0; i < 1000; i++ )
+    {
+      int number = randomizer.getRandomInt( 10 );
+      QVERIFY( number >= 0 );
+      QVERIFY( number < 10 );
+    }
 }
 
 void SIGEL_Tools::SIG_RandomizerTest::maximumZeroGivesZero()
