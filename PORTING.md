@@ -1052,6 +1052,26 @@ classes and leave truncation a hard error. **They are not interchangeable.**
     them and makes them again at several points during its life, which
     needs a `reset()` at each.
 
+**2026-10-09 — DONE: ITEM 153, `toSpawnList` HOLDS ITS TASKS BY VALUE.**
+
+- **Before:** `SIG_GPFitnessTrainer::toSpawnList` was a list of pointers to
+  lists of two numbers, made with `new` in `spawnTask` and in two branches
+  of `checkTask`, read as `[0]` and `[1]`. `sweepToSpawn` ended its pass by
+  comparing two of the pointers.
+- **Now:** the struct `SIG_GPTaskToSpawn` with the members `internalId` and
+  `individualPosition`, declared in `SIG_GPFitnessTrainer.h` above the class,
+  held by value. `sweepToSpawn` is an index loop: a spawned task is removed,
+  another one is stepped over. New structs are declared outside the class
+  that uses them; 1.3 has both forms.
+- **Tested:** a model of the old and the new loop for every list length from
+  0 to 10 and every pattern of spawn successes and failures: 4094 cases, no
+  difference in the tasks tried, their order, and the tasks left. One
+  machine, `sigel -de` with one `manage_dyn_slave`, 45 seconds: 8
+  generations, 287 and 282 scores from the two hosts, no failed spawn.
+  `check.sh`: 821 pass and 0 fail.
+- **Not done:** `fitTaskList` in `evalNewIndis` and `evalNeededIndis` of
+  `SIG_GPManager` keeps the old form.
+
 **2026-10-09 — DONE: ITEM 154, DYNAMIC CLIENTS STAY FOR THE WHOLE EVOLUTION.**
 
 - **Before:** `SIG_GPManager::run()` released all dynamic clients at every
