@@ -41,7 +41,8 @@
 SIGEL_GP::SIG_GPPVMDynamicClientServer::SIG_GPPVMDynamicClientServer()
 	: allDisconnected( false ),
 	  disconnectClients( false ),
-	  serverIsUp( false )
+	  serverIsUp( false ),
+	  listenSocket( -1 )
 {
 	pthread_mutex_init(&disconnectMutex, nullptr);
 	pthread_cond_init(&cond, nullptr);
@@ -49,21 +50,27 @@ SIGEL_GP::SIG_GPPVMDynamicClientServer::SIG_GPPVMDynamicClientServer()
 
 void SIGEL_GP::SIG_GPPVMDynamicClientServer::run(SIG_GPFitnessTrainer *trainer)
 {
-	enum
-	{
-		kSigelMasterRegPort = 6789,
-		kSuicidalRequest   = 13
-	};
-
-	struct sockaddr_in  sad;
-	QList<int> clientSockets(0);
-	struct protoent *tcpProtocol;
-	int listenSocket, sdRecv;
-	char clientName[256];
-	QString client;
-
 	// init some variables
 	serverIsUp = true;
+
+	openPort();
+
+	// the (almost) endless server loop
+	while ( true )
+	{
+		if (waitForClient())
+		{
+			acceptClient(trainer);
+		}
+
+		disconnectClientsOnRequest();
+	}
+}
+
+void SIGEL_GP::SIG_GPPVMDynamicClientServer::openPort()
+{
+	struct sockaddr_in  sad;
+	struct protoent *tcpProtocol;
 
 	// Make a socket to listen to our clients;
 	// init sockaddr struct: using Internet family, port kSigelMasterRegPort
@@ -103,103 +110,110 @@ void SIGEL_GP::SIG_GPPVMDynamicClientServer::run(SIG_GPFitnessTrainer *trainer)
 
 	// (bounded) waiting for requests..
 	fprintf(stderr, "Server is awaiting requests from dynamic clients on port %d..\n\n", kSigelMasterRegPort);
+}
 
-	// the (almost) endless server loop
-	while ( true )
+bool SIGEL_GP::SIG_GPPVMDynamicClientServer::waitForClient()
+{
+	// to use select() we need to build a fs_set first
+	fd_set listenSet;
+	FD_ZERO(&listenSet);
+	FD_SET(listenSocket, &listenSet);
+
+	// accept() is blocking, but we want to wait in 10 sec. chunks;
+	// this allows the main thread to adjust it's active-pvm-host list based on
+	// our freshly registered clients. Also check all 10 seconds if the main
+	// thread wants us to cancel all connections.
+	struct timeval timeOut;
+	timeOut.tv_sec  = 10;
+	timeOut.tv_usec = 0;
+
+	// pselect returns zero when timeout occurs..
+	select(listenSocket+1, &listenSet, nullptr, nullptr, &timeOut);
+
+	return FD_ISSET(listenSocket, &listenSet);
+}
+
+void SIGEL_GP::SIG_GPPVMDynamicClientServer::acceptClient(SIG_GPFitnessTrainer *trainer)
+{
+	int sdRecv;
+	char clientName[256];
+	QString client;
+
+	sdRecv = accept(listenSocket, nullptr, nullptr);
+
+	if (sdRecv < 0)
 	{
-		// to use select() we need to build a fs_set first
-		fd_set listenSet;
-		FD_ZERO(&listenSet);
-		FD_SET(listenSocket, &listenSet);
-
-		// accept() is blocking, but we want to wait in 10 sec. chunks;
-		// this allows the main thread to adjust it's active-pvm-host list based on
-		// our freshly registered clients. Also check all 10 seconds if the main
-		// thread wants us to cancel all connections.
-		struct timeval timeOut;
-		timeOut.tv_sec  = 10;
-		timeOut.tv_usec = 0;
-
-		// pselect returns zero when timeout occurs..
-		select(listenSocket+1, &listenSet, nullptr, nullptr, &timeOut);
-
-		// check what caused pselect() to exit
-		if ( FD_ISSET(listenSocket, &listenSet) )
-		{
-			sdRecv = accept(listenSocket, nullptr, nullptr);
-
-			if (sdRecv < 0)
-			{
-				fprintf(stderr, "ERR:   accept() failed\n");
-				exit(1);
-			}
-
-			// a client that sends nothing must not block this thread
-			struct timeval receiveTimeOut;
-			receiveTimeOut.tv_sec  = 10;
-			receiveTimeOut.tv_usec = 0;
-
-			if (setsockopt(sdRecv, SOL_SOCKET, SO_RCVTIMEO, &receiveTimeOut, sizeof(receiveTimeOut)) < 0)
-			{
-				fprintf(stderr, "ERR:   setsockopt() failed for a dynamic client; its connection is closed\n");
-				close(sdRecv);
-				continue;
-			}
-
-			const ssize_t receivedBytes = recv(sdRecv, clientName, sizeof(clientName), 0);
-
-			if (receivedBytes <= 0)
-			{
-				fprintf(stderr, "ERR:   a dynamic client sent no host name; it is not registered\n");
-				close(sdRecv);
-				continue;
-			}
-
-			if (memchr(clientName, '\0', receivedBytes) == nullptr)
-			{
-				fprintf(stderr, "ERR:   a dynamic client sent a host name with no end; its connection is closed\n");
-				close(sdRecv);
-				continue;
-			}
-
-			// store socket for later disconnect
-			clientSockets.resize( clientSockets.count()+1 );
-			clientSockets[clientSockets.count()-1] = sdRecv;
-
-			// remember client locally for later disconnect
-			client = clientName;
-
-			// tell the fitnesstrainer there's a fresh host
-			trainer->addDynHost(client);
-			fprintf(stderr, "\t(Servertask registered dyn. client \"%s\")\n", clientName);
-		}
-
-		// check if computation is finished and clients need to be disconnected
-		pthread_mutex_lock( &disconnectMutex );
-
-		if (disconnectClients)
-		{
-			// iterate through list of connected sockets and cut connection;
-			// be sure all clients have been removed from the pvmHost list !
-			const int disconnectMessage = kSuicidalRequest;
-
-			for (int i=0; i<clientSockets.count(); i++)
-			{
-				send( clientSockets[i], &disconnectMessage, sizeof(disconnectMessage), 0);
-				close(clientSockets[i]);
-			}
-			fprintf(stderr, "\t(Servertask disconnected %d clients)\n", static_cast< int >(clientSockets.count()));
-			clientSockets.resize(0);
-
-			// tell main thread to continue !
-			disconnectClients = false;
-			allDisconnected = true;
-
-			pthread_cond_broadcast(&cond);
-		}
-
-		pthread_mutex_unlock( &disconnectMutex );
+		fprintf(stderr, "ERR:   accept() failed\n");
+		exit(1);
 	}
+
+	// a client that sends nothing must not block this thread
+	struct timeval receiveTimeOut;
+	receiveTimeOut.tv_sec  = 10;
+	receiveTimeOut.tv_usec = 0;
+
+	if (setsockopt(sdRecv, SOL_SOCKET, SO_RCVTIMEO, &receiveTimeOut, sizeof(receiveTimeOut)) < 0)
+	{
+		fprintf(stderr, "ERR:   setsockopt() failed for a dynamic client; its connection is closed\n");
+		close(sdRecv);
+		return;
+	}
+
+	const ssize_t receivedBytes = recv(sdRecv, clientName, sizeof(clientName), 0);
+
+	if (receivedBytes <= 0)
+	{
+		fprintf(stderr, "ERR:   a dynamic client sent no host name; it is not registered\n");
+		close(sdRecv);
+		return;
+	}
+
+	if (memchr(clientName, '\0', receivedBytes) == nullptr)
+	{
+		fprintf(stderr, "ERR:   a dynamic client sent a host name with no end; its connection is closed\n");
+		close(sdRecv);
+		return;
+	}
+
+	// store socket for later disconnect
+	clientSockets.resize( clientSockets.count()+1 );
+	clientSockets[clientSockets.count()-1] = sdRecv;
+
+	// remember client locally for later disconnect
+	client = clientName;
+
+	// tell the fitnesstrainer there's a fresh host
+	trainer->addDynHost(client);
+	fprintf(stderr, "\t(Servertask registered dyn. client \"%s\")\n", clientName);
+}
+
+void SIGEL_GP::SIG_GPPVMDynamicClientServer::disconnectClientsOnRequest()
+{
+	// check if computation is finished and clients need to be disconnected
+	pthread_mutex_lock( &disconnectMutex );
+
+	if (disconnectClients)
+	{
+		// iterate through list of connected sockets and cut connection;
+		// be sure all clients have been removed from the pvmHost list !
+		const int disconnectMessage = kSuicidalRequest;
+
+		for (int i=0; i<clientSockets.count(); i++)
+		{
+			send( clientSockets[i], &disconnectMessage, sizeof(disconnectMessage), 0);
+			close(clientSockets[i]);
+		}
+		fprintf(stderr, "\t(Servertask disconnected %d clients)\n", static_cast< int >(clientSockets.count()));
+		clientSockets.resize(0);
+
+		// tell main thread to continue !
+		disconnectClients = false;
+		allDisconnected = true;
+
+		pthread_cond_broadcast(&cond);
+	}
+
+	pthread_mutex_unlock( &disconnectMutex );
 }
 
 void SIGEL_GP::SIG_GPPVMDynamicClientServer::releaseAllClients(SIG_GPFitnessTrainer *trainer)

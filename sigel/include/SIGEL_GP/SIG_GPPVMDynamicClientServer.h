@@ -26,6 +26,8 @@
 
 #include "SIGEL_GP/SIG_GPFitnessTrainer.h"
 
+#include <QList>
+
 #include <pthread.h>
 
 namespace SIGEL_GP
@@ -58,6 +60,32 @@ namespace SIGEL_GP
 		bool isRunning() const;
 
 	private:
+		enum
+		{
+			kSigelMasterRegPort = 6789,
+			kSuicidalRequest   = 13
+		};
+
+		/**
+		 * Opens the port that the clients connect to.
+		 */
+		void openPort();
+
+		/**
+		 * Waits up to 10 seconds. True when the server is to accept a client.
+		 */
+		bool waitForClient();
+
+		/**
+		 * Accepts one client and registers its host with 'trainer', or refuses it.
+		 */
+		void acceptClient(SIG_GPFitnessTrainer *trainer);
+
+		/**
+		 * Disconnects all clients if the main thread has asked for it.
+		 */
+		void disconnectClientsOnRequest();
+
 		/**
 		 * Two flags to synchronize the main thread and server thread when disconnecting
 		 * dynamically registered clients; if 'disconnectClients' is set, the server thread
@@ -88,6 +116,16 @@ namespace SIGEL_GP
 		 * Guards 'allDisconnected', 'disconnectClients' and 'cond'.
 		 */
 		pthread_mutex_t disconnectMutex;
+
+		/**
+		 * The socket that listens on the port. Only the server thread uses it.
+		 */
+		int listenSocket;
+
+		/**
+		 * The sockets of the registered clients. Only the server thread uses them.
+		 */
+		QList<int> clientSockets;
 	};
 
 }

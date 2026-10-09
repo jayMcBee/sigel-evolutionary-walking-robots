@@ -35,15 +35,6 @@
 
 #include <qdatetime.h>
 
-#include <sys/types.h>
-#include <sys/select.h>
-#include <sys/time.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-
-#include <pthread.h>
-
 namespace SIGEL_GP
 {
 
