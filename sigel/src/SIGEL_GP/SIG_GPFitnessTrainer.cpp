@@ -354,7 +354,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 	  		result = 0;
 	  	}
 
-	  	scoresReceivedByHost[ pvmTask->host.name ]++;
+	  	SIGEL_Tools::SIG_IO::cerr << "\tScore from " << pvmTask->host.name << Qt::endl;
 	  	pvmTask->host.noOfSlaves--;
 	  	delete pvmTasks[ taskId ];   // insert() freed the finished task
 	  	pvmTasks[ taskId ] = nullptr;
@@ -420,15 +420,6 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 
   return result;
 };
-
-void SIGEL_GP::SIG_GPFitnessTrainer::printScoresReceivedByHost()
-{
-  const QList<QString> hostNames = scoresReceivedByHost.keys();
-  for (qsizetype i = 0; i < hostNames.size(); i++)
-    SIGEL_Tools::SIG_IO::cerr << "\tScores from " << hostNames[ i ] << ": " << scoresReceivedByHost[ hostNames[ i ] ] << Qt::endl;
-
-  scoresReceivedByHost.clear();
-}
 
 void SIGEL_GP::SIG_GPFitnessTrainer::stopTrainersSlaves()
 {

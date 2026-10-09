@@ -1067,19 +1067,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   manager are in a block that ends before the last `pvm_halt()`, so the
   destructor of `SIG_GPFitnessTrainer` calls `pvm_delhosts` on a live daemon.
   The three `return 1` paths inside the block still call `pvm_halt()` first.
-- **Now, commit e99f1e0:** `SIG_GPFitnessTrainer::checkTask` counts the scores
-  by host name. `SIG_GPFitnessTrainer::printScoresReceivedByHost` prints one
-  line `Scores from <host>: <count>` per host and sets the counts to zero.
-  Both `SIG_GPManager::run` methods call it before the `Computing Generation`
-  line. The scores of the last generation before a stop are not printed.
+- **Now:** `SIG_GPFitnessTrainer::checkTask` prints one line
+  `Score from <host>` for each score it receives. A first version counted
+  the scores per host and printed `Scores from <host>: <count>` before each
+  generation line (commit e99f1e0); it was more code than the purpose needs
+  and is replaced.
 - **Now, commit eb4850f:** `sigel/README` section 2 is rewritten as steps: one
   machine, several hosts over ssh, dynamic clients. It says that the
   experiment exists on the master only.
 - **Measured, two machines:** master on aarch64, client on x86_64 with SIGEL
   at 0f56a07, the master started with `./sigelLauncher -devolve` and
   `PVM_RSH=/usr/bin/ssh` on a copy of `twoBases.exp`. The master registered
-  the client and added the host. `Scores from` named the client in 39 of 41
-  generations, with 4 to 42 scores each. The master released the client at
+  the client and added the host. With the first version of the score line,
+  `Scores from` named the client in 39 of 41 generations, with 4 to 42
+  scores each. The master released the client at
   generation 20; the client joined again and was released at generation 40.
   `sigelDynClient` returned by itself both times with exit status 0. The
   master ended on one SIGINT with exit 0 and no `pvm_delhosts` line.

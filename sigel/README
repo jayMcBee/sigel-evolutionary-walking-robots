@@ -125,9 +125,9 @@ of the client to the master. The master must reach the client by this name; it i
 name that "hostname" prints on the client. The master then starts its slaves on the
 client, one at a time.
 
-Before each generation line the master prints how many fitness values each host sent:
+For each fitness value the master prints the host that sent it:
 
-	Scores from <host>: 32
+	Score from <host>
 
 At every 20th generation the master releases all dynamic clients. The script then
 removes the directory "/tmp/_SIGEL_EVOLUTION_TEMP" and ends. Start it again to join
