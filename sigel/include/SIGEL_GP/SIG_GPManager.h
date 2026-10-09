@@ -26,6 +26,7 @@
 #include <QList>
 #include <atomic>
 #include "SIGEL_GP/SIG_GPFitnessTrainer.h"
+#include "SIGEL_GP/SIG_GPPVMDynamicClientServer.h"
 #include "SIGEL_GP/SIG_GPTournament.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 
@@ -136,32 +137,6 @@ namespace SIGEL_GP
 		 * from the generation break or the termination type.
 		 */
 		std::atomic<bool> userTerminated;
-
-		/**
-		 * Two flags to synchronize the main thread and server thread when disconnecting
-		 * dynamically registered clients; if 'disconnectClients' is set, the server thread
-		 * will disconnect all clients causing them to cleanup temp. files since it'll be
-		 * no longer used for computations.
-		 * The 'allDisconnected' flag is set to true when all clients have been disconnected,
-		 * at which point only atically declared clients -- i.e. declared in the *.exp file --
-		 * are known to the SIGEL master application, all dynamic hosts must register again
-		 * for the next fitness computation phase.
-		 * Has to be volatile of course since the compiler needs to know that these variables
-		 * can get changed elsewhere, not just in our local code (local thread).
-		 */
-		volatile bool allDisconnected;
-		volatile bool disconnectClients;
-
-		/**
-		 * Simple flag indicating if the threaded server is up and running, i.e. if we
-		 * have to expect dynamic clients participate on the fitness evaluations.
-		 */
-		volatile bool serverIsUp;
-
-		/**
-		 * condition variable required to synchronize the threads.
-		 */
-		pthread_cond_t cond;
 
 	protected:
 		/**
@@ -288,9 +263,9 @@ namespace SIGEL_GP
 		SIG_GPExperiment& getCurrentExperiment();
 
 		/**
-		 * Guards 'allDisconnected', 'disconnectClients' and 'cond'.
+		 * The server for the dynamic clients of an evolution started with '-de'.
 		 */
-		pthread_mutex_t disconnectMutex;
+		SIG_GPPVMDynamicClientServer dynamicClientServer;
 
 		/**
 		 * This list contains the indices of all tournaments in tours
