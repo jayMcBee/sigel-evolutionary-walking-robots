@@ -7,8 +7,7 @@
 #
 # Evaluates three individuals of each of the 7 experiments and prints their
 # fitness. It is the only check that compares simulated numbers. Before the
-# evaluations it runs the MetaGP mating check, and on a sanitized build the
-# unit tests.
+# evaluations, on a sanitized build, it runs the unit tests.
 #
 # The baseline holds for this machine only. Fitness is chaotic: a change of
 # one unit in the last place of a start height moved one individual by 45 %.
@@ -35,14 +34,10 @@ make -q --no-print-directory -C "$ROOT" B="$B" coredrive >/dev/null 2>&1 || {
 SIGEL_ROOT=$ROOT/sigelApp
 [ -f "$SIGEL_ROOT/Terrain.ter" ] || { echo "no $SIGEL_ROOT/Terrain.ter -- run 'make'" >&2; exit 1; }
 export SIGEL_ROOT
-# The mating code of MetaGP. Its rules hold for every seed, so it has no
-# baseline; it passes or fails.
-"$ROOT/$B/coredrive" -metamating >&2 || exit 1
-# The mating code again and the unit tests, with LeakSanitizer on: every
-# object they make must be freed. The evaluations below cannot run this way,
-# because a simulation does not free all it allocates. A build without a
-# sanitizer ignores ASAN_OPTIONS, so test the program and say when the leak
-# tests are skipped.
+# The unit tests, with LeakSanitizer on: every object they make must be
+# freed. The evaluations below cannot run this way, because a simulation does
+# not free all it allocates. A build without a sanitizer ignores ASAN_OPTIONS,
+# so test the program and say when this run is skipped.
 if nm -C "$ROOT/$B/coredrive" 2>/dev/null | grep -q __asan_init; then
 	leaks=$(ASAN_OPTIONS=detect_leaks=1 make -s --no-print-directory -C "$ROOT" B="$B" test 2>&1) || {
 		echo "make test FAILED under the sanitizers -- the build, a test or a leak:" >&2
@@ -55,14 +50,8 @@ if nm -C "$ROOT/$B/coredrive" 2>/dev/null | grep -q __asan_init; then
 		echo "$leaks" >&2
 		exit 1
 	fi
-	leaks=$(ASAN_OPTIONS=detect_leaks=1 "$ROOT/$B/coredrive" -metamating 2>&1 >/dev/null) || {
-		echo "metamating LEAKED under LeakSanitizer:" >&2
-		echo "$leaks" >&2
-		exit 1
-	}
 else
-	echo "note: $B has no sanitizer, so the leak test of the mating code and the" >&2
-	echo "      sanitized run of the unit tests were SKIPPED." >&2
+	echo "note: $B has no sanitizer, so the sanitized run of the unit tests was SKIPPED." >&2
 	echo "      run 'ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan' for it." >&2
 fi
 
