@@ -1057,6 +1057,13 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients()
 				continue;
 			}
 
+			if (memchr(clientName, '\0', receivedBytes) == nullptr)
+			{
+				fprintf(stderr, "ERR:   a dynamic client sent a host name with no end; its connection is closed\n");
+				close(sdRecv);
+				continue;
+			}
+
 			// store socket for later disconnect
 			clientSockets.resize( clientSockets.count()+1 );
 			clientSockets[clientSockets.count()-1] = sdRecv;
