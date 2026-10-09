@@ -36,6 +36,15 @@ namespace SIGEL_GP
 {
 
 	/**
+	 * A task that waits for a free host: its number, and the position of its individual in the pool.
+	 */
+	struct SIG_GPTaskToSpawn
+	{
+		int internalId;
+		int individualPosition;
+	};
+
+	/**
 	 * This class controls the fitness computation tasks lauchned by PVM.
 	 *
 	 */
@@ -164,9 +173,9 @@ namespace SIGEL_GP
 		int nextHostNumber;
 
 		/**
-		 * The array of indices, representing the position of the individual in the pool, which is to simulate.
+		 * The tasks that wait for a free host.
 		 */
-		QList< QList<int> * > toSpawnList;
+		QList< SIG_GPTaskToSpawn > toSpawnList;
 
 		/**
 		 * This is an object of the class, which contains the data encode and decode

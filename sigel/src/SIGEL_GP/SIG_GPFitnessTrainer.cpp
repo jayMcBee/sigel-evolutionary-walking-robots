@@ -85,10 +85,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
 };
 
 SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
-  // This class owns its dynamic host list and its pending-spawn jobs.
-  qDeleteAll( toSpawnList );
-  toSpawnList.clear();
-
+  // This class owns its dynamic host list.
   qDeleteAll( freshDynHosts );
   freshDynHosts.clear();
 
@@ -237,10 +234,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
   };
 
   if (!success) {
-      QList<int> *toSpawn = new QList<int>(2);
-      (*toSpawn)[0] = actId;
-      (*toSpawn)[1] = ind.getPoolPos();
-      toSpawnList.append( toSpawn );
+      toSpawnList.append( SIG_GPTaskToSpawn{ actId, ind.getPoolPos() } );
     };
 
   nextFreeNumber++;
@@ -299,10 +293,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 
 		  pvm_kill( pvmTask->pvmTaskId );
 		  pvmTask->host.noOfSlaves--;
-		  QList<int> *toSpawn = new QList<int>(2);
-		  (*toSpawn)[0] = taskId;
-		  (*toSpawn)[1] = pvmTask->indPosition;
-		  toSpawnList.append( toSpawn );
+		  toSpawnList.append( SIG_GPTaskToSpawn{ taskId, pvmTask->indPosition } );
 
 		  delete pvmTasks[ taskId ];
 		  pvmTasks[ taskId ] = nullptr;
@@ -322,11 +313,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 
 		  		pvm_kill( pvmTask->pvmTaskId );
 		  		pvmTask->host.noOfSlaves--;
-		  		QList<int> *toSpawn = new QList<int>(2);
-		  		(*toSpawn)[0] = taskId;
-		  		(*toSpawn)[1] = pvmTask->indPosition;
-
-		  		toSpawnList.append( toSpawn );
+		  		toSpawnList.append( SIG_GPTaskToSpawn{ taskId, pvmTask->indPosition } );
 
 		  		delete pvmTasks[ taskId ];   // insert() freed the finished task
 		  		pvmTasks[ taskId ] = nullptr;
@@ -363,17 +350,15 @@ void SIGEL_GP::SIG_GPFitnessTrainer::stopTrainersSlaves()
 
 void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 {
-  // One pass over toSpawnList: each job gets one spawn try, and a spawned job
-  // is removed. cur is -1 when the pass has run off the end.
-  qsizetype cur = toSpawnList.isEmpty() ? -1 : 0;
-  QList< int > *actJob = (cur < 0) ? nullptr : toSpawnList.at( cur );
-  QList< int > *prevJob = nullptr;
+  // One pass over toSpawnList: each task gets one spawn try, and a spawned task
+  // is removed.
+  qsizetype cur = 0;
 
 #ifdef SIG_DEBUG
   SIGEL_Tools::SIG_IO::cerr << "Sweeping to spawn!" << Qt::endl;
 #endif
 
-  while (actJob)
+  while (cur < toSpawnList.size())
     {
 #ifdef SIG_DEBUG
       SIGEL_Tools::SIG_IO::cerr << "Entering spawn loop!" << Qt::endl;
@@ -412,8 +397,8 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 	    {
 	      success = true;
 
-	      int internalId = (*actJob)[0];
-	      int individualNumber = (*actJob)[1];
+	      int internalId = toSpawnList.at( cur ).internalId;
+	      int individualNumber = toSpawnList.at( cur ).individualPosition;
 
 	      SIG_GPIndividual &ind = exp.population.getIndividual( individualNumber );
 
@@ -439,24 +424,9 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 	};
 
       if (success)
-	{
-	  delete toSpawnList.takeAt( cur );      // remove() freed it
-	  // Past the end: step back to the last job. That is prevJob, so the pass ends.
-	  if (cur >= toSpawnList.size())
-	    cur = toSpawnList.isEmpty() ? -1 : toSpawnList.size() - 1;
-	  actJob = (cur < 0) ? nullptr : toSpawnList.at( cur );
-	  if (actJob == prevJob)
-	    break;
-	}
+	toSpawnList.removeAt( cur );
       else
-	{
-	  prevJob = actJob;
-	  // next(): a dead cursor stays dead and does NOT advance.
-	  if (cur < 0 || ++cur >= toSpawnList.size())
-	    { cur = -1; actJob = nullptr; }
-	  else
-	    actJob = toSpawnList.at( cur );
-	};
+	cur++;
     };
 };
 
