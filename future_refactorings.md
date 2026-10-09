@@ -298,16 +298,6 @@ touched, because changing one changes behaviour against the reference binary.
   `EVALUATOR_SUBST` and `CLASSIFIER_SUBST`, and `MT_Substitute::Typ` holds
   it as 1 or 2. Use one scoped enum for both.
 
-- [ ] **150. Give `subst_cache` a name and a file that fit SIGEL.** The
-  struct at the top of `MT_Substitute.h` holds the estimation settings that
-  `MT_Controller` keeps while no evaluator or classifier exists. Its name
-  has no `MT_` prefix, is in lower case with an underscore, and says
-  "cache" for something that is not one. It has no header of its own, and
-  its members are short forms such as `refreshInt` and `numCorrectEst`.
-  Rename it, for example to `MT_EstimationSettings`, move it into its own
-  header, and write the member names out. Do it in one round. Plan it with
-  item 148, which changes its `strategy` member.
-
 - [ ] **132. Make the MetaGP autosave rotate.** In `MT_Controller`,
   `autoSaveCnt = autoSaveCnt++ % 3` writes the old value back, so the
   counter stays at 0. The `saveName` it builds is also not used: the next

@@ -1052,6 +1052,27 @@ classes and leave truncation a hard error. **They are not interchangeable.**
     them and makes them again at several points during its life, which
     needs a `reset()` at each.
 
+**2026-10-09 — DONE: ITEM 150, `subst_cache` IS `MT_EstimationState`.**
+
+- **Before:** the struct `subst_cache` stood at the top of
+  `MT_Substitute.h`, which does not use it. Its owner is `MT_Controller`.
+  The members were `refreshInt`, `genNumber`, `numCorrectEst` and
+  `numMetaEst`; the variables that hold it were `substCache`, `subst` and
+  `sigStat`, and `MT_Controller` read and wrote it with `loadCache` and
+  `saveCache`.
+- **Now:** `MT_EstimationState` in its own header
+  `MT_Control/MT_EstimationState.h`, with the members `refreshInterval`,
+  `generationCount`, `simulationCounts` and `estimationCounts`; `inUse`,
+  `strategy` and `tolerance` keep their names. Every variable that holds it
+  is `estimationState`, and the two methods are `loadEstimationState` and
+  `saveEstimationState`. Member order and types are unchanged, and so is
+  the saved MetaGP file. Two commits: the type and its members, then the
+  variables and methods.
+- **Tested:** `check.sh` passed with 0 fail for each commit. The pass count
+  rose from 821 to 823: the new header is one more standalone header and
+  one more tracked text file.
+- **Not done:** `strategy` stays an `int`; that is item 148.
+
 **2026-10-09 — DONE: ITEM 153, `toSpawnList` HOLDS ITS TASKS BY VALUE.**
 
 - **Before:** `SIG_GPFitnessTrainer::toSpawnList` was a list of pointers to
