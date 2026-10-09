@@ -87,16 +87,11 @@ namespace SIGEL_GP
 		void disconnectClientsOnRequest();
 
 		/**
-		 * Two flags to synchronize the main thread and server thread when disconnecting
-		 * dynamically registered clients; if 'disconnectClients' is set, the server thread
-		 * will disconnect all clients causing them to cleanup temp. files since it'll be
-		 * no longer used for computations.
-		 * The 'allDisconnected' flag is set to true when all clients have been disconnected,
-		 * at which point only atically declared clients -- i.e. declared in the *.exp file --
-		 * are known to the SIGEL master application, all dynamic hosts must register again
-		 * for the next fitness computation phase.
-		 * Has to be volatile of course since the compiler needs to know that these variables
-		 * can get changed elsewhere, not just in our local code (local thread).
+		 * The main thread sets 'disconnectClients' to ask the server thread to disconnect
+		 * all clients; each client then removes its temporary files.
+		 * The server thread sets 'allDisconnected' when that is done. The master then knows
+		 * only the hosts declared in the *.exp file, and a dynamic client must register again.
+		 * Both are volatile, because two threads change them.
 		 */
 		volatile bool allDisconnected;
 		volatile bool disconnectClients;
@@ -110,10 +105,10 @@ namespace SIGEL_GP
 		/**
 		 * condition variable required to synchronize the threads.
 		 */
-		pthread_cond_t cond;
+		pthread_cond_t allDisconnectedCondition;
 
 		/**
-		 * Guards 'allDisconnected', 'disconnectClients' and 'cond'.
+		 * Guards 'allDisconnected', 'disconnectClients' and 'allDisconnectedCondition'.
 		 */
 		pthread_mutex_t disconnectMutex;
 

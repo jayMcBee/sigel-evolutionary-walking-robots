@@ -23,7 +23,6 @@
 */
 #include "SIGEL_GP/SIG_GPPVMDynamicClientServer.h"
 
-#include <QList>
 #include <QString>
 
 #include <cstdio>
@@ -45,12 +44,11 @@ SIGEL_GP::SIG_GPPVMDynamicClientServer::SIG_GPPVMDynamicClientServer()
 	  listenSocket( -1 )
 {
 	pthread_mutex_init(&disconnectMutex, nullptr);
-	pthread_cond_init(&cond, nullptr);
+	pthread_cond_init(&allDisconnectedCondition, nullptr);
 }
 
 void SIGEL_GP::SIG_GPPVMDynamicClientServer::run(SIG_GPFitnessTrainer *trainer)
 {
-	// init some variables
 	serverIsUp = true;
 
 	openPort();
@@ -208,7 +206,7 @@ void SIGEL_GP::SIG_GPPVMDynamicClientServer::disconnectClientsOnRequest()
 		disconnectClients = false;
 		allDisconnected = true;
 
-		pthread_cond_broadcast(&cond);
+		pthread_cond_broadcast(&allDisconnectedCondition);
 	}
 
 	pthread_mutex_unlock( &disconnectMutex );
@@ -230,7 +228,7 @@ void SIGEL_GP::SIG_GPPVMDynamicClientServer::releaseAllClients(SIG_GPFitnessTrai
 	// let's wait for server thread
 	while ( ! allDisconnected )
 	{
-		pthread_cond_wait(&cond, &disconnectMutex);
+		pthread_cond_wait(&allDisconnectedCondition, &disconnectMutex);
 	}
 	pthread_mutex_unlock( &disconnectMutex );
 
