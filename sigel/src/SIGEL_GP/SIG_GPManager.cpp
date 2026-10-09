@@ -1036,6 +1036,18 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients()
 				exit(1);
 			}
 
+			// a client that sends nothing must not block this thread
+			struct timeval receiveTimeOut;
+			receiveTimeOut.tv_sec  = 10;
+			receiveTimeOut.tv_usec = 0;
+
+			if (setsockopt(sdRecv, SOL_SOCKET, SO_RCVTIMEO, &receiveTimeOut, sizeof(receiveTimeOut)) < 0)
+			{
+				fprintf(stderr, "ERR:   setsockopt() failed for a dynamic client; its connection is closed\n");
+				close(sdRecv);
+				continue;
+			}
+
 			const ssize_t receivedBytes = recv(sdRecv, clientName, sizeof(clientName), 0);
 
 			if (receivedBytes <= 0)
