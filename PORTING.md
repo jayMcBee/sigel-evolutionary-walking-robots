@@ -1052,6 +1052,41 @@ classes and leave truncation a hard error. **They are not interchangeable.**
     them and makes them again at several points during its life, which
     needs a `reset()` at each.
 
+**2026-10-09 — DONE: THE SERVER FOR DYNAMIC CLIENTS IS THE CLASS `SIG_GPPVMDynamicClientServer`.**
+
+- **Before:** `SIG_GPManager::RegisterDynPVMClients` was one method with four
+  jobs: open the port, wait, take in a client, release all clients. The main
+  thread's half of the release stood twice, in `SIG_GPManager::run()` and in
+  `SIG_GPManager::run(MT_Classifier *)`. Five members of `SIG_GPManager`
+  existed only for this: `serverIsUp`, `disconnectClients`,
+  `allDisconnected`, `cond` and `disconnectMutex`.
+- **Now:** the new class `SIG_GPPVMDynamicClientServer` in `SIGEL_GP` holds
+  all of it, and `SIG_GPManager` owns one object of it.
+  - `run()` is the body of the server thread. It calls the private methods
+    `openPort`, `waitForClient`, `acceptClient` and
+    `disconnectClientsOnRequest`.
+  - `releaseAllClients()` is the main thread's half of the release. Both
+    `run` methods of the manager call it; the rule for when to release stays
+    in the manager.
+  - `isRunning()` replaces the read of `serverIsUp`.
+  - The five members are private there. `cond` is
+    `allDisconnectedCondition`.
+  - `SIG_GPManager::RegisterDynPVMClients` is one line that calls `run()`,
+    so `sigel.cpp` is unchanged.
+- **Behaviour that changed:** the condition variable is set up in the
+  constructor, no longer at the start of each `run` of the manager. After a
+  refused client the release check runs in the same pass of the loop, not
+  one pass later. Messages, port and what goes over the connection are the
+  same.
+- **Done in three steps,** each with its own commit: the body moved text for
+  text; then the main thread's half; then the split into methods.
+- **Measured, for each step:** on one machine, `sigel -de` on a copy of
+  `twoBases.exp` with a connection that sent nothing, a connection that sent
+  a name with no zero byte, and one `manage_dyn_slave`: both connections
+  were refused with their messages, the client was registered and released
+  at generation 20, and the run went on. `check.sh` passed after each step,
+  the last time with 822 pass and 0 fail. Two machines are not tested.
+
 **2026-10-09 — DONE: A SILENT OR WRONG PROGRAM ON THE PORT FOR DYNAMIC CLIENTS DOES NOT STOP THE SERVER THREAD.**
 
 - **Before:** `SIG_GPManager::RegisterDynPVMClients` read the host name of a
