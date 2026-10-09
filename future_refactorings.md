@@ -86,9 +86,8 @@ Paths are relative to `sigel/`, the source tree.
   `check.sh` catches that. No reference file holds these names.
 
 - [ ] **16. Set the version to 2.0** in `SIGEL_Tools/SIG_Version.h` when it
-  is time. To discuss: what to do with `sigel/README`, which still says
-  `KDESIGEL v1.1 Readme File`. `pixmaps/altLogo.png`, with a `Sigel v1.0`
-  caption, is kept but unused.
+  is time, and in the header of `sigel/README`, which names the version too.
+  `pixmaps/altLogo.png`, with a `Sigel v1.0` caption, is kept but unused.
 
 - [ ] **30. Cut comments over two lines that do not earn their place.** A
   longer comment must carry something the code cannot say. **Comments the port
