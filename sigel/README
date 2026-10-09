@@ -26,104 +26,109 @@ the directory "sigelApp", from which SIGEL is started, with:
 
 2. Getting SIGEL to work
 
-First of all: Starting just the SIGEL-executable without argument will start the
-GUI-Version of SIGEL.
-- Starting it with the "-evolve <filename>" argument will start without a GUI
-  and just evolves the given experiment until all individuals have got a valid fitnessvalue
-  and the termination condition is reached.
-- Starting it with "-devolve <filename>"  SIGEL evolves with dynamic clients.
-  For more information see below (2.6)
+Start SIGEL in the directory "sigelApp" with the script "sigelLauncher":
 
-To start SIGEL on one machine, use the script "sigelLauncher" (see below 2.3). To let other
-hosts take part in the parallel evolution computations, you have first to do the following things:
+./sigelLauncher                         starts SIGEL with its windows
+./sigelLauncher -evolve <experiment>    evolves the experiment without windows until its
+                                        termination condition is reached, then saves it
+                                        to the same file
+./sigelLauncher -devolve <experiment>   the same, and dynamic clients can join (see 2.6)
 
-2.1 Environment variables
+On one machine nothing else is needed. Sections 2.1 and 2.2 are for an evolution on
+several hosts.
 
-Some environment variables have to be set in the shell-startup script (.cshrc for example in
-the case you are using the C-Shell) of all hosts that want to take part in the parallel
-evolution computations. The reason is that this variables have to be set when
-the parallel evolution automatically open a remote shell on these hosts.
+2.1 Evolving on several hosts
 
-Variable                     Value
+The master is the host on which you start SIGEL. Through PVM it starts the program
+"sigel_slave" on the other hosts.
 
-SIGEL_ROOT          Should contain the path to your sigel-installation directory.
-PVM_ROOT             $SIGEL_ROOT/supportingLibs/pvm3
-PVM_ARCHDIR      LINUX (for linux ;-)
+The experiment exists on the master only. Do not copy it to the other hosts. The master
+sends the data of the experiment to each slave, and each slave sends one fitness value
+back.
 
-If you only want to start SIGEL locally, you could also use the script "sigelLauncher", which
-sets all the environment variables (see below 2.3).
+On each other host:
+- Build SIGEL as in section 1. The directory "sigelApp" must be writable.
+- Set two environment variables in the start-up file of the shell:
 
-2.2 The .rhosts file or using ssh for a remote-shell
+  SIGEL_ROOT    the full path of the directory "sigelApp"
+  PVM_ROOT      $SIGEL_ROOT/supportingLibs/pvm3
 
-One method to start evolution computations on other hosts is the use of the rsh (remote-shell) mechanism.
-That means that:
-- This service has to be offered by the host.
-- An appropriate .rhosts file has to grant SIGEL acces without a password.
+  With bash this file is ".bashrc". On Debian and Ubuntu put the two lines at the top of
+  the file, above the lines that end it for a shell that is not interactive.
 
-Example: If you want to start the SIGEL-master process on a host named "dagobah" and your
-loginname on this host is "yoda", while you want to use a host called "hoth" for SIGEL-slave
-computations. Then the .rhosts file on "hoth" has to contain the following line:
+The master must reach each other host by its host name. A host behind NAT cannot take
+part.
 
-dagobah yoda
+2.2 The remote shell
 
-That means that the user "yoda" may log into from "dagobah" into "hoth" without giving
-a password using the rsh mechanism. You better be careful with the .rhosts file. You find
-more info on that typing "man rhosts".
+The master starts PVM on the other hosts through a remote shell. On the master:
 
-Because of the security issues of r-commands, PVM and thus SIGEL supports the use of
-ssh. Therefore you have to set the environment variable
+- Set up ssh so that "ssh <host>" logs in to each other host with a key and without a
+  password. Log in once by hand, so that ssh knows the key of the host.
+- If your login name on the other host is different, give it in "~/.ssh/config":
 
-PVM_RSH=path to ssh
+  Host <host>
+      User <login name>
 
-in addition to the environment variables in section 2.1. After this SIGEL starts the slave on
-other clients with ssh. You should set up ssh thus you can login to the clients without specifing
-a password.
-It is important to mention it again, if you use SIGEL with automatic evolution you must set
-the environment variables in your shell configuration file, else it will not run.
+- Tell PVM to use ssh, before you start "sigelLauncher":
+
+  export PVM_RSH=/usr/bin/ssh
+
+  Without PVM_RSH, PVM uses rsh.
+- Check the variables of the other host. This must print both paths:
+
+  ssh <host> 'echo $SIGEL_ROOT $PVM_ROOT'
+
+- Check the name of the master. This must print its network address:
+
+  getent ahostsv4 <host name of the master>
+
+  If it prints 127.0.1.1, replace 127.0.1.1 in the file "/etc/hosts" with the network
+  address of the master.
 
 2.3 The sigelLauncher script
 
-This script sigelLauncher does the setting of the variables decribed above. It does not
-replace the step 2.1, but is written for the case you want to start sigel through a cronjob.
-The cronjob starts in a "naked" shell. The script contains one line setting the SIGEL_ROOT
-variable. This is the only line you need to modify. Then you can use it for example in the
-folowing crontab-entry:
+The script sets the environment variables that SIGEL needs on the master and starts
+"sigel" with the arguments it was given. It takes the directory it is started in as
+SIGEL_ROOT. To start it from another directory, for example from cron, set SIGEL_ROOT
+in the script to the full path of "sigelApp". A crontab entry can then be:
 
-00      21      20      8       *       /home/user/sigelLauncher -evolve insect.exp
+00      21      20      8       *       /home/user/sigelApp/sigelLauncher -evolve insect.exp
 
 2.4 Using gnuplot
 
-It is possible to plot the fitnesscurves with gnuplot directly from SIGEL. This of course
-works only if gnuplot is found in a directory given in your PATH-variable.
+SIGEL can plot the fitness curves with gnuplot. For this, gnuplot must be in a directory
+of your PATH variable.
 
 2.5 PovrayLauncher
 
-The SIGEL distribution contains a script called "povrayLauncher" which calls Povray for
-all .pov-files found in the current directory. Arguments given to the script are reached
-to Povray, which has of course to be found in a directory given in your PATH-variable.
+The script "povrayLauncher" calls Povray for all .pov files in the current directory and
+passes its arguments to Povray. Povray must be in a directory of your PATH variable.
 
 2.6 Dynamic clients and sigelDynClient
 
-A dynamic client is a host that joins an evolution while it runs. Start the
-master with the argument "-devolve":
+A dynamic client is a host that joins an evolution while it runs. Prepare it as in 2.1
+and 2.2. It needs no experiment file.
+
+On the master:
 
 ./sigelLauncher -devolve <experiment>
 
 The master prints "Server is awaiting requests from dynamic clients on port 6789.."
 and starts the evolution. From then on a client can join. On the client, in the
-SIGEL folder:
+directory "sigelApp":
 
 ./sigelDynClient <host name of the master>
 
-The script copies "sigel_slave" to "/tmp/_SIGEL_EVOLUTION_TEMP". Then it runs the
-program "manage_dyn_slave", which sends the host name of the client to the master
-over a socket. The master starts its slaves on the client from that folder, one
-at a time.
+The script copies "sigel_slave" to "/tmp/_SIGEL_EVOLUTION_TEMP" and gives the host name
+of the client to the master. The master must reach the client by this name; it is the
+name that "hostname" prints on the client. The master then starts its slaves on the
+client, one at a time.
+
+Before each generation line the master prints how many fitness values each host sent:
+
+	Scores from <host>: 32
 
 At every 20th generation the master releases all dynamic clients. The script then
-removes the directory "/tmp/_SIGEL_EVOLUTION_TEMP" and ends. Start it again to
-join again.
-
-These steps were run with the master and the client on one machine. A client on
-a second machine is not tested. The master starts PVM on it through a remote
-shell, so sections 2.1 and 2.2 apply to it.
+removes the directory "/tmp/_SIGEL_EVOLUTION_TEMP" and ends. Start it again to join
+again. The PVM daemon on the client ends when the master ends.
