@@ -122,9 +122,9 @@ namespace SIGEL_GP
 
 		/** This method is invoked from the SIGEL master application
 		 * when started with the '-de' argument.
-		 * It waits for 180 seconds to allow all clients that dynamically
-		 * participate on the evolutionary process to register, i.e.
-		 * submit their hostname.
+		 * It runs in its own thread until the program ends. It registers
+		 * each client that submits its hostname, and it disconnects all
+		 * clients when the main thread asks for it.
 		 */
 		void RegisterDynPVMClients();
 

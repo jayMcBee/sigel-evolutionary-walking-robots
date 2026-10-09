@@ -178,7 +178,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::flushAllDynHosts() {
         }
       }
 
-      // delete the dynamic host from our list and from PVM
+      // delete the dynamic host from our list; it stays in PVM
       if (res) {
         if (pHost->noOfSlaves > 0)
           SIGEL_Tools::SIG_IO::cerr << "Dynamic host \"" << pHost->name << "\" is removed while " << pHost->noOfSlaves << " of its slaves still run." << Qt::endl;

@@ -11,12 +11,12 @@
  *  that's all. Thus the sigel master knows our local host has a sigel_slave
  *  binary (and supporting files) installed in /tmp/_SIGEL_EVOLUTION_TEMP
  *
- *  Make sure the latter is the case by launching the installSigelTmpEvolver
- *  script on the dedicated host.
+ *  The sigelDynClient script makes sure the latter is the case, and then
+ *  starts this program.
  *
- *  When the computation is finished and the sigel_master application
- *  decides this host is no longer needed, it sends the self-destruct
- *  command to all temp. slaves, which in turn makes this slave remove
+ *  When the sigel_master application decides this host is no longer
+ *  needed, it sends a message to all temp. slaves and closes the
+ *  connection. This program then exits, and sigelDynClient removes
  *  the /tmp/_SIGEL_EVOLUTION_TEMP directory.
  *
  *  Author:  Jan Barnholt  <jan-b@uni.de>, <jan.barnholt@epost.de>
