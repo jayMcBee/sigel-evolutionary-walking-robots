@@ -6,50 +6,36 @@ or endorsed by SIGEL's original authors.
 Repository: https://github.com/jayMcBee/sigel-evolutionary-walking-robots
 This software is placed under the GNU General Public License.
 
-Welcome to the world of Kdesigel. You want to use it? It's not as difficult
-as baking pancake. Supported operating systems are Solaris (sparc)
-and Linux (x86). All the following steps should be the same for both.
+Welcome to the world of SIGEL. You want to use it? It's not as difficult
+as baking pancake. SIGEL runs on Linux.
 
-1. Building Kdesigel
+1. Building SIGEL
 
-If you don't have got a binary distribution and decided to build Kdesigel
-by yourself, you need the gcc 2.95.2 or higher (get yours at www.gnu.org)
-together with the appropriate libstdc++. The only thing you need which
-maybe is not installed on every system is OpenGL. Its header files have
-to be in the /usr/include/GL directory, the .so-files in /usr/openwin/lib
-or /usr/X11R6/lib (in the Solaris respectively Linux case).
+To build SIGEL you need g++ with C++20, Qt 6, OpenGL with GLU, and libtirpc.
+In the top directory of the repository run
 
-Assumed that you have untared the source-distribution, the best way to build Kdesigel is to use
-kdevelop. First select build->autoconf/automake. After that klick on build->configure. Now you can
-build Kdesigel with build->build.
-If you want to build it without kdevelop, you should be familar with the autotools. After running
-"autoconf" and "automake" (at least version 1.5) in the kdesigel-directory, you should
-set "CXXFLAGS" to "-DQT_THREAD_SUPPORT -DQT_ALTERNATE_QTSMANIP -fpermissive"
-and run "./configure". And it should build Kdesigel like kdevelop (tested on Suse and Debian).
+make
 
-Having build Kdesigel, you can delete everything but:
+This builds the supporting libraries, PVM and the three executables. Then it fills
+the directory "sigelApp", from which SIGEL is started, with:
 - the executables "sigel", "sigel_slave" and "manage_dyn_slave" (for dynamic clients, see below)
 - the scripts "sigelLauncher", "povrayLauncher", "sigelDynClient" (for dynamic clients, see below)
-- the file "Terrain.ter"
-- the subdirectory pixmaps
-- the subdirectory supportingLibs/pvm3
+- the files "Terrain.ter" and "stdConf.mt"
+- the subdirectories pixmaps and textures
+- the subdirectory supportingLibs/pvm3, a link to the PVM that was built
 
-Then you should have quite the things as included in the binary distributions.
-Or you could use the shell-script "./makeBinary" which copies all relevant files to
-"/tmp/kdesigel".
+2. Getting SIGEL to work
 
-2. Getting Kdesigel to work
-
-First of all: Starting just the Kdesigel-executable without argument will start the
-GUI-Version of Kdesigel.
+First of all: Starting just the SIGEL-executable without argument will start the
+GUI-Version of SIGEL.
 - Starting it with the "-evolve <filename>" argument will start without a GUI
   and just evolves the given experiment until all individuals have got a valid fitnessvalue
   and the termination condition is reached.
-- Starting it with "-devolve <filename>"  Kdesigel evolves with dynamic clients.
-  Thus you can run Kdesigel for example in a batch system. For more information see below (2.6)
+- Starting it with "-devolve <filename>"  SIGEL evolves with dynamic clients.
+  For more information see below (2.6)
 
-But whether you compiled Kdesigel by yourself oder downloaded a binary distribution, you have
-first to do the following things to get Kdesigel to work:
+To start SIGEL on one machine, use the script "sigelLauncher" (see below 2.3). To let other
+hosts take part in the parallel evolution computations, you have first to do the following things:
 
 2.1 Environment variables
 
@@ -64,7 +50,7 @@ SIGEL_ROOT          Should contain the path to your sigel-installation directory
 PVM_ROOT             $SIGEL_ROOT/supportingLibs/pvm3
 PVM_ARCHDIR      LINUX (for linux ;-)
 
-If you only want to start Kdesigel locally, you could also use the script "sigelLauncher", which
+If you only want to start SIGEL locally, you could also use the script "sigelLauncher", which
 sets all the environment variables (see below 2.3).
 
 2.2 The .rhosts file or using ssh for a remote-shell
@@ -72,10 +58,10 @@ sets all the environment variables (see below 2.3).
 One method to start evolution computations on other hosts is the use of the rsh (remote-shell) mechanism.
 That means that:
 - This service has to be offered by the host.
-- An appropriate .rhosts file has to grant Kdesigel acces without a password.
+- An appropriate .rhosts file has to grant SIGEL acces without a password.
 
-Example: If you want to start the Kdesigel-master process on a host named "dagobah" and your
-loginname on this host is "yoda", while you want to use a host called "hoth" for Kdesigel-slave
+Example: If you want to start the SIGEL-master process on a host named "dagobah" and your
+loginname on this host is "yoda", while you want to use a host called "hoth" for SIGEL-slave
 computations. Then the .rhosts file on "hoth" has to contain the following line:
 
 dagobah yoda
@@ -84,15 +70,15 @@ That means that the user "yoda" may log into from "dagobah" into "hoth" without 
 a password using the rsh mechanism. You better be careful with the .rhosts file. You find
 more info on that typing "man rhosts".
 
-Because of the security issues of r-commands, PVM and thus Kdesigel supports the use of
+Because of the security issues of r-commands, PVM and thus SIGEL supports the use of
 ssh. Therefore you have to set the environment variable
 
 PVM_RSH=path to ssh
 
-in addition to the environment variables in section 2.1. After this kdesigel starts the slave on
+in addition to the environment variables in section 2.1. After this SIGEL starts the slave on
 other clients with ssh. You should set up ssh thus you can login to the clients without specifing
 a password.
-It is important to mention it again, if you use Kdesigel with automatic evolution you must set
+It is important to mention it again, if you use SIGEL with automatic evolution you must set
 the environment variables in your shell configuration file, else it will not run.
 
 2.3 The sigelLauncher script
@@ -107,12 +93,12 @@ folowing crontab-entry:
 
 2.4 Using gnuplot
 
-It is possible to plot the fitnesscurves with gnuplot directly from Kdesigel. This of course
+It is possible to plot the fitnesscurves with gnuplot directly from SIGEL. This of course
 works only if gnuplot is found in a directory given in your PATH-variable.
 
 2.5 PovrayLauncher
 
-The Kdesigel distribution contains a script called "povrayLauncher" which calls Povray for
+The SIGEL distribution contains a script called "povrayLauncher" which calls Povray for
 all .pov-files found in the current directory. Arguments given to the script are reached
 to Povray, which has of course to be found in a directory given in your PATH-variable.
 
