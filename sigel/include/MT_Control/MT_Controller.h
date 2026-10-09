@@ -7,6 +7,7 @@
 #include <QFile>
 class MT_MainWindow;
 class QWidget;
+#include "MT_Control/MT_EstimationState.h"
 #include "MT_Control/MT_Substitute.h"
 #include "MT_GPSystem/MT_GPManager.h"
 
@@ -77,7 +78,7 @@ private:
 
 	QString saveName;
 	QString baseName;
-	subst_cache substCache;
+	MT_EstimationState substCache;
 
 	bool createGPSystem();
 	bool saveSystem(QString sigExpName);

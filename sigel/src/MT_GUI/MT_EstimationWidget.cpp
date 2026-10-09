@@ -93,7 +93,7 @@ void MT_EstimationWidget::slotStrategyChanged(int index)
 	}
 }
 
-bool MT_EstimationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
+bool MT_EstimationWidget::onHide(MT_GPManager *manager, MT_EstimationState *subst)
 {
 	int strategy, refInt;
 	double tolerance;
@@ -133,7 +133,7 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 	if(subst){
 		subst->strategy = strategy;
 		subst->tolerance = tolerance;
-		subst->refreshInt = refInt;
+		subst->refreshInterval = refInt;
 	}
 	else
 		QMessageBox::critical(this, "Configure MetaGP System", "Couldn't set the information for the current MetaGP system.");
@@ -141,7 +141,7 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, subst_cache *subst)
 	return true;
 }
 
-void MT_EstimationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
+void MT_EstimationWidget::onShow(MT_GPManager *manager, MT_EstimationState *subst)
 {
 	int strategy = 0;
 	int refInt = 0;
@@ -150,7 +150,7 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	// read in the values
 	if(subst){
 		strategy = subst->strategy;
-		refInt = subst->refreshInt;
+		refInt = subst->refreshInterval;
 		tolerance = subst->tolerance;
 	}
 	else {

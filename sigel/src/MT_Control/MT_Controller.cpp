@@ -43,10 +43,10 @@ MT_Controller::MT_Controller(SIGEL_GP::SIG_GPExperiment &exp)
 	metaOn = false;
 
 	substCache.inUse = false;
-	substCache.genNumber = 0;
-	substCache.numCorrectEst = nullptr;
-	substCache.numMetaEst = nullptr;
-	substCache.refreshInt = 0;
+	substCache.generationCount = 0;
+	substCache.simulationCounts = nullptr;
+	substCache.estimationCounts = nullptr;
+	substCache.refreshInterval = 0;
 	substCache.strategy = -1;
 	substCache.tolerance = 0;
 
@@ -659,24 +659,24 @@ void MT_Controller::loadCache(QTextStream &File)
 		savedSystem = EVALUATOR_SUBST;
 	}
 
-	substCache.numCorrectEst = nullptr;
-	substCache.numMetaEst = nullptr;
+	substCache.simulationCounts = nullptr;
+	substCache.estimationCounts = nullptr;
 	if(usedSystem == savedSystem){
 		substCache.strategy = (File.readLine()).toInt();
 		substCache.tolerance = (File.readLine()).toDouble();
-		substCache.refreshInt = (File.readLine()).toInt();
-		substCache.genNumber = (File.readLine()).toUInt();
-		if(substCache.genNumber != 0){
-			correctEst.resize(substCache.genNumber);
-			metaEst.resize(substCache.genNumber);
+		substCache.refreshInterval = (File.readLine()).toInt();
+		substCache.generationCount = (File.readLine()).toUInt();
+		if(substCache.generationCount != 0){
+			correctEst.resize(substCache.generationCount);
+			metaEst.resize(substCache.generationCount);
 						
-			for(int i=0; i< substCache.genNumber; i++)
+			for(int i=0; i< substCache.generationCount; i++)
 			{
 				correctEst[i] = (File.readLine()).toUInt();
 				metaEst[i] = (File.readLine()).toUInt();
 			}
-			substCache.numCorrectEst = &correctEst;
-			substCache.numMetaEst = &metaEst;
+			substCache.simulationCounts = &correctEst;
+			substCache.estimationCounts = &metaEst;
 		}
 	} else {		// default setup
 		QFile defFile(defConfFileName);
@@ -692,8 +692,8 @@ void MT_Controller::loadCache(QTextStream &File)
 			if ((PresentLine == Classifier) && !(defStrm.atEnd())){
 				substCache.strategy = (defStrm.readLine()).toInt();
 				substCache.tolerance = (defStrm.readLine()).toDouble();
-				substCache.refreshInt = (defStrm.readLine()).toInt();
-				substCache.genNumber = (defStrm.readLine()).toUInt();
+				substCache.refreshInterval = (defStrm.readLine()).toInt();
+				substCache.generationCount = (defStrm.readLine()).toUInt();
 			}
 			break;
 
@@ -705,8 +705,8 @@ void MT_Controller::loadCache(QTextStream &File)
 			if ((PresentLine == Evaluator) && !(defStrm.atEnd())){
 				substCache.strategy = (defStrm.readLine()).toInt();
 				substCache.tolerance = (defStrm.readLine()).toDouble();
-				substCache.refreshInt = (defStrm.readLine()).toInt();
-				substCache.genNumber = (defStrm.readLine()).toUInt();
+				substCache.refreshInterval = (defStrm.readLine()).toInt();
+				substCache.generationCount = (defStrm.readLine()).toUInt();
 			}
 			break;
 		}
@@ -727,10 +727,10 @@ void MT_Controller::saveCache(QTextStream &File)
 	}
 	File << substCache.strategy <<Qt::endl;
 	File << substCache.tolerance <<Qt::endl;
-	File << substCache.refreshInt <<Qt::endl;
-	File << substCache.genNumber <<Qt::endl;
-	if(substCache.genNumber != 0){
-		for(int i=0; i< substCache.genNumber; i++){
+	File << substCache.refreshInterval <<Qt::endl;
+	File << substCache.generationCount <<Qt::endl;
+	if(substCache.generationCount != 0){
+		for(int i=0; i< substCache.generationCount; i++){
 			File << correctEst[i] << "\n";
 			File << metaEst[i] << "\n";
 		}
@@ -746,10 +746,10 @@ void MT_Controller::writeEstimationSettings()
 	}
 	estimationSettingsText.append(QString("%1\n").arg(substCache.strategy));
 	estimationSettingsText.append(QString("%1\n").arg(substCache.tolerance));
-	estimationSettingsText.append(QString("%1\n").arg(substCache.refreshInt));
-	estimationSettingsText.append(QString("%1\n").arg(substCache.genNumber));
-	if(substCache.genNumber != 0){
-		for(int i=0; i<substCache.genNumber; i++){
+	estimationSettingsText.append(QString("%1\n").arg(substCache.refreshInterval));
+	estimationSettingsText.append(QString("%1\n").arg(substCache.generationCount));
+	if(substCache.generationCount != 0){
+		for(int i=0; i<substCache.generationCount; i++){
 			estimationSettingsText.append(QString("%1\n%2\n").arg(correctEst[i]).arg(metaEst[i]));
 		}
 	}

@@ -48,7 +48,7 @@ MT_SearchWidget::MT_SearchWidget(QWidget* parent, const char* name, Qt::WindowFl
  * exchange data between GUI and GP-System
  * update GUI
  ***/
-void MT_SearchWidget::onShow(MT_GPManager *manager, subst_cache *subst)
+void MT_SearchWidget::onShow(MT_GPManager *manager, MT_EstimationState *subst)
 {
 	QList<double> *probMutPow   = nullptr;
 	QList<double> *probSearchOp = nullptr;
@@ -75,7 +75,7 @@ void MT_SearchWidget::onShow(MT_GPManager *manager, subst_cache *subst)
  * exchange data between GUI and GP-System
  * update GP-System
  ***/
-bool MT_SearchWidget::onHide(MT_GPManager *manager, subst_cache *subst)
+bool MT_SearchWidget::onHide(MT_GPManager *manager, MT_EstimationState *subst)
 {
 	QList<double> *probMutPow   = nullptr;
 	QList<double> *probSearchOp = nullptr;

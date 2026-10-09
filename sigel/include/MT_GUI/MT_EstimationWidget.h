@@ -12,8 +12,8 @@ class MT_EstimationWidget : public MT_EstimationWidgetBase, public MT_WidgetBase
 public:
 	MT_EstimationWidget(QWidget* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags() );
 
-	bool onHide(MT_GPManager *manager, subst_cache *subst);
-	void onShow(MT_GPManager *manager, subst_cache *subst);
+	bool onHide(MT_GPManager *manager, MT_EstimationState *subst);
+	void onShow(MT_GPManager *manager, MT_EstimationState *subst);
 
 public slots:
 	void slotStrategyChanged(int index);

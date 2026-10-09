@@ -18,6 +18,7 @@
 
 #include "MT_GPSystem/MT_Randomizer.h"
 #include "MT_GPSystem/MT_GPManager.h"
+#include "MT_Control/MT_EstimationState.h"
 #include "MT_Control/MT_Substitute.h"
 
 class MT_Controller;
@@ -29,7 +30,7 @@ class MT_MainWindow : public QMainWindow
 	friend class MT_Controller;
 
 public:
-	MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, subst_cache *substCache, QWidget * parent = nullptr, const char * name = nullptr, Qt::WindowFlags f = Qt::Dialog );
+	MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, MT_EstimationState *substCache, QWidget * parent = nullptr, const char * name = nullptr, Qt::WindowFlags f = Qt::Dialog );
 	~MT_MainWindow();
 
 	MT_GPManager* getManager();
@@ -80,7 +81,7 @@ private:
 
 	MT_Randomizer *random;
 	MT_GPManager *gpManager;
-	subst_cache *subst;
+	MT_EstimationState *subst;
 
 	void raiseWidget(int pos);
 

@@ -4,7 +4,7 @@
 #include "MT_GUI/MT_MainWindow.h"
 #include "MT_Control/MT_Controller.h"
 
-MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, subst_cache *substCache, QWidget * parent, const char * name, Qt::WindowFlags f )
+MT_MainWindow::MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, MT_EstimationState *substCache, QWidget * parent, const char * name, Qt::WindowFlags f )
  : QMainWindow( parent, f ), gpManager(manager), subst(substCache)
 {
 	if ( name )

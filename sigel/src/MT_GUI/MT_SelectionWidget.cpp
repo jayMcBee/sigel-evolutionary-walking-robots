@@ -64,7 +64,7 @@ int MT_SelectionWidget::calculateTournSize(int pSize, int oSize, int oTSize)
 	return lastSize;
 }
 
-void MT_SelectionWidget::onShow(MT_GPManager *manager, subst_cache *subst)
+void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *subst)
 {
 	int offspringSize;
 	int tournSize;
@@ -127,7 +127,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, subst_cache *subst)
 	QObject::connect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
 }
 
-bool MT_SelectionWidget::onHide(MT_GPManager *manager, subst_cache *subst)
+bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *subst)
 {
 	int offspringSize=0;
 	int tournSize=0;

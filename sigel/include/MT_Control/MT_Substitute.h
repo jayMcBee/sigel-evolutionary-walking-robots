@@ -17,16 +17,6 @@
 #include <qtextstream.h>
 #include <math.h>
 
-struct subst_cache {
-	bool inUse;
-	int strategy;
-	int refreshInt;
-	double tolerance;
-	unsigned int genNumber;
-	QList<unsigned int> *numCorrectEst;
-	QList<unsigned int> *numMetaEst;
-};
-
 class MT_Substitute  
 {
 public:
