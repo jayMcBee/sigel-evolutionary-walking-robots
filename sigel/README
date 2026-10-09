@@ -1,7 +1,9 @@
-KDESIGEL v1.1 Readme File 
------------------------
+SIGEL v1.4 Readme File
+----------------------
 
-Contact: sigel@ls11.cs.uni-dortmund.de
+This is an independent fork of the SIGEL project. It is not made, maintained
+or endorsed by SIGEL's original authors.
+Repository: https://github.com/jayMcBee/sigel-evolutionary-walking-robots
 This software is placed under the GNU General Public License.
 
 Welcome to the world of Kdesigel. You want to use it? It's not as difficult
