@@ -8,6 +8,12 @@ tests each program in a physics simulator.
 
 To build and run it, see [Getting started](sigel/GETTING_STARTED).
 
+## Tests
+
+The unit tests are in `sigel/tests/` and use Qt Test. To build and run them:
+
+    make test
+
 ## Origin
 
 - **SIGEL 1.0 (2001):** written by project group PG 368 at the University of

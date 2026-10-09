@@ -8,7 +8,7 @@ at https://sigel.sourceforge.net/seiten/links_en.html.
 
 | library | version here | SIGEL uses it for | upstream |
 |---|---|---|---|
-| Qt 6: Core, Gui, Widgets, OpenGL, OpenGLWidgets | 6.10.2 | the interface and the 3-D view's widget. Qt Test is used by the checks only | https://www.qt.io/ |
+| Qt 6: Core, Gui, Widgets, OpenGL, OpenGLWidgets | 6.10.2 | the interface and the 3-D view's widget. Qt Test is used by the unit tests and the checks only | https://www.qt.io/ |
 | OpenGL and GLU | libGL 1.7.0 (libglvnd), GLU 9.0.2 (Mesa) | drawing the 3-D view | https://www.khronos.org/opengl/, https://gitlab.freedesktop.org/mesa/glu |
 | libtirpc | 1.3.7 | PVM's data encoding | https://sourceforge.net/projects/libtirpc/ |
 

@@ -40,13 +40,15 @@ coredrive`, and `make B=build-asan coredrive pvm-link`.
    exists, and every form is in the build.
 9. **Robot check.** The issues that the robot check raises on the 7 shipped
    experiments must match `baselines/robotcheck-baseline.txt`.
+10. **Unit tests.** Runs `make test`: the unit tests in `sigel/tests/` must
+    all pass.
 
 It prints one row per check and a total, and exits non-zero if anything fails
 or is skipped. The warning count on the total line is part of the result.
 
 ## Separate scripts
 
-10. **`fitness-check.sh`.** 21 fitness values, 3 for each of the 7
+11. **`fitness-check.sh`.** 21 fitness values, 3 for each of the 7
     experiments, must match `baselines/fitness-baseline.txt`. It also runs the
     evaluator's self-test, and the MetaGP mating test: crossover, mutation
     and reproduction for 200 random seeds each, against rules that hold for
@@ -56,12 +58,12 @@ or is skipped. The warning count on the total line is part of the result.
         ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan \
             | diff -u checks/baselines/fitness-baseline.txt -
 
-11. **`dictorder-dump.sh`.** The order in which robot parts reach the
+12. **`dictorder-dump.sh`.** The order in which robot parts reach the
     simulation must match the baseline.
 
         ./checks/dictorder-dump.sh | diff -u checks/baselines/dictorder-baseline.txt -
 
-12. **`pvm-check.sh`.** Starts a PVM daemon, makes one plain PVM round trip,
+13. **`pvm-check.sh`.** Starts a PVM daemon, makes one plain PVM round trip,
     then sends SIGEL's own PVM data through real PVM under AddressSanitizer.
     Pass or fail; no baseline.
 

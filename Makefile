@@ -6,6 +6,8 @@
 #                   the folder SIGEL is started from:
 #                   cd sigelApp && ./sigelLauncher
 #   make coredrive build/coredrive -- one fitness evaluation, for the checks
+#   make test       build/sigel_tests -- the unit tests in sigel/tests/, and
+#                   run them
 #   make vendor     the five vendored libraries only
 #   make pvm        libpvm3.a and pvmd3, built by PVM's own make
 #   make pvm-link   build/pvm_link -- SIGEL's PVM code against real PVM
@@ -151,7 +153,7 @@ PVM_DIR  := $(SL)/pvm3
 PVM_LIB  := $(PVM_DIR)/lib/LINUX64/libpvm3.a
 PVM_D    := $(PVM_DIR)/lib/LINUX64/pvmd3
 
-.PHONY: all vendor core clean unpatch pvm pvm-link coredrive
+.PHONY: all vendor core clean unpatch pvm pvm-link coredrive test
 # sigelApp/ takes the plain build only, so a sanitized `make' does not fill it.
 ifeq ($(B),build)
 all: programs sigelApp
@@ -479,6 +481,16 @@ $(B)/coredrive: checks/programs/coredrive.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CO
 	 test -n "$$want" && test "$$got" = "$$want" || { \
 	   echo "coredrive linked the WRONG SIG_GPExperiment: constructor is $$got," \
 	        "Clean's is $$want -- see PORTING.md section 9." >&2; exit 1; }
+
+# The unit tests, with Qt Test. They link as coredrive does: the core modules,
+# the Clean SIG_GPExperiment and no GUI archive.
+test: $(B)/sigel_tests
+	$(B)/sigel_tests
+
+$(B)/sigel_tests: $(SRC)/tests/main.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS)
+	$(SIGCXX) $(SIGINC) -isystem $(QTINC)/QtTest $< $(MOC_OBJS_CORE) $(CLEAN_OBJ) -o $@ \
+	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
+	  -L$(QTLIB) -lQt6Test -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
 
 # ---------------------------------------------------------------------------
 # Does SIGEL's own PVM code link and run against real PVM? -- PORTING.md

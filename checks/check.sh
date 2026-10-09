@@ -1040,6 +1040,19 @@ rm -f /tmp/rc.$$ /tmp/rcb.$$
 printf '%-22s %2d pass  %2d fail\n' "robot check" "$rp" "$rf"
 pass=$((pass+rp)); fail=$((fail+rf))
 
+# ---------------------------------------------------------------------------
+# The unit tests in sigel/tests/: `make test' builds them and runs them.
+up=0; uf=0
+if ut=$(make -s -C "$ROOT" test 2>&1); then up=$((up+1))
+else
+    uf=$((uf+1))
+    echo "  make test fails:"
+    printf '%s\n' "$ut" | command grep -a -A4 'FAIL!' | head -40 | cut -c1-200 | sed 's/^/    /'
+    printf '%s\n' "$ut" | tail -6 | cut -c1-200 | sed 's/^/    /'
+fi
+printf '%-22s %2d pass  %2d fail\n' "unit tests" "$up" "$uf"
+pass=$((pass+up)); fail=$((fail+uf))
+
 rm -f /tmp/chk.$$ /tmp/hdr.$$.cpp /tmp/uic2.$$ /tmp/mkforms.$$
 rm -rf "$FORMSB"
 echo "-----"
