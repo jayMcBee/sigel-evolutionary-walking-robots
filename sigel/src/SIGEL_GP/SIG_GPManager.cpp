@@ -1083,8 +1083,6 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients()
 
 		pthread_mutex_unlock( &disconnectMutex );
 	}
-
-	fprintf(stderr, "SIGEL_GP::SIG_GPManager::RegisterDynPVMClients -- The server is exiting ! This should never ever happen ! !");
 }
 
 SIGEL_GP::SIG_GPManager::~SIG_GPManager()
