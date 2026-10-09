@@ -174,13 +174,6 @@ touched, because changing one changes behaviour against the reference binary.
   model, or on the `default:` branch, an uninitialised value is loaded. No shipped robot triggers
   any of them.
 
-- [ ] **74. Decide when to give up on a timed-out individual.**
-  `SIG_GPFitnessTrainer::checkTask` re-spawns it for ever, as 1.0 did, and
-  the probe-error branch does the same; on one
-  machine it will likely time out every time, and the generation does not
-  end. The shipped experiments set 0, 10 or 30 minutes. To decide: when to
-  give up, and what score it then gets.
-
 - [ ] **76. Warn when a mesh has negative volume.** Inverted face winding
   gives negative mass and inertia in `SIG_Mirtich::computePhysics`; the robot
   loads and the simulation runs into NaN. The robot check reports it as
