@@ -264,7 +264,7 @@ sigel/                                      the repo root
 │   ├── doc/                                2 Doxygen settings files, 2003
 │   ├── sigelLauncher  sigelDynClient       sigelDynClient: item 47
 │   ├── povrayLauncher                      renders the POV-Ray export
-│   └── COPYING  README  kdesigel.doxygen   upstream, 2003
+│   └── COPYING  README                     upstream, 2003
 ├── vendor/                                 third-party code and our fixes to it
 │   ├── patches/                            13 patches, applied by `make`
 │   ├── supportingLibs.tar.gz               tracked, so a clone builds offline
