@@ -159,22 +159,6 @@ touched, because changing one changes behaviour against the reference binary.
   experiments that select `ForceFitnessFunction` are affected; no shipped
   experiment does. No patch to the library touches this method.
 
-- [ ] **34. Fix `tearDownPvm()`: `pvm_halt()` never returns.** The daemon
-  SIGTERMs this process instead. `guidrive` survives that with
-  `keepExitCodeThroughPvmShutdown`.
-  **Open:** once that handler holds a status of 0, the process reports 0 for
-  any SIGTERM, including a person killing a wedged `guidrive`. A teardown
-  flag, or preserving only a non-zero status, closes it.
-  **Do not simply delete the call:** it is what stops the daemon this process
-  started; dropping it left `pvmd3` and its slaves running. With a daemon
-  already up there is no halt and no problem. No stray `pvmd3` survives PVM's
-  own shutdown, so today's behaviour is safe, only untidy. Matters before `check.sh` ever
-  runs a PVM scenario.
-  *Any printf on an early-return path here is lost unless it flushes itself.*
-  **Closing `sigel` with SIGTERM does not end it either:** in the one
-  measured run, `sigelStandardSignalHandler` called `pvm_halt()` twice and
-  the process stayed until SIGKILL.
-
 - [ ] **61. Decide whether to un-transpose the terrain.**
   `SIG_Environment::generateTerrain` and DynaMechs'
   `dmEnvironment::loadTerrainData` disagree on row order, so a floor whose X
