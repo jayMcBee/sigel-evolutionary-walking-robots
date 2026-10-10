@@ -253,7 +253,13 @@ void SIG_ExperimentListView::slotCloneExperiment()
   SIGEL_GP::SIG_GPExperiment fresh;
   {
     QTextStream copyIn( &copy, QIODevice::ReadOnly );
-    fresh.loadExperiment( copyIn );
+    try {
+        fresh.loadExperiment( copyIn );
+    }
+    catch ( const SIGEL_Tools::SIG_Exception &e ) {
+        QMessageBox::warning( this, "Clone Experiment (Empty Pool)", "The experiment could not be cloned:\n\n" + e.getMessage() );
+        return;
+    }
   }
 
   // No individuals, generation 0, no history: filled like a new experiment.
