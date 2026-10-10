@@ -549,7 +549,8 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
 
   if((pos=indStr.indexOf("NAME='", 0, Qt::CaseInsensitive))!=-1)
     {
-      setName(indStr.mid(pos+6,indStr.indexOf("'", pos+7, Qt::CaseInsensitive)-pos-6));
+      long endPos=indStr.indexOf("'", pos+7, Qt::CaseInsensitive);
+      setName(indStr.mid(pos+6,endPos-pos-6));
     }
   else
     {
@@ -557,7 +558,8 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
 
   if((pos=indStr.indexOf("POOLPOS=", 0, Qt::CaseInsensitive))!=-1)
     {
-      setPoolPos((indStr.mid(pos+8,indStr.indexOf(";", pos+9, Qt::CaseInsensitive)-pos-8)).toLong());
+      long endPos=indStr.indexOf(";", pos+9, Qt::CaseInsensitive);
+      setPoolPos((indStr.mid(pos+8,endPos-pos-8)).toLong());
     }
   else
     {
@@ -565,7 +567,8 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
 
   if((pos=indStr.indexOf("FITNESS=", 0, Qt::CaseInsensitive))!=-1)
     {
-      setFitness((indStr.mid(pos+8,indStr.indexOf(";", pos+9, Qt::CaseInsensitive)-pos-8)).toDouble());
+      long endPos=indStr.indexOf(";", pos+9, Qt::CaseInsensitive);
+      setFitness((indStr.mid(pos+8,endPos-pos-8)).toDouble());
     }
   else
     {
@@ -573,7 +576,8 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
 
   if((pos=indStr.indexOf("AGE=", 0, Qt::CaseInsensitive))!=-1)
     {
-      setAge((indStr.mid(pos+4,indStr.indexOf(";", pos+5, Qt::CaseInsensitive)-pos-4)).toLong());
+      long endPos=indStr.indexOf(";", pos+5, Qt::CaseInsensitive);
+      setAge((indStr.mid(pos+4,endPos-pos-4)).toLong());
     }
   else
     {
@@ -581,7 +585,8 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
   
   if((pos=indStr.indexOf("PROGRAM BEGIN{", 0, Qt::CaseInsensitive))!=-1)
     {
-      prgStr=indStr.mid(pos+15,indStr.indexOf("}PROGRAM END", pos+16, Qt::CaseInsensitive)-pos-14);
+      long endPos=indStr.indexOf("}PROGRAM END", pos+16, Qt::CaseInsensitive);
+      prgStr=indStr.mid(pos+15,endPos-pos-14);
       getProgramPointer()->readFromFile(inputFile);
     }
   else
@@ -590,7 +595,8 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
   
   if((pos=indStr.indexOf("HISTORY BEGIN{", 0, Qt::CaseInsensitive))!=-1)
     {
-       histStr=indStr.mid(pos+14,indStr.indexOf("}HISTORY END", pos+15, Qt::CaseInsensitive)-pos-14).trimmed();
+       long endPos=indStr.indexOf("}HISTORY END", pos+15, Qt::CaseInsensitive);
+       histStr=indStr.mid(pos+14,endPos-pos-14).trimmed();
        history.append(histStr);
     }
   else
