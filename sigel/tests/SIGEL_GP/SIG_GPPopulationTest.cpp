@@ -257,8 +257,8 @@ void SIGEL_GP::SIG_GPPopulationTest::bestWorstAndAverageUseOnlySimulatedFitnessV
   population.getIndividualPointer( 1 )->setFitness( 5.0 );
   population.getIndividualPointer( 3 )->setFitness( 2.0 );
 
-  QCOMPARE( population.getBestFitness( true ), 5.0 );
-  QCOMPARE( population.getWorstFitness( true ), 2.0 );
+  QCOMPARE( population.getBestFitness(), 5.0 );
+  QCOMPARE( population.getWorstFitness(), 2.0 );
   QCOMPARE( population.getAverageFitness(), 3.5 );
 }
 

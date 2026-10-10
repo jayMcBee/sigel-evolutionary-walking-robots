@@ -473,7 +473,7 @@ void SIGEL_GP::SIG_GPPopulation::writeToFile(QTextStream &file)
 	file<<"\n\n}POPULATION END";
 }
 
-double SIGEL_GP::SIG_GPPopulation::getBestFitness(bool high)
+double SIGEL_GP::SIG_GPPopulation::getBestFitness()
 {
 	// take only the simulated values into account
 	// the estimated fitness values are < -2
@@ -488,12 +488,7 @@ double SIGEL_GP::SIG_GPPopulation::getBestFitness(bool high)
 			double actFitness = getIndividualPointer( i )->getFitness();
 
 			if(actFitness >= 0.0)
-			{
-				if (high)
-					bestFitness = ( actFitness > bestFitness ) ? actFitness : bestFitness;
-				else
-					bestFitness = ( actFitness < bestFitness ) ? actFitness : bestFitness;
-			}
+				bestFitness = ( actFitness > bestFitness ) ? actFitness : bestFitness;
 		};
 
 		return bestFitness;
@@ -508,7 +503,7 @@ void SIGEL_GP::SIG_GPPopulation::resetAllFitnessValues()
 		pool[ counter ]->setFitness( -1 );
 };
 
-double SIGEL_GP::SIG_GPPopulation::getWorstFitness(bool high)
+double SIGEL_GP::SIG_GPPopulation::getWorstFitness()
 {
 	// take only the simulated values into account
 	// the estimated fitness values are < -2
@@ -523,12 +518,7 @@ double SIGEL_GP::SIG_GPPopulation::getWorstFitness(bool high)
 			double actFitness = getIndividualPointer( i )->getFitness();
 
 			if(actFitness >= 0.0)
-			{
-				if (high)
-					worstFitness = ( actFitness < worstFitness ) ? actFitness : worstFitness;
-				else
-					worstFitness = ( actFitness > worstFitness ) ? actFitness : worstFitness;
-			}
+				worstFitness = ( actFitness < worstFitness ) ? actFitness : worstFitness;
 		};
 
 		return worstFitness;

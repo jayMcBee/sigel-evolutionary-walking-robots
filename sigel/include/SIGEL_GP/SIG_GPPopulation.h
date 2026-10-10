@@ -374,17 +374,15 @@ class SIG_GPPopulation
 			      SIGEL_GP::SIG_GPParameter& gpParameter, 
 			      SIGEL_Robot::SIG_LanguageParameters& languageParameters);
     
-    /** 
-     * This function searches for the best fitness within the population. It returns the best found fitness and the position
-     * of the intdividual the fitness belongs to. HIGH = TRUE defines a high fitness to be a better fitness. Vice versa, 
-     * HIGH=FALSE defines a low fitness to be better fitness.
+    /**
+     * The highest fitness of the individuals that have one, or 0.
      */
 
   public:
-    double getBestFitness(bool high);
+    double getBestFitness();
 
   public:
-    double getWorstFitness(bool high);
+    double getWorstFitness();
 
   public:
     double getAverageFitness();

@@ -839,8 +839,8 @@ void SIGEL_GP::SIG_GPManager::run()
 
 		int poolGenerationNo = currentExperiment.population.poolGeneration;
 		QDateTime generationBreak = QDateTime::currentDateTime();
-		double bestFitness = currentExperiment.population.getBestFitness( true );
-		double minFitness = currentExperiment.population.getWorstFitness( true );
+		double bestFitness = currentExperiment.population.getBestFitness();
+		double minFitness = currentExperiment.population.getWorstFitness();
 		double averageFitness = currentExperiment.population.getAverageFitness();
 		// write the stats of the evolution into a history
 		SIG_GPExperimentHistoryEntry *newExpHistEntry = new SIG_GPExperimentHistoryEntry( poolGenerationNo,
@@ -1036,8 +1036,8 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 		int poolGenerationNo = currentExperiment.population.poolGeneration;
 		QDateTime generationBreak = QDateTime::currentDateTime();
-		double bestFitness = currentExperiment.population.getBestFitness( true );
-		double minFitness = currentExperiment.population.getWorstFitness( true );
+		double bestFitness = currentExperiment.population.getBestFitness();
+		double minFitness = currentExperiment.population.getWorstFitness();
 
 		// In the meta-classifier approach the average fitness is computed over those
 		// SIG_Individuals whose fitness was computed exactly, by simulation
