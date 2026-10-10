@@ -29,6 +29,10 @@ the directory "sigelApp", from which SIGEL is started, with:
 - the subdirectories pixmaps and textures
 - the subdirectory supportingLibs/pvm3, a link to the PVM that was built
 
+To build and run the unit tests in the directory "sigel/tests", which use Qt Test, run
+
+make test
+
 2. Getting SIGEL to work
 
 Start SIGEL in the directory "sigelApp" with the script "sigelLauncher":
