@@ -304,19 +304,25 @@ bool SIGEL_GP::SIG_GPPopulation::importNewIndividual( QString& filename )
 	if( lastPos >= maximumSize )
 		return false;
 
-	pool.resize( lastPos + 1 );
-
 	SIG_GPIndividual *newInd = new SIG_GPIndividual();
 
-	newInd->importIndividual( filename );
+	try
+	{
+		newInd->importIndividual( filename );
+	}
+	catch( ... )
+	{
+		delete newInd;
+		throw;
+	}
+
 	newInd->setName( getNextIdentifier() );
 	newInd->setPoolPos( lastPos );
 
 	// we don't know where this individual came from -> void fitness !
 	newInd->setFitness(-1.0);
 
-	delete pool[ lastPos ];
-	pool[ lastPos ] = newInd;
+	pool.append( newInd );
 	return true;
 }
 
