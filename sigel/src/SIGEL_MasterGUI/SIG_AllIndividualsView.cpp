@@ -468,10 +468,17 @@ void SIG_AllIndividualsView::slotImportIndividual()
   QString fileName = QFileDialog::getOpenFileName( this, "Import Individual", QString(), "Individual Files (*.ind);;All Files (*)" );
   if( !fileName.isEmpty() )
     {
-      if( !theExperiment.population.importNewIndividual( fileName ) )
+      try
         {
-          QString message = QString( "Nothing imported: the pool is limited to %1." ).arg( SIGEL_GP::SIG_GPPopulation::maximumSize );
-          QMessageBox::information( this, "Pool Full", message );
+          if( !theExperiment.population.importNewIndividual( fileName ) )
+            {
+              QString message = QString( "Nothing imported: the pool is limited to %1." ).arg( SIGEL_GP::SIG_GPPopulation::maximumSize );
+              QMessageBox::information( this, "Pool Full", message );
+            }
+        }
+      catch ( const SIGEL_Tools::SIG_Exception &e )
+        {
+          QMessageBox::warning( this, "Import Individual", e.getMessage() );
         }
     }
   slotCompleteRefreshList(); // can be done more efficiently!!!
