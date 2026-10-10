@@ -115,10 +115,8 @@ namespace SIGEL_Robot
     void addMaterial (SIG_Material *m);
     /**
      * Adds a SIG_Link object.
-     *
-     * @param islink This is deprecated. Use setRootLink instead.
      */
-    void addLink (SIG_Link *l, bool islink = false);
+    void addLink (SIG_Link *l);
     /**
      * Adds a SIG_Joint object (or one of its descendants).
      */

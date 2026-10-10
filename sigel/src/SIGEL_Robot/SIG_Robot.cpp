@@ -103,13 +103,9 @@ namespace SIGEL_Robot {
                 materials.append (m);
         }
 
-        void SIG_Robot::addLink (SIG_Link *l, bool isroot)
+        void SIG_Robot::addLink (SIG_Link *l)
         {
                 links.append (l);
-                if (isroot) {
-                        // Something seems to be missing here, but I no longer
-                        // have the faintest idea what.
-                }
         }
 
         void SIG_Robot::addJoint (SIG_Joint *j)
