@@ -1117,6 +1117,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   trace lines to the error output for each object, 3,600 lines in one run
   of `MT_SearchTest`. They are deleted, with the `#include <iostream>` that
   only they used. All five checks passed with this change in the tree.
+- **Found by the tests:** `SIG_GPPopulation::getWorstFitness` gave 0 if
+  the first individual had no fitness and a later one had. The unused
+  parameter `bool high` of `getBestFitness` and `getWorstFitness` is
+  deleted; each call passed `true`. The best, the worst and the average
+  fitness now come from one private method,
+  `getFitnessValuesOfSimulatedIndividuals`, with `std::max_element`,
+  `std::min_element` and sum divided by count. Three tests are new; one of
+  them failed with the old code. All five checks passed.
 - **Not done:** with `-o file`, each test class writes the same file
   again, so the file holds the last class only. `make test` does not use
   `-o`.
