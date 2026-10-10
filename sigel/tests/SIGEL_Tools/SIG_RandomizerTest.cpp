@@ -25,6 +25,7 @@
 
 #include "SIGEL_Tools/SIG_Randomizer.h"
 
+#include <QTime>
 #include <QtTest>
 
 void SIGEL_Tools::SIG_RandomizerTest::sameSeedGivesSameNumbers()
@@ -66,6 +67,31 @@ void SIGEL_Tools::SIG_RandomizerTest::setNewSeedAfterTheDefaultConstructorGivesT
   QCOMPARE( randomizer.getRandomInt( 32768 ), 16838 );
 }
 
+void SIGEL_Tools::SIG_RandomizerTest::defaultConstructorTakesTheSecondsSinceMidnightAsSeed()
+{
+  for ( int attempt = 0; attempt < 20; attempt++ )
+    {
+      int secondsBefore = QTime( 0, 0 ).secsTo( QTime::currentTime() );
+      SIG_Randomizer randomizer;
+      int secondsAfter = QTime( 0, 0 ).secsTo( QTime::currentTime() );
+
+      // The second changes between the two readings, or it is midnight,
+      // where the seed 0 means the time of day again.
+      if ( secondsBefore != secondsAfter || secondsBefore == 0 )
+        {
+          QTest::qSleep( 100 );
+          continue;
+        }
+
+      SIG_Randomizer expected( secondsBefore );
+      QCOMPARE( randomizer.getRandomInt( 32768 ), expected.getRandomInt( 32768 ) );
+      QCOMPARE( randomizer.getRandomInt( 32768 ), expected.getRandomInt( 32768 ) );
+      return;
+    }
+
+  QFAIL( "The clock gives no two equal readings." );
+}
+
 void SIGEL_Tools::SIG_RandomizerTest::numberIsBelowMaximum()
 {
   SIG_Randomizer randomizer( 42 );
@@ -85,6 +111,7 @@ void SIGEL_Tools::SIG_RandomizerTest::maximumZeroGivesZero()
   QCOMPARE( randomizer.getRandomInt( 0 ), 0 );
 }
 
+// A change here gives each seed another run.
 void SIGEL_Tools::SIG_RandomizerTest::maximumZeroMovesTheGeneratorOn()
 {
   SIG_Randomizer reference( 42 );
@@ -97,6 +124,7 @@ void SIGEL_Tools::SIG_RandomizerTest::maximumZeroMovesTheGeneratorOn()
   QCOMPARE( randomizer.getRandomInt( 1000 ), secondNumber );
 }
 
+// A change here gives each seed another run.
 void SIGEL_Tools::SIG_RandomizerTest::getRandomLongGivesTheNumberOfGetRandomInt()
 {
   SIG_Randomizer first( 42 );
@@ -105,8 +133,15 @@ void SIGEL_Tools::SIG_RandomizerTest::getRandomLongGivesTheNumberOfGetRandomInt(
   QCOMPARE( first.getRandomLong( 1000 ), static_cast<long>( second.getRandomInt( 1000 ) ) );
 }
 
+void SIGEL_Tools::SIG_RandomizerTest::getRandomLongWithMaximumZeroGivesZero()
+{
+  SIG_Randomizer randomizer( 42 );
+
+  QCOMPARE( randomizer.getRandomLong( 0 ), 0L );
+}
+
 // Four numbers: the first one alone does not show a small change of the
-// multiplier or the increment.
+// multiplier or the increment. A change here gives each seed another run.
 void SIGEL_Tools::SIG_RandomizerTest::seedOneGivesKnownNumbers()
 {
   SIG_Randomizer randomizer( 1 );
@@ -118,7 +153,8 @@ void SIGEL_Tools::SIG_RandomizerTest::seedOneGivesKnownNumbers()
 }
 
 // A maximum that is not a power of two: the numbers also depend on the mask
-// and on the remainder of the division by the maximum.
+// and on the remainder of the division by the maximum. A change here gives
+// each seed another run.
 void SIGEL_Tools::SIG_RandomizerTest::seedFortyTwoGivesKnownNumbersBelowOneThousand()
 {
   SIG_Randomizer randomizer( 42 );

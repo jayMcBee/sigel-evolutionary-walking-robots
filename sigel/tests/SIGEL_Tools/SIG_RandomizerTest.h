@@ -46,6 +46,8 @@ namespace SIGEL_Tools
 
     void setNewSeedAfterTheDefaultConstructorGivesTheNumbersOfTheSeed();
 
+    void defaultConstructorTakesTheSecondsSinceMidnightAsSeed();
+
     void numberIsBelowMaximum();
 
     void maximumZeroGivesZero();
@@ -53,6 +55,8 @@ namespace SIGEL_Tools
     void maximumZeroMovesTheGeneratorOn();
 
     void getRandomLongGivesTheNumberOfGetRandomInt();
+
+    void getRandomLongWithMaximumZeroGivesZero();
 
     void seedOneGivesKnownNumbers();
 

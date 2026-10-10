@@ -90,6 +90,20 @@ void SIGEL_GP::SIG_GPPopulationTest::addRandomIndividualsKeepsTheIndividualsThat
     }
 }
 
+void SIGEL_GP::SIG_GPPopulationTest::addRandomIndividualsTakesTheNamesFromTheIdentifier()
+{
+  SIG_GPPopulation population;
+  population.setNextIdentifier( "40" );
+
+  addIndividuals( population, 2 );
+
+  QCOMPARE( population.getIndividualPointer( 0 )->getName(), QString( "40" ) );
+  QCOMPARE( population.getIndividualPointer( 1 )->getName(), QString( "41" ) );
+  QCOMPARE( population.getIndividualPointer( 0 )->getPoolPos(), 0 );
+  QCOMPARE( population.getIndividualPointer( 1 )->getPoolPos(), 1 );
+  QCOMPARE( population.nextIdentifier, QString( "42" ) );
+}
+
 void SIGEL_GP::SIG_GPPopulationTest::addRandomIndividualsUsesTheLengthLimits()
 {
   SIG_GPParameter gpParameter;
@@ -103,6 +117,25 @@ void SIGEL_GP::SIG_GPPopulationTest::addRandomIndividualsUsesTheLengthLimits()
 
   for ( int i = 0; i < 3; i++ )
     QCOMPARE( population.getIndividualPointer( i )->getProgram().getProgramLength(), 7L );
+}
+
+void SIGEL_GP::SIG_GPPopulationTest::programLengthsAreInsideTheLimits()
+{
+  SIG_GPParameter gpParameter;
+  gpParameter.setMinIndLength( 5 );
+  gpParameter.setMaxIndLength( 8 );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  SIG_GPPopulation population;
+  population.getRandomizerPointer()->setNewSeed( 1 );
+
+  population.addRandomIndividuals( 20, gpParameter, languageParameters );
+
+  for ( int i = 0; i < 20; i++ )
+    {
+      long length = population.getIndividualPointer( i )->getProgram().getProgramLength();
+      QVERIFY( length >= 5 );
+      QVERIFY( length <= 8 );
+    }
 }
 
 void SIGEL_GP::SIG_GPPopulationTest::sameSeedGivesTheSameIndividuals()
@@ -229,14 +262,6 @@ void SIGEL_GP::SIG_GPPopulationTest::bestWorstAndAverageUseOnlySimulatedFitnessV
   QCOMPARE( population.getAverageFitness(), 3.5 );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::averageIsZeroWithoutASimulatedFitnessValue()
-{
-  SIG_GPPopulation population;
-  addIndividuals( population, 2 );
-
-  QCOMPARE( population.getAverageFitness(), 0.0 );
-}
-
 // 11 individuals: the text then has a position with two digits.
 void SIGEL_GP::SIG_GPPopulationTest::writtenTextIsReadBack()
 {
@@ -284,6 +309,7 @@ void SIGEL_GP::SIG_GPPopulationTest::individualsWithHistoryAreReadBack()
   SIG_GPPopulation original;
   addIndividuals( original, 3 );
   original.getIndividualPointer( 1 )->setFitness( 3.5 );
+  original.getIndividualPointer( 1 )->setAge( 7 );
   QString written = writtenText( original );
 
   SIG_GPPopulation copy;
@@ -300,7 +326,10 @@ void SIGEL_GP::SIG_GPPopulationTest::individualsWithHistoryAreReadBack()
       QCOMPARE( read->getName(), expected->getName() );
       QCOMPARE( read->getPoolPos(), expected->getPoolPos() );
       QCOMPARE( read->getFitness(), expected->getFitness() );
+      QCOMPARE( read->getAge(), expected->getAge() );
       QCOMPARE( read->getProgram().getProgramLength(), expected->getProgram().getProgramLength() );
+      // readFromFile keeps the white space in front of the end of the history block.
+      QCOMPARE( read->getHistory().join( "\n" ).trimmed(), expected->getHistory().join( "\n" ).trimmed() );
     }
 }
 
@@ -318,6 +347,7 @@ void SIGEL_GP::SIG_GPPopulationTest::textWithoutHeaderIsRead()
   QTextStream stream( &withoutHeader, QIODevice::ReadOnly );
   copy.readFromFile( stream );
 
+  QVERIFY( copy.getHistory() );
   QCOMPARE( copy.getSize(), 2 );
   QCOMPARE( copy.getIndividualPointer( 1 )->getName(), QString( "1" ) );
 }

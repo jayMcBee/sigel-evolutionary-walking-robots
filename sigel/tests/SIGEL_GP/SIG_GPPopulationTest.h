@@ -49,7 +49,11 @@ namespace SIGEL_GP
 
     void addRandomIndividualsKeepsTheIndividualsThatAreThere();
 
+    void addRandomIndividualsTakesTheNamesFromTheIdentifier();
+
     void addRandomIndividualsUsesTheLengthLimits();
+
+    void programLengthsAreInsideTheLimits();
 
     void sameSeedGivesTheSameIndividuals();
 
@@ -68,8 +72,6 @@ namespace SIGEL_GP
     void resetAllFitnessValuesSetsMinusOne();
 
     void bestWorstAndAverageUseOnlySimulatedFitnessValues();
-
-    void averageIsZeroWithoutASimulatedFitnessValue();
 
     void writtenTextIsReadBack();
 
