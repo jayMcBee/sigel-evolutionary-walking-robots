@@ -264,9 +264,7 @@ touched, because changing one changes behaviour against the reference binary.
   `<pre>` wrapper, one `<span>` per token, a line number per line. Colour
   opcodes by group: arithmetic `ADD SUB MUL DIV MOD MIN MAX`, data
   `COPY LOAD`, control `CMP JMP`, robot `MOVE SENSE DELAY`; `NOP` has no
-  group yet. Registers print as
-  `R0`–`R7`, computed as `element % getMemorySize()`; `LOAD` operand 2 and
-  `JMP` operand 1 print as literals. Callers: `SIG_SimulationWidget::visualizeThis`,
+  group yet. Callers: `SIG_SimulationWidget::visualizeThis`,
   `SIG_IndividualView::SIG_IndividualView`,
   `SIG_AllIndividualsView::slotSelectionChanged`.
 
@@ -397,7 +395,57 @@ problem; the choice is made before any code is written.
 
 ---
 
-## 8 · Removals
+## 8 · The robot language
+
+- [ ] **156. `MOD` gives a wrong result for a negative value that the divisor divides exactly.**
+  `SIG_Register::modReg` gives |divisor| there, not 0: -4 MOD 2 is 2. The
+  result must be from 0 to |divisor| - 1.
+
+- [ ] **157. A negative register operand picks the wrong register when the memory size is not a power of two.**
+  `SIG_Interpreter::interprete` takes the operand modulo the number of
+  registers as an unsigned number. With 6 registers, operand -1 is register
+  3, not 5.
+
+- [ ] **158. `remainingLastCommandTime` is subtracted twice.**
+  `SIG_Interpreter::interprete` subtracts it from `timeAccountSize` and
+  does not clear it. When that call ends at exactly 0, the next call
+  subtracts it again.
+
+- [ ] **159. A program line with a bad operand is read as an instruction with 0.**
+  `SIG_ProgramLine::readFromFile` reads an operand that is missing or is
+  not a number as 0, with no message: `ADD 1,2 # note` becomes `ADD 1,0`.
+  Such a line must give an error.
+
+- [ ] **160. The conditional instructions are `CMP`, `JLE` and `JMP`.**
+  Today `JMP n` jumps only when `CMP` has set the compare flag, and no
+  instruction jumps always. The set becomes:
+
+  | Instruction | Meaning |
+  |---|---|
+  | `CMP a,b` | Sets the compare flag when register a <= register b. Unchanged. |
+  | `JLE n` | Jumps n lines when the compare flag is set. Today's `JMP`. |
+  | `JMP n` | Jumps n lines always. |
+
+- [ ] **161. A jump to a line before line 0 goes to the wrong line.**
+  `SIG_Interpreter::interprete` negates a negative target: in a program of
+  6 lines, `JMP -6` on line 1 goes to line 4. The target must wrap from the
+  end of the program, as a target past the last line wraps from the start:
+  line 2.
+
+- [ ] **162. Two buttons for two sets of default instruction probabilities.**
+  On the GP parameters page: one sets all probabilities equal, one sets
+  the conditional instructions `CMP`, `JLE` and `JMP` (item 160) lower than
+  the others.
+
+- [ ] **163. Draw each operand from 32768 values, not 32000.**
+  `SIG_ProgramLine::randomRobotinstruction` and `SIG_GPOperations::mutation`
+  call `getRandomInt( 32000 )`. `SIG_Randomizer` makes 0 to 32767 and takes
+  it modulo 32000, so the values 0 to 767 are drawn twice as often as the
+  others.
+
+---
+
+## 9 · Removals
 
 - [ ] **83. Put ZORC support behind a compile-time switch, off by default.**
   Decided. ZORC is a real robot driven over a serial line; the simulation does
