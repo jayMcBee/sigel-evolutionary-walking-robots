@@ -21,8 +21,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_GP_SIG_GPPOPULATIONTEST_H
-#define SIGEL_GP_SIG_GPPOPULATIONTEST_H
+#ifndef SIGEL_GP_TST_SIG_GPPOPULATION_H
+#define SIGEL_GP_TST_SIG_GPPOPULATION_H
 
 #include <QObject>
 #include <QString>
@@ -35,7 +35,7 @@ namespace SIGEL_GP
   /**
    * The unit tests of SIG_GPPopulation.
    */
-  class SIG_GPPopulationTest : public QObject
+  class TST_SIG_GPPopulation : public QObject
   {
     Q_OBJECT
 
@@ -117,4 +117,4 @@ namespace SIGEL_GP
 
 }
 
-#endif // SIGEL_GP_SIG_GPPOPULATIONTEST_H
+#endif // SIGEL_GP_TST_SIG_GPPOPULATION_H

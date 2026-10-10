@@ -21,48 +21,52 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_TOOLS_SIG_RANDOMIZERTEST_H
-#define SIGEL_TOOLS_SIG_RANDOMIZERTEST_H
+#ifndef SIGEL_GP_TST_SIG_GPINDIVIDUAL_H
+#define SIGEL_GP_TST_SIG_GPINDIVIDUAL_H
 
 #include <QObject>
+#include <QString>
 
-namespace SIGEL_Tools
+#include <memory>
+
+namespace SIGEL_GP
 {
 
+  class SIG_GPIndividual;
+
   /**
-   * The unit tests of SIG_Randomizer.
+   * The unit tests of SIG_GPIndividual.
    */
-  class SIG_RandomizerTest : public QObject
+  class TST_SIG_GPIndividual : public QObject
   {
     Q_OBJECT
 
   private slots:
 
-    void sameSeedGivesSameNumbers();
+    void writtenTextIsReadBack();
 
-    void differentSeedsGiveDifferentNumbers();
+    void writtenTextWithoutHistoryHasNoHistoryBlock();
 
-    void setNewSeedStartsTheNumbersAgain();
+    void textWithoutHistoryBlockIsRead();
 
-    void setNewSeedAfterTheDefaultConstructorGivesTheNumbersOfTheSeed();
+    void historyIsReadBack();
 
-    void defaultConstructorTakesTheSecondsSinceMidnightAsSeed();
+    void historyWithALineBreakAtTheStartIsTheSameAfterTheFirstLoad();
 
-    void numberIsBelowMaximum();
+    void historyWithoutLineBreakAtTheStartIsRead();
 
-    void maximumZeroGivesZero();
+    void textWithoutARequiredFieldIsRefused_data();
 
-    void maximumZeroMovesTheGeneratorOn();
+    void textWithoutARequiredFieldIsRefused();
 
-    void getRandomLongGivesTheNumberOfGetRandomInt();
+  private:
 
-    void getRandomLongWithMaximumZeroGivesZero();
+    // Sets the seed first: without it the program depends on the time of day.
+    std::unique_ptr< SIG_GPIndividual > randomIndividual();
 
-    void seedOneGivesKnownNumbers();
-
-    void seedFortyTwoGivesKnownNumbersBelowOneThousand();
+    QString writtenText( SIG_GPIndividual &individual, bool withHistory );
   };
 
 }
 
-#endif // SIGEL_TOOLS_SIG_RANDOMIZERTEST_H
+#endif // SIGEL_GP_TST_SIG_GPINDIVIDUAL_H

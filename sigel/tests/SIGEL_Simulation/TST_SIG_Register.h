@@ -21,52 +21,34 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_GP_SIG_GPINDIVIDUALTEST_H
-#define SIGEL_GP_SIG_GPINDIVIDUALTEST_H
+#ifndef SIGEL_SIMULATION_TST_SIG_REGISTER_H
+#define SIGEL_SIMULATION_TST_SIG_REGISTER_H
 
 #include <QObject>
-#include <QString>
 
-#include <memory>
-
-namespace SIGEL_GP
+namespace SIGEL_Simulation
 {
 
-  class SIG_GPIndividual;
-
   /**
-   * The unit tests of SIG_GPIndividual.
+   * The unit tests of SIG_Register.
    */
-  class SIG_GPIndividualTest : public QObject
+  class TST_SIG_Register : public QObject
   {
     Q_OBJECT
 
   private slots:
 
-    void writtenTextIsReadBack();
+    void newRegisterHasValueZeroAndItsWidth();
 
-    void writtenTextWithoutHistoryHasNoHistoryBlock();
+    void constructorRefusesWidthOutsideOneToSixteen();
 
-    void textWithoutHistoryBlockIsRead();
+    void getMinValueAndGetMaxValueGiveTheRange();
 
-    void historyIsReadBack();
+    void loadValueWrapsToTheWidth_data();
 
-    void historyWithALineBreakAtTheStartIsTheSameAfterTheFirstLoad();
-
-    void historyWithoutLineBreakAtTheStartIsRead();
-
-    void textWithoutARequiredFieldIsRefused_data();
-
-    void textWithoutARequiredFieldIsRefused();
-
-  private:
-
-    // Sets the seed first: without it the program depends on the time of day.
-    std::unique_ptr< SIG_GPIndividual > randomIndividual();
-
-    QString writtenText( SIG_GPIndividual &individual, bool withHistory );
+    void loadValueWrapsToTheWidth();
   };
 
 }
 
-#endif // SIGEL_GP_SIG_GPINDIVIDUALTEST_H
+#endif // SIGEL_SIMULATION_TST_SIG_REGISTER_H

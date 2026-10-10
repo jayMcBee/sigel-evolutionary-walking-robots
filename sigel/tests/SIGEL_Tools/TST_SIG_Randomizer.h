@@ -21,48 +21,48 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_ROBOT_SIG_LANGUAGEPARAMETERSTEST_H
-#define SIGEL_ROBOT_SIG_LANGUAGEPARAMETERSTEST_H
+#ifndef SIGEL_TOOLS_TST_SIG_RANDOMIZER_H
+#define SIGEL_TOOLS_TST_SIG_RANDOMIZER_H
 
 #include <QObject>
 
-namespace SIGEL_Robot
+namespace SIGEL_Tools
 {
 
   /**
-   * The unit tests of SIG_LanguageParameters.
+   * The unit tests of SIG_Randomizer.
    */
-  class SIG_LanguageParametersTest : public QObject
+  class TST_SIG_Randomizer : public QObject
   {
     Q_OBJECT
 
   private slots:
 
-    void defaultConstructorGivesTheStandardLanguage();
+    void sameSeedGivesSameNumbers();
 
-    void settersChangeTheValues();
+    void differentSeedsGiveDifferentNumbers();
 
-    void hasCommandFindsOnlyAKnownName();
+    void setNewSeedStartsTheNumbersAgain();
 
-    void removeCommandRemovesTheCommand();
+    void setNewSeedAfterTheDefaultConstructorGivesTheNumbersOfTheSeed();
 
-    void removeCommandLeavesTheOtherCommands();
+    void defaultConstructorTakesTheSecondsSinceMidnightAsSeed();
 
-    void removeCommandWithUnknownNameChangesNothing();
+    void numberIsBelowMaximum();
 
-    void writeToFileTransferWritesTheCommandsInOrder();
+    void maximumZeroGivesZero();
 
-    void writtenTextIsReadBack();
+    void maximumZeroMovesTheGeneratorOn();
 
-    void streamInARobotHasNoToken();
+    void getRandomLongGivesTheNumberOfGetRandomInt();
 
-    void wrongTokenThrows();
+    void getRandomLongWithMaximumZeroGivesZero();
 
-    void registerWidthOutsideOneToSixteenThrows();
+    void seedOneGivesKnownNumbers();
 
-    void registerWidthOneAndSixteenAreAccepted();
+    void seedFortyTwoGivesKnownNumbersBelowOneThousand();
   };
 
 }
 
-#endif // SIGEL_ROBOT_SIG_LANGUAGEPARAMETERSTEST_H
+#endif // SIGEL_TOOLS_TST_SIG_RANDOMIZER_H

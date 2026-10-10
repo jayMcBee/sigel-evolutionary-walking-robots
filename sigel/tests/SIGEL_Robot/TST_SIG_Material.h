@@ -21,8 +21,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_ROBOT_SIG_ROBOTTEST_H
-#define SIGEL_ROBOT_SIG_ROBOTTEST_H
+#ifndef SIGEL_ROBOT_TST_SIG_MATERIAL_H
+#define SIGEL_ROBOT_TST_SIG_MATERIAL_H
 
 #include <QObject>
 
@@ -30,17 +30,19 @@ namespace SIGEL_Robot
 {
 
   /**
-   * The unit tests of SIG_Robot.
+   * The unit tests of SIG_Material.
    */
-  class SIG_RobotTest : public QObject
+  class TST_SIG_Material : public QObject
   {
     Q_OBJECT
 
   private slots:
 
-    void lookupFindsEachKindOfPartByName();
+    void setFrictionValueSetsAndUpdatesBothPartners();
+
+    void materialReadFromStreamKeepsOnlyALoadedPartner();
   };
 
 }
 
-#endif // SIGEL_ROBOT_SIG_ROBOTTEST_H
+#endif // SIGEL_ROBOT_TST_SIG_MATERIAL_H

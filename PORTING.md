@@ -1084,9 +1084,10 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   ran both, and both again under LeakSanitizer.
 - **Now:** `make test` builds `build/sigel_tests` and runs it. The tests
   are in `sigel/tests/`, one folder for each module and one test class for
-  each class under test, named after it: `SIG_RandomizerTest`,
-  `SIG_LanguageParametersTest`, `SIG_LinkTest`, `SIG_RobotTest`,
-  `SIG_MaterialTest`, `SIG_GPPopulationTest` and `MT_SearchTest`. A test
+  each class under test, named after it with the prefix `TST_`, which
+  marks test code: `TST_SIG_Randomizer`,
+  `TST_SIG_LanguageParameters`, `TST_SIG_Link`, `TST_SIG_Robot`,
+  `TST_SIG_Material`, `TST_SIG_GPPopulation` and `TST_MT_Search`. A test
   uses public methods only, and nothing in `sigel/src/` changed for the
   tests. `main.cpp` runs each class with `QTest::qExec`, prints one summary
   line and has no application object, because with one
@@ -1103,10 +1104,10 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   `fitness-check.sh` on both builds. A wrong expected value, a leak in a
   test and a test class that `main.cpp` does not name were each made on
   purpose once, and each one failed as it must.
-- **Extended:** an independent assessment found `SIG_RandomizerTest` and
-  `SIG_LanguageParametersTest` not complete. `SIG_RandomizerTest` now has
+- **Extended:** an independent assessment found `TST_SIG_Randomizer` and
+  `TST_SIG_LanguageParameters` not complete. `TST_SIG_Randomizer` now has
   known numbers for two seeds and two maximums, so a change of a constant
-  of the formula fails. `SIG_LanguageParametersTest` now has the default
+  of the formula fails. `TST_SIG_LanguageParameters` now has the default
   constructor, the setters and getters, `hasCommand`, the written text, the
   reading with and without the token, and the limits of the register
   width. A second assessment found no behaviour of
@@ -1114,7 +1115,7 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   takes the seconds since midnight; a test checks that against the clock.
 - **With it:** the constructor `MT_Randomizer(QTextStream &)` wrote three
   trace lines to the error output for each object, 3,600 lines in one run
-  of `MT_SearchTest`. They are deleted, with the `#include <iostream>` that
+  of `TST_MT_Search`. They are deleted, with the `#include <iostream>` that
   only they used. All five checks passed with this change in the tree.
 - **Found by the tests:** `SIG_GPPopulation::getWorstFitness` gave 0 if
   the first individual had no fitness and a later one had. The unused

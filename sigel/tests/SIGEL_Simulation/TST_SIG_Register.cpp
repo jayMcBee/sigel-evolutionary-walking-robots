@@ -21,7 +21,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_Simulation/SIG_RegisterTest.h"
+#include "SIGEL_Simulation/TST_SIG_Register.h"
 
 #include "SIGEL_Simulation/SIG_Register.h"
 #include "SIGEL_Simulation/SIG_RegisterWrongSizeException.h"
@@ -29,7 +29,7 @@
 #include <QList>
 #include <QtTest>
 
-void SIGEL_Simulation::SIG_RegisterTest::newRegisterHasValueZeroAndItsWidth()
+void SIGEL_Simulation::TST_SIG_Register::newRegisterHasValueZeroAndItsWidth()
 {
   const QList<int> widths = { 1, 3, 8, 16 };
 
@@ -42,14 +42,14 @@ void SIGEL_Simulation::SIG_RegisterTest::newRegisterHasValueZeroAndItsWidth()
     }
 }
 
-void SIGEL_Simulation::SIG_RegisterTest::constructorRefusesWidthOutsideOneToSixteen()
+void SIGEL_Simulation::TST_SIG_Register::constructorRefusesWidthOutsideOneToSixteen()
 {
   QVERIFY_THROWS_EXCEPTION( SIG_RegisterWrongSizeException, SIG_Register negativeWidth( -1 ) );
   QVERIFY_THROWS_EXCEPTION( SIG_RegisterWrongSizeException, SIG_Register noWidth( 0 ) );
   QVERIFY_THROWS_EXCEPTION( SIG_RegisterWrongSizeException, SIG_Register tooWide( 17 ) );
 }
 
-void SIGEL_Simulation::SIG_RegisterTest::getMinValueAndGetMaxValueGiveTheRange()
+void SIGEL_Simulation::TST_SIG_Register::getMinValueAndGetMaxValueGiveTheRange()
 {
   SIG_Register oneBit( 1 );
   QCOMPARE( oneBit.getMinValue(), -1 );
@@ -68,7 +68,7 @@ void SIGEL_Simulation::SIG_RegisterTest::getMinValueAndGetMaxValueGiveTheRange()
   QCOMPARE( sixteenBits.getMaxValue(), 32767 );
 }
 
-void SIGEL_Simulation::SIG_RegisterTest::loadValueWrapsToTheWidth_data()
+void SIGEL_Simulation::TST_SIG_Register::loadValueWrapsToTheWidth_data()
 {
   QTest::addColumn< int >( "width" );
   QTest::addColumn< int >( "value" );
@@ -175,7 +175,7 @@ void SIGEL_Simulation::SIG_RegisterTest::loadValueWrapsToTheWidth_data()
   QTest::newRow( "width 16: -32769" ) << 16 << -32769 << 32767;
 }
 
-void SIGEL_Simulation::SIG_RegisterTest::loadValueWrapsToTheWidth()
+void SIGEL_Simulation::TST_SIG_Register::loadValueWrapsToTheWidth()
 {
   QFETCH( int, width );
   QFETCH( int, value );

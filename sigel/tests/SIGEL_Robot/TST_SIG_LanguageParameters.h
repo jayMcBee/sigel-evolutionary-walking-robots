@@ -21,39 +21,48 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_Robot/SIG_LinkTest.h"
+#ifndef SIGEL_ROBOT_TST_SIG_LANGUAGEPARAMETERS_H
+#define SIGEL_ROBOT_TST_SIG_LANGUAGEPARAMETERS_H
 
-#include "SIGEL_Robot/SIG_Link.h"
-#include "SIGEL_Robot/SIG_Robot.h"
+#include <QObject>
 
-#include <QtTest>
-
-// A robot file may declare a point of a link twice.
-void SIGEL_Robot::SIG_LinkTest::pointAddedTwiceKeepsTheLastValue()
+namespace SIGEL_Robot
 {
-  SIG_Link link( 0, "L", 0 );
 
-  link.addPoint( "P", SIG_Vector( 1, 0, 0 ) );
-  link.addPoint( "P", SIG_Vector( 2, 0, 0 ) );
+  /**
+   * The unit tests of SIG_LanguageParameters.
+   */
+  class TST_SIG_LanguageParameters : public QObject
+  {
+    Q_OBJECT
 
-  QCOMPARE( link.getPoint( "P" ).x, 2.0 );
+  private slots:
+
+    void defaultConstructorGivesTheStandardLanguage();
+
+    void settersChangeTheValues();
+
+    void hasCommandFindsOnlyAKnownName();
+
+    void removeCommandRemovesTheCommand();
+
+    void removeCommandLeavesTheOtherCommands();
+
+    void removeCommandWithUnknownNameChangesNothing();
+
+    void writeToFileTransferWritesTheCommandsInOrder();
+
+    void writtenTextIsReadBack();
+
+    void streamInARobotHasNoToken();
+
+    void wrongTokenThrows();
+
+    void registerWidthOutsideOneToSixteenThrows();
+
+    void registerWidthOneAndSixteenAreAccepted();
+  };
+
 }
 
-void SIGEL_Robot::SIG_LinkTest::addNoCollideRegistersThePairOnBothLinksOnce()
-{
-  SIG_Robot robot;
-  SIG_Link first( &robot, "first", 0 );
-  SIG_Link second( &robot, "second", 1 );
-
-  first.addNoCollide( &second );
-
-  QCOMPARE( first.getNoCollides().count(), 1 );
-  QCOMPARE( second.getNoCollides().count(), 1 );
-  QCOMPARE( first.getNoCollides().value( 0 ), &second );
-  QCOMPARE( second.getNoCollides().value( 0 ), &first );
-
-  first.addNoCollide( &second );
-
-  QCOMPARE( first.getNoCollides().count(), 1 );
-  QCOMPARE( second.getNoCollides().count(), 1 );
-}
+#endif // SIGEL_ROBOT_TST_SIG_LANGUAGEPARAMETERS_H

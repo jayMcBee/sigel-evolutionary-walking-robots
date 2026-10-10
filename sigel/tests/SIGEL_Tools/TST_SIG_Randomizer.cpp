@@ -21,14 +21,14 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_Tools/SIG_RandomizerTest.h"
+#include "SIGEL_Tools/TST_SIG_Randomizer.h"
 
 #include "SIGEL_Tools/SIG_Randomizer.h"
 
 #include <QTime>
 #include <QtTest>
 
-void SIGEL_Tools::SIG_RandomizerTest::sameSeedGivesSameNumbers()
+void SIGEL_Tools::TST_SIG_Randomizer::sameSeedGivesSameNumbers()
 {
   SIG_Randomizer first( 42 );
   SIG_Randomizer second( 42 );
@@ -37,7 +37,7 @@ void SIGEL_Tools::SIG_RandomizerTest::sameSeedGivesSameNumbers()
     QCOMPARE( first.getRandomInt( 1000 ), second.getRandomInt( 1000 ) );
 }
 
-void SIGEL_Tools::SIG_RandomizerTest::differentSeedsGiveDifferentNumbers()
+void SIGEL_Tools::TST_SIG_Randomizer::differentSeedsGiveDifferentNumbers()
 {
   SIG_Randomizer first( 1 );
   SIG_Randomizer second( 2 );
@@ -45,7 +45,7 @@ void SIGEL_Tools::SIG_RandomizerTest::differentSeedsGiveDifferentNumbers()
   QVERIFY( first.getRandomInt( 32768 ) != second.getRandomInt( 32768 ) );
 }
 
-void SIGEL_Tools::SIG_RandomizerTest::setNewSeedStartsTheNumbersAgain()
+void SIGEL_Tools::TST_SIG_Randomizer::setNewSeedStartsTheNumbersAgain()
 {
   SIG_Randomizer randomizer( 42 );
   int firstNumber = randomizer.getRandomInt( 1000 );
@@ -58,7 +58,7 @@ void SIGEL_Tools::SIG_RandomizerTest::setNewSeedStartsTheNumbersAgain()
 }
 
 // The default constructor takes its seed from the time of day.
-void SIGEL_Tools::SIG_RandomizerTest::setNewSeedAfterTheDefaultConstructorGivesTheNumbersOfTheSeed()
+void SIGEL_Tools::TST_SIG_Randomizer::setNewSeedAfterTheDefaultConstructorGivesTheNumbersOfTheSeed()
 {
   SIG_Randomizer randomizer;
 
@@ -67,7 +67,7 @@ void SIGEL_Tools::SIG_RandomizerTest::setNewSeedAfterTheDefaultConstructorGivesT
   QCOMPARE( randomizer.getRandomInt( 32768 ), 16838 );
 }
 
-void SIGEL_Tools::SIG_RandomizerTest::defaultConstructorTakesTheSecondsSinceMidnightAsSeed()
+void SIGEL_Tools::TST_SIG_Randomizer::defaultConstructorTakesTheSecondsSinceMidnightAsSeed()
 {
   for ( int attempt = 0; attempt < 20; attempt++ )
     {
@@ -92,7 +92,7 @@ void SIGEL_Tools::SIG_RandomizerTest::defaultConstructorTakesTheSecondsSinceMidn
   QFAIL( "The clock gives no two equal readings." );
 }
 
-void SIGEL_Tools::SIG_RandomizerTest::numberIsBelowMaximum()
+void SIGEL_Tools::TST_SIG_Randomizer::numberIsBelowMaximum()
 {
   SIG_Randomizer randomizer( 42 );
 
@@ -104,7 +104,7 @@ void SIGEL_Tools::SIG_RandomizerTest::numberIsBelowMaximum()
     }
 }
 
-void SIGEL_Tools::SIG_RandomizerTest::maximumZeroGivesZero()
+void SIGEL_Tools::TST_SIG_Randomizer::maximumZeroGivesZero()
 {
   SIG_Randomizer randomizer( 42 );
 
@@ -112,7 +112,7 @@ void SIGEL_Tools::SIG_RandomizerTest::maximumZeroGivesZero()
 }
 
 // A change here gives each seed another run.
-void SIGEL_Tools::SIG_RandomizerTest::maximumZeroMovesTheGeneratorOn()
+void SIGEL_Tools::TST_SIG_Randomizer::maximumZeroMovesTheGeneratorOn()
 {
   SIG_Randomizer reference( 42 );
   reference.getRandomInt( 1000 );
@@ -125,7 +125,7 @@ void SIGEL_Tools::SIG_RandomizerTest::maximumZeroMovesTheGeneratorOn()
 }
 
 // A change here gives each seed another run.
-void SIGEL_Tools::SIG_RandomizerTest::getRandomLongGivesTheNumberOfGetRandomInt()
+void SIGEL_Tools::TST_SIG_Randomizer::getRandomLongGivesTheNumberOfGetRandomInt()
 {
   SIG_Randomizer first( 42 );
   SIG_Randomizer second( 42 );
@@ -133,7 +133,7 @@ void SIGEL_Tools::SIG_RandomizerTest::getRandomLongGivesTheNumberOfGetRandomInt(
   QCOMPARE( first.getRandomLong( 1000 ), static_cast<long>( second.getRandomInt( 1000 ) ) );
 }
 
-void SIGEL_Tools::SIG_RandomizerTest::getRandomLongWithMaximumZeroGivesZero()
+void SIGEL_Tools::TST_SIG_Randomizer::getRandomLongWithMaximumZeroGivesZero()
 {
   SIG_Randomizer randomizer( 42 );
 
@@ -142,7 +142,7 @@ void SIGEL_Tools::SIG_RandomizerTest::getRandomLongWithMaximumZeroGivesZero()
 
 // Four numbers: the first one alone does not show a small change of the
 // multiplier or the increment. A change here gives each seed another run.
-void SIGEL_Tools::SIG_RandomizerTest::seedOneGivesKnownNumbers()
+void SIGEL_Tools::TST_SIG_Randomizer::seedOneGivesKnownNumbers()
 {
   SIG_Randomizer randomizer( 1 );
 
@@ -155,7 +155,7 @@ void SIGEL_Tools::SIG_RandomizerTest::seedOneGivesKnownNumbers()
 // A maximum that is not a power of two: the numbers also depend on the mask
 // and on the remainder of the division by the maximum. A change here gives
 // each seed another run.
-void SIGEL_Tools::SIG_RandomizerTest::seedFortyTwoGivesKnownNumbersBelowOneThousand()
+void SIGEL_Tools::TST_SIG_Randomizer::seedFortyTwoGivesKnownNumbersBelowOneThousand()
 {
   SIG_Randomizer randomizer( 42 );
 

@@ -21,15 +21,15 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "MT_GPSystem/MT_SearchTest.h"
-#include "SIGEL_GP/SIG_GPIndividualTest.h"
-#include "SIGEL_GP/SIG_GPPopulationTest.h"
-#include "SIGEL_Robot/SIG_LanguageParametersTest.h"
-#include "SIGEL_Robot/SIG_LinkTest.h"
-#include "SIGEL_Robot/SIG_MaterialTest.h"
-#include "SIGEL_Robot/SIG_RobotTest.h"
-#include "SIGEL_Simulation/SIG_RegisterTest.h"
-#include "SIGEL_Tools/SIG_RandomizerTest.h"
+#include "MT_GPSystem/TST_MT_Search.h"
+#include "SIGEL_GP/TST_SIG_GPIndividual.h"
+#include "SIGEL_GP/TST_SIG_GPPopulation.h"
+#include "SIGEL_Robot/TST_SIG_LanguageParameters.h"
+#include "SIGEL_Robot/TST_SIG_Link.h"
+#include "SIGEL_Robot/TST_SIG_Material.h"
+#include "SIGEL_Robot/TST_SIG_Robot.h"
+#include "SIGEL_Simulation/TST_SIG_Register.h"
+#include "SIGEL_Tools/TST_SIG_Randomizer.h"
 
 #include <QtTest>
 
@@ -43,15 +43,15 @@
 // makes a progress dialog.
 int main( int argc, char *argv[] ) {
   std::vector<std::unique_ptr<QObject>> testClasses;
-  testClasses.push_back( std::make_unique<MT_SearchTest>() );
-  testClasses.push_back( std::make_unique<SIGEL_GP::SIG_GPIndividualTest>() );
-  testClasses.push_back( std::make_unique<SIGEL_GP::SIG_GPPopulationTest>() );
-  testClasses.push_back( std::make_unique<SIGEL_Robot::SIG_LanguageParametersTest>() );
-  testClasses.push_back( std::make_unique<SIGEL_Robot::SIG_LinkTest>() );
-  testClasses.push_back( std::make_unique<SIGEL_Robot::SIG_MaterialTest>() );
-  testClasses.push_back( std::make_unique<SIGEL_Robot::SIG_RobotTest>() );
-  testClasses.push_back( std::make_unique<SIGEL_Simulation::SIG_RegisterTest>() );
-  testClasses.push_back( std::make_unique<SIGEL_Tools::SIG_RandomizerTest>() );
+  testClasses.push_back( std::make_unique<TST_MT_Search>() );
+  testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPIndividual>() );
+  testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPPopulation>() );
+  testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_LanguageParameters>() );
+  testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Link>() );
+  testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Material>() );
+  testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Robot>() );
+  testClasses.push_back( std::make_unique<SIGEL_Simulation::TST_SIG_Register>() );
+  testClasses.push_back( std::make_unique<SIGEL_Tools::TST_SIG_Randomizer>() );
 
   int failures = 0;
   for ( const std::unique_ptr<QObject> &testClass : testClasses )

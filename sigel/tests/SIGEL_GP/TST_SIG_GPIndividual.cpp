@@ -21,7 +21,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_GP/SIG_GPIndividualTest.h"
+#include "SIGEL_GP/TST_SIG_GPIndividual.h"
 
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #include "SIGEL_GP/SIG_GPParameter.h"
@@ -32,7 +32,7 @@
 
 #include <QtTest>
 
-void SIGEL_GP::SIG_GPIndividualTest::writtenTextIsReadBack()
+void SIGEL_GP::TST_SIG_GPIndividual::writtenTextIsReadBack()
 {
   std::unique_ptr< SIG_GPIndividual > original = randomIndividual();
   original->setName( "17" );
@@ -53,7 +53,7 @@ void SIGEL_GP::SIG_GPIndividualTest::writtenTextIsReadBack()
   QCOMPARE( writtenText( copy, false ), written );
 }
 
-void SIGEL_GP::SIG_GPIndividualTest::writtenTextWithoutHistoryHasNoHistoryBlock()
+void SIGEL_GP::TST_SIG_GPIndividual::writtenTextWithoutHistoryHasNoHistoryBlock()
 {
   std::unique_ptr< SIG_GPIndividual > original = randomIndividual();
 
@@ -61,7 +61,7 @@ void SIGEL_GP::SIG_GPIndividualTest::writtenTextWithoutHistoryHasNoHistoryBlock(
   QVERIFY( !writtenText( *original, false ).contains( "HISTORY BEGIN{" ) );
 }
 
-void SIGEL_GP::SIG_GPIndividualTest::textWithoutHistoryBlockIsRead()
+void SIGEL_GP::TST_SIG_GPIndividual::textWithoutHistoryBlockIsRead()
 {
   std::unique_ptr< SIG_GPIndividual > original = randomIndividual();
   QString written = writtenText( *original, false );
@@ -73,7 +73,7 @@ void SIGEL_GP::SIG_GPIndividualTest::textWithoutHistoryBlockIsRead()
   QCOMPARE( writtenText( copy, false ), written );
 }
 
-void SIGEL_GP::SIG_GPIndividualTest::historyIsReadBack()
+void SIGEL_GP::TST_SIG_GPIndividual::historyIsReadBack()
 {
   std::unique_ptr< SIG_GPIndividual > original = randomIndividual();
   original->addMutationInfo( "17", QDateTime( QDate( 2026, 1, 2 ), QTime( 3, 4, 5 ) ), 2 );
@@ -88,7 +88,7 @@ void SIGEL_GP::SIG_GPIndividualTest::historyIsReadBack()
 }
 
 // The history of an imported individual starts with a line break. The first load removes it.
-void SIGEL_GP::SIG_GPIndividualTest::historyWithALineBreakAtTheStartIsTheSameAfterTheFirstLoad()
+void SIGEL_GP::TST_SIG_GPIndividual::historyWithALineBreakAtTheStartIsTheSameAfterTheFirstLoad()
 {
   SIG_GPIndividual original;
   original.addPreparationOfHistoryInfo();
@@ -106,7 +106,7 @@ void SIGEL_GP::SIG_GPIndividualTest::historyWithALineBreakAtTheStartIsTheSameAft
 }
 
 // Older experiment files have the history on the line of HISTORY BEGIN{.
-void SIGEL_GP::SIG_GPIndividualTest::historyWithoutLineBreakAtTheStartIsRead()
+void SIGEL_GP::TST_SIG_GPIndividual::historyWithoutLineBreakAtTheStartIsRead()
 {
   std::unique_ptr< SIG_GPIndividual > original = randomIndividual();
   QString written = writtenText( *original, true );
@@ -120,7 +120,7 @@ void SIGEL_GP::SIG_GPIndividualTest::historyWithoutLineBreakAtTheStartIsRead()
   QCOMPARE( writtenText( copy, true ), written );
 }
 
-void SIGEL_GP::SIG_GPIndividualTest::textWithoutARequiredFieldIsRefused_data()
+void SIGEL_GP::TST_SIG_GPIndividual::textWithoutARequiredFieldIsRefused_data()
 {
   QTest::addColumn< QString >( "field" );
   QTest::addColumn< QString >( "message" );
@@ -132,7 +132,7 @@ void SIGEL_GP::SIG_GPIndividualTest::textWithoutARequiredFieldIsRefused_data()
   QTest::newRow( "PROGRAM" ) << "PROGRAM BEGIN{" << "Individual '17' has no PROGRAM block.";
 }
 
-void SIGEL_GP::SIG_GPIndividualTest::textWithoutARequiredFieldIsRefused()
+void SIGEL_GP::TST_SIG_GPIndividual::textWithoutARequiredFieldIsRefused()
 {
   QFETCH( QString, field );
   QFETCH( QString, message );
@@ -156,7 +156,7 @@ void SIGEL_GP::SIG_GPIndividualTest::textWithoutARequiredFieldIsRefused()
   QVERIFY2( thrown.contains( message ), qPrintable( thrown ) );
 }
 
-std::unique_ptr< SIGEL_GP::SIG_GPIndividual > SIGEL_GP::SIG_GPIndividualTest::randomIndividual()
+std::unique_ptr< SIGEL_GP::SIG_GPIndividual > SIGEL_GP::TST_SIG_GPIndividual::randomIndividual()
 {
   SIGEL_Tools::SIG_Randomizer randomizer( 1 );
   SIG_GPParameter gpParameter;
@@ -167,7 +167,7 @@ std::unique_ptr< SIGEL_GP::SIG_GPIndividual > SIGEL_GP::SIG_GPIndividualTest::ra
   return std::make_unique< SIG_GPIndividual >( randomizer, gpParameter, languageParameters );
 }
 
-QString SIGEL_GP::SIG_GPIndividualTest::writtenText( SIG_GPIndividual &individual, bool withHistory )
+QString SIGEL_GP::TST_SIG_GPIndividual::writtenText( SIG_GPIndividual &individual, bool withHistory )
 {
   QString text;
   QTextStream stream( &text );

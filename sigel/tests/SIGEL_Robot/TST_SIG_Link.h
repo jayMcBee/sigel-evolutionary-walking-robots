@@ -21,8 +21,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_ROBOT_SIG_MATERIALTEST_H
-#define SIGEL_ROBOT_SIG_MATERIALTEST_H
+#ifndef SIGEL_ROBOT_TST_SIG_LINK_H
+#define SIGEL_ROBOT_TST_SIG_LINK_H
 
 #include <QObject>
 
@@ -30,19 +30,19 @@ namespace SIGEL_Robot
 {
 
   /**
-   * The unit tests of SIG_Material.
+   * The unit tests of SIG_Link.
    */
-  class SIG_MaterialTest : public QObject
+  class TST_SIG_Link : public QObject
   {
     Q_OBJECT
 
   private slots:
 
-    void setFrictionValueSetsAndUpdatesBothPartners();
+    void pointAddedTwiceKeepsTheLastValue();
 
-    void materialReadFromStreamKeepsOnlyALoadedPartner();
+    void addNoCollideRegistersThePairOnBothLinksOnce();
   };
 
 }
 
-#endif // SIGEL_ROBOT_SIG_MATERIALTEST_H
+#endif // SIGEL_ROBOT_TST_SIG_LINK_H

@@ -21,8 +21,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef MT_GPSYSTEM_MT_SEARCHTEST_H
-#define MT_GPSYSTEM_MT_SEARCHTEST_H
+#ifndef MT_GPSYSTEM_TST_MT_SEARCH_H
+#define MT_GPSYSTEM_TST_MT_SEARCH_H
 
 #include <QList>
 #include <QObject>
@@ -58,7 +58,7 @@ struct MT_MatingResult
  * The genesis of a child is the number of crossover points, 100 plus the
  * number of mutations, or 4 for a reproduction.
  */
-class MT_SearchTest : public QObject
+class TST_MT_Search : public QObject
 {
   Q_OBJECT
 
@@ -104,4 +104,4 @@ private:
                         const int crossoverPoints[3], int startLength, int maxProgramLength );
 };
 
-#endif // MT_GPSYSTEM_MT_SEARCHTEST_H
+#endif // MT_GPSYSTEM_TST_MT_SEARCH_H

@@ -21,8 +21,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_ROBOT_SIG_LINKTEST_H
-#define SIGEL_ROBOT_SIG_LINKTEST_H
+#ifndef SIGEL_ROBOT_TST_SIG_ROBOT_H
+#define SIGEL_ROBOT_TST_SIG_ROBOT_H
 
 #include <QObject>
 
@@ -30,19 +30,17 @@ namespace SIGEL_Robot
 {
 
   /**
-   * The unit tests of SIG_Link.
+   * The unit tests of SIG_Robot.
    */
-  class SIG_LinkTest : public QObject
+  class TST_SIG_Robot : public QObject
   {
     Q_OBJECT
 
   private slots:
 
-    void pointAddedTwiceKeepsTheLastValue();
-
-    void addNoCollideRegistersThePairOnBothLinksOnce();
+    void lookupFindsEachKindOfPartByName();
   };
 
 }
 
-#endif // SIGEL_ROBOT_SIG_LINKTEST_H
+#endif // SIGEL_ROBOT_TST_SIG_ROBOT_H

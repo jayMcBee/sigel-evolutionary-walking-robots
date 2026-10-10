@@ -21,7 +21,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "MT_GPSystem/MT_SearchTest.h"
+#include "MT_GPSystem/TST_MT_Search.h"
 
 #include "MT_GPSystem/MT_Individual.h"
 #include "MT_GPSystem/MT_Population.h"
@@ -34,12 +34,12 @@
 
 #include <cstdlib>
 
-void MT_SearchTest::crossoverKeepsTheLinesOfTheParents_data()
+void TST_MT_Search::crossoverKeepsTheLinesOfTheParents_data()
 {
   addCrossoverPointRows();
 }
 
-void MT_SearchTest::crossoverKeepsTheLinesOfTheParents()
+void TST_MT_Search::crossoverKeepsTheLinesOfTheParents()
 {
   QFETCH( int, firstThreshold );
   QFETCH( int, secondThreshold );
@@ -64,13 +64,13 @@ void MT_SearchTest::crossoverKeepsTheLinesOfTheParents()
     }
 }
 
-void MT_SearchTest::crossoverWithNoRoomCutsTheChildren_data()
+void TST_MT_Search::crossoverWithNoRoomCutsTheChildren_data()
 {
   addCrossoverPointRows();
 }
 
 // A child is never empty.
-void MT_SearchTest::crossoverWithNoRoomCutsTheChildren()
+void TST_MT_Search::crossoverWithNoRoomCutsTheChildren()
 {
   QFETCH( int, firstThreshold );
   QFETCH( int, secondThreshold );
@@ -90,7 +90,7 @@ void MT_SearchTest::crossoverWithNoRoomCutsTheChildren()
     }
 }
 
-void MT_SearchTest::mutationKeepsTheLengthOfTheParent()
+void TST_MT_Search::mutationKeepsTheLengthOfTheParent()
 {
   int mutatedChildren = 0;
 
@@ -116,7 +116,7 @@ void MT_SearchTest::mutationKeepsTheLengthOfTheParent()
   QVERIFY( mutatedChildren > 0 );
 }
 
-void MT_SearchTest::mutationWithRateZeroCopiesTheParent()
+void TST_MT_Search::mutationWithRateZeroCopiesTheParent()
 {
   for ( unsigned seed = 1; seed <= seeds; seed++ )
     {
@@ -132,7 +132,7 @@ void MT_SearchTest::mutationWithRateZeroCopiesTheParent()
     }
 }
 
-void MT_SearchTest::reproductionCopiesTheParent()
+void TST_MT_Search::reproductionCopiesTheParent()
 {
   for ( unsigned seed = 1; seed <= seeds; seed++ )
     {
@@ -149,7 +149,7 @@ void MT_SearchTest::reproductionCopiesTheParent()
     }
 }
 
-void MT_SearchTest::addCrossoverPointRows()
+void TST_MT_Search::addCrossoverPointRows()
 {
   QTest::addColumn<int>( "firstThreshold" );
   QTest::addColumn<int>( "secondThreshold" );
@@ -161,7 +161,7 @@ void MT_SearchTest::addCrossoverPointRows()
   QTest::newRow( "3 points" ) << 0 << 0 << 1000 << 3;
 }
 
-QStringList MT_SearchTest::programLines( MT_Program *program )
+QStringList TST_MT_Search::programLines( MT_Program *program )
 {
   QStringList lines;
 
@@ -176,7 +176,7 @@ QStringList MT_SearchTest::programLines( MT_Program *program )
   return lines;
 }
 
-QString MT_SearchTest::randomizerText( const int searchOperator[3], const int mutationPower[2],
+QString TST_MT_Search::randomizerText( const int searchOperator[3], const int mutationPower[2],
                                        const int crossoverPoints[3], int maxProgramLength )
 {
   QString text;
@@ -198,7 +198,7 @@ QString MT_SearchTest::randomizerText( const int searchOperator[3], const int mu
   return text;
 }
 
-MT_MatingResult MT_SearchTest::mate( unsigned seed, const int searchOperator[3], const int mutationPower[2],
+MT_MatingResult TST_MT_Search::mate( unsigned seed, const int searchOperator[3], const int mutationPower[2],
                                      const int crossoverPoints[3], int startLength, int maxProgramLength )
 {
   MT_MatingResult result;

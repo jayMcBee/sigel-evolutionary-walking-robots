@@ -21,7 +21,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_Robot/SIG_RobotTest.h"
+#include "SIGEL_Robot/TST_SIG_Robot.h"
 
 #include "SIGEL_Robot/SIG_Body.h"
 #include "SIGEL_Robot/SIG_ContactSensor.h"
@@ -33,7 +33,7 @@
 
 #include <QtTest>
 
-void SIGEL_Robot::SIG_RobotTest::lookupFindsEachKindOfPartByName()
+void SIGEL_Robot::TST_SIG_Robot::lookupFindsEachKindOfPartByName()
 {
   SIG_Robot robot;
   SIG_Body *body = new SIG_Body( &robot, "body", "d" );

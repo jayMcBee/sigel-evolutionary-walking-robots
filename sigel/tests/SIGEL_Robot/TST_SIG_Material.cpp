@@ -21,14 +21,14 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_Robot/SIG_MaterialTest.h"
+#include "SIGEL_Robot/TST_SIG_Material.h"
 
 #include "SIGEL_Robot/SIG_Material.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 
 #include <QtTest>
 
-void SIGEL_Robot::SIG_MaterialTest::setFrictionValueSetsAndUpdatesBothPartners()
+void SIGEL_Robot::TST_SIG_Material::setFrictionValueSetsAndUpdatesBothPartners()
 {
   SIG_Robot robot;
   SIG_Material a( &robot, "a" );
@@ -61,7 +61,7 @@ void SIGEL_Robot::SIG_MaterialTest::setFrictionValueSetsAndUpdatesBothPartners()
   QVERIFY( written.contains( "c 0.5" ) );
 }
 
-void SIGEL_Robot::SIG_MaterialTest::materialReadFromStreamKeepsOnlyALoadedPartner()
+void SIGEL_Robot::TST_SIG_Material::materialReadFromStreamKeepsOnlyALoadedPartner()
 {
   SIG_Robot robot;
   SIG_Material *known = new SIG_Material( &robot, "known" );

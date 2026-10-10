@@ -21,7 +21,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_GP/SIG_GPPopulationTest.h"
+#include "SIGEL_GP/TST_SIG_GPPopulation.h"
 
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #include "SIGEL_GP/SIG_GPParameter.h"
@@ -33,7 +33,7 @@
 
 #include <QtTest>
 
-void SIGEL_GP::SIG_GPPopulationTest::defaultConstructorGivesAnEmptyPopulation()
+void SIGEL_GP::TST_SIG_GPPopulation::defaultConstructorGivesAnEmptyPopulation()
 {
   SIG_GPPopulation population;
 
@@ -43,7 +43,7 @@ void SIGEL_GP::SIG_GPPopulationTest::defaultConstructorGivesAnEmptyPopulation()
   QVERIFY( population.getHistory() );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::getNextIdentifierCountsUp()
+void SIGEL_GP::TST_SIG_GPPopulation::getNextIdentifierCountsUp()
 {
   SIG_GPPopulation population;
 
@@ -57,7 +57,7 @@ void SIGEL_GP::SIG_GPPopulationTest::getNextIdentifierCountsUp()
   QCOMPARE( population.nextIdentifier, QString( "8" ) );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::addRandomIndividualsGivesNamesAndPoolPositions()
+void SIGEL_GP::TST_SIG_GPPopulation::addRandomIndividualsGivesNamesAndPoolPositions()
 {
   SIG_GPPopulation population;
 
@@ -72,7 +72,7 @@ void SIGEL_GP::SIG_GPPopulationTest::addRandomIndividualsGivesNamesAndPoolPositi
   QCOMPARE( population.nextIdentifier, QString( "4" ) );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::addRandomIndividualsKeepsTheIndividualsThatAreThere()
+void SIGEL_GP::TST_SIG_GPPopulation::addRandomIndividualsKeepsTheIndividualsThatAreThere()
 {
   SIG_GPPopulation population;
   addIndividuals( population, 2 );
@@ -91,7 +91,7 @@ void SIGEL_GP::SIG_GPPopulationTest::addRandomIndividualsKeepsTheIndividualsThat
     }
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::addRandomIndividualsTakesTheNamesFromTheIdentifier()
+void SIGEL_GP::TST_SIG_GPPopulation::addRandomIndividualsTakesTheNamesFromTheIdentifier()
 {
   SIG_GPPopulation population;
   population.setNextIdentifier( "40" );
@@ -105,7 +105,7 @@ void SIGEL_GP::SIG_GPPopulationTest::addRandomIndividualsTakesTheNamesFromTheIde
   QCOMPARE( population.nextIdentifier, QString( "42" ) );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::addRandomIndividualsUsesTheLengthLimits()
+void SIGEL_GP::TST_SIG_GPPopulation::addRandomIndividualsUsesTheLengthLimits()
 {
   SIG_GPParameter gpParameter;
   gpParameter.setMinIndLength( 7 );
@@ -120,7 +120,7 @@ void SIGEL_GP::SIG_GPPopulationTest::addRandomIndividualsUsesTheLengthLimits()
     QCOMPARE( population.getIndividualPointer( i )->getProgram().getProgramLength(), 7L );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::programLengthsAreInsideTheLimits()
+void SIGEL_GP::TST_SIG_GPPopulation::programLengthsAreInsideTheLimits()
 {
   SIG_GPParameter gpParameter;
   gpParameter.setMinIndLength( 5 );
@@ -139,7 +139,7 @@ void SIGEL_GP::SIG_GPPopulationTest::programLengthsAreInsideTheLimits()
     }
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::programLengthsReachBothLimits()
+void SIGEL_GP::TST_SIG_GPPopulation::programLengthsReachBothLimits()
 {
   SIG_GPParameter gpParameter;
   gpParameter.setMinIndLength( 5 );
@@ -166,7 +166,7 @@ void SIGEL_GP::SIG_GPPopulationTest::programLengthsReachBothLimits()
 }
 
 // A maximum length of 0 means that there is no maximum.
-void SIGEL_GP::SIG_GPPopulationTest::randomProgramsHaveTheMinimumLengthWithoutAMaximum()
+void SIGEL_GP::TST_SIG_GPPopulation::randomProgramsHaveTheMinimumLengthWithoutAMaximum()
 {
   SIG_GPParameter gpParameter;
   gpParameter.setMinIndLength( 5 );
@@ -181,7 +181,7 @@ void SIGEL_GP::SIG_GPPopulationTest::randomProgramsHaveTheMinimumLengthWithoutAM
     QCOMPARE( population.getIndividualPointer( i )->getProgram().getProgramLength(), 5L );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::sameSeedGivesTheSameIndividuals()
+void SIGEL_GP::TST_SIG_GPPopulation::sameSeedGivesTheSameIndividuals()
 {
   SIG_GPPopulation first;
   SIG_GPPopulation second;
@@ -195,7 +195,7 @@ void SIGEL_GP::SIG_GPPopulationTest::sameSeedGivesTheSameIndividuals()
   QCOMPARE( writtenText( second ), writtenText( first ) );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::differentSeedsGiveDifferentIndividuals()
+void SIGEL_GP::TST_SIG_GPPopulation::differentSeedsGiveDifferentIndividuals()
 {
   SIG_GPPopulation first;
   SIG_GPPopulation second;
@@ -208,7 +208,7 @@ void SIGEL_GP::SIG_GPPopulationTest::differentSeedsGiveDifferentIndividuals()
   QVERIFY( writtenText( second ) != writtenText( first ) );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::getIndividualGivesTheIndividualAtThePosition()
+void SIGEL_GP::TST_SIG_GPPopulation::getIndividualGivesTheIndividualAtThePosition()
 {
   SIG_GPPopulation population;
   addIndividuals( population, 3 );
@@ -217,7 +217,7 @@ void SIGEL_GP::SIG_GPPopulationTest::getIndividualGivesTheIndividualAtThePositio
     QCOMPARE( &population.getIndividual( i ), population.getIndividualPointer( i ) );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::deleteIndividualMovesTheRestDown()
+void SIGEL_GP::TST_SIG_GPPopulation::deleteIndividualMovesTheRestDown()
 {
   SIG_GPPopulation population;
   addIndividuals( population, 4 );
@@ -235,7 +235,7 @@ void SIGEL_GP::SIG_GPPopulationTest::deleteIndividualMovesTheRestDown()
     QCOMPARE( population.getIndividualPointer( i )->getPoolPos(), i );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::deleteIndividualOfTheLastLeavesTheOthers()
+void SIGEL_GP::TST_SIG_GPPopulation::deleteIndividualOfTheLastLeavesTheOthers()
 {
   SIG_GPPopulation population;
   addIndividuals( population, 3 );
@@ -249,7 +249,7 @@ void SIGEL_GP::SIG_GPPopulationTest::deleteIndividualOfTheLastLeavesTheOthers()
   QCOMPARE( population.getIndividualPointer( 1 ), second );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::deleteIndividualDownToAnEmptyPopulation()
+void SIGEL_GP::TST_SIG_GPPopulation::deleteIndividualDownToAnEmptyPopulation()
 {
   SIG_GPPopulation population;
   addIndividuals( population, 3 );
@@ -260,7 +260,7 @@ void SIGEL_GP::SIG_GPPopulationTest::deleteIndividualDownToAnEmptyPopulation()
   QCOMPARE( population.getSize(), 0 );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::setIndividualReplacesOneIndividual()
+void SIGEL_GP::TST_SIG_GPPopulation::setIndividualReplacesOneIndividual()
 {
   SIG_GPPopulation population;
   addIndividuals( population, 3 );
@@ -277,7 +277,7 @@ void SIGEL_GP::SIG_GPPopulationTest::setIndividualReplacesOneIndividual()
   QCOMPARE( population.getIndividualPointer( 2 ), last );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::resetAllFitnessValuesSetsMinusOne()
+void SIGEL_GP::TST_SIG_GPPopulation::resetAllFitnessValuesSetsMinusOne()
 {
   SIG_GPPopulation population;
   addIndividuals( population, 2 );
@@ -292,7 +292,7 @@ void SIGEL_GP::SIG_GPPopulationTest::resetAllFitnessValuesSetsMinusOne()
 }
 
 // An individual with no simulation has a fitness below 0.
-void SIGEL_GP::SIG_GPPopulationTest::bestWorstAndAverageUseOnlySimulatedFitnessValues()
+void SIGEL_GP::TST_SIG_GPPopulation::bestWorstAndAverageUseOnlySimulatedFitnessValues()
 {
   SIG_GPPopulation population;
   addIndividuals( population, 4 );
@@ -305,7 +305,7 @@ void SIGEL_GP::SIG_GPPopulationTest::bestWorstAndAverageUseOnlySimulatedFitnessV
   QCOMPARE( population.getAverageFitness(), 3.5 );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::bestWorstAndAverageDoNotDependOnThePositionWithoutFitness()
+void SIGEL_GP::TST_SIG_GPPopulation::bestWorstAndAverageDoNotDependOnThePositionWithoutFitness()
 {
   SIG_GPPopulation population;
   addIndividuals( population, 4 );
@@ -319,7 +319,7 @@ void SIGEL_GP::SIG_GPPopulationTest::bestWorstAndAverageDoNotDependOnThePosition
 }
 
 // A robot that does not move has the fitness 0.
-void SIGEL_GP::SIG_GPPopulationTest::fitnessZeroCountsAsAFitness()
+void SIGEL_GP::TST_SIG_GPPopulation::fitnessZeroCountsAsAFitness()
 {
   SIG_GPPopulation population;
   addIndividuals( population, 3 );
@@ -331,7 +331,7 @@ void SIGEL_GP::SIG_GPPopulationTest::fitnessZeroCountsAsAFitness()
   QCOMPARE( population.getAverageFitness(), 2.0 );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::bestWorstAndAverageAreZeroWithoutAnyFitness()
+void SIGEL_GP::TST_SIG_GPPopulation::bestWorstAndAverageAreZeroWithoutAnyFitness()
 {
   SIG_GPPopulation population;
   addIndividuals( population, 2 );
@@ -342,7 +342,7 @@ void SIGEL_GP::SIG_GPPopulationTest::bestWorstAndAverageAreZeroWithoutAnyFitness
 }
 
 // 11 individuals: the text then has a position with two digits.
-void SIGEL_GP::SIG_GPPopulationTest::writtenTextIsReadBack()
+void SIGEL_GP::TST_SIG_GPPopulation::writtenTextIsReadBack()
 {
   SIG_GPPopulation original;
   addIndividuals( original, 11 );
@@ -364,7 +364,7 @@ void SIGEL_GP::SIG_GPPopulationTest::writtenTextIsReadBack()
   QCOMPARE( writtenText( copy ), written );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::writtenTextWithoutHistoryHasNoHistoryBlock()
+void SIGEL_GP::TST_SIG_GPPopulation::writtenTextWithoutHistoryHasNoHistoryBlock()
 {
   SIG_GPPopulation original;
   addIndividuals( original, 2 );
@@ -383,7 +383,7 @@ void SIGEL_GP::SIG_GPPopulationTest::writtenTextWithoutHistoryHasNoHistoryBlock(
   QCOMPARE( writtenText( copy ), written );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::individualsWithHistoryAreReadBack()
+void SIGEL_GP::TST_SIG_GPPopulation::individualsWithHistoryAreReadBack()
 {
   SIG_GPPopulation original;
   addIndividuals( original, 3 );
@@ -414,7 +414,7 @@ void SIGEL_GP::SIG_GPPopulationTest::individualsWithHistoryAreReadBack()
 }
 
 // Some experiment files have no WITHHISTORY line.
-void SIGEL_GP::SIG_GPPopulationTest::textWithoutHeaderIsRead()
+void SIGEL_GP::TST_SIG_GPPopulation::textWithoutHeaderIsRead()
 {
   SIG_GPPopulation original;
   addIndividuals( original, 2 );
@@ -432,7 +432,7 @@ void SIGEL_GP::SIG_GPPopulationTest::textWithoutHeaderIsRead()
   QCOMPARE( copy.getIndividualPointer( 1 )->getName(), QString( "1" ) );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::emptyPopulationIsReadBack()
+void SIGEL_GP::TST_SIG_GPPopulation::emptyPopulationIsReadBack()
 {
   SIG_GPPopulation original;
   QString written = writtenText( original );
@@ -446,7 +446,7 @@ void SIGEL_GP::SIG_GPPopulationTest::emptyPopulationIsReadBack()
   QCOMPARE( copy.nextIdentifier, QString( "0" ) );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::savePoolWritesTheTextOfWriteToFile()
+void SIGEL_GP::TST_SIG_GPPopulation::savePoolWritesTheTextOfWriteToFile()
 {
   SIG_GPPopulation population;
   addIndividuals( population, 2 );
@@ -459,7 +459,7 @@ void SIGEL_GP::SIG_GPPopulationTest::savePoolWritesTheTextOfWriteToFile()
   QCOMPARE( saved, writtenText( population ) );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::readFromFileReplacesTheIndividualsThatAreThere()
+void SIGEL_GP::TST_SIG_GPPopulation::readFromFileReplacesTheIndividualsThatAreThere()
 {
   SIG_GPPopulation original;
   addIndividuals( original, 2 );
@@ -484,7 +484,7 @@ void SIGEL_GP::SIG_GPPopulationTest::readFromFileReplacesTheIndividualsThatAreTh
   QCOMPARE( writtenText( smaller ), written );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::textWithoutARequiredFieldIsRefused_data()
+void SIGEL_GP::TST_SIG_GPPopulation::textWithoutARequiredFieldIsRefused_data()
 {
   QTest::addColumn< QString >( "field" );
   QTest::addColumn< QString >( "message" );
@@ -494,7 +494,7 @@ void SIGEL_GP::SIG_GPPopulationTest::textWithoutARequiredFieldIsRefused_data()
   QTest::newRow( "POOLGENERATION" ) << "POOLGENERATION=" << "The population has no POOLGENERATION field.";
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::textWithoutARequiredFieldIsRefused()
+void SIGEL_GP::TST_SIG_GPPopulation::textWithoutARequiredFieldIsRefused()
 {
   QFETCH( QString, field );
   QFETCH( QString, message );
@@ -523,7 +523,7 @@ void SIGEL_GP::SIG_GPPopulationTest::textWithoutARequiredFieldIsRefused()
   QCOMPARE( copy.nextIdentifier, QString( "2" ) );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::refusedTextLeavesOnlyCompleteIndividuals()
+void SIGEL_GP::TST_SIG_GPPopulation::refusedTextLeavesOnlyCompleteIndividuals()
 {
   SIG_GPPopulation original;
   addIndividuals( original, 3 );
@@ -543,7 +543,7 @@ void SIGEL_GP::SIG_GPPopulationTest::refusedTextLeavesOnlyCompleteIndividuals()
   QCOMPARE( copy.getIndividualPointer( 0 )->getFitness(), 3.5 );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::importNewIndividualAddsTheIndividualOfTheFile()
+void SIGEL_GP::TST_SIG_GPPopulation::importNewIndividualAddsTheIndividualOfTheFile()
 {
   QTemporaryDir folder;
   QString fileName = folder.filePath( "individual.ind" );
@@ -566,7 +566,7 @@ void SIGEL_GP::SIG_GPPopulationTest::importNewIndividualAddsTheIndividualOfTheFi
   QCOMPARE( population.nextIdentifier, QString( "3" ) );
 }
 
-void SIGEL_GP::SIG_GPPopulationTest::importNewIndividualOfABrokenFileLeavesThePopulation()
+void SIGEL_GP::TST_SIG_GPPopulation::importNewIndividualOfABrokenFileLeavesThePopulation()
 {
   QTemporaryDir folder;
   QString fileName = folder.filePath( "individual.ind" );
@@ -585,7 +585,7 @@ void SIGEL_GP::SIG_GPPopulationTest::importNewIndividualOfABrokenFileLeavesThePo
   QCOMPARE( writtenText( population ), before );
 }
 
-int SIGEL_GP::SIG_GPPopulationTest::addIndividuals( SIG_GPPopulation &population, int quantity, int seed )
+int SIGEL_GP::TST_SIG_GPPopulation::addIndividuals( SIG_GPPopulation &population, int quantity, int seed )
 {
   SIG_GPParameter gpParameter;
   gpParameter.setMinIndLength( 5 );
@@ -596,7 +596,7 @@ int SIGEL_GP::SIG_GPPopulationTest::addIndividuals( SIG_GPPopulation &population
   return population.addRandomIndividuals( quantity, gpParameter, languageParameters );
 }
 
-QString SIGEL_GP::SIG_GPPopulationTest::writtenText( SIG_GPPopulation &population )
+QString SIGEL_GP::TST_SIG_GPPopulation::writtenText( SIG_GPPopulation &population )
 {
   QString text;
   QTextStream stream( &text );

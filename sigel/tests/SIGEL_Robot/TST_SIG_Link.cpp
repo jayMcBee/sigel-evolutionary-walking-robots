@@ -21,34 +21,39 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_SIMULATION_SIG_REGISTERTEST_H
-#define SIGEL_SIMULATION_SIG_REGISTERTEST_H
+#include "SIGEL_Robot/TST_SIG_Link.h"
 
-#include <QObject>
+#include "SIGEL_Robot/SIG_Link.h"
+#include "SIGEL_Robot/SIG_Robot.h"
 
-namespace SIGEL_Simulation
+#include <QtTest>
+
+// A robot file may declare a point of a link twice.
+void SIGEL_Robot::TST_SIG_Link::pointAddedTwiceKeepsTheLastValue()
 {
+  SIG_Link link( 0, "L", 0 );
 
-  /**
-   * The unit tests of SIG_Register.
-   */
-  class SIG_RegisterTest : public QObject
-  {
-    Q_OBJECT
+  link.addPoint( "P", SIG_Vector( 1, 0, 0 ) );
+  link.addPoint( "P", SIG_Vector( 2, 0, 0 ) );
 
-  private slots:
-
-    void newRegisterHasValueZeroAndItsWidth();
-
-    void constructorRefusesWidthOutsideOneToSixteen();
-
-    void getMinValueAndGetMaxValueGiveTheRange();
-
-    void loadValueWrapsToTheWidth_data();
-
-    void loadValueWrapsToTheWidth();
-  };
-
+  QCOMPARE( link.getPoint( "P" ).x, 2.0 );
 }
 
-#endif // SIGEL_SIMULATION_SIG_REGISTERTEST_H
+void SIGEL_Robot::TST_SIG_Link::addNoCollideRegistersThePairOnBothLinksOnce()
+{
+  SIG_Robot robot;
+  SIG_Link first( &robot, "first", 0 );
+  SIG_Link second( &robot, "second", 1 );
+
+  first.addNoCollide( &second );
+
+  QCOMPARE( first.getNoCollides().count(), 1 );
+  QCOMPARE( second.getNoCollides().count(), 1 );
+  QCOMPARE( first.getNoCollides().value( 0 ), &second );
+  QCOMPARE( second.getNoCollides().value( 0 ), &first );
+
+  first.addNoCollide( &second );
+
+  QCOMPARE( first.getNoCollides().count(), 1 );
+  QCOMPARE( second.getNoCollides().count(), 1 );
+}

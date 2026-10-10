@@ -21,7 +21,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_Robot/SIG_LanguageParametersTest.h"
+#include "SIGEL_Robot/TST_SIG_LanguageParameters.h"
 
 #include "SIGEL_Robot/SIG_CommandParameters.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
@@ -29,7 +29,7 @@
 
 #include <QtTest>
 
-void SIGEL_Robot::SIG_LanguageParametersTest::defaultConstructorGivesTheStandardLanguage()
+void SIGEL_Robot::TST_SIG_LanguageParameters::defaultConstructorGivesTheStandardLanguage()
 {
   SIG_LanguageParameters languageParameters;
 
@@ -48,7 +48,7 @@ void SIGEL_Robot::SIG_LanguageParametersTest::defaultConstructorGivesTheStandard
     }
 }
 
-void SIGEL_Robot::SIG_LanguageParametersTest::settersChangeTheValues()
+void SIGEL_Robot::TST_SIG_LanguageParameters::settersChangeTheValues()
 {
   SIG_LanguageParameters languageParameters;
 
@@ -61,7 +61,7 @@ void SIGEL_Robot::SIG_LanguageParametersTest::settersChangeTheValues()
   QCOMPARE( languageParameters.getMaximalDelayTime(), 300 );
 }
 
-void SIGEL_Robot::SIG_LanguageParametersTest::hasCommandFindsOnlyAKnownName()
+void SIGEL_Robot::TST_SIG_LanguageParameters::hasCommandFindsOnlyAKnownName()
 {
   SIG_LanguageParameters languageParameters;
 
@@ -69,7 +69,7 @@ void SIGEL_Robot::SIG_LanguageParametersTest::hasCommandFindsOnlyAKnownName()
   QVERIFY( !languageParameters.hasCommand( "MISSING" ) );
 }
 
-void SIGEL_Robot::SIG_LanguageParametersTest::removeCommandRemovesTheCommand()
+void SIGEL_Robot::TST_SIG_LanguageParameters::removeCommandRemovesTheCommand()
 {
   SIG_LanguageParameters languageParameters;
   SIG_CommandParameters *command = new SIG_CommandParameters();
@@ -82,7 +82,7 @@ void SIGEL_Robot::SIG_LanguageParametersTest::removeCommandRemovesTheCommand()
   QCOMPARE( languageParameters.getCommand( "CHECKED" ), nullptr );
 }
 
-void SIGEL_Robot::SIG_LanguageParametersTest::removeCommandLeavesTheOtherCommands()
+void SIGEL_Robot::TST_SIG_LanguageParameters::removeCommandLeavesTheOtherCommands()
 {
   SIG_LanguageParameters languageParameters;
 
@@ -94,7 +94,7 @@ void SIGEL_Robot::SIG_LanguageParametersTest::removeCommandLeavesTheOtherCommand
   QCOMPARE( languageParameters.getCommands().at( 1 ).name, QString( "CMP" ) );
 }
 
-void SIGEL_Robot::SIG_LanguageParametersTest::removeCommandWithUnknownNameChangesNothing()
+void SIGEL_Robot::TST_SIG_LanguageParameters::removeCommandWithUnknownNameChangesNothing()
 {
   SIG_LanguageParameters languageParameters;
 
@@ -103,7 +103,7 @@ void SIGEL_Robot::SIG_LanguageParametersTest::removeCommandWithUnknownNameChange
   QCOMPARE( languageParameters.getCommands().count(), 15 );
 }
 
-void SIGEL_Robot::SIG_LanguageParametersTest::writeToFileTransferWritesTheCommandsInOrder()
+void SIGEL_Robot::TST_SIG_LanguageParameters::writeToFileTransferWritesTheCommandsInOrder()
 {
   SIG_LanguageParameters languageParameters;
   languageParameters.setRegisterWidth( 12 );
@@ -133,7 +133,7 @@ void SIGEL_Robot::SIG_LanguageParametersTest::writeToFileTransferWritesTheComman
                               "MAX CommandParameters 0.001\n" ) );
 }
 
-void SIGEL_Robot::SIG_LanguageParametersTest::writtenTextIsReadBack()
+void SIGEL_Robot::TST_SIG_LanguageParameters::writtenTextIsReadBack()
 {
   SIG_LanguageParameters original;
   original.setRegisterWidth( 12 );
@@ -161,7 +161,7 @@ void SIGEL_Robot::SIG_LanguageParametersTest::writtenTextIsReadBack()
 }
 
 // SIG_Robot reads the token itself and then gives the stream to this class.
-void SIGEL_Robot::SIG_LanguageParametersTest::streamInARobotHasNoToken()
+void SIGEL_Robot::TST_SIG_LanguageParameters::streamInARobotHasNoToken()
 {
   QString text = "4 6 100 2\nADD CommandParameters 0.5\nSUB CommandParameters 0.25\n";
   QTextStream stream( &text, QIODevice::ReadOnly );
@@ -178,7 +178,7 @@ void SIGEL_Robot::SIG_LanguageParametersTest::streamInARobotHasNoToken()
   QCOMPARE( languageParameters.getCommands().at( 1 ).value->getDuration(), 0.25 );
 }
 
-void SIGEL_Robot::SIG_LanguageParametersTest::wrongTokenThrows()
+void SIGEL_Robot::TST_SIG_LanguageParameters::wrongTokenThrows()
 {
   QString text = "Environment 8 8 5000 0\n";
   QTextStream stream( &text, QIODevice::ReadOnly );
@@ -186,7 +186,7 @@ void SIGEL_Robot::SIG_LanguageParametersTest::wrongTokenThrows()
   QVERIFY_THROWS_EXCEPTION( SIG_UnstreamingError, SIG_LanguageParameters languageParameters( stream, true ) );
 }
 
-void SIGEL_Robot::SIG_LanguageParametersTest::registerWidthOutsideOneToSixteenThrows()
+void SIGEL_Robot::TST_SIG_LanguageParameters::registerWidthOutsideOneToSixteenThrows()
 {
   QString tooSmall = "0 8 5000 0\n";
   QTextStream tooSmallStream( &tooSmall, QIODevice::ReadOnly );
@@ -197,7 +197,7 @@ void SIGEL_Robot::SIG_LanguageParametersTest::registerWidthOutsideOneToSixteenTh
   QVERIFY_THROWS_EXCEPTION( SIG_UnstreamingError, SIG_LanguageParameters languageParameters( tooLargeStream ) );
 }
 
-void SIGEL_Robot::SIG_LanguageParametersTest::registerWidthOneAndSixteenAreAccepted()
+void SIGEL_Robot::TST_SIG_LanguageParameters::registerWidthOneAndSixteenAreAccepted()
 {
   QString smallest = "1 8 5000 0\n";
   QTextStream smallestStream( &smallest, QIODevice::ReadOnly );
