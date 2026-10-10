@@ -215,6 +215,12 @@
 
       bool traceRobot;
 
+      /**
+       * How slowly the look point follows the robot, in simulation seconds.
+       */
+      static constexpr double horizontalFollowTime = 0.75;
+      static constexpr double verticalFollowTime = 2.5;
+
       QColor planeColor;
 
       QColor gridColor;
@@ -232,6 +238,12 @@
        * @param noOfSteps The number of timesteps to progress.
        */
       void makeTimeSteps(int noOfSteps);
+
+      /**
+       * Moves the look point a part of the way to the robot's centre.
+       * The part grows with the elapsed simulation time.
+       */
+      void moveLookPointTowardsRobot( SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation, double elapsedSeconds );
 
       void recordFrame( SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation, double seconds );
 

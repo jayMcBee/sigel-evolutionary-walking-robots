@@ -234,15 +234,25 @@
 			emit signalSimulationProgress( simulationVisualisation.getCurrentSimulationSeconds() );
 
 			if ( traceRobot )
-			{
-				SIG_Vector robotCentre = simulationVisualisation.getRobotCentre();
-				simulationVisualisation.viewSettings.lookPoint.assign( &robotCentre );
-			}
+				moveLookPointTowardsRobot( simulationVisualisation, noOfSteps * simulationParameters->getStepSize() );
 
 			double seconds = simulationVisualisation.getCurrentSimulationSeconds();
 
 			if ( movieRecorder.needsToRecordFrameAt( seconds ) )
 				recordFrame( simulationVisualisation, seconds );
+		}
+	};
+
+	void SIG_SimulationVisualisationWidget::moveLookPointTowardsRobot( SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation, double elapsedSeconds )
+	{
+		SIG_Vector robotCentre = simulationVisualisation.getRobotCentre();
+		SIG_Vector &lookPoint = simulationVisualisation.viewSettings.lookPoint;
+
+		for (int k=0; k<3; k++)
+		{
+			double const followTime = (k == 1) ? verticalFollowTime : horizontalFollowTime;
+			double const fraction = 1 - std::exp( -elapsedSeconds / followTime );
+			lookPoint.set( k, lookPoint.get(k) + (robotCentre.get(k) - lookPoint.get(k)) * fraction );
 		}
 	};
 
@@ -655,6 +665,10 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 
     if (visualisation)
       {
-	emit signalPosition( visualisation->viewSettings.lookPoint );
+	// The look point lags behind the robot while it follows it.
+	if (traceRobot)
+	  emit signalPosition( static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation* >( visualisation )->getRobotCentre() );
+	else
+	  emit signalPosition( visualisation->viewSettings.lookPoint );
       };
   };
