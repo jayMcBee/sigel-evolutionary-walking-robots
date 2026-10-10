@@ -43,6 +43,10 @@ namespace SIGEL_Simulation
     void constructorRefusesWidthOutsideOneToSixteen();
 
     void getMinValueAndGetMaxValueGiveTheRange();
+
+    void loadValueWrapsToTheWidth_data();
+
+    void loadValueWrapsToTheWidth();
   };
 
 }
