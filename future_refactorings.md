@@ -382,6 +382,17 @@ problem; the choice is made before any code is written.
   Register it in `SIG_GPFitnessFunctionRegistry::fitnessFunctions()`. No
   file format changes.
 
+- [ ] **164. The simulated fitness functions share their setup.** Each
+  `evalFitness` copies the same code by hand: build the recorder and the
+  simulation, catch the exception from `start()`, normalise the recorded
+  positions, append the end position, and walk the list with the Inf and NaN
+  test. `SIG_GPForceFitnessFunction` also copies the height band of
+  `SIG_GPNiceWalkingFitnessFunction`. The few lines that score are hard to
+  find. Put the shared part in one place, so that each `evalFitness` holds
+  only its score: either a class that runs the simulation and hands back the
+  normalised positions, or methods in `SIG_GPFitnessFunction`. The fitness
+  values must stay identical.
+
 - [ ] **155. The master refuses a `sigel_slave` built from other source.**
   Nothing checks that the master and a slave are the same SIGEL. A slave of
   another state can read a job differently or simulate differently, and the
