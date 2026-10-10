@@ -1,5 +1,4 @@
 #include "MT_GPSystem/MT_Randomizer.h"
-#include <iostream>
 
 // administrative methods
 
@@ -50,14 +49,11 @@ MT_Randomizer::MT_Randomizer(QTextStream &File)
 	for (int i=0; i<7; i++)
 		RandomXPoints[i]=0;
 
-	std::cerr << ">>> in Randomizer <<<" << std::endl;
 	QString Randomizer( "Randomizer:" );
 	QString PresentLine = File.readLine();
-	std::cerr << PresentLine.toStdString() << std::endl;
 	
 	while ((PresentLine != Randomizer) && !(File.atEnd())){
 		PresentLine = File.readLine();
-		std::cerr << PresentLine.toStdString() << std::endl;
 	}
 
 	if ((PresentLine == Randomizer) && !(File.atEnd()))
