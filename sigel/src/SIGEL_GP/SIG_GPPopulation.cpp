@@ -30,6 +30,7 @@
 #include<iostream>
 
 #include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation()
 	: pool(),
@@ -352,6 +353,15 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
 #endif
 
+	if( populationStr.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive)==-1 )
+		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The population has no POPULATIONSIZE field." );
+
+	if( populationStr.indexOf("NEXTIDENTIFIER=", 0, Qt::CaseInsensitive)==-1 )
+		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The population has no NEXTIDENTIFIER field." );
+
+	if( populationStr.indexOf("POOLGENERATION=", 0, Qt::CaseInsensitive)==-1 )
+		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The population has no POOLGENERATION field." );
+
 	if( (pos=populationStr.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive) )!=-1 )
 	{
 		pos2=populationStr.indexOf(";", pos + 16, Qt::CaseInsensitive);
@@ -385,8 +395,6 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 #endif
 			setNextIdentifier(populationStr.mid(pos+15,pos2-pos-15));
 		}
-		else
-			setNextIdentifier(QString::number(0));
 
 		pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
 		if( (pos=populationStr.indexOf("POOLGENERATION=", 0, Qt::CaseInsensitive))!=-1 )
@@ -399,8 +407,6 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 #endif
 			setPoolGeneration((populationStr.mid(pos+15,pos2-pos-15)).toLong());
 		}
-		else
-			setPoolGeneration(0);
 
 		for(long x=0;x<getSize();x++)
 		{
@@ -414,7 +420,16 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
 			indStr = populationStr.mid(pos+19+tmpStr1.length(),pos2-pos-20-tmpStr1.length());
 
-			getIndividualPointer(x)->readFromFile(indStr);
+			try
+			{
+				getIndividualPointer(x)->readFromFile(indStr);
+			}
+			catch( ... )
+			{
+				// The pool keeps the individuals that were read completely, as after Cancel.
+				resizeOwning( pool, x );
+				throw;
+			}
 
 			if( qApp )
 			{

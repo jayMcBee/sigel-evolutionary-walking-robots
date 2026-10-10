@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include "SIGEL_GP/SIG_GPIndividual.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 
 
 SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPIndividual::operator =(SIG_GPIndividual& ind)
@@ -541,65 +542,55 @@ void SIGEL_GP::SIG_GPIndividual::setHistory( QStringList hist )
 void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
 {
 	long                        pos;
+	long                        endPos;
 
 	QString                     prgStr;
 	QString                     histStr;
 	QTextStream                 outputFile(&prgStr, QIODeviceBase::WriteOnly);
 	QTextStream                 inputFile(&prgStr, QIODeviceBase::ReadOnly);
 
-	if((pos=indStr.indexOf("NAME='", 0, Qt::CaseInsensitive))!=-1)
-	{
-		long endPos=indStr.indexOf("'", pos+7, Qt::CaseInsensitive);
-		setName(indStr.mid(pos+6,endPos-pos-6));
-	}
-	else
-	{
-	}
+	pos=indStr.indexOf("NAME='", 0, Qt::CaseInsensitive);
+	if(pos==-1)
+		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "An individual has no NAME field." );
 
-	if((pos=indStr.indexOf("POOLPOS=", 0, Qt::CaseInsensitive))!=-1)
-	{
-		long endPos=indStr.indexOf(";", pos+9, Qt::CaseInsensitive);
-		setPoolPos((indStr.mid(pos+8,endPos-pos-8)).toLong());
-	}
-	else
-	{
-	}
+	endPos=indStr.indexOf("'", pos+7, Qt::CaseInsensitive);
+	setName(indStr.mid(pos+6,endPos-pos-6));
 
-	if((pos=indStr.indexOf("FITNESS=", 0, Qt::CaseInsensitive))!=-1)
-	{
-		long endPos=indStr.indexOf(";", pos+9, Qt::CaseInsensitive);
-		setFitness((indStr.mid(pos+8,endPos-pos-8)).toDouble());
-	}
-	else
-	{
-	}
+	pos=indStr.indexOf("POOLPOS=", 0, Qt::CaseInsensitive);
+	if(pos==-1)
+		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "Individual '" + getName() + "' has no POOLPOS field." );
 
-	if((pos=indStr.indexOf("AGE=", 0, Qt::CaseInsensitive))!=-1)
-	{
-		long endPos=indStr.indexOf(";", pos+5, Qt::CaseInsensitive);
-		setAge((indStr.mid(pos+4,endPos-pos-4)).toLong());
-	}
-	else
-	{
-	}
+	endPos=indStr.indexOf(";", pos+9, Qt::CaseInsensitive);
+	setPoolPos((indStr.mid(pos+8,endPos-pos-8)).toLong());
 
-	if((pos=indStr.indexOf("PROGRAM BEGIN{", 0, Qt::CaseInsensitive))!=-1)
-	{
-		long endPos=indStr.indexOf("}PROGRAM END", pos+16, Qt::CaseInsensitive);
-		prgStr=indStr.mid(pos+15,endPos-pos-14);
-		getProgramPointer()->readFromFile(inputFile);
-	}
-	else
-	{
-	}
+	pos=indStr.indexOf("FITNESS=", 0, Qt::CaseInsensitive);
+	if(pos==-1)
+		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "Individual '" + getName() + "' has no FITNESS field." );
 
-	if((pos=indStr.indexOf("HISTORY BEGIN{", 0, Qt::CaseInsensitive))!=-1)
-	{
-		long endPos=indStr.indexOf("}HISTORY END", pos+15, Qt::CaseInsensitive);
-		histStr=indStr.mid(pos+14,endPos-pos-14).trimmed();
-		history.append(histStr);
-	}
-	else
-	{
-	}
+	endPos=indStr.indexOf(";", pos+9, Qt::CaseInsensitive);
+	setFitness((indStr.mid(pos+8,endPos-pos-8)).toDouble());
+
+	pos=indStr.indexOf("AGE=", 0, Qt::CaseInsensitive);
+	if(pos==-1)
+		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "Individual '" + getName() + "' has no AGE field." );
+
+	endPos=indStr.indexOf(";", pos+5, Qt::CaseInsensitive);
+	setAge((indStr.mid(pos+4,endPos-pos-4)).toLong());
+
+	pos=indStr.indexOf("PROGRAM BEGIN{", 0, Qt::CaseInsensitive);
+	if(pos==-1)
+		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "Individual '" + getName() + "' has no PROGRAM block." );
+
+	endPos=indStr.indexOf("}PROGRAM END", pos+16, Qt::CaseInsensitive);
+	prgStr=indStr.mid(pos+15,endPos-pos-14);
+	getProgramPointer()->readFromFile(inputFile);
+
+	// An individual that was saved without its history has no HISTORY block.
+	pos=indStr.indexOf("HISTORY BEGIN{", 0, Qt::CaseInsensitive);
+	if(pos==-1)
+		return;
+
+	endPos=indStr.indexOf("}HISTORY END", pos+15, Qt::CaseInsensitive);
+	histStr=indStr.mid(pos+14,endPos-pos-14).trimmed();
+	history.append(histStr);
 }
