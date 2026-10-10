@@ -632,7 +632,14 @@ void SIG_GUIGPExperiment::slotPopulationImport()
       if( file.open(QIODevice::ReadOnly) )
 	{
 	  QTextStream theStream( &file );
-	  gpExperiment.population.readFromFile( theStream );
+	  try
+	    {
+	      gpExperiment.population.readFromFile( theStream );
+	    }
+	  catch ( const SIGEL_Tools::SIG_Exception &e )
+	    {
+	      QMessageBox::warning( experimentListView, "Import Population", e.getMessage() );
+	    }
 	}
       file.close();
       allIndividualsView->slotCompleteRefreshList();
