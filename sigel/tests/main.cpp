@@ -22,6 +22,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "MT_GPSystem/MT_SearchTest.h"
+#include "SIGEL_GP/SIG_GPIndividualTest.h"
 #include "SIGEL_GP/SIG_GPPopulationTest.h"
 #include "SIGEL_Robot/SIG_LanguageParametersTest.h"
 #include "SIGEL_Robot/SIG_LinkTest.h"
@@ -42,6 +43,7 @@
 int main( int argc, char *argv[] ) {
   std::vector<std::unique_ptr<QObject>> testClasses;
   testClasses.push_back( std::make_unique<MT_SearchTest>() );
+  testClasses.push_back( std::make_unique<SIGEL_GP::SIG_GPIndividualTest>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::SIG_GPPopulationTest>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::SIG_LanguageParametersTest>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::SIG_LinkTest>() );

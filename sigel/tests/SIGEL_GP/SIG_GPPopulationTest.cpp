@@ -413,23 +413,6 @@ void SIGEL_GP::SIG_GPPopulationTest::individualsWithHistoryAreReadBack()
   QCOMPARE( writtenText( copy ), written );
 }
 
-// Older experiment files have the history on the line of HISTORY BEGIN{.
-void SIGEL_GP::SIG_GPPopulationTest::historyWithoutLineBreakAtTheStartIsRead()
-{
-  SIG_GPPopulation original;
-  addIndividuals( original, 3 );
-  QString written = writtenText( original );
-  QVERIFY( written.contains( "HISTORY BEGIN{\n" ) );
-  QString older = written;
-  older.replace( "HISTORY BEGIN{\n", "HISTORY BEGIN{" );
-
-  SIG_GPPopulation copy;
-  QTextStream stream( &older, QIODevice::ReadOnly );
-  copy.readFromFile( stream );
-
-  QCOMPARE( writtenText( copy ), written );
-}
-
 // Some experiment files have no WITHHISTORY line.
 void SIGEL_GP::SIG_GPPopulationTest::textWithoutHeaderIsRead()
 {
@@ -504,20 +487,17 @@ void SIGEL_GP::SIG_GPPopulationTest::readFromFileReplacesTheIndividualsThatAreTh
 void SIGEL_GP::SIG_GPPopulationTest::textWithoutARequiredFieldIsRefused_data()
 {
   QTest::addColumn< QString >( "field" );
+  QTest::addColumn< QString >( "message" );
 
-  QTest::newRow( "POPULATIONSIZE" ) << "POPULATIONSIZE=";
-  QTest::newRow( "NEXTIDENTIFIER" ) << "NEXTIDENTIFIER=";
-  QTest::newRow( "POOLGENERATION" ) << "POOLGENERATION=";
-  QTest::newRow( "NAME" ) << "NAME='";
-  QTest::newRow( "POOLPOS" ) << "POOLPOS=";
-  QTest::newRow( "FITNESS" ) << "FITNESS=";
-  QTest::newRow( "AGE" ) << "AGE=";
-  QTest::newRow( "PROGRAM" ) << "PROGRAM BEGIN{";
+  QTest::newRow( "POPULATIONSIZE" ) << "POPULATIONSIZE=" << "The population has no POPULATIONSIZE field.";
+  QTest::newRow( "NEXTIDENTIFIER" ) << "NEXTIDENTIFIER=" << "The population has no NEXTIDENTIFIER field.";
+  QTest::newRow( "POOLGENERATION" ) << "POOLGENERATION=" << "The population has no POOLGENERATION field.";
 }
 
 void SIGEL_GP::SIG_GPPopulationTest::textWithoutARequiredFieldIsRefused()
 {
   QFETCH( QString, field );
+  QFETCH( QString, message );
   SIG_GPPopulation original;
   addIndividuals( original, 3 );
   original.setHistory( false );
@@ -526,9 +506,21 @@ void SIGEL_GP::SIG_GPPopulationTest::textWithoutARequiredFieldIsRefused()
   broken.replace( field, "MISSING" );
 
   SIG_GPPopulation copy;
+  addIndividuals( copy, 2 );
   QTextStream stream( &broken, QIODevice::ReadOnly );
+  QString thrown;
+  try
+    {
+      copy.readFromFile( stream );
+    }
+  catch ( const SIGEL_Tools::SIG_Exception &e )
+    {
+      thrown = e.getMessage();
+    }
 
-  QVERIFY_THROWS_EXCEPTION( SIGEL_Tools::SIG_Exception, copy.readFromFile( stream ) );
+  QVERIFY2( thrown.contains( message ), qPrintable( thrown ) );
+  QCOMPARE( copy.getSize(), 2 );
+  QCOMPARE( copy.nextIdentifier, QString( "2" ) );
 }
 
 void SIGEL_GP::SIG_GPPopulationTest::refusedTextLeavesOnlyCompleteIndividuals()
@@ -536,6 +528,7 @@ void SIGEL_GP::SIG_GPPopulationTest::refusedTextLeavesOnlyCompleteIndividuals()
   SIG_GPPopulation original;
   addIndividuals( original, 3 );
   original.setHistory( false );
+  original.getIndividualPointer( 0 )->setFitness( 3.5 );
   QString broken = writtenText( original );
   const qsizetype secondFitness = broken.indexOf( "FITNESS=", broken.indexOf( "FITNESS=" ) + 1 );
   QVERIFY( secondFitness != -1 );
@@ -547,7 +540,49 @@ void SIGEL_GP::SIG_GPPopulationTest::refusedTextLeavesOnlyCompleteIndividuals()
   QVERIFY_THROWS_EXCEPTION( SIGEL_Tools::SIG_Exception, copy.readFromFile( stream ) );
 
   QCOMPARE( copy.getSize(), 1 );
-  QCOMPARE( copy.getIndividualPointer( 0 )->getName(), QString( "0" ) );
+  QCOMPARE( copy.getIndividualPointer( 0 )->getFitness(), 3.5 );
+}
+
+void SIGEL_GP::SIG_GPPopulationTest::importNewIndividualAddsTheIndividualOfTheFile()
+{
+  QTemporaryDir folder;
+  QString fileName = folder.filePath( "individual.ind" );
+  SIG_GPPopulation source;
+  addIndividuals( source, 1 );
+  source.getIndividualPointer( 0 )->setFitness( 3.5 );
+  source.getIndividualPointer( 0 )->exportIndividual( fileName );
+
+  SIG_GPPopulation population;
+  addIndividuals( population, 2, 2 );
+
+  QVERIFY( population.importNewIndividual( fileName ) );
+
+  QCOMPARE( population.getSize(), 3 );
+  SIG_GPIndividual *imported = population.getIndividualPointer( 2 );
+  QCOMPARE( imported->getName(), QString( "2" ) );
+  QCOMPARE( imported->getPoolPos(), 2 );
+  QCOMPARE( imported->getFitness(), -1.0 );
+  QCOMPARE( imported->getProgram().getProgramLength(), source.getIndividualPointer( 0 )->getProgram().getProgramLength() );
+  QCOMPARE( population.nextIdentifier, QString( "3" ) );
+}
+
+void SIGEL_GP::SIG_GPPopulationTest::importNewIndividualOfABrokenFileLeavesThePopulation()
+{
+  QTemporaryDir folder;
+  QString fileName = folder.filePath( "individual.ind" );
+  QFile file( fileName );
+  QVERIFY( file.open( QIODevice::WriteOnly ) );
+  file.write( "INDIVIDUAL BEGIN{ NAME='0'; POOLPOS=0; }INDIVIDUAL END" );
+  file.close();
+
+  SIG_GPPopulation population;
+  addIndividuals( population, 2 );
+  QString before = writtenText( population );
+
+  QVERIFY_THROWS_EXCEPTION( SIGEL_Tools::SIG_Exception, population.importNewIndividual( fileName ) );
+
+  QCOMPARE( population.getSize(), 2 );
+  QCOMPARE( writtenText( population ), before );
 }
 
 int SIGEL_GP::SIG_GPPopulationTest::addIndividuals( SIG_GPPopulation &population, int quantity, int seed )

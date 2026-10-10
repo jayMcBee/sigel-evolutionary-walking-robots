@@ -89,8 +89,6 @@ namespace SIGEL_GP
 
     void individualsWithHistoryAreReadBack();
 
-    void historyWithoutLineBreakAtTheStartIsRead();
-
     void textWithoutHeaderIsRead();
 
     void emptyPopulationIsReadBack();
@@ -104,6 +102,10 @@ namespace SIGEL_GP
     void textWithoutARequiredFieldIsRefused();
 
     void refusedTextLeavesOnlyCompleteIndividuals();
+
+    void importNewIndividualAddsTheIndividualOfTheFile();
+
+    void importNewIndividualOfABrokenFileLeavesThePopulation();
 
   private:
 
