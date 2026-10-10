@@ -1103,6 +1103,16 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   `fitness-check.sh` on both builds. A wrong expected value, a leak in a
   test and a test class that `main.cpp` does not name were each made on
   purpose once, and each one failed as it must.
+- **Extended:** an independent assessment found `SIG_RandomizerTest` and
+  `SIG_LanguageParametersTest` not complete. `SIG_RandomizerTest` now has
+  known numbers for two seeds and two maximums, so a change of a constant
+  of the formula fails. `SIG_LanguageParametersTest` now has the default
+  constructor, the setters and getters, `hasCommand`, the written text, the
+  reading with and without the token, and the limits of the register
+  width. A second assessment found no behaviour of
+  `SIG_LanguageParameters` that a normal run uses without a test. One gap
+  of `SIG_RandomizerTest` is accepted: seed 0 takes the time of day, and no
+  test can check that without a change to `SIG_Randomizer`.
 - **With it:** the constructor `MT_Randomizer(QTextStream &)` wrote three
   trace lines to the error output for each object, 3,600 lines in one run
   of `MT_SearchTest`. They are deleted, with the `#include <iostream>` that
