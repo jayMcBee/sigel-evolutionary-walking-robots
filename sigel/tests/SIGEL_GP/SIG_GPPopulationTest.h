@@ -89,6 +89,8 @@ namespace SIGEL_GP
 
     void individualsWithHistoryAreReadBack();
 
+    void historyWithoutLineBreakAtTheStartIsRead();
+
     void textWithoutHeaderIsRead();
 
     void emptyPopulationIsReadBack();

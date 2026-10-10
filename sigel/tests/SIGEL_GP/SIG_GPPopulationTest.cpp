@@ -412,6 +412,23 @@ void SIGEL_GP::SIG_GPPopulationTest::individualsWithHistoryAreReadBack()
   QCOMPARE( writtenText( copy ), written );
 }
 
+// Older experiment files have the history on the line of HISTORY BEGIN{.
+void SIGEL_GP::SIG_GPPopulationTest::historyWithoutLineBreakAtTheStartIsRead()
+{
+  SIG_GPPopulation original;
+  addIndividuals( original, 3 );
+  QString written = writtenText( original );
+  QVERIFY( written.contains( "HISTORY BEGIN{\n" ) );
+  QString older = written;
+  older.replace( "HISTORY BEGIN{\n", "HISTORY BEGIN{" );
+
+  SIG_GPPopulation copy;
+  QTextStream stream( &older, QIODevice::ReadOnly );
+  copy.readFromFile( stream );
+
+  QCOMPARE( writtenText( copy ), written );
+}
+
 // Some experiment files have no WITHHISTORY line.
 void SIGEL_GP::SIG_GPPopulationTest::textWithoutHeaderIsRead()
 {
