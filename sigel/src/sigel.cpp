@@ -176,7 +176,7 @@ int main( int argc, char *argv[] ) {
     }
 
     // The trainer's destructor calls pvm_delhosts, so the experiment and the manager end before pvm_halt().
-    {
+    try {
       SIGEL_GP::SIG_GPExperiment experiment;
 
       experiment.experimentName = experimentName;
@@ -238,6 +238,13 @@ int main( int argc, char *argv[] ) {
       QTextStream experimentSaveStream( &experimentFile );
       experiment.saveExperiment( experimentSaveStream );
       experimentFile.close();
+    }
+    catch (SIGEL_Tools::SIG_Exception &e) {
+      // The manager no longer exists; the signal handler must not use it.
+      headlessManager = nullptr;
+      SIGEL_Tools::SIG_IO::cerr << "Error in " << experimentName << ": " << e.getMessage() << Qt::endl;
+      pvm_halt();
+      return 1;
     }
 
     pvm_halt();
