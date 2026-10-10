@@ -99,6 +99,12 @@ namespace SIGEL_GP
 
     void readFromFileReplacesTheIndividualsThatAreThere();
 
+    void textWithoutARequiredFieldIsRefused_data();
+
+    void textWithoutARequiredFieldIsRefused();
+
+    void refusedTextLeavesOnlyCompleteIndividuals();
+
   private:
 
     // Sets the seed first: without it the programs depend on the time of day.

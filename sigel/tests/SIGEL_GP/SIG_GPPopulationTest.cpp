@@ -28,6 +28,7 @@
 #include "SIGEL_GP/SIG_GPPopulation.h"
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 
 #include <QtTest>
@@ -498,6 +499,55 @@ void SIGEL_GP::SIG_GPPopulationTest::readFromFileReplacesTheIndividualsThatAreTh
 
   QCOMPARE( smaller.getSize(), 2 );
   QCOMPARE( writtenText( smaller ), written );
+}
+
+void SIGEL_GP::SIG_GPPopulationTest::textWithoutARequiredFieldIsRefused_data()
+{
+  QTest::addColumn< QString >( "field" );
+
+  QTest::newRow( "POPULATIONSIZE" ) << "POPULATIONSIZE=";
+  QTest::newRow( "NEXTIDENTIFIER" ) << "NEXTIDENTIFIER=";
+  QTest::newRow( "POOLGENERATION" ) << "POOLGENERATION=";
+  QTest::newRow( "NAME" ) << "NAME='";
+  QTest::newRow( "POOLPOS" ) << "POOLPOS=";
+  QTest::newRow( "FITNESS" ) << "FITNESS=";
+  QTest::newRow( "AGE" ) << "AGE=";
+  QTest::newRow( "PROGRAM" ) << "PROGRAM BEGIN{";
+}
+
+void SIGEL_GP::SIG_GPPopulationTest::textWithoutARequiredFieldIsRefused()
+{
+  QFETCH( QString, field );
+  SIG_GPPopulation original;
+  addIndividuals( original, 3 );
+  original.setHistory( false );
+  QString broken = writtenText( original );
+  QVERIFY( broken.contains( field ) );
+  broken.replace( field, "MISSING" );
+
+  SIG_GPPopulation copy;
+  QTextStream stream( &broken, QIODevice::ReadOnly );
+
+  QVERIFY_THROWS_EXCEPTION( SIGEL_Tools::SIG_Exception, copy.readFromFile( stream ) );
+}
+
+void SIGEL_GP::SIG_GPPopulationTest::refusedTextLeavesOnlyCompleteIndividuals()
+{
+  SIG_GPPopulation original;
+  addIndividuals( original, 3 );
+  original.setHistory( false );
+  QString broken = writtenText( original );
+  const qsizetype secondFitness = broken.indexOf( "FITNESS=", broken.indexOf( "FITNESS=" ) + 1 );
+  QVERIFY( secondFitness != -1 );
+  broken.replace( secondFitness, 8, "MISSING" );
+
+  SIG_GPPopulation copy;
+  addIndividuals( copy, 5 );
+  QTextStream stream( &broken, QIODevice::ReadOnly );
+  QVERIFY_THROWS_EXCEPTION( SIGEL_Tools::SIG_Exception, copy.readFromFile( stream ) );
+
+  QCOMPARE( copy.getSize(), 1 );
+  QCOMPARE( copy.getIndividualPointer( 0 )->getName(), QString( "0" ) );
 }
 
 int SIGEL_GP::SIG_GPPopulationTest::addIndividuals( SIG_GPPopulation &population, int quantity, int seed )
