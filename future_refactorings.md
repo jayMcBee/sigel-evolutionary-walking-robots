@@ -199,17 +199,6 @@ touched, because changing one changes behaviour against the reference binary.
   transfer text can bring an unknown word in; the robot
   compiler rejects it.
 
-- [ ] **55. Review the marker checks that do nothing.** The
-  stream constructor of `SIG_CommandParameters` holds only `// ERROR` and
-  reads on; those of `SIG_Geometry` and `SIG_Polygon` print a message and
-  read on; `SIG_Robot` and
-  `SIG_LanguageParameters` already throw `SIG_UnstreamingError`. Throwing
-  would make a malformed transfer text fail at once; valid files are not
-  affected. The other empty bodies go in the same round:
-  `if (running) {} else {}` in the `MT_*Widget.cpp` files, empty `else {}` in
-  `SIG_GPIndividual.cpp` and `SIG_GPPopulation.cpp`, and `SIG_Robot`'s
-  `if (isroot)`, "Something seems to be missing here".
-
 - [ ] **152. A geometry file with `DEF` and `USE` aborts SIGEL.** A VRML
   file may give a shape a name with `DEF` and place it again with `USE`.
   `SIG_Body` loads the file with the `cv97` library, and the library stops
