@@ -19,76 +19,78 @@
   You should have received a copy of the GNU General Public License
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 #include "SIGEL_Robot/SIG_Polygon.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include <stdio.h>
 
-namespace SIGEL_Robot {
+namespace SIGEL_Robot
+{
 
-        SIG_Polygon::SIG_Polygon (SIG_Geometry *within, SIG_Polygon *other)
-                : myGeometry (within),
-                  vertices (0)
-        {
-                vertices.resize (other->vertices.count ());
-                for (int i = 0; i < other->vertices.count (); i++)
-                        vertices [i] = other->vertices [i];
-        }
-        
-        SIG_Polygon::SIG_Polygon (SIG_Geometry *within)
-                : myGeometry (within),
-                  vertices (0)
-        {
-                within->addPolygon (this);
-        }
+	SIG_Polygon::SIG_Polygon (SIG_Geometry *within, SIG_Polygon *other)
+		: myGeometry (within),
+		  vertices (0)
+	{
+		vertices.resize (other->vertices.count ());
+		for (int i = 0; i < other->vertices.count (); i++)
+			vertices [i] = other->vertices [i];
+	}
 
-        SIG_Polygon::SIG_Polygon (SIG_Geometry *mygeom, QTextStream & tx)
-                : myGeometry (mygeom)
-        {
-                QString tmpstr;
-                int vertexCount;
+	SIG_Polygon::SIG_Polygon (SIG_Geometry *within)
+		: myGeometry (within),
+		  vertices (0)
+	{
+		within->addPolygon (this);
+	}
 
-                tx >> tmpstr;
-                if (tmpstr != "Polygon")
-                        throw SIG_UnstreamingError (__FILE__, __LINE__, "Polygon expected, found '" + tmpstr + "'");
-                
-                tx >> vertexCount;
-                vertices.resize (vertexCount);
-                for (int i = 0; i < vertexCount; i++)
-                        tx >> vertices [i];
-        }
+	SIG_Polygon::SIG_Polygon (SIG_Geometry *mygeom, QTextStream & tx)
+		: myGeometry (mygeom)
+	{
+		QString tmpstr;
+		int vertexCount;
 
-        void SIG_Polygon::appendVertex (SIG_Vector pt)
-        {
-                int idx = vertices.size ();
-                vertices.resize (idx + 1);
-                vertices [idx] = myGeometry->getOrAddVertex (pt);
-        }
+		tx >> tmpstr;
+		if (tmpstr != "Polygon")
+			throw SIG_UnstreamingError (__FILE__, __LINE__, "Polygon expected, found '" + tmpstr + "'");
 
-        int SIG_Polygon::getNumVertices () const
-        {
-                return vertices.size ();
-        }
+		tx >> vertexCount;
+		vertices.resize (vertexCount);
+		for (int i = 0; i < vertexCount; i++)
+			tx >> vertices [i];
+	}
 
-        SIG_Vector SIG_Polygon::getVertex (int nr) const
-        {
-                return myGeometry->getVertex (vertices [nr]);
-        }
+	void SIG_Polygon::appendVertex (SIG_Vector pt)
+	{
+		int idx = vertices.size ();
+		vertices.resize (idx + 1);
+		vertices [idx] = myGeometry->getOrAddVertex (pt);
+	}
 
-        int SIG_Polygon::getVertexIndex (int nr) const
-        {
-                return vertices [nr];
-        }
+	int SIG_Polygon::getNumVertices () const
+	{
+		return vertices.size ();
+	}
 
-        void SIG_Polygon::writeToFileTransfer (QTextStream & tx) const
-        {
-                int vc = vertices.count ();
-                tx << "Polygon " << vc;
-                for (int i = 0; i < vc; i++) {
-                        tx << ' ' << vertices [i];
-                }
-                tx << '\n';
-        }
+	SIG_Vector SIG_Polygon::getVertex (int nr) const
+	{
+		return myGeometry->getVertex (vertices [nr]);
+	}
+
+	int SIG_Polygon::getVertexIndex (int nr) const
+	{
+		return vertices [nr];
+	}
+
+	void SIG_Polygon::writeToFileTransfer (QTextStream & tx) const
+	{
+		int vc = vertices.count ();
+		tx << "Polygon " << vc;
+		for (int i = 0; i < vc; i++)
+		{
+			tx << ' ' << vertices [i];
+		}
+		tx << '\n';
+	}
 
 }

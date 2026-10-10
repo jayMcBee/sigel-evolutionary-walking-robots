@@ -19,122 +19,127 @@
   You should have received a copy of the GNU General Public License
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 #include "SIGEL_Robot/SIG_Geometry.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
 
-namespace SIGEL_Robot {
+namespace SIGEL_Robot
+{
 
-        void SIG_Geometry::addPolygon (SIG_Polygon *p)
-        {
-	  polygons.append (p);
-        }
+	void SIG_Geometry::addPolygon (SIG_Polygon *p)
+	{
+		polygons.append (p);
+	}
 
-        SIG_Polygon const *SIG_Geometry::getPolygon (int i) const
-        {
-                return polygons [i];
-        }
+	SIG_Polygon const *SIG_Geometry::getPolygon (int i) const
+	{
+		return polygons [i];
+	}
 
-        SIG_Geometry::SIG_Geometry ()
-        {
-        }
+	SIG_Geometry::SIG_Geometry ()
+	{
+	}
 
-        SIG_Geometry::SIG_Geometry (const SIG_Geometry *geom)
-        {
-                for (SIG_Vector *v : geom->vertices)
-                        vertices.append (new SIG_Vector (v));
+	SIG_Geometry::SIG_Geometry (const SIG_Geometry *geom)
+	{
+		for (SIG_Vector *v : geom->vertices)
+			vertices.append (new SIG_Vector (v));
 
-                for (SIG_Polygon *p : geom->polygons)
-                        polygons.append (new SIG_Polygon (this, p));
-        }
+		for (SIG_Polygon *p : geom->polygons)
+			polygons.append (new SIG_Polygon (this, p));
+	}
 
-        SIG_Geometry::SIG_Geometry (QTextStream & tx)
-        {
-                QString tmpstr;
-                int itemCount;
-                
-                tx >> tmpstr;
-                if (tmpstr != "Geometry")
-                        throw SIG_UnstreamingError (__FILE__, __LINE__, "Geometry expected, found '" + tmpstr + "'");
+	SIG_Geometry::SIG_Geometry (QTextStream & tx)
+	{
+		QString tmpstr;
+		int itemCount;
 
-                tx >> itemCount;
-                for (int i = 0; i < itemCount; i++) {
-                        SIG_Vector d = SIG_Robot::streamToVector (tx);
-                        vertices.append (new SIG_Vector (&d));
-                }
+		tx >> tmpstr;
+		if (tmpstr != "Geometry")
+			throw SIG_UnstreamingError (__FILE__, __LINE__, "Geometry expected, found '" + tmpstr + "'");
 
-                tx >> itemCount;
-                for (int j = 0; j < itemCount; j++)
-                        polygons.append (new SIG_Polygon (this, tx));
-        }
+		tx >> itemCount;
+		for (int i = 0; i < itemCount; i++)
+		{
+			SIG_Vector d = SIG_Robot::streamToVector (tx);
+			vertices.append (new SIG_Vector (&d));
+		}
 
-        SIG_Geometry::~SIG_Geometry ()
-        {
-                qDeleteAll (polygons);
-                qDeleteAll (vertices);
-        }
-        
-        int SIG_Geometry::getOrAddVertex (SIG_Vector vertex)
-        {
-                int appending_position = vertices.size ();
-                for (int i = 0; i < appending_position; i++) {
-                        if (vertex.equal (vertices [i]))
-                                return i;
-                }
-                vertices.append (new SIG_Vector (&vertex));
-                return appending_position;
-        }
+		tx >> itemCount;
+		for (int j = 0; j < itemCount; j++)
+			polygons.append (new SIG_Polygon (this, tx));
+	}
 
-        QList<SIG_Vector *> const & SIG_Geometry::getVertices () const
-        {
-                return vertices;
-        }
-        
-        int SIG_Geometry::getNumVertices () const
-        {
-                return vertices.size ();
-        }
-        
-        SIG_Vector SIG_Geometry::getVertex (int i) const
-        {
-                return *vertices.at (i);
-        }
+	SIG_Geometry::~SIG_Geometry ()
+	{
+		qDeleteAll (polygons);
+		qDeleteAll (vertices);
+	}
 
-        int SIG_Geometry::getNumPolygons () const
-        {
-                return polygons.size ();
-        }
-        
-        void SIG_Geometry::translate (SIG_Vector dir)
-        {
-                int nrofverts = vertices.count ();
-                for (int i = 0; i < nrofverts; i++) {
-                        vertices [i]->plusis (&dir);
-                }
-        }
-        
-        void SIG_Geometry::rotate (SIG_Matrix mat)
-        {
-                int nrofverts = vertices.count ();
-                for (int i = 0; i < nrofverts; i++) {
-                        SIG_Vector d (vertices [i]);
-                        mat.times (&d, vertices [i]);
-                }
-        }
+	int SIG_Geometry::getOrAddVertex (SIG_Vector vertex)
+	{
+		int appending_position = vertices.size ();
+		for (int i = 0; i < appending_position; i++)
+		{
+			if (vertex.equal (vertices [i]))
+				return i;
+		}
+		vertices.append (new SIG_Vector (&vertex));
+		return appending_position;
+	}
 
-        void SIG_Geometry::writeToFileTransfer (QTextStream & tx) const
-        {
-                int nrofverts = vertices.count ();
-                tx << "Geometry "
-                   << vertices.count () << ' ';
-                for (int i = 0; i < nrofverts; i++)
-                        SIG_Robot::vectorToStream (tx, *vertices [i]);
-                
-                int nrofpolys = polygons.count ();
-                tx << polygons.count () << '\n';
-                for (int j = 0; j < nrofpolys; j++)
-                        polygons [j]->writeToFileTransfer (tx);
-        }
+	QList<SIG_Vector *> const & SIG_Geometry::getVertices () const
+	{
+		return vertices;
+	}
+
+	int SIG_Geometry::getNumVertices () const
+	{
+		return vertices.size ();
+	}
+
+	SIG_Vector SIG_Geometry::getVertex (int i) const
+	{
+		return *vertices.at (i);
+	}
+
+	int SIG_Geometry::getNumPolygons () const
+	{
+		return polygons.size ();
+	}
+
+	void SIG_Geometry::translate (SIG_Vector dir)
+	{
+		int nrofverts = vertices.count ();
+		for (int i = 0; i < nrofverts; i++)
+		{
+			vertices [i]->plusis (&dir);
+		}
+	}
+
+	void SIG_Geometry::rotate (SIG_Matrix mat)
+	{
+		int nrofverts = vertices.count ();
+		for (int i = 0; i < nrofverts; i++)
+		{
+			SIG_Vector d (vertices [i]);
+			mat.times (&d, vertices [i]);
+		}
+	}
+
+	void SIG_Geometry::writeToFileTransfer (QTextStream & tx) const
+	{
+		int nrofverts = vertices.count ();
+		tx << "Geometry "
+		   << vertices.count () << ' ';
+		for (int i = 0; i < nrofverts; i++)
+			SIG_Robot::vectorToStream (tx, *vertices [i]);
+
+		int nrofpolys = polygons.count ();
+		tx << polygons.count () << '\n';
+		for (int j = 0; j < nrofpolys; j++)
+			polygons [j]->writeToFileTransfer (tx);
+	}
 
 }

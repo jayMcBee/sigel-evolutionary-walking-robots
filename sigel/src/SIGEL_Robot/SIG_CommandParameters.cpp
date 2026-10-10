@@ -19,41 +19,42 @@
   You should have received a copy of the GNU General Public License
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 #include "SIGEL_Robot/SIG_CommandParameters.h"
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include <math.h>
 
-namespace SIGEL_Robot {
+namespace SIGEL_Robot
+{
 
-        SIG_CommandParameters::SIG_CommandParameters ()
-                : duration (0.000001)
-        { }
+	SIG_CommandParameters::SIG_CommandParameters ()
+		: duration (0.000001)
+	{ }
 
-        SIG_CommandParameters::SIG_CommandParameters (QTextStream & tx)
-        {
-                QString tmpstr;
+	SIG_CommandParameters::SIG_CommandParameters (QTextStream & tx)
+	{
+		QString tmpstr;
 
-                tx >> tmpstr;
-                if (tmpstr != "CommandParameters")
-                        throw SIG_UnstreamingError (__FILE__, __LINE__, "CommandParameters expected, found '" + tmpstr + "'");
+		tx >> tmpstr;
+		if (tmpstr != "CommandParameters")
+			throw SIG_UnstreamingError (__FILE__, __LINE__, "CommandParameters expected, found '" + tmpstr + "'");
 
-                tx >> duration;
-        }
+		tx >> duration;
+	}
 
-        void SIG_CommandParameters::setDuration (double dur)
-        {
-                duration = dur;
-        }
+	void SIG_CommandParameters::setDuration (double dur)
+	{
+		duration = dur;
+	}
 
-        double SIG_CommandParameters::getDuration () const
-        {
-                return duration;
-        }
-        
-        void SIG_CommandParameters::writeToFileTransfer (QTextStream & tx) const
-        {
-                tx << "CommandParameters " << duration << '\n';
-        }
+	double SIG_CommandParameters::getDuration () const
+	{
+		return duration;
+	}
+
+	void SIG_CommandParameters::writeToFileTransfer (QTextStream & tx) const
+	{
+		tx << "CommandParameters " << duration << '\n';
+	}
 
 }
