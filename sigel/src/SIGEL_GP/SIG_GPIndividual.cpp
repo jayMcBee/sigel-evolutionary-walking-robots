@@ -19,587 +19,587 @@
   You should have received a copy of the GNU General Public License
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 #include "SIGEL_GP/SIG_GPIndividual.h"
 
 
 SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPIndividual::operator =(SIG_GPIndividual& ind)
-   {     
-     setAge(0);
-     history=ind.getHistory();
-     setName(ind.getName());
-     setPoolPos(ind.getPoolPos());
-     getProgramVar()=ind.getProgramVar();
-     setFitness( ind.getFitness() );
-     return *this;
-   }
- 
-SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIG_GPParameter& gpParameter,
-					     SIGEL_Tools::SIG_Randomizer& randomizer,
-					     QString name, QDateTime birthtime,
-					     int poolpos)
-  : prog()
 {
-  setName(name);
-  setPoolPos(poolpos);
-  setFitness(-1);
-  setAge(0);
+	setAge(0);
+	history=ind.getHistory();
+	setName(ind.getName());
+	setPoolPos(ind.getPoolPos());
+	getProgramVar()=ind.getProgramVar();
+	setFitness( ind.getFitness() );
+	return *this;
+}
 
-  QString nameTmp    = "NAME         : " + getName();
-  QString str;
-  QString poolposTmp = "Pool Position: " + str.number(getPoolPos(),10);
-  QString birthdTmp  = "Date of Birth: " + birthtime.toString();
-  QString ageTmp     = "Age          : " + str.number(getAge(),10);
-  QString fitTmp     = "Fitness Value: " + str.number(getFitness(),'g',6);
+SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIG_GPParameter& gpParameter,
+                                             SIGEL_Tools::SIG_Randomizer& randomizer,
+                                             QString name, QDateTime birthtime,
+                                             int poolpos)
+	: prog()
+{
+	setName(name);
+	setPoolPos(poolpos);
+	setFitness(-1);
+	setAge(0);
 
-  history.append("CREATED NEW INDIVIDUAL:\n======================="); 
-  history.append(nameTmp);
-  history.append(birthdTmp);
-  history.append(poolposTmp);
-  history.append(ageTmp);
-  history.append(fitTmp); 
+	QString nameTmp    = "NAME         : " + getName();
+	QString str;
+	QString poolposTmp = "Pool Position: " + str.number(getPoolPos(),10);
+	QString birthdTmp  = "Date of Birth: " + birthtime.toString();
+	QString ageTmp     = "Age          : " + str.number(getAge(),10);
+	QString fitTmp     = "Fitness Value: " + str.number(getFitness(),'g',6);
+
+	history.append("CREATED NEW INDIVIDUAL:\n=======================");
+	history.append(nameTmp);
+	history.append(birthdTmp);
+	history.append(poolposTmp);
+	history.append(ageTmp);
+	history.append(fitTmp);
 };
 
 SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual( SIG_GPParameter const& gpParameter,
-					      QStringList const& hist,
-					      QString name,
-					      QDateTime birthtime,
+                                              QStringList const& hist,
+                                              QString name,
+                                              QDateTime birthtime,
 
-					      int poolpos )
-  : prog()
+                                              int poolpos )
+	: prog()
 {
-  setName( name );
-  setPoolPos(poolpos);
-  setHistory( hist );
-  setFitness( -1 );
-  setAge( 0 );
+	setName( name );
+	setPoolPos(poolpos);
+	setHistory( hist );
+	setFitness( -1 );
+	setAge( 0 );
 };
 
 SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual( SIGEL_Program::SIG_Program const& prog,
-					      QString name1,
-					      QString name2,
-					      QString name3,
-					      QDateTime birthtime,
-					      int poolpos,
-					      QStringList const& hist )
-  :prog()
+                                              QString name1,
+                                              QString name2,
+                                              QString name3,
+                                              QDateTime birthtime,
+                                              int poolpos,
+                                              QStringList const& hist )
+	:prog()
 {
-   setName(name1);
-   setPoolPos(poolpos);
-   setHistory( hist );
-   setFitness( -1 );
-   setAge( 0 );
+	setName(name1);
+	setPoolPos(poolpos);
+	setHistory( hist );
+	setFitness( -1 );
+	setAge( 0 );
 };
 
 SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual():prog()
-{  
-   setName("<no name set>");
-   setPoolPos(0);
-   setFitness(-1);
-   setAge(0);
+{
+	setName("<no name set>");
+	setPoolPos(0);
+	setFitness(-1);
+	setAge(0);
 }
 
-SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &randomizer):
-  prog()
-{ 
-   setName("No Name");
-   setFitness(-1);
-   setAge(0);
-   setPoolPos(0);
-   QDateTime cdt      = cdt.currentDateTime();
-   QString nameTmp    = "NAME         : " + getName();
-   QString str;
-   QString poolposTmp = "Pool Position: " + str.number(getPoolPos(),10);
-   QString birthdTmp  = "Date of Birth: " + cdt.toString();
-   QString ageTmp     = "Age          : " + str.number(getAge(),10);
-   QString fitTmp     = "Fitness Value: " + str.number(getFitness(),'g',6);     
+SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &randomizer): prog()
+{
+	setName("No Name");
+	setFitness(-1);
+	setAge(0);
+	setPoolPos(0);
+	QDateTime cdt      = cdt.currentDateTime();
+	QString nameTmp    = "NAME         : " + getName();
+	QString str;
+	QString poolposTmp = "Pool Position: " + str.number(getPoolPos(),10);
+	QString birthdTmp  = "Date of Birth: " + cdt.toString();
+	QString ageTmp     = "Age          : " + str.number(getAge(),10);
+	QString fitTmp     = "Fitness Value: " + str.number(getFitness(),'g',6);
 
-   history.append("\nINDIVIDUAL WITH RANDOMLY GENERATED PROGRAM:\n===========================================");
-   history.append(nameTmp);
-   history.append(birthdTmp);
-   history.append(poolposTmp);
-   history.append(ageTmp);
-   history.append(fitTmp);
+	history.append("\nINDIVIDUAL WITH RANDOMLY GENERATED PROGRAM:\n===========================================");
+	history.append(nameTmp);
+	history.append(birthdTmp);
+	history.append(poolposTmp);
+	history.append(ageTmp);
+	history.append(fitTmp);
 }
 
-SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &randomizer, 
-                                             SIGEL_GP::SIG_GPParameter& gpParameter, 
+SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(SIGEL_Tools::SIG_Randomizer &randomizer,
+                                             SIGEL_GP::SIG_GPParameter& gpParameter,
                                              SIGEL_Robot::SIG_LanguageParameters& languageParameters)
-  :prog( gpParameter, languageParameters,randomizer )
-{ 
-   setName( "No name" );
-   setFitness( -1 );
-   setAge( 0 );
-   setPoolPos( 0 );
+	:prog( gpParameter, languageParameters,randomizer )
+{
+	setName( "No name" );
+	setFitness( -1 );
+	setAge( 0 );
+	setPoolPos( 0 );
 
-   QString str;
-   QDateTime cdt = cdt.currentDateTime();
+	QString str;
+	QDateTime cdt = cdt.currentDateTime();
 
-   history.append( "INDIVIDUAL IS CREATED:\n====================" );
-   history.append( "Date of Birth: " + cdt.toString() );
+	history.append( "INDIVIDUAL IS CREATED:\n====================" );
+	history.append( "Date of Birth: " + cdt.toString() );
 }
 
 SIGEL_GP::SIG_GPIndividual::SIG_GPIndividual(QString data)
 {
-   loadIndividual(data);
+	loadIndividual(data);
 };
 
 void SIGEL_GP::SIG_GPIndividual::generateRandomIndividual(SIGEL_Tools::SIG_Randomizer& randomizer,
-                                                          SIGEL_GP::SIG_GPParameter& gpParameter, 
+                                                          SIGEL_GP::SIG_GPParameter& gpParameter,
                                                           SIGEL_Robot::SIG_LanguageParameters& languageParameters )
 {
-   prog.generateRandomProgram(gpParameter,languageParameters,randomizer);
-   setName("No Name");
-   setPoolPos(0);
-   setFitness(-1);
-   setAge(0);
-   QDateTime cdt    = cdt.currentDateTime();
-   QString nameTmp    = "NAME         : " + getName();
-   QString str;
-   QString poolposTmp = "Pool Position: " + str.number(getPoolPos(),10);
-   QString birthdTmp  = "Date of Birth: " + cdt.toString();
-   QString ageTmp     = "Age          : " + str.number(getAge(),10);
-   QString fitTmp     = "Fitness Value: " + str.number(getFitness(),'g',6);     
+	prog.generateRandomProgram(gpParameter,languageParameters,randomizer);
+	setName("No Name");
+	setPoolPos(0);
+	setFitness(-1);
+	setAge(0);
+	QDateTime cdt    = cdt.currentDateTime();
+	QString nameTmp    = "NAME         : " + getName();
+	QString str;
+	QString poolposTmp = "Pool Position: " + str.number(getPoolPos(),10);
+	QString birthdTmp  = "Date of Birth: " + cdt.toString();
+	QString ageTmp     = "Age          : " + str.number(getAge(),10);
+	QString fitTmp     = "Fitness Value: " + str.number(getFitness(),'g',6);
 
-   history.append("INDIVIDUAL IS GENERATED RANDOMLY:\n---------------------------------");
-   history.append(nameTmp);
-   history.append(birthdTmp);
-   history.append(poolposTmp);
-   history.append(ageTmp);
-   history.append(fitTmp);
+	history.append("INDIVIDUAL IS GENERATED RANDOMLY:\n---------------------------------");
+	history.append(nameTmp);
+	history.append(birthdTmp);
+	history.append(poolposTmp);
+	history.append(ageTmp);
+	history.append(fitTmp);
 }
 
 void SIGEL_GP::SIG_GPIndividual::increaseAge()
 {
-   age++;
+	age++;
 };
 
 void SIGEL_GP::SIG_GPIndividual::increaseAgeInfo()
 {
-   QString str;
-   history.append( "\nAGE IS INCREASED:\n-----------------");
-   history.append( "New Age: " + str.number( getAge(), 10 ) );
+	QString str;
+	history.append( "\nAGE IS INCREASED:\n-----------------");
+	history.append( "New Age: " + str.number( getAge(), 10 ) );
 };
 
 long SIGEL_GP::SIG_GPIndividual::getAge() const
 {
-   return age;
+	return age;
 };
 
 void SIGEL_GP::SIG_GPIndividual::importProgram(SIGEL_Program::SIG_Program& prog )
 {
-   getProgramVar()=prog;
+	getProgramVar()=prog;
 };
 
 void SIGEL_GP::SIG_GPIndividual::importProgram( QString& filename )
 {
-   getProgramVar().importProgram( filename );
-   addImportProgramInfo( QDateTime::currentDateTime() );
+	getProgramVar().importProgram( filename );
+	addImportProgramInfo( QDateTime::currentDateTime() );
 
-   // you'll never know where these programs stem from..
-   fitnessValue = -1.0;
+	// you'll never know where these programs stem from..
+	fitnessValue = -1.0;
 }
 
 void SIGEL_GP::SIG_GPIndividual::exportProgram( QString& filename )
 {
-   getProgram().exportProgram( filename );
+	getProgram().exportProgram( filename );
 }
 
 QString SIGEL_GP::SIG_GPIndividual::getName()
 {
-   return indName;
+	return indName;
 };
 
 void SIGEL_GP::SIG_GPIndividual::loadIndividual(QString data)
 {
-   readFromFile(data);
-}; 
+	readFromFile(data);
+};
 
 QString SIGEL_GP::SIG_GPIndividual::saveIndividual(bool history)
 {
-  QString                     str;
-  QTextStream                 outputFile(&str, QIODeviceBase::WriteOnly);
+	QString                     str;
+	QTextStream                 outputFile(&str, QIODeviceBase::WriteOnly);
 
-  writeToFile(outputFile,history);
+	writeToFile(outputFile,history);
 
-  return str;
+	return str;
 };
- 
+
 void SIGEL_GP::SIG_GPIndividual::copyIndividual(SIGEL_GP::SIG_GPIndividual& cInd,
                                                 int poolPos)
 {
-   *this=cInd;
-   setPoolPos(poolPos);
-}; 
+	*this=cInd;
+	setPoolPos(poolPos);
+};
 
 int SIGEL_GP::SIG_GPIndividual::getPoolPos() const
 {
-   return poolPos;
+	return poolPos;
 };
 
 void SIGEL_GP::SIG_GPIndividual::setPoolPos(int pp)
 {
-   poolPos=pp;
+	poolPos=pp;
 };
 
 void SIGEL_GP::SIG_GPIndividual::setPoolPosInfo()
 {
-   QString str;
-   history.append("\nINDIVIDUAL HAS A NEW POOL POSITION:\n-----------------------------------");
-   history.append("New Pool Position: " + str.number(getPoolPos(),10));
+	QString str;
+	history.append("\nINDIVIDUAL HAS A NEW POOL POSITION:\n-----------------------------------");
+	history.append("New Pool Position: " + str.number(getPoolPos(),10));
 };
 
 SIGEL_Program::SIG_Program  const & SIGEL_GP::SIG_GPIndividual::getProgram() const
 {
-   return prog;
+	return prog;
 };
 
 SIGEL_Program::SIG_Program& SIGEL_GP::SIG_GPIndividual::getProgramVar()
 {
-   return prog;
+	return prog;
 };
 
 void SIGEL_GP::SIG_GPIndividual::setFitness(double fit)
 {
-  fitnessValue=fit;
+	fitnessValue=fit;
 };
 
 void SIGEL_GP::SIG_GPIndividual::setFitnessInfo()
 {
-  QString str;
-  history.append( "\nNEW FITNESS VALUE SET:\n----------------------");
-  history.append( "Evaluated fitness value: " + str.number( getFitness(), 'g', 6 ) );
+	QString str;
+	history.append( "\nNEW FITNESS VALUE SET:\n----------------------");
+	history.append( "Evaluated fitness value: " + str.number( getFitness(), 'g', 6 ) );
 };
 
 double SIGEL_GP::SIG_GPIndividual::getFitness() const
 {
-   return fitnessValue;
+	return fitnessValue;
 };
 
 QStringList SIGEL_GP::SIG_GPIndividual::getHistory() const
 {
-   return history;
+	return history;
 };
 
-void SIGEL_GP::SIG_GPIndividual::addMutationInfo(QString name, 
-                                                 QDateTime time, 
+void SIGEL_GP::SIG_GPIndividual::addMutationInfo(QString name,
+                                                 QDateTime time,
                                                  int mutpoint)
 {
-   QString str;
-   QString mutdTmp    = "Date of Mutation: " + time.toString();
-   QString ageTmp     = "Current Age: " + str.number(getAge(),10);
-   QString mpointTmp  = "Mutation Point: " + str.number(mutpoint);
-   QString fitTmp     = "Fitness Value (before Mutation): " + str.number(getFitness(),'g',6);
-   QString poolposTmp = "Current Pool Position: " + str.number(getPoolPos(),10);
+	QString str;
+	QString mutdTmp    = "Date of Mutation: " + time.toString();
+	QString ageTmp     = "Current Age: " + str.number(getAge(),10);
+	QString mpointTmp  = "Mutation Point: " + str.number(mutpoint);
+	QString fitTmp     = "Fitness Value (before Mutation): " + str.number(getFitness(),'g',6);
+	QString poolposTmp = "Current Pool Position: " + str.number(getPoolPos(),10);
 
-   history.append("\nMUTATION:\n---------");
-   history.append("Father: " + name);
-   history.append(mpointTmp);
-   history.append(mutdTmp);
-   history.append(poolposTmp);
-   history.append(ageTmp);
-   history.append(fitTmp);   
+	history.append("\nMUTATION:\n---------");
+	history.append("Father: " + name);
+	history.append(mpointTmp);
+	history.append(mutdTmp);
+	history.append(poolposTmp);
+	history.append(ageTmp);
+	history.append(fitTmp);
 };
 
-void SIGEL_GP::SIG_GPIndividual::addMutationInfo(QString name, 
-                                                 QDateTime time, 
+void SIGEL_GP::SIG_GPIndividual::addMutationInfo(QString name,
+                                                 QDateTime time,
                                                  int mutpoint,
-						 double fit )
+                                                 double fit )
 {
-   QString str;
-   QString mutdTmp    = "Date of Mutation: " + time.toString();
-   QString ageTmp     = "Current Age: " + str.number(getAge(),10);
-   QString mpointTmp  = "Mutation Point: " + str.number(mutpoint);
-   QString fitTmp     = "Fitness Value (before Mutation): " + str.number(fit,'g',6);
-   QString poolposTmp = "Current Pool Position: " + str.number(getPoolPos(),10);
+	QString str;
+	QString mutdTmp    = "Date of Mutation: " + time.toString();
+	QString ageTmp     = "Current Age: " + str.number(getAge(),10);
+	QString mpointTmp  = "Mutation Point: " + str.number(mutpoint);
+	QString fitTmp     = "Fitness Value (before Mutation): " + str.number(fit,'g',6);
+	QString poolposTmp = "Current Pool Position: " + str.number(getPoolPos(),10);
 
-   history.append("\nMUTATION:\n---------");
-   history.append("Father: " + name);
-   history.append(mpointTmp);
-   history.append(mutdTmp);
-   history.append(poolposTmp);
-   history.append(ageTmp);
-   history.append(fitTmp);   
+	history.append("\nMUTATION:\n---------");
+	history.append("Father: " + name);
+	history.append(mpointTmp);
+	history.append(mutdTmp);
+	history.append(poolposTmp);
+	history.append(ageTmp);
+	history.append(fitTmp);
 };
 
-void SIGEL_GP::SIG_GPIndividual::addCrossOverInfo(QString name1, 
-                                                  QString name2, 
-                                                  QDateTime time, 
-                                                  int xoverpnt1, 
+void SIGEL_GP::SIG_GPIndividual::addCrossOverInfo(QString name1,
+                                                  QString name2,
+                                                  QDateTime time,
+                                                  int xoverpnt1,
                                                   int xoverpnt2)
 {
-   QString str;
-   QString mutdTmp    = "Date of CrossOver: " + time.toString();
-   QString nameTmp    = "Parents: " + name1 +" + "+name2;
-   QString ageTmp     = "Current Age: " + str.number(getAge(),10);
-   QString cpointTmp  = "Crossover Points: " + str.number(xoverpnt1) + " + " + str.number(xoverpnt2);
-   QString fitTmp     = "Fitness Value (before Crossover): " + str.number(getFitness(),'g',6);
-   QString poolposTmp = "Current Pool Position: " + str.number(getPoolPos(),10);
+	QString str;
+	QString mutdTmp    = "Date of CrossOver: " + time.toString();
+	QString nameTmp    = "Parents: " + name1 +" + "+name2;
+	QString ageTmp     = "Current Age: " + str.number(getAge(),10);
+	QString cpointTmp  = "Crossover Points: " + str.number(xoverpnt1) + " + " + str.number(xoverpnt2);
+	QString fitTmp     = "Fitness Value (before Crossover): " + str.number(getFitness(),'g',6);
+	QString poolposTmp = "Current Pool Position: " + str.number(getPoolPos(),10);
 
-   history.append("\nCROSSOVER:\n----------");
-   history.append(nameTmp);
-   history.append(cpointTmp);
-   history.append(mutdTmp);
-   history.append(poolposTmp);
-   history.append(ageTmp);
-   history.append(fitTmp);
+	history.append("\nCROSSOVER:\n----------");
+	history.append(nameTmp);
+	history.append(cpointTmp);
+	history.append(mutdTmp);
+	history.append(poolposTmp);
+	history.append(ageTmp);
+	history.append(fitTmp);
 };
 
-void SIGEL_GP::SIG_GPIndividual::addCrossOverInfo(QString name1, 
-                                                  QString name2, 
-                                                  QDateTime time, 
-                                                  int xoverpnt1, 
+void SIGEL_GP::SIG_GPIndividual::addCrossOverInfo(QString name1,
+                                                  QString name2,
+                                                  QDateTime time,
+                                                  int xoverpnt1,
                                                   int xoverpnt2,
-						  double fitness1,
-						  double fitness2 )
+                                                  double fitness1,
+                                                  double fitness2 )
 {
-   QString str;
-   QString mutdTmp    = "Date of CrossOver: " + time.toString();
-   QString nameTmp    = "Parents: " + name1 +" + "+name2;
-   QString cpointTmp  = "Crossover Points: " + str.number(xoverpnt1) + " + " + str.number(xoverpnt2);
-   QString fitTmp1    = "Fitness (Parent 1): " + str.number(fitness1,'g',6);
-   QString fitTmp2    = "Fitness (Parent 2): " + str.number(fitness2,'g',6);
-   QString poolposTmp = "Current Pool Position: " + str.number(getPoolPos(),10);
+	QString str;
+	QString mutdTmp    = "Date of CrossOver: " + time.toString();
+	QString nameTmp    = "Parents: " + name1 +" + "+name2;
+	QString cpointTmp  = "Crossover Points: " + str.number(xoverpnt1) + " + " + str.number(xoverpnt2);
+	QString fitTmp1    = "Fitness (Parent 1): " + str.number(fitness1,'g',6);
+	QString fitTmp2    = "Fitness (Parent 2): " + str.number(fitness2,'g',6);
+	QString poolposTmp = "Current Pool Position: " + str.number(getPoolPos(),10);
 
-   history.append("\nCROSSOVER:\n----------");
-   history.append(nameTmp);
-   history.append(cpointTmp);
-   history.append(mutdTmp);
-   history.append(poolposTmp);
-   history.append(fitTmp1);
-   history.append(fitTmp2);
+	history.append("\nCROSSOVER:\n----------");
+	history.append(nameTmp);
+	history.append(cpointTmp);
+	history.append(mutdTmp);
+	history.append(poolposTmp);
+	history.append(fitTmp1);
+	history.append(fitTmp2);
 };
 
-void SIGEL_GP::SIG_GPIndividual::addReproductionInfo(QString name, 
+void SIGEL_GP::SIG_GPIndividual::addReproductionInfo(QString name,
                                                      QDateTime time)
 {
-   QString str;
-   QString reprdTmp   = "Date of Reproduction: " + time.toString();
-   QString ageTmp     = "Current Age: " + str.number(getAge(),10);
-   QString fitTmp     = "Fitness Value: " + str.number(getFitness(),'g',6);
-   QString poolposTmp = "Current Pool Position: " + str.number(getPoolPos(),10);
+	QString str;
+	QString reprdTmp   = "Date of Reproduction: " + time.toString();
+	QString ageTmp     = "Current Age: " + str.number(getAge(),10);
+	QString fitTmp     = "Fitness Value: " + str.number(getFitness(),'g',6);
+	QString poolposTmp = "Current Pool Position: " + str.number(getPoolPos(),10);
 
-   history.append("\nREPRODUCTION:\n-------------");
-   history.append("Father: " + name);
-   history.append(reprdTmp);
-   history.append(poolposTmp);
-   history.append(ageTmp);
-   history.append(fitTmp);
+	history.append("\nREPRODUCTION:\n-------------");
+	history.append("Father: " + name);
+	history.append(reprdTmp);
+	history.append(poolposTmp);
+	history.append(ageTmp);
+	history.append(fitTmp);
 };
 
 void SIGEL_GP::SIG_GPIndividual::addPreparationOfHistoryInfo()
 {
-   history.append( "\n-----------------------------" );
-   history.append( " OLD INDIVIDUAL DATA DELETED" );
-   history.append( " DATA OF IMPORTED INDIVIDUAL:" );
-   history.append( "-----------------------------" );
+	history.append( "\n-----------------------------" );
+	history.append( " OLD INDIVIDUAL DATA DELETED" );
+	history.append( " DATA OF IMPORTED INDIVIDUAL:" );
+	history.append( "-----------------------------" );
 }
 
 void SIGEL_GP::SIG_GPIndividual::addImportIndividualInfo(QDateTime time)
 {
-   history.append( "\nINDIVIDUAL IMPORTED:\n--------------------" );
-   history.append( "Date of Import: " + time.toString() );
+	history.append( "\nINDIVIDUAL IMPORTED:\n--------------------" );
+	history.append( "Date of Import: " + time.toString() );
 }
 
 void SIGEL_GP::SIG_GPIndividual::addImportProgramInfo(QDateTime time)
 {
-   history.append( "\nOLD PROGRAM DELETED\n" );
-   history.append( "\nPROGRAM IMPORTED:\n-----------------" );
-   history.append( "Date of Import: " + time.toString() );
+	history.append( "\nOLD PROGRAM DELETED\n" );
+	history.append( "\nPROGRAM IMPORTED:\n-----------------" );
+	history.append( "Date of Import: " + time.toString() );
 }
 
 void SIGEL_GP::SIG_GPIndividual::addLengthIncreasedInfo( QDateTime time, long lgth )
 {
-    history.append( "\nPROGRAM LENGTH INCREASED:\n-------------------------");
-    history.append( "Date of action: " + time.toString() );
-    QString str;
-    history.append( "Added Length: " + str.number( lgth ) );
+	history.append( "\nPROGRAM LENGTH INCREASED:\n-------------------------");
+	history.append( "Date of action: " + time.toString() );
+	QString str;
+	history.append( "Added Length: " + str.number( lgth ) );
 }
 
 void SIGEL_GP::SIG_GPIndividual::addLengthDecreasedInfo( QDateTime time, long lgth )
 {
-    history.append( "\nPROGRAM LENGTH DECREASED:\n-------------------------");
-    history.append( "Date of action: " + time.toString() );
-    QString str;
-    history.append( "Removed Length: " + str.number( lgth ) );
+	history.append( "\nPROGRAM LENGTH DECREASED:\n-------------------------");
+	history.append( "Date of action: " + time.toString() );
+	QString str;
+	history.append( "Removed Length: " + str.number( lgth ) );
 }
 
 bool SIGEL_GP::SIG_GPIndividual::upToDate()const
 {
-  return ( getFitness() != -1 ); 
+	return ( getFitness() != -1 );
 };
 
 void SIGEL_GP::SIG_GPIndividual::importIndividual( QString& filename )
-{   
-   QFile   indFile( filename );
-   QString indString;
+{
+	QFile   indFile( filename );
+	QString indString;
 
-   if( indFile.open( QIODeviceBase::ReadOnly ) )
-     {
-       addPreparationOfHistoryInfo();
-       QTextStream buffer( &indFile );
-       indString = buffer.readAll();
-       readFromFile( indString );
-       indFile.close();
-       addImportIndividualInfo( QDateTime::currentDateTime() );
-       fitnessValue = -1.0;
-     }
-   else
-     SIGEL_Tools::SIG_IO::cerr << "Could not import Individual from "
-					<< filename
-					<< "!" << Qt::endl;   
+	if( indFile.open( QIODeviceBase::ReadOnly ) )
+	{
+		addPreparationOfHistoryInfo();
+		QTextStream buffer( &indFile );
+		indString = buffer.readAll();
+		readFromFile( indString );
+		indFile.close();
+		addImportIndividualInfo( QDateTime::currentDateTime() );
+		fitnessValue = -1.0;
+	}
+	else
+		SIGEL_Tools::SIG_IO::cerr << "Could not import Individual from "
+		                                   << filename
+		                                   << "!" << Qt::endl;
 }
 
 void SIGEL_GP::SIG_GPIndividual::exportIndividual( QString& filename )
 {
-   QFile indFile( filename );
+	QFile indFile( filename );
 
-   if( indFile.open( QIODeviceBase::WriteOnly ) )
-     {
-       QTextStream buffer( &indFile );
-       writeToFile( buffer,true );
-       indFile.close();
-     }
-   else
-     SIGEL_Tools::SIG_IO::cerr << "Could not export Individual to "
-			       << filename
-			       << "!" << Qt::endl;   
+	if( indFile.open( QIODeviceBase::WriteOnly ) )
+	{
+		QTextStream buffer( &indFile );
+		writeToFile( buffer,true );
+		indFile.close();
+	}
+	else
+		SIGEL_Tools::SIG_IO::cerr << "Could not export Individual to "
+		                          << filename
+		                          << "!" << Qt::endl;
 }
 
 SIGEL_Program::SIG_Program *SIGEL_GP::SIG_GPIndividual::getProgramPointer()
 {
-   return &prog;
+	return &prog;
 };
 
 void SIGEL_GP::SIG_GPIndividual::setAge(long a)
 {
-   age=a;
+	age=a;
 };
 
 void SIGEL_GP::SIG_GPIndividual::setAgeInfo()
 {
-   QString str;
-   history.append( "*INDIVIDUAL HAS A NEW AGE*");
-   history.append( "New Age: " + str.number( getAge(), 10 ) );
+	QString str;
+	history.append( "*INDIVIDUAL HAS A NEW AGE*");
+	history.append( "New Age: " + str.number( getAge(), 10 ) );
 };
 
 void SIGEL_GP::SIG_GPIndividual::setName(QString n)
 {
-   indName=n; 
+	indName=n;
 };
 
 void SIGEL_GP::SIG_GPIndividual::setNameInfo()
 {
-   QString str;
-   history.append( "\nINDIVIDUAL HAS A NEW NAME:\n--------------------------");
-   history.append( "New Name: " + str.number( getAge(), 10 ) );
+	QString str;
+	history.append( "\nINDIVIDUAL HAS A NEW NAME:\n--------------------------");
+	history.append( "New Name: " + str.number( getAge(), 10 ) );
 };
 
 void SIGEL_GP::SIG_GPIndividual::print()
 {
-  SIGEL_Tools::SIG_IO::cerr << "\nCurrent individual's data:\n--------------------------"
-                            << "\n- Name   : "
-                            << getName()
-                            << "\n- Poolpos: "
-                            << getPoolPos()
-                            << "\n- Fitness: "
-                            << getFitness()
-                            << "\n- Age    : "
-                            << getAge()
-                            << "\n- Program:\n" << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "\nCurrent individual's data:\n--------------------------"
+	                          << "\n- Name   : "
+	                          << getName()
+	                          << "\n- Poolpos: "
+	                          << getPoolPos()
+	                          << "\n- Fitness: "
+	                          << getFitness()
+	                          << "\n- Age    : "
+	                          << getAge()
+	                          << "\n- Program:\n" << Qt::endl;
 
-  getProgram().print();
+	getProgram().print();
 }
 
 void SIGEL_GP::SIG_GPIndividual::writeToFile(QTextStream &file, bool withHistory)
 {
-  file<<"\n    INDIVIDUAL BEGIN{ "<<"\n      NAME='"<<getName()<<"';";
-  file<<"\n      POOLPOS="<<getPoolPos()<<";";
-  file<<"\n      FITNESS="<<getFitness()<<";";
-  file<<"\n      AGE="<<getAge()<<";";
+	file<<"\n    INDIVIDUAL BEGIN{ "<<"\n      NAME='"<<getName()<<"';";
+	file<<"\n      POOLPOS="<<getPoolPos()<<";";
+	file<<"\n      FITNESS="<<getFitness()<<";";
+	file<<"\n      AGE="<<getAge()<<";";
 
-  if (withHistory) {
-  	file<<"\n      HISTORY BEGIN{"<<'\n';
-  	file<<history.join("\n");
-  	file<<"\n      }HISTORY END;";
-  }
+	if (withHistory)
+	{
+		file<<"\n      HISTORY BEGIN{"<<'\n';
+		file<<history.join("\n");
+		file<<"\n      }HISTORY END;";
+	}
 
-  file<<"\n      PROGRAM BEGIN{"<<'\n';
-  
-  getProgramPointer()->writeToFile(file);
+	file<<"\n      PROGRAM BEGIN{"<<'\n';
 
-  file<<"        }PROGRAM END;";
+	getProgramPointer()->writeToFile(file);
 
-  file<<"\n    }INDIVIDUAL END";
+	file<<"        }PROGRAM END;";
+
+	file<<"\n    }INDIVIDUAL END";
 }
 
 void SIGEL_GP::SIG_GPIndividual::setHistory( QStringList hist )
 {
-  history = hist;
+	history = hist;
 }
 
 void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
 {
-  long                        pos;
+	long                        pos;
 
-  QString                     prgStr;
-  QString                     histStr;
-  QTextStream                 outputFile(&prgStr, QIODeviceBase::WriteOnly);  
-  QTextStream                 inputFile(&prgStr, QIODeviceBase::ReadOnly);
+	QString                     prgStr;
+	QString                     histStr;
+	QTextStream                 outputFile(&prgStr, QIODeviceBase::WriteOnly);
+	QTextStream                 inputFile(&prgStr, QIODeviceBase::ReadOnly);
 
-  if((pos=indStr.indexOf("NAME='", 0, Qt::CaseInsensitive))!=-1)
-    {
-      long endPos=indStr.indexOf("'", pos+7, Qt::CaseInsensitive);
-      setName(indStr.mid(pos+6,endPos-pos-6));
-    }
-  else
-    {
-    }
+	if((pos=indStr.indexOf("NAME='", 0, Qt::CaseInsensitive))!=-1)
+	{
+		long endPos=indStr.indexOf("'", pos+7, Qt::CaseInsensitive);
+		setName(indStr.mid(pos+6,endPos-pos-6));
+	}
+	else
+	{
+	}
 
-  if((pos=indStr.indexOf("POOLPOS=", 0, Qt::CaseInsensitive))!=-1)
-    {
-      long endPos=indStr.indexOf(";", pos+9, Qt::CaseInsensitive);
-      setPoolPos((indStr.mid(pos+8,endPos-pos-8)).toLong());
-    }
-  else
-    {
-    }  
+	if((pos=indStr.indexOf("POOLPOS=", 0, Qt::CaseInsensitive))!=-1)
+	{
+		long endPos=indStr.indexOf(";", pos+9, Qt::CaseInsensitive);
+		setPoolPos((indStr.mid(pos+8,endPos-pos-8)).toLong());
+	}
+	else
+	{
+	}
 
-  if((pos=indStr.indexOf("FITNESS=", 0, Qt::CaseInsensitive))!=-1)
-    {
-      long endPos=indStr.indexOf(";", pos+9, Qt::CaseInsensitive);
-      setFitness((indStr.mid(pos+8,endPos-pos-8)).toDouble());
-    }
-  else
-    {
-    }
+	if((pos=indStr.indexOf("FITNESS=", 0, Qt::CaseInsensitive))!=-1)
+	{
+		long endPos=indStr.indexOf(";", pos+9, Qt::CaseInsensitive);
+		setFitness((indStr.mid(pos+8,endPos-pos-8)).toDouble());
+	}
+	else
+	{
+	}
 
-  if((pos=indStr.indexOf("AGE=", 0, Qt::CaseInsensitive))!=-1)
-    {
-      long endPos=indStr.indexOf(";", pos+5, Qt::CaseInsensitive);
-      setAge((indStr.mid(pos+4,endPos-pos-4)).toLong());
-    }
-  else
-    {
-    }  
-  
-  if((pos=indStr.indexOf("PROGRAM BEGIN{", 0, Qt::CaseInsensitive))!=-1)
-    {
-      long endPos=indStr.indexOf("}PROGRAM END", pos+16, Qt::CaseInsensitive);
-      prgStr=indStr.mid(pos+15,endPos-pos-14);
-      getProgramPointer()->readFromFile(inputFile);
-    }
-  else
-    {
-    } 
-  
-  if((pos=indStr.indexOf("HISTORY BEGIN{", 0, Qt::CaseInsensitive))!=-1)
-    {
-       long endPos=indStr.indexOf("}HISTORY END", pos+15, Qt::CaseInsensitive);
-       histStr=indStr.mid(pos+14,endPos-pos-14).trimmed();
-       history.append(histStr);
-    }
-  else
-    {
-    } 
+	if((pos=indStr.indexOf("AGE=", 0, Qt::CaseInsensitive))!=-1)
+	{
+		long endPos=indStr.indexOf(";", pos+5, Qt::CaseInsensitive);
+		setAge((indStr.mid(pos+4,endPos-pos-4)).toLong());
+	}
+	else
+	{
+	}
+
+	if((pos=indStr.indexOf("PROGRAM BEGIN{", 0, Qt::CaseInsensitive))!=-1)
+	{
+		long endPos=indStr.indexOf("}PROGRAM END", pos+16, Qt::CaseInsensitive);
+		prgStr=indStr.mid(pos+15,endPos-pos-14);
+		getProgramPointer()->readFromFile(inputFile);
+	}
+	else
+	{
+	}
+
+	if((pos=indStr.indexOf("HISTORY BEGIN{", 0, Qt::CaseInsensitive))!=-1)
+	{
+		long endPos=indStr.indexOf("}HISTORY END", pos+15, Qt::CaseInsensitive);
+		histStr=indStr.mid(pos+14,endPos-pos-14).trimmed();
+		history.append(histStr);
+	}
+	else
+	{
+	}
 }

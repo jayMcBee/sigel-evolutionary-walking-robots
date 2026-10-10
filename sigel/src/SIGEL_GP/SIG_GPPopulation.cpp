@@ -19,7 +19,7 @@
   You should have received a copy of the GNU General Public License
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 #include <QApplication>   // qApp and QProgressDialog need QtWidgets
 #include <QProgressDialog>   // widget used in this file only
 #include <algorithm>
@@ -129,14 +129,14 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
 namespace
 {
 
-void resizeOwning( QList< SIGEL_GP::SIG_GPIndividual * > &v, qsizetype want )
-{
-	if (want < 0)
-		want = 0;
-	for (qsizetype i = want; i < v.size(); i++)
-		delete v[ i ];
-	v.resize( want );
-}
+	void resizeOwning( QList< SIGEL_GP::SIG_GPIndividual * > &v, qsizetype want )
+	{
+		if (want < 0)
+			want = 0;
+		for (qsizetype i = want; i < v.size(); i++)
+			delete v[ i ];
+		v.resize( want );
+	}
 
 }
 
