@@ -375,8 +375,7 @@ class SIG_GPPopulation
 			      SIGEL_Robot::SIG_LanguageParameters& languageParameters);
     
     /** 
-     * This function searches for the best fitness within the population. It returns the best found fitness and the position
-     * of the intdividual the fitness belongs to. A high fitness is a better fitness.
+     * Returns the highest fitness of the individuals that have one, or 0 if none has one.
      */
 
   public:
