@@ -661,13 +661,13 @@ pass=$((pass+pp)); fail=$((fail+pf))
 #   So agreement there is no evidence. hammer tests material
 #   order, `Body' emission order and `middle3''s axis points, plus everything
 #   outside the robot: the section line counts, the experiment history, the
-#   HISTORY growth defect and the ten first-save keys.
+#   size of the HISTORY blocks and the ten first-save keys.
 #   octopus supplies the rest. Its joint, drive and sensor containers DO
 #   collide: 1.3 permutes all three on every save, and the body order and the
 #   command list too, while the port keeps the stored order.
 #
 # Two saves each. Pass 0 to 1 shows the ten keys arrive; pass 1 to 2 shows
-# they hold and gives the steady-state growth.
+# they hold and that the HISTORY blocks stay the same size.
 #
 # The input cannot be compared with pass 1: the shipped .exp are a 2001 format
 # revision, and the 2003 binary adds ten keys with defaults on the first save.
@@ -700,8 +700,7 @@ pass=$((pass+pp)); fail=$((fail+pf))
 # Not every line below is 1.3's, and the diff labels say so. Four kinds:
 #
 #   1.3's own numbers, from the hammer capture: the experiment-history line
-#   count and its first and last entry, the first block's character counts,
-#   the HISTORY growth and the ten first-save keys.
+#   count and its first and last entry, and the ten first-save keys.
 #
 #   1.3's DATA, read back. The individual names are the shipped file's own
 #   bytes, so pinning them pins this build against 1.3's file.
@@ -711,6 +710,11 @@ pass=$((pass+pp)); fail=$((fail+pf))
 #   these pin this build against the file in experiments/. The file has one
 #   host, so host order is not tested; v8-1.3-gp-blocks.txt keeps the order of
 #   1.3's 20 hosts for the file as shipped.
+#
+#   OURS only: the first block's character counts and the HISTORY growth.
+#   1.3 makes each HISTORY block 7 characters longer at each save. This build
+#   removes the white space at both ends of a history when it loads, so the
+#   blocks change at the first save and then stay the same.
 #
 #   OURS only: the `expstruct' hash and the whole octopus half. expstruct is
 #   kept because it covers the population, which nothing else here reaches.
@@ -887,8 +891,8 @@ else
         cat > "$V2D/expect.txt" <<'V2EXPECT'
 == V2 round trip, against v8-1.3-gp-blocks.txt (hammer) and the port's own output (octopus)
 markers ham0        37 65 152 75204 75291 75453
-markers ham1        37 82 171 75325 75412 75574
-markers ham2        37 82 171 75425 75512 75674
+markers ham1        37 82 171 75125 75212 75374
+markers ham2        37 82 171 75125 75212 75374
 pvmhost ham0        1 .
 pvmhost ham1        1 .
 pvmhost ham2        1 .
@@ -896,12 +900,12 @@ exp history lines    161 161 161
 exp history stable   yes
 exp history first    1 2001 8 8 21 13 32 0.0821164 0 0.00939138
 exp history last     160 2001 8 9 7 30 45 0.45972 0 0.3833
-first block chars    10574 10581 10588
-history growth 0->1  100 blocks +1
-history growth 1->2  100 blocks +1
+first block chars    10574 10561 10561
+history growth 0->1  100 blocks -1
+history growth 1->2  100 blocks +0
 names stable         yes 100 NAME='10443' NAME='10194'
 hammer robot block   identical in all three 70 lines dde685bd78c14a9d
-expstruct ham1==ham2 yes 108 lines 6d41aac125bbef95
+expstruct ham1==ham2 yes 108 lines 656d9dae08991d19
 -- first-save keys, ham0
 FLOORDIMENSION     x0
 FLOORFUNCTION      x0

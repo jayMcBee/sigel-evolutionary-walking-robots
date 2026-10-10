@@ -24,8 +24,8 @@
 # values" and then listed the fitness-name combo separately, which counted the
 # integrator combo as typed and made the arithmetic work only by accident.*
 #
-# LanguageParameters IS NOT IN THE BLOCK. It lives at line 71650 of the saved
-# file, far below `POPULATION BEGIN{' at 179, so a check over the 178-line
+# LanguageParameters IS NOT IN THE BLOCK. It lives after the population in the
+# saved file, far below `POPULATION BEGIN{' at 179, so a check over the 178-line
 # block alone covers nine of the ten edits and silently misses the
 # registers one. It gets its own line here. That was found because the oracle
 # reported where POPULATION BEGIN{ had moved to, not by reading the code.

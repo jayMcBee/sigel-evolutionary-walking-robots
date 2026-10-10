@@ -513,16 +513,13 @@ void SIGEL_GP::SIG_GPIndividual::print()
 
 void SIGEL_GP::SIG_GPIndividual::writeToFile(QTextStream &file, bool withHistory)
 {
-  // HISTORY IS MISSING !!!!
-
   file<<"\n    INDIVIDUAL BEGIN{ "<<"\n      NAME='"<<getName()<<"';";
   file<<"\n      POOLPOS="<<getPoolPos()<<";";
   file<<"\n      FITNESS="<<getFitness()<<";";
   file<<"\n      AGE="<<getAge()<<";";
 
-  // you select whether the history should be saved or not.
   if (withHistory) {
-  	file<<"\n      HISTORY BEGIN{";
+  	file<<"\n      HISTORY BEGIN{"<<'\n';
   	file<<history.join("\n");
   	file<<"\n      }HISTORY END;";
   }
@@ -593,7 +590,7 @@ void SIGEL_GP::SIG_GPIndividual::readFromFile(QString indStr)
   
   if((pos=indStr.indexOf("HISTORY BEGIN{", 0, Qt::CaseInsensitive))!=-1)
     {
-       histStr=indStr.mid(pos+14,indStr.indexOf("}HISTORY END", pos+15, Qt::CaseInsensitive)-pos-14);
+       histStr=indStr.mid(pos+14,indStr.indexOf("}HISTORY END", pos+15, Qt::CaseInsensitive)-pos-14).trimmed();
        history.append(histStr);
     }
   else

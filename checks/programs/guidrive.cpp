@@ -1783,9 +1783,8 @@ static int guidriveMain(int argc, char **argv)
     // x87 vs IEEE the way a fitness value can.
     //
     // Run it TWICE, once with SIGEL_PAGEEDIT=1 and once without: both are the
-    // FIRST save of a freshly loaded experiment, so the history whitespace
-    // that C10 measured growing by 840 bytes a save is identical in the two,
-    // and diffing them shows the edits and nothing else.
+    // FIRST save of a freshly loaded experiment, so diffing them shows the
+    // edits and nothing else.
     if (scenario == "pagesave") {
         const bool edit = qgetenv("SIGEL_PAGEEDIT") == "1";
         QString out = scratch() + (edit ? "/pagesave-edited.exp"
@@ -2114,8 +2113,8 @@ static int guidriveMain(int argc, char **argv)
             printf("  export2 %lld bytes  %s\n", static_cast<long long>(nb), qPrintable(sb));
             if (sa == sb) { printf("  ROUND TRIP STABLE (and the import undid the change)\n");
                             fflush(stdout); continue; }
-            // Whitespace-only growth is C10's documented history defect, not a
-            // reader/writer disagreement -- say which before calling it either.
+            // A difference in blank lines only is not a change in content --
+            // say which before calling it either.
             QFile x(fa), y(fb);
             QByteArray xa, yb;
             if (x.open(QIODevice::ReadOnly)) { xa = x.readAll(); x.close(); }
@@ -2128,8 +2127,7 @@ static int guidriveMain(int argc, char **argv)
             };
             const bool onlyBlank = squeeze(xa) == squeeze(yb);
             printf("  ROUND TRIP %s\n", onlyBlank
-                   ? "differs ONLY in blank lines -- C10's history growth, "
-                     "not a reader/writer disagreement"
+                   ? "differs ONLY in blank lines"
                    : "*** CHANGED IN CONTENT ***");
             printf("  delta=%lld bytes  blankLineDelta=%d\n",
                    static_cast<long long>(yb.size() - xa.size()),
