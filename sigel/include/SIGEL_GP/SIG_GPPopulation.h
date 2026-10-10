@@ -381,11 +381,26 @@ class SIG_GPPopulation
   public:
     double getBestFitness();
 
+    /**
+     * Returns the lowest fitness of the individuals that have one, or 0 if none has one.
+     */
+
   public:
     double getWorstFitness();
 
+    /**
+     * Returns the average fitness of the individuals that have one, or 0 if none has one.
+     */
+
   public:
     double getAverageFitness();
+
+    /**
+     * Returns the fitness of each individual that has one. An individual with no simulation has a fitness below 0.
+     */
+
+  private:
+    QList<double> getFitnessValuesOfSimulatedIndividuals() const;
 
   public:
     void resetAllFitnessValues();

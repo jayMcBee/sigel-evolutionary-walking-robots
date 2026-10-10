@@ -262,6 +262,42 @@ void SIGEL_GP::SIG_GPPopulationTest::bestWorstAndAverageUseOnlySimulatedFitnessV
   QCOMPARE( population.getAverageFitness(), 3.5 );
 }
 
+void SIGEL_GP::SIG_GPPopulationTest::bestWorstAndAverageDoNotDependOnThePositionWithoutFitness()
+{
+  SIG_GPPopulation population;
+  addIndividuals( population, 4 );
+  population.getIndividualPointer( 1 )->setFitness( 3.5 );
+  population.getIndividualPointer( 2 )->setFitness( 5.0 );
+  population.getIndividualPointer( 3 )->setFitness( 2.0 );
+
+  QCOMPARE( population.getBestFitness(), 5.0 );
+  QCOMPARE( population.getWorstFitness(), 2.0 );
+  QCOMPARE( population.getAverageFitness(), 3.5 );
+}
+
+// A robot that does not move has the fitness 0.
+void SIGEL_GP::SIG_GPPopulationTest::fitnessZeroCountsAsAFitness()
+{
+  SIG_GPPopulation population;
+  addIndividuals( population, 3 );
+  population.getIndividualPointer( 1 )->setFitness( 0.0 );
+  population.getIndividualPointer( 2 )->setFitness( 4.0 );
+
+  QCOMPARE( population.getBestFitness(), 4.0 );
+  QCOMPARE( population.getWorstFitness(), 0.0 );
+  QCOMPARE( population.getAverageFitness(), 2.0 );
+}
+
+void SIGEL_GP::SIG_GPPopulationTest::bestWorstAndAverageAreZeroWithoutAnyFitness()
+{
+  SIG_GPPopulation population;
+  addIndividuals( population, 2 );
+
+  QCOMPARE( population.getBestFitness(), 0.0 );
+  QCOMPARE( population.getWorstFitness(), 0.0 );
+  QCOMPARE( population.getAverageFitness(), 0.0 );
+}
+
 // 11 individuals: the text then has a position with two digits.
 void SIGEL_GP::SIG_GPPopulationTest::writtenTextIsReadBack()
 {

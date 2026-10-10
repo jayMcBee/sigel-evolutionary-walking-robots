@@ -22,6 +22,7 @@
 */
 #include <QApplication>   // qApp and QProgressDialog need QtWidgets
 #include <QProgressDialog>   // widget used in this file only
+#include <algorithm>
 #include <memory>
 #include "SIGEL_Tools/SIG_DialogParent.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
@@ -475,26 +476,11 @@ void SIGEL_GP::SIG_GPPopulation::writeToFile(QTextStream &file)
 
 double SIGEL_GP::SIG_GPPopulation::getBestFitness()
 {
-	// take only the simulated values into account
-	// the estimated fitness values are < -2
-	if (getSize()>0)
-	{
-		double bestFitness = getIndividualPointer( 0 )->getFitness();
-		if(bestFitness < 0.0)
-			bestFitness = 0.0;
-
-		for (int i=1; i<getSize(); i++)
-		{
-			double actFitness = getIndividualPointer( i )->getFitness();
-
-			if(actFitness >= 0.0)
-				bestFitness = ( actFitness > bestFitness ) ? actFitness : bestFitness;
-		};
-
-		return bestFitness;
-	}
-	else
+	QList<double> simulated = getFitnessValuesOfSimulatedIndividuals();
+	if( simulated.isEmpty() )
 		return 0;
+
+	return *std::max_element( simulated.begin(), simulated.end() );
 }
 
 void SIGEL_GP::SIG_GPPopulation::resetAllFitnessValues()
@@ -505,52 +491,36 @@ void SIGEL_GP::SIG_GPPopulation::resetAllFitnessValues()
 
 double SIGEL_GP::SIG_GPPopulation::getWorstFitness()
 {
-	// take only the simulated values into account
-	// the estimated fitness values are < -2
-	if (getSize()>0)
-	{
-		double worstFitness = getIndividualPointer( 0 )->getFitness();
-		if(worstFitness < 0.0)
-			worstFitness = 0.0;
-
-		for (int i=1; i<getSize(); i++)
-		{
-			double actFitness = getIndividualPointer( i )->getFitness();
-
-			if(actFitness >= 0.0)
-				worstFitness = ( actFitness < worstFitness ) ? actFitness : worstFitness;
-		};
-
-		return worstFitness;
-	}
-	else
+	QList<double> simulated = getFitnessValuesOfSimulatedIndividuals();
+	if( simulated.isEmpty() )
 		return 0;
-};
+
+	return *std::min_element( simulated.begin(), simulated.end() );
+}
 
 double SIGEL_GP::SIG_GPPopulation::getAverageFitness()
 {
+	QList<double> simulated = getFitnessValuesOfSimulatedIndividuals();
+	if( simulated.isEmpty() )
+		return 0;
+
 	double fitnessSum = 0;
-	double actFitness = 0;
-	int size = 0;
+	for( double fitness : simulated )
+		fitnessSum += fitness;
 
-	// take only the simulated values into account
-	// the estimated fitness values are < -2
-	for (int i=0; i<getSize(); i++)
-	{
-		actFitness = getIndividualPointer( i )->getFitness();
-		if(actFitness >= 0.0)
-		{
-			fitnessSum += actFitness;
-			size++;
-		}
-	}
+	return fitnessSum / simulated.size();
+}
 
-	double averageFitness = 0.0;
-	if(size)
-		averageFitness = fitnessSum / size;
+QList<double> SIGEL_GP::SIG_GPPopulation::getFitnessValuesOfSimulatedIndividuals() const
+{
+	QList<double> simulated;
 
-	return averageFitness;
-};
+	for( const SIG_GPIndividual *individual : pool )
+		if( individual->getFitness() >= 0.0 )
+			simulated.append( individual->getFitness() );
+
+	return simulated;
+}
 
 void SIGEL_GP::SIG_GPPopulation::setHistory(bool newHistory)
 {

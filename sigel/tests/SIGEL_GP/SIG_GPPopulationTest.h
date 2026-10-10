@@ -73,6 +73,12 @@ namespace SIGEL_GP
 
     void bestWorstAndAverageUseOnlySimulatedFitnessValues();
 
+    void bestWorstAndAverageDoNotDependOnThePositionWithoutFitness();
+
+    void fitnessZeroCountsAsAFitness();
+
+    void bestWorstAndAverageAreZeroWithoutAnyFitness();
+
     void writtenTextIsReadBack();
 
     void writtenTextWithoutHistoryHasNoHistoryBlock();
