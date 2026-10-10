@@ -1103,6 +1103,10 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   `fitness-check.sh` on both builds. A wrong expected value, a leak in a
   test and a test class that `main.cpp` does not name were each made on
   purpose once, and each one failed as it must.
+- **With it:** the constructor `MT_Randomizer(QTextStream &)` wrote three
+  trace lines to the error output for each object, 3,600 lines in one run
+  of `MT_SearchTest`. They are deleted, with the `#include <iostream>` that
+  only they used. All five checks passed with this change in the tree.
 - **Not done:** with `-o file`, each test class writes the same file
   again, so the file holds the last class only. `make test` does not use
   `-o`.
