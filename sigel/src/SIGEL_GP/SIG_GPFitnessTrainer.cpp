@@ -458,7 +458,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
     delete pvmHosts[ pvmHosts.size()-1 ];
     pvmHosts[ pvmHosts.size()-1 ] = new SIG_GPActivePVMHost(*freshHost);
 
-    fprintf(stderr, "\to new host added to pvmHosts: \"%s\"\n", freshHostNameCString);
+    fprintf(stderr, "\tAdded dynamic host \"%s\" to the host list.\n", freshHostNameCString);
   }
 
   qDeleteAll( freshDynHosts );
