@@ -25,9 +25,12 @@
 #define SIGEL_GP_SIG_GPPOPULATIONTEST_H
 
 #include <QObject>
+#include <QString>
 
 namespace SIGEL_GP
 {
+
+  class SIG_GPPopulation;
 
   /**
    * The unit tests of SIG_GPPopulation.
@@ -38,7 +41,56 @@ namespace SIGEL_GP
 
   private slots:
 
-    void individualsAreDeletedReplacedAndReset();
+    void defaultConstructorGivesAnEmptyPopulation();
+
+    void getNextIdentifierCountsUp();
+
+    void addRandomIndividualsGivesNamesAndPoolPositions();
+
+    void addRandomIndividualsKeepsTheIndividualsThatAreThere();
+
+    void addRandomIndividualsUsesTheLengthLimits();
+
+    void sameSeedGivesTheSameIndividuals();
+
+    void differentSeedsGiveDifferentIndividuals();
+
+    void getIndividualGivesTheIndividualAtThePosition();
+
+    void deleteIndividualMovesTheRestDown();
+
+    void deleteIndividualOfTheLastLeavesTheOthers();
+
+    void deleteIndividualDownToAnEmptyPopulation();
+
+    void setIndividualReplacesOneIndividual();
+
+    void resetAllFitnessValuesSetsMinusOne();
+
+    void bestWorstAndAverageUseOnlySimulatedFitnessValues();
+
+    void averageIsZeroWithoutASimulatedFitnessValue();
+
+    void writtenTextIsReadBack();
+
+    void writtenTextWithoutHistoryHasNoHistoryBlock();
+
+    void individualsWithHistoryAreReadBack();
+
+    void textWithoutHeaderIsRead();
+
+    void emptyPopulationIsReadBack();
+
+    void savePoolWritesTheTextOfWriteToFile();
+
+    void readFromFileReplacesTheIndividualsThatAreThere();
+
+  private:
+
+    // Sets the seed first: without it the programs depend on the time of day.
+    int addIndividuals( SIG_GPPopulation &population, int quantity, int seed = 1 );
+
+    QString writtenText( SIG_GPPopulation &population );
   };
 
 }
