@@ -404,6 +404,11 @@ problem; the choice is made before any code is written.
   vendored libraries, their patches), how the `Makefile` keeps it current,
   and what the master does with a slave that does not match.
 
+- [ ] **165. Mutation adds a line also if there is no maximum length.**
+  With "Ignore maximum length" the maximum is 0. `SIG_GPOperations::mutation`
+  compares the new length with that 0, so it never adds a line. Crossover
+  and `SIG_Program::checkLength` read 0 as "no maximum".
+
 ---
 
 ## 8 · The robot language
