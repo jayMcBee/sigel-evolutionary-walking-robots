@@ -205,7 +205,7 @@ void SIGEL_GP::SIG_GPIndividual::exportProgram( QString& filename )
 	getProgram().exportProgram( filename );
 }
 
-QString SIGEL_GP::SIG_GPIndividual::getName()
+QString SIGEL_GP::SIG_GPIndividual::getName() const
 {
 	return indName;
 };

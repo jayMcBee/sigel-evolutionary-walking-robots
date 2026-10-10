@@ -1205,7 +1205,9 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   destructor of `SIG_GPFitnessTrainer` calls `pvm_delhosts` on a live daemon.
   The three `return 1` paths inside the block still call `pvm_halt()` first.
 - **Now:** `SIG_GPFitnessTrainer::checkTask` prints one line
-  `Score from <host>` for each score it receives. A first version counted
+  `Fitness <value> for individual "<name>" from host "<host>".` for each
+  score it receives. The other task messages of `SIG_GPFitnessTrainer` name
+  the individual in the same way. A first version counted
   the scores per host and printed `Scores from <host>: <count>` before each
   generation line (commit e99f1e0); it was more code than the purpose needs
   and is replaced.

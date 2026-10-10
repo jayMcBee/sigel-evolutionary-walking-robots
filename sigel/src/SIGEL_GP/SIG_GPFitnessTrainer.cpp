@@ -136,9 +136,9 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
   bool success = false;
 
 #ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cerr << "Trying to spawn task for individual "
-			    << ind.getPoolPos()
-			    << Qt::endl;
+  SIGEL_Tools::SIG_IO::cerr << "Trying to spawn task for individual \""
+			    << ind.getName()
+			    << "\"" << Qt::endl;
 #endif
 
   int oldSize = pvmTasks.size();
@@ -229,7 +229,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
           default:
             errorText = QString::asprintf("Unknown error occurred.");
         };
-        SIGEL_Tools::SIG_IO::cerr << "pvm_spawn() failed on \"" << hostNameQCString << "\"   (" << spawnInfo << "/" << taskId << ") - " << errorText.toUtf8() << Qt::endl;
+        SIGEL_Tools::SIG_IO::cerr << "pvm_spawn() failed for individual \"" << ind.getName() << "\" on \"" << hostNameQCString << "\"   (" << spawnInfo << "/" << taskId << ") - " << errorText.toUtf8() << Qt::endl;
       }
   };
 
@@ -250,6 +250,8 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 
   if (pvmTask)
   {
+		QString const indName = exp.population.getIndividual( pvmTask->indPosition ).getName();
+
 		int info = pvm_probe(pvmTask->pvmTaskId, 5);
 
     // pvm_probe answers three ways: a buffer id above zero, zero for nothing
@@ -265,13 +267,12 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 	  	// deleted below.
 	  	if (result < 0)
 	  	{
-	  		SIGEL_Tools::SIG_IO::cerr << "Task " << taskId
-	  					  << " for individual " << pvmTask->indPosition
-	  					  << " returned " << result << "; it is recorded as fitness 0." << Qt::endl;
+	  		SIGEL_Tools::SIG_IO::cerr << "Individual \"" << indName
+	  					  << "\" returned " << result << "; it is recorded as fitness 0." << Qt::endl;
 	  		result = 0;
 	  	}
 
-	  	SIGEL_Tools::SIG_IO::cerr << "\tScore from " << pvmTask->host.name << Qt::endl;
+	  	SIGEL_Tools::SIG_IO::cerr << "\tFitness " << result << " for individual \"" << indName << "\" from host \"" << pvmTask->host.name << "\"." << Qt::endl;
 	  	pvmTask->host.noOfSlaves--;
 	  	delete pvmTasks[ taskId ];   // insert() freed the finished task
 	  	pvmTasks[ taskId ] = nullptr;
@@ -288,7 +289,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 		  SIGEL_Tools::SIG_IO::cerr << "pvm_probe() failed with "
 					    << ( info == PvmSysErr ? "pvmd is not responding"
 								   : "an error" )
-					    << " (" << info << ") -- giving up on this task"
+					    << " (" << info << ") -- giving up on the task for individual \"" << indName << "\""
 					    << Qt::endl;
 
 		  pvm_kill( pvmTask->pvmTaskId );
@@ -309,7 +310,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 
 	      if (QDateTime::currentDateTime() >= timeOutTime)
 				{
-		      SIGEL_Tools::SIG_IO::cerr << "sigel_slave timed out -- force quit via 'pvm_kill()'" << Qt::endl;
+		      SIGEL_Tools::SIG_IO::cerr << "sigel_slave timed out for individual \"" << indName << "\" -- force quit via 'pvm_kill()'" << Qt::endl;
 
 		  		pvm_kill( pvmTask->pvmTaskId );
 		  		pvmTask->host.noOfSlaves--;

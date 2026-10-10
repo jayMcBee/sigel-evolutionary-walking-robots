@@ -134,9 +134,9 @@ of the client to the master. The master must reach the client by this name; it i
 name that "hostname" prints on the client. The master then starts its slaves on the
 client, one at a time.
 
-For each fitness value the master prints the host that sent it:
+For each fitness value the master prints the individual and the host that sent it:
 
-	Score from <host>
+	Fitness <value> for individual "<name>" from host "<host>".
 
 A dynamic client stays until the master ends. The script then removes the directory
 "/tmp/_SIGEL_EVOLUTION_TEMP" and ends. The PVM daemon on the client ends when the

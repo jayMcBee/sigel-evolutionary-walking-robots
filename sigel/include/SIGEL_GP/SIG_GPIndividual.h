@@ -241,7 +241,7 @@ class SIG_GPIndividual{
  *
  */
  public:
- QString getName();
+ QString getName() const;
 
   /**
  * This function loads an individual from a set of data which describes an complete individual.
