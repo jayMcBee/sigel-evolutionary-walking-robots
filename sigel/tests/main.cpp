@@ -28,6 +28,7 @@
 #include "SIGEL_Robot/SIG_LinkTest.h"
 #include "SIGEL_Robot/SIG_MaterialTest.h"
 #include "SIGEL_Robot/SIG_RobotTest.h"
+#include "SIGEL_Simulation/SIG_RegisterTest.h"
 #include "SIGEL_Tools/SIG_RandomizerTest.h"
 
 #include <QtTest>
@@ -49,6 +50,7 @@ int main( int argc, char *argv[] ) {
   testClasses.push_back( std::make_unique<SIGEL_Robot::SIG_LinkTest>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::SIG_MaterialTest>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::SIG_RobotTest>() );
+  testClasses.push_back( std::make_unique<SIGEL_Simulation::SIG_RegisterTest>() );
   testClasses.push_back( std::make_unique<SIGEL_Tools::SIG_RandomizerTest>() );
 
   int failures = 0;
