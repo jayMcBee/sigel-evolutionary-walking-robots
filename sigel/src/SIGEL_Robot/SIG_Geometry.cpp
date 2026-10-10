@@ -22,7 +22,7 @@
 */
 #include "SIGEL_Robot/SIG_Geometry.h"
 #include "SIGEL_Robot/SIG_Robot.h"
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Robot/SIG_RobotExceptions.h"
 
 namespace SIGEL_Robot {
 
@@ -56,7 +56,7 @@ namespace SIGEL_Robot {
                 
                 tx >> tmpstr;
                 if (tmpstr != "Geometry")
-                        SIGEL_Tools::SIG_IO::cerr << "Robot geometry: 'Geometry' expected, found '" << tmpstr << "'" << Qt::endl;
+                        throw SIG_UnstreamingError (__FILE__, __LINE__, "Geometry expected, found '" + tmpstr + "'");
 
                 tx >> itemCount;
                 for (int i = 0; i < itemCount; i++) {

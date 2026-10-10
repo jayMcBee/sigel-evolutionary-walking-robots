@@ -22,7 +22,7 @@
 */
 #include "SIGEL_Robot/SIG_Polygon.h"
 #include "SIGEL_Robot/SIG_Robot.h"
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include <stdio.h>
 
 namespace SIGEL_Robot {
@@ -51,7 +51,7 @@ namespace SIGEL_Robot {
 
                 tx >> tmpstr;
                 if (tmpstr != "Polygon")
-                        SIGEL_Tools::SIG_IO::cerr << "Robot polygon: 'Polygon' expected, found '" << tmpstr << "'" << Qt::endl;
+                        throw SIG_UnstreamingError (__FILE__, __LINE__, "Polygon expected, found '" + tmpstr + "'");
                 
                 tx >> vertexCount;
                 vertices.resize (vertexCount);

@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_Robot/SIG_CommandParameters.h"
+#include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include <math.h>
 
 namespace SIGEL_Robot {
@@ -34,9 +35,8 @@ namespace SIGEL_Robot {
                 QString tmpstr;
 
                 tx >> tmpstr;
-                if (tmpstr != "CommandParameters"){
-                        // ERROR
-        				}
+                if (tmpstr != "CommandParameters")
+                        throw SIG_UnstreamingError (__FILE__, __LINE__, "CommandParameters expected, found '" + tmpstr + "'");
 
                 tx >> duration;
         }
