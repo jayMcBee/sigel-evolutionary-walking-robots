@@ -2500,9 +2500,9 @@ Do you want to replace it?]
   individuals after Add=5
   [modal] class=QFileDialog title=[Save Experiment As]
   [savedialog] parentIsTheMainWindow=1
-  programs=5  instructionLines=2762
-  perProgramLengths=[74,795,392,891,610]
-  sha256(instructions)=034b0c308ba91e1c8ac08e3683af1f37cd9084f71ae8945745a1e5ed3d28ad8c
+  programs=5  instructionLines=1785
+  perProgramLengths=[53,490,670,133,439]
+  sha256(instructions)=1de08c6e34a0d156d5794926bd7dd2d1ffc3c5f0b9d4bbd7c7c45d283a4fecec
   first 6 of individual 0: LOAD 9988,-22117 / MOVE 19741 / ADD -5659,-9758 / MAX -26233,15212 / NOP / JMP -23212
   RANDOMSEED at line 10 = 0
   RANDOMSEED at line 83 = 12345

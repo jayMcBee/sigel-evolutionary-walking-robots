@@ -138,6 +138,32 @@ void SIGEL_GP::SIG_GPPopulationTest::programLengthsAreInsideTheLimits()
     }
 }
 
+void SIGEL_GP::SIG_GPPopulationTest::programLengthsReachBothLimits()
+{
+  SIG_GPParameter gpParameter;
+  gpParameter.setMinIndLength( 5 );
+  gpParameter.setMaxIndLength( 8 );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  SIG_GPPopulation population;
+  population.getRandomizerPointer()->setNewSeed( 1 );
+
+  population.addRandomIndividuals( 100, gpParameter, languageParameters );
+
+  bool hasMinimum = false;
+  bool hasMaximum = false;
+  for ( int i = 0; i < 100; i++ )
+    {
+      long length = population.getIndividualPointer( i )->getProgram().getProgramLength();
+      if ( length == 5 )
+        hasMinimum = true;
+      if ( length == 8 )
+        hasMaximum = true;
+    }
+
+  QVERIFY( hasMinimum );
+  QVERIFY( hasMaximum );
+}
+
 void SIGEL_GP::SIG_GPPopulationTest::sameSeedGivesTheSameIndividuals()
 {
   SIG_GPPopulation first;

@@ -1110,9 +1110,8 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   constructor, the setters and getters, `hasCommand`, the written text, the
   reading with and without the token, and the limits of the register
   width. A second assessment found no behaviour of
-  `SIG_LanguageParameters` that a normal run uses without a test. One gap
-  of `SIG_RandomizerTest` is accepted: seed 0 takes the time of day, and no
-  test can check that without a change to `SIG_Randomizer`.
+  `SIG_LanguageParameters` that a normal run uses without a test. Seed 0
+  takes the seconds since midnight; a test checks that against the clock.
 - **With it:** the constructor `MT_Randomizer(QTextStream &)` wrote three
   trace lines to the error output for each object, 3,600 lines in one run
   of `MT_SearchTest`. They are deleted, with the `#include <iostream>` that
@@ -1125,6 +1124,16 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   `getFitnessValuesOfSimulatedIndividuals`, with `std::max_element`,
   `std::min_element` and sum divided by count. Three tests are new; one of
   them failed with the old code. All five checks passed.
+  A random program never had the maximum length:
+  `SIG_Program::generateRandomProgram` asked `getRandomInt` for a number
+  below maximum minus minimum, and `getRandomInt` gives one less than its
+  argument at most. The argument is now one more, so the length goes from
+  the minimum to the maximum, both included. The new test
+  `programLengthsReachBothLimits` failed with the old code. The random
+  programs of each seed change with this: three values of
+  `guibehaviour-baseline.txt` are new (the five programs of "Add
+  individuals"); the fitness and the part-order baselines did not change.
+  All five checks passed.
 - **Not done:** with `-o file`, each test class writes the same file
   again, so the file holds the last class only. `make test` does not use
   `-o`.

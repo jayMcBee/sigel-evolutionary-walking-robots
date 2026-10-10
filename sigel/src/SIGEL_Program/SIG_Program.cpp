@@ -279,10 +279,10 @@ void SIGEL_Program::SIG_Program::generateRandomProgram( SIGEL_GP::SIG_GPParamete
 {
     lines.clear();
 
-    long n = gpParameter.getMinIndLength() + 
-             randomizer.getRandomInt( gpParameter.getMaxIndLength() - gpParameter.getMinIndLength() );
+    long programLength = gpParameter.getMinIndLength() + 
+                         randomizer.getRandomInt( gpParameter.getMaxIndLength() - gpParameter.getMinIndLength() + 1 );
 
-    for( long x=0; x<n; x++ )
+    for( long x=0; x<programLength; x++ )
       {
         SIGEL_Program::SIG_ProgramLine newLine( randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
 

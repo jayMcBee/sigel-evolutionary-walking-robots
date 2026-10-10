@@ -54,6 +54,7 @@ namespace SIGEL_GP
     void addRandomIndividualsUsesTheLengthLimits();
 
     void programLengthsAreInsideTheLimits();
+    void programLengthsReachBothLimits();
 
     void sameSeedGivesTheSameIndividuals();
 
