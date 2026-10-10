@@ -1134,6 +1134,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   `guibehaviour-baseline.txt` are new (the five programs of "Add
   individuals"); the fitness and the part-order baselines did not change.
   All five checks passed.
+  With "Ignore maximum length" the maximum is 0, and
+  `generateRandomProgram` calculated with that 0: the length was between
+  the minimum and about two times the minimum. A random program now has
+  the minimum length if the maximum is 0. The test
+  `randomProgramsHaveTheMinimumLengthWithoutAMaximum` was committed first
+  and failed until the fix. No baseline changed; all five checks passed.
 - **Not done:** with `-o file`, each test class writes the same file
   again, so the file holds the last class only. `make test` does not use
   `-o`.
