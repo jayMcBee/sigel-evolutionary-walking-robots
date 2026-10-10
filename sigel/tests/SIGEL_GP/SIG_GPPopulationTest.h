@@ -55,6 +55,7 @@ namespace SIGEL_GP
 
     void programLengthsAreInsideTheLimits();
     void programLengthsReachBothLimits();
+    void randomProgramsHaveTheMinimumLengthWithoutAMaximum();
 
     void sameSeedGivesTheSameIndividuals();
 

@@ -164,6 +164,22 @@ void SIGEL_GP::SIG_GPPopulationTest::programLengthsReachBothLimits()
   QVERIFY( hasMaximum );
 }
 
+// A maximum length of 0 means that there is no maximum.
+void SIGEL_GP::SIG_GPPopulationTest::randomProgramsHaveTheMinimumLengthWithoutAMaximum()
+{
+  SIG_GPParameter gpParameter;
+  gpParameter.setMinIndLength( 5 );
+  gpParameter.setMaxIndLength( 0 );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  SIG_GPPopulation population;
+  population.getRandomizerPointer()->setNewSeed( 1 );
+
+  population.addRandomIndividuals( 20, gpParameter, languageParameters );
+
+  for ( int i = 0; i < 20; i++ )
+    QCOMPARE( population.getIndividualPointer( i )->getProgram().getProgramLength(), 5L );
+}
+
 void SIGEL_GP::SIG_GPPopulationTest::sameSeedGivesTheSameIndividuals()
 {
   SIG_GPPopulation first;
