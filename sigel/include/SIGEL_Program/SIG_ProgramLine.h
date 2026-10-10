@@ -249,7 +249,7 @@ class SIG_ProgramLine
 /**
  * This function returns the element of the current robotinstruction.
  * The first element, e.g. a register, is to be accessed with index 0.
- * In case of an invalid access, e.g. a not defined index, this function returns -1.
+ * In case of an invalid access, e.g. a not defined index, this function returns 0.
  * Example 1: LOAD 1,432 -> getInstructionElement(0)=1,getInstructionElement(1)=432;
  * Example 2: ADD 1,2 -> getInstructionElement(0)=1,getInstructionElement(1)=2;
  * @return
