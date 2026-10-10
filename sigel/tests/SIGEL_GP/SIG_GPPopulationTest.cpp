@@ -406,9 +406,10 @@ void SIGEL_GP::SIG_GPPopulationTest::individualsWithHistoryAreReadBack()
       QCOMPARE( read->getFitness(), expected->getFitness() );
       QCOMPARE( read->getAge(), expected->getAge() );
       QCOMPARE( read->getProgram().getProgramLength(), expected->getProgram().getProgramLength() );
-      // readFromFile keeps the white space in front of the end of the history block.
-      QCOMPARE( read->getHistory().join( "\n" ).trimmed(), expected->getHistory().join( "\n" ).trimmed() );
+      QCOMPARE( read->getHistory().join( "\n" ), expected->getHistory().join( "\n" ) );
     }
+
+  QCOMPARE( writtenText( copy ), written );
 }
 
 // Some experiment files have no WITHHISTORY line.
