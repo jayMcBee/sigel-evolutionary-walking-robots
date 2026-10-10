@@ -38,7 +38,29 @@ namespace SIGEL_Robot
 
   private slots:
 
+    void defaultConstructorGivesTheStandardLanguage();
+
+    void settersChangeTheValues();
+
+    void hasCommandFindsOnlyAKnownName();
+
     void removeCommandRemovesTheCommand();
+
+    void removeCommandLeavesTheOtherCommands();
+
+    void removeCommandWithUnknownNameChangesNothing();
+
+    void writeToFileTransferWritesTheCommandsInOrder();
+
+    void writtenTextIsReadBack();
+
+    void streamInARobotHasNoToken();
+
+    void wrongTokenThrows();
+
+    void registerWidthOutsideOneToSixteenThrows();
+
+    void registerWidthOneAndSixteenAreAccepted();
   };
 
 }

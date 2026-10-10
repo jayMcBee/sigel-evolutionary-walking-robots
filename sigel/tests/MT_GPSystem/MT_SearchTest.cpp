@@ -39,7 +39,6 @@ void MT_SearchTest::crossoverKeepsTheLinesOfTheParents_data()
   addCrossoverPointRows();
 }
 
-// With room for each line, the children together have exactly the lines of the parents.
 void MT_SearchTest::crossoverKeepsTheLinesOfTheParents()
 {
   QFETCH( int, firstThreshold );
@@ -70,7 +69,7 @@ void MT_SearchTest::crossoverWithNoRoomCutsTheChildren_data()
   addCrossoverPointRows();
 }
 
-// A child is cut at the maximum length and is never empty.
+// A child is never empty.
 void MT_SearchTest::crossoverWithNoRoomCutsTheChildren()
 {
   QFETCH( int, firstThreshold );

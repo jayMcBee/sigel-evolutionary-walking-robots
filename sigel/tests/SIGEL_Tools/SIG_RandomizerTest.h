@@ -40,15 +40,23 @@ namespace SIGEL_Tools
 
     void sameSeedGivesSameNumbers();
 
+    void differentSeedsGiveDifferentNumbers();
+
     void setNewSeedStartsTheNumbersAgain();
+
+    void setNewSeedAfterTheDefaultConstructorGivesTheNumbersOfTheSeed();
 
     void numberIsBelowMaximum();
 
     void maximumZeroGivesZero();
 
+    void maximumZeroMovesTheGeneratorOn();
+
     void getRandomLongGivesTheNumberOfGetRandomInt();
 
-    void seedOneGivesKnownFirstNumber();
+    void seedOneGivesKnownNumbers();
+
+    void seedFortyTwoGivesKnownNumbersBelowOneThousand();
   };
 
 }

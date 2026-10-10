@@ -54,6 +54,9 @@ struct MT_MatingResult
  * one operator for a mating: a draw is below 1000, so the thresholds
  * 1000/1000/1000 always select the first entry, 0/1000/1000 the second and
  * 0/0/1000 the third.
+ *
+ * The genesis of a child is the number of crossover points, 100 plus the
+ * number of mutations, or 4 for a reproduction.
  */
 class MT_SearchTest : public QObject
 {

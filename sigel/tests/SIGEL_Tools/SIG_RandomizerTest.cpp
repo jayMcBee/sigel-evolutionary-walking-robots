@@ -36,6 +36,14 @@ void SIGEL_Tools::SIG_RandomizerTest::sameSeedGivesSameNumbers()
     QCOMPARE( first.getRandomInt( 1000 ), second.getRandomInt( 1000 ) );
 }
 
+void SIGEL_Tools::SIG_RandomizerTest::differentSeedsGiveDifferentNumbers()
+{
+  SIG_Randomizer first( 1 );
+  SIG_Randomizer second( 2 );
+
+  QVERIFY( first.getRandomInt( 32768 ) != second.getRandomInt( 32768 ) );
+}
+
 void SIGEL_Tools::SIG_RandomizerTest::setNewSeedStartsTheNumbersAgain()
 {
   SIG_Randomizer randomizer( 42 );
@@ -46,6 +54,16 @@ void SIGEL_Tools::SIG_RandomizerTest::setNewSeedStartsTheNumbersAgain()
 
   QCOMPARE( randomizer.getRandomInt( 1000 ), firstNumber );
   QCOMPARE( randomizer.getRandomInt( 1000 ), secondNumber );
+}
+
+// The default constructor takes its seed from the time of day.
+void SIGEL_Tools::SIG_RandomizerTest::setNewSeedAfterTheDefaultConstructorGivesTheNumbersOfTheSeed()
+{
+  SIG_Randomizer randomizer;
+
+  randomizer.setNewSeed( 1 );
+
+  QCOMPARE( randomizer.getRandomInt( 32768 ), 16838 );
 }
 
 void SIGEL_Tools::SIG_RandomizerTest::numberIsBelowMaximum()
@@ -67,6 +85,18 @@ void SIGEL_Tools::SIG_RandomizerTest::maximumZeroGivesZero()
   QCOMPARE( randomizer.getRandomInt( 0 ), 0 );
 }
 
+void SIGEL_Tools::SIG_RandomizerTest::maximumZeroMovesTheGeneratorOn()
+{
+  SIG_Randomizer reference( 42 );
+  reference.getRandomInt( 1000 );
+  int secondNumber = reference.getRandomInt( 1000 );
+  SIG_Randomizer randomizer( 42 );
+
+  randomizer.getRandomInt( 0 );
+
+  QCOMPARE( randomizer.getRandomInt( 1000 ), secondNumber );
+}
+
 void SIGEL_Tools::SIG_RandomizerTest::getRandomLongGivesTheNumberOfGetRandomInt()
 {
   SIG_Randomizer first( 42 );
@@ -75,10 +105,26 @@ void SIGEL_Tools::SIG_RandomizerTest::getRandomLongGivesTheNumberOfGetRandomInt(
   QCOMPARE( first.getRandomLong( 1000 ), static_cast<long>( second.getRandomInt( 1000 ) ) );
 }
 
-// Pins the formula: any change to it changes this number.
-void SIGEL_Tools::SIG_RandomizerTest::seedOneGivesKnownFirstNumber()
+// Four numbers: the first one alone does not show a small change of the
+// multiplier or the increment.
+void SIGEL_Tools::SIG_RandomizerTest::seedOneGivesKnownNumbers()
 {
   SIG_Randomizer randomizer( 1 );
 
   QCOMPARE( randomizer.getRandomInt( 32768 ), 16838 );
+  QCOMPARE( randomizer.getRandomInt( 32768 ), 5758 );
+  QCOMPARE( randomizer.getRandomInt( 32768 ), 10113 );
+  QCOMPARE( randomizer.getRandomInt( 32768 ), 17515 );
+}
+
+// A maximum that is not a power of two: the numbers also depend on the mask
+// and on the remainder of the division by the maximum.
+void SIGEL_Tools::SIG_RandomizerTest::seedFortyTwoGivesKnownNumbersBelowOneThousand()
+{
+  SIG_Randomizer randomizer( 42 );
+
+  QCOMPARE( randomizer.getRandomInt( 1000 ), 81 );
+  QCOMPARE( randomizer.getRandomInt( 1000 ), 33 );
+  QCOMPARE( randomizer.getRandomInt( 1000 ), 269 );
+  QCOMPARE( randomizer.getRandomInt( 1000 ), 461 );
 }
