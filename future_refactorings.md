@@ -372,15 +372,15 @@ problem; the choice is made before any code is written.
   - split the run into 1 s windows; drop a partial last window;
   - pᵢ = horizontal progress in window i along the line from the run's start
     to its end, so no direction is fixed;
-  - v̄ = mean of pᵢ per second; cv = std(pᵢ) / v̄;
-  - h = std(body height) / start height;
-  - score = v̄ / (1 + cv) / (1 + h), the height weight being 1;
+  - score = the smallest pᵢ, the progress of the slowest second; 0 when it
+    is below 0, or a position is Inf or NaN;
   - no settling time at the start; a full run, never the early-stop
-    simulation;
-  - 0 when v̄ is 0 or below, or a position is Inf or NaN.
-  Records every frame with `SIG_GPFullDataRecorder`. Register it in
-  `SIG_GPFitnessFunctionRegistry::fitnessFunctions()`. No file format
-  changes.
+    simulation.
+  A robot that lunges and then rests scores 0. Height is not scored; add the
+  height band of `SIG_GPNiceWalkingFitnessFunction` only if bobbing shows up
+  in runs. Records one position per second with `SIG_GPFullDataRecorder`.
+  Register it in `SIG_GPFitnessFunctionRegistry::fitnessFunctions()`. No
+  file format changes.
 
 - [ ] **155. The master refuses a `sigel_slave` built from other source.**
   Nothing checks that the master and a slave are the same SIGEL. A slave of
