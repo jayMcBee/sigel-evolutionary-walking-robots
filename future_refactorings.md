@@ -308,10 +308,6 @@ touched, because changing one changes behaviour against the reference binary.
   published with results (Ziegler and Banzhaf, CLAWAR 2003), so the fresh
   start presumably ran on Windows only.
 
-- [ ] **37. Give each `generateTerrain` call its own partial file name.** The
-  name is unique per process, but `MT_Controller` runs an evolution on its own
-  thread.
-
 - [ ] **120. Make MetaGP's Add work.** On the MetaGP window's population
   page, Add does not add individuals, so the population can only be filled by
   loading one. Found in use; the cause is not known yet
