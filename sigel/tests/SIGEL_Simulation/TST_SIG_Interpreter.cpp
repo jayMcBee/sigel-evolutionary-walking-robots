@@ -430,6 +430,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultIn
   QTest::newRow( "COPY" ) << SIGEL_Program::COPY << 20 << 6 << 6;
   QTest::newRow( "ADD" ) << SIGEL_Program::ADD << 20 << 6 << 26;
   QTest::newRow( "SUB" ) << SIGEL_Program::SUB << 20 << 6 << 14;
+  QTest::newRow( "MUL" ) << SIGEL_Program::MUL << 20 << 6 << 120;
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultInTheFirstRegister()
@@ -491,6 +492,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsS
   QTest::newRow( "COPY" ) << SIGEL_Program::COPY << "COPY";
   QTest::newRow( "ADD" ) << SIGEL_Program::ADD << "ADD";
   QTest::newRow( "SUB" ) << SIGEL_Program::SUB << "SUB";
+  QTest::newRow( "MUL" ) << SIGEL_Program::MUL << "MUL";
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsSkipped()
@@ -530,6 +532,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLin
   QTest::newRow( "COPY" ) << SIGEL_Program::COPY;
   QTest::newRow( "ADD" ) << SIGEL_Program::ADD;
   QTest::newRow( "SUB" ) << SIGEL_Program::SUB;
+  QTest::newRow( "MUL" ) << SIGEL_Program::MUL;
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLineZero()
@@ -559,6 +562,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration_data()
   QTest::newRow( "COPY" ) << SIGEL_Program::COPY << "COPY";
   QTest::newRow( "ADD" ) << SIGEL_Program::ADD << "ADD";
   QTest::newRow( "SUB" ) << SIGEL_Program::SUB << "SUB";
+  QTest::newRow( "MUL" ) << SIGEL_Program::MUL << "MUL";
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration()

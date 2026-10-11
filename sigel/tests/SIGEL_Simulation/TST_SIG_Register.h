@@ -60,6 +60,10 @@ namespace SIGEL_Simulation
 
     void subRegGivesTheExpectedValue();
 
+    void mulRegGivesTheExpectedValue_data();
+
+    void mulRegGivesTheExpectedValue();
+
     void operationWithTheSameRegisterOnBothSides();
   };
 
