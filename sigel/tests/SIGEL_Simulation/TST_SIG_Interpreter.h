@@ -134,6 +134,10 @@ namespace SIGEL_Simulation
 
     void negativeRegisterOperandWithSixRegisters();
 
+    void nopChangesNothingAndTakesItsTime();
+
+    void nopThatIsNotAllowedIsSkipped();
+
     void timeAccountOfThreeRunsThreeCommands();
 
     void timeAccountOfZeroRunsNothing();

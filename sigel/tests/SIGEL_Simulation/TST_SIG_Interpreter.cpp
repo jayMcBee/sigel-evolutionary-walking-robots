@@ -376,6 +376,50 @@ void SIGEL_Simulation::TST_SIG_Interpreter::negativeRegisterOperandWithSixRegist
   QCOMPARE( moveRecords[0].registerValues, expectedValues );
 }
 
+void SIGEL_Simulation::TST_SIG_Interpreter::nopChangesNothingAndTakesItsTime()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.getCommand( "NOP" )->setDuration( 2.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 2, 5 );
+  appendLine( program, SIGEL_Program::NOP, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[2] = 5;
+
+  interpreter.interprete( 3 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
+
+  interpreter.interprete( 1 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::nopThatIsNotAllowedIsSkipped()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.removeCommand( "NOP" );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::NOP, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  // The time is enough for the MOVE only, so its record shows that the skipped NOP took no time.
+  interpreter.interprete( 1 );
+
+  QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
+}
+
 void SIGEL_Simulation::TST_SIG_Interpreter::timeAccountOfThreeRunsThreeCommands()
 {
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
