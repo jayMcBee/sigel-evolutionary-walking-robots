@@ -48,6 +48,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements_
   QTest::newRow( "SUB" ) << SUB << 2 << -12 << -34;
   QTest::newRow( "MUL" ) << MUL << 2 << -12 << -34;
   QTest::newRow( "DIV" ) << DIV << 2 << -12 << -34;
+  QTest::newRow( "MOD" ) << MOD << 2 << -12 << -34;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements()
@@ -84,6 +85,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText_data()
   QTest::newRow( "SUB" ) << SUB << "SUB -12,-34\n";
   QTest::newRow( "MUL" ) << MUL << "MUL -12,-34\n";
   QTest::newRow( "DIV" ) << DIV << "DIV -12, -34\n";
+  QTest::newRow( "MOD" ) << MOD << "MOD -12,-34\n";
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText()
@@ -112,6 +114,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText_data()
   QTest::newRow( "SUB" ) << SUB << "       SUB -12,-34\n";
   QTest::newRow( "MUL" ) << MUL << "       MUL -12,-34\n";
   QTest::newRow( "DIV" ) << DIV << "       DIV -12,-34\n";
+  QTest::newRow( "MOD" ) << MOD << "       MOD -12,-34\n";
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText()
@@ -161,6 +164,9 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm_data()
   QTest::newRow( "DIV file" ) << "       DIV -12,-34" << DIV << 2 << -12 << -34;
   QTest::newRow( "DIV shown" ) << "DIV -12, -34" << DIV << 2 << -12 << -34;
   QTest::newRow( "DIV lower case" ) << "       div -12,-34" << DIV << 2 << -12 << -34;
+  QTest::newRow( "MOD file" ) << "       MOD -12,-34" << MOD << 2 << -12 << -34;
+  QTest::newRow( "MOD shown" ) << "MOD -12,-34" << MOD << 2 << -12 << -34;
+  QTest::newRow( "MOD lower case" ) << "       mod -12,-34" << MOD << 2 << -12 << -34;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm()
@@ -199,6 +205,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedComman
   QTest::newRow( "SUB" ) << "SUB" << SUB;
   QTest::newRow( "MUL" ) << "MUL" << MUL;
   QTest::newRow( "DIV" ) << "DIV" << DIV;
+  QTest::newRow( "MOD" ) << "MOD" << MOD;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommand()
@@ -235,6 +242,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAW
   QTest::newRow( "SUB" ) << SUB;
   QTest::newRow( "MUL" ) << MUL;
   QTest::newRow( "DIV" ) << DIV;
+  QTest::newRow( "MOD" ) << MOD;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAWeight()

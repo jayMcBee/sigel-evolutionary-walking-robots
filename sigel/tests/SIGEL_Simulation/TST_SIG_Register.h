@@ -68,6 +68,10 @@ namespace SIGEL_Simulation
 
     void divRegGivesTheExpectedValue();
 
+    void modRegGivesTheExpectedValue_data();
+
+    void modRegGivesTheExpectedValue();
+
     void operationWithTheSameRegisterOnBothSides();
   };
 
