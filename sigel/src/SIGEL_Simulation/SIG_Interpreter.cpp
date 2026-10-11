@@ -72,6 +72,7 @@ namespace SIGEL_Simulation
       {
 	// use the rest of remaining and interprete on! :)
 	timeAccountSize -= remainingLastCommandTime;
+	remainingLastCommandTime = 0;
 
 	// we still got time to do something
 	while ( timeAccountSize > 0)

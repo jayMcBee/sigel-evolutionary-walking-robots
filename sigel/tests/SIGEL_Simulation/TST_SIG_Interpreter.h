@@ -126,6 +126,8 @@ namespace SIGEL_Simulation
 
     void exceededTimeLargerThanTheTimeAccountIsSubtractedOverSeveralCalls();
 
+    void remainingLastCommandTimeIsSubtractedOnlyOnce();
+
   private:
 
     /**

@@ -13,9 +13,9 @@ runner                             2  0
 shortHammer                        0  0
 shortHammer                        1  0
 shortHammer                        2  0
-twoBases                           0  0.56524370626422127
-twoBases                           1  0.56524370626422127
-twoBases                           2  0.0020065703328882166
+twoBases                           0  0.58041087019940329
+twoBases                           1  0.58041087019940329
+twoBases                           2  0.0019010504498110589
 walker                             0  0
 walker                             1  0.14151186129657561
 walker                             2  0.14151186129657561

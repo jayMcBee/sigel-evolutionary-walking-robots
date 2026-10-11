@@ -411,11 +411,6 @@ problem; the choice is made before any code is written.
   registers as an unsigned number. With 6 registers, operand -1 is register
   3, not 5.
 
-- [ ] **158. `remainingLastCommandTime` is subtracted twice.**
-  `SIG_Interpreter::interprete` subtracts it from `timeAccountSize` and
-  does not clear it. When that call ends at exactly 0, the next call
-  subtracts it again.
-
 - [ ] **159. A program line with a bad operand is read as an instruction with 0.**
   `SIG_ProgramLine::readFromFile` reads an operand that is missing or is
   not a number as 0, with no message: `ADD 1,2 # note` becomes `ADD 1,0`.
