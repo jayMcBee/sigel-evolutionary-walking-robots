@@ -193,6 +193,102 @@ void SIGEL_Simulation::TST_SIG_Interpreter::moveThatIsNotAllowedIsSkipped()
   QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 }
 
+void SIGEL_Simulation::TST_SIG_Interpreter::timeAccountOfThreeRunsThreeCommands()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  interpreter.interprete( 3 );
+
+  QCOMPARE( commandInterface.getMoveRecords().size(), 3 );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::timeAccountOfZeroRunsNothing()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  interpreter.interprete( 0 );
+
+  QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::exceededTimeIsSubtractedFromTheNextCall()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  interpreter.interprete( 2.5 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 3 );
+
+  interpreter.interprete( 0.5 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 3 );
+
+  interpreter.interprete( 1 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 4 );
+
+  interpreter.interprete( 0.5 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 5 );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::exceededTimeSmallerThanTheTimeAccountIsSubtractedFromThatCall()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  interpreter.interprete( 2.5 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 3 );
+
+  interpreter.interprete( 1.25 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 4 );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::exceededTimeLargerThanTheTimeAccountIsSubtractedOverSeveralCalls()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  interpreter.interprete( 0.25 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
+
+  interpreter.interprete( 0.25 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
+
+  interpreter.interprete( 0.25 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
+
+  interpreter.interprete( 0.25 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
+
+  interpreter.interprete( 0.25 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 2 );
+}
+
 void SIGEL_Simulation::TST_SIG_Interpreter::setAllDurations( SIGEL_Robot::SIG_LanguageParameters &languageParameters, double duration )
 {
   for ( const SIGEL_Robot::SIG_LanguageParameters::NamedCommand &command : languageParameters.getCommands() )

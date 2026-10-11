@@ -116,6 +116,16 @@ namespace SIGEL_Simulation
 
     void moveThatIsNotAllowedIsSkipped();
 
+    void timeAccountOfThreeRunsThreeCommands();
+
+    void timeAccountOfZeroRunsNothing();
+
+    void exceededTimeIsSubtractedFromTheNextCall();
+
+    void exceededTimeSmallerThanTheTimeAccountIsSubtractedFromThatCall();
+
+    void exceededTimeLargerThanTheTimeAccountIsSubtractedOverSeveralCalls();
+
   private:
 
     /**
