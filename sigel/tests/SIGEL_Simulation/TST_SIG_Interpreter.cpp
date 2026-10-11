@@ -435,6 +435,8 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultIn
   QTest::newRow( "MOD" ) << SIGEL_Program::MOD << 20 << 6 << 2;
   QTest::newRow( "MIN first is greater" ) << SIGEL_Program::MIN << 20 << 6 << 6;
   QTest::newRow( "MIN first is less" ) << SIGEL_Program::MIN << 6 << 20 << 6;
+  QTest::newRow( "MAX first is greater" ) << SIGEL_Program::MAX << 20 << 6 << 20;
+  QTest::newRow( "MAX first is less" ) << SIGEL_Program::MAX << 6 << 20 << 20;
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultInTheFirstRegister()
@@ -492,27 +494,34 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsS
 {
   QTest::addColumn< SIGEL_Program::Robotinstruction >( "instruction" );
   QTest::addColumn< QString >( "name" );
+  QTest::addColumn< int >( "firstRegister" );
+  QTest::addColumn< int >( "secondRegister" );
 
-  QTest::newRow( "COPY" ) << SIGEL_Program::COPY << "COPY";
-  QTest::newRow( "ADD" ) << SIGEL_Program::ADD << "ADD";
-  QTest::newRow( "SUB" ) << SIGEL_Program::SUB << "SUB";
-  QTest::newRow( "MUL" ) << SIGEL_Program::MUL << "MUL";
-  QTest::newRow( "DIV" ) << SIGEL_Program::DIV << "DIV";
-  QTest::newRow( "MOD" ) << SIGEL_Program::MOD << "MOD";
-  QTest::newRow( "MIN" ) << SIGEL_Program::MIN << "MIN";
+  QTest::newRow( "COPY" ) << SIGEL_Program::COPY << "COPY" << 2 << 3;
+  QTest::newRow( "ADD" ) << SIGEL_Program::ADD << "ADD" << 2 << 3;
+  QTest::newRow( "SUB" ) << SIGEL_Program::SUB << "SUB" << 2 << 3;
+  QTest::newRow( "MUL" ) << SIGEL_Program::MUL << "MUL" << 2 << 3;
+  QTest::newRow( "DIV" ) << SIGEL_Program::DIV << "DIV" << 2 << 3;
+  QTest::newRow( "MOD" ) << SIGEL_Program::MOD << "MOD" << 2 << 3;
+  QTest::newRow( "MIN" ) << SIGEL_Program::MIN << "MIN" << 2 << 3;
+
+  // Register 2 has 5 and register 3 has 3, so MAX 2,3 would change nothing. MAX 3,2 would change register 3.
+  QTest::newRow( "MAX" ) << SIGEL_Program::MAX << "MAX" << 3 << 2;
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsSkipped()
 {
   QFETCH( SIGEL_Program::Robotinstruction, instruction );
   QFETCH( QString, name );
+  QFETCH( int, firstRegister );
+  QFETCH( int, secondRegister );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   setAllDurations( languageParameters, 1.0 );
   languageParameters.removeCommand( name );
   SIGEL_Program::SIG_Program program;
   appendLine( program, SIGEL_Program::LOAD, 2, 5 );
   appendLine( program, SIGEL_Program::LOAD, 3, 3 );
-  appendLine( program, instruction, 2, 3 );
+  appendLine( program, instruction, firstRegister, secondRegister );
   appendLine( program, SIGEL_Program::MOVE, 0, 0 );
   TST_RecordingCommandInterface commandInterface;
   TST_FixedSimulationQueries simulationQueries( 55 );
@@ -543,6 +552,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLin
   QTest::newRow( "DIV" ) << SIGEL_Program::DIV;
   QTest::newRow( "MOD" ) << SIGEL_Program::MOD;
   QTest::newRow( "MIN" ) << SIGEL_Program::MIN;
+  QTest::newRow( "MAX" ) << SIGEL_Program::MAX;
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLineZero()
@@ -576,6 +586,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration_data()
   QTest::newRow( "DIV" ) << SIGEL_Program::DIV << "DIV";
   QTest::newRow( "MOD" ) << SIGEL_Program::MOD << "MOD";
   QTest::newRow( "MIN" ) << SIGEL_Program::MIN << "MIN";
+  QTest::newRow( "MAX" ) << SIGEL_Program::MAX << "MAX";
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration()

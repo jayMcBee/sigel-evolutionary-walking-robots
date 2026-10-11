@@ -76,6 +76,10 @@ namespace SIGEL_Simulation
 
     void minRegGivesTheExpectedValue();
 
+    void maxRegGivesTheExpectedValue_data();
+
+    void maxRegGivesTheExpectedValue();
+
     void operationWithTheSameRegisterOnBothSides();
   };
 

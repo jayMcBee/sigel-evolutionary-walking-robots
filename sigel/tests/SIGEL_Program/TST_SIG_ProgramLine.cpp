@@ -50,6 +50,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements_
   QTest::newRow( "DIV" ) << DIV << 2 << -12 << -34;
   QTest::newRow( "MOD" ) << MOD << 2 << -12 << -34;
   QTest::newRow( "MIN" ) << MIN << 2 << -12 << -34;
+  QTest::newRow( "MAX" ) << MAX << 2 << -12 << -34;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements()
@@ -88,6 +89,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText_data()
   QTest::newRow( "DIV" ) << DIV << "DIV -12, -34\n";
   QTest::newRow( "MOD" ) << MOD << "MOD -12,-34\n";
   QTest::newRow( "MIN" ) << MIN << "MIN -12,-34\n";
+  QTest::newRow( "MAX" ) << MAX << "MAX -12,-34\n";
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText()
@@ -118,6 +120,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText_data()
   QTest::newRow( "DIV" ) << DIV << "       DIV -12,-34\n";
   QTest::newRow( "MOD" ) << MOD << "       MOD -12,-34\n";
   QTest::newRow( "MIN" ) << MIN << "       MIN -12,-34\n";
+  QTest::newRow( "MAX" ) << MAX << "       MAX -12,-34\n";
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText()
@@ -173,6 +176,9 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm_data()
   QTest::newRow( "MIN file" ) << "       MIN -12,-34" << MIN << 2 << -12 << -34;
   QTest::newRow( "MIN shown" ) << "MIN -12,-34" << MIN << 2 << -12 << -34;
   QTest::newRow( "MIN lower case" ) << "       min -12,-34" << MIN << 2 << -12 << -34;
+  QTest::newRow( "MAX file" ) << "       MAX -12,-34" << MAX << 2 << -12 << -34;
+  QTest::newRow( "MAX shown" ) << "MAX -12,-34" << MAX << 2 << -12 << -34;
+  QTest::newRow( "MAX lower case" ) << "       max -12,-34" << MAX << 2 << -12 << -34;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm()
@@ -213,6 +219,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedComman
   QTest::newRow( "DIV" ) << "DIV" << DIV;
   QTest::newRow( "MOD" ) << "MOD" << MOD;
   QTest::newRow( "MIN" ) << "MIN" << MIN;
+  QTest::newRow( "MAX" ) << "MAX" << MAX;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommand()
@@ -251,6 +258,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAW
   QTest::newRow( "DIV" ) << DIV;
   QTest::newRow( "MOD" ) << MOD;
   QTest::newRow( "MIN" ) << MIN;
+  QTest::newRow( "MAX" ) << MAX;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAWeight()
