@@ -41,6 +41,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements_
   QTest::addColumn< int >( "element1" );
 
   QTest::newRow( "MOVE" ) << MOVE << 1 << -12 << 0;
+  QTest::newRow( "LOAD" ) << LOAD << 2 << -12 << -34;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements()
@@ -70,6 +71,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText_data()
   QTest::addColumn< QString >( "text" );
 
   QTest::newRow( "MOVE" ) << MOVE << "MOVE -12\n";
+  QTest::newRow( "LOAD" ) << LOAD << "LOAD -12,-34\n";
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText()
@@ -91,6 +93,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText_data()
   QTest::addColumn< QString >( "text" );
 
   QTest::newRow( "MOVE" ) << MOVE << "       MOVE -12\n";
+  QTest::newRow( "LOAD" ) << LOAD << "       LOAD -12,-34\n";
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText()
@@ -119,6 +122,9 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm_data()
   QTest::newRow( "MOVE file" ) << "       MOVE -12" << MOVE << 1 << -12 << 0;
   QTest::newRow( "MOVE shown" ) << "MOVE -12" << MOVE << 1 << -12 << 0;
   QTest::newRow( "MOVE lower case" ) << "       move -12" << MOVE << 1 << -12 << 0;
+  QTest::newRow( "LOAD file" ) << "       LOAD -12,-34" << LOAD << 2 << -12 << -34;
+  QTest::newRow( "LOAD shown" ) << "LOAD -12,-34" << LOAD << 2 << -12 << -34;
+  QTest::newRow( "LOAD lower case" ) << "       load -12,-34" << LOAD << 2 << -12 << -34;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm()
@@ -150,6 +156,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedComman
   QTest::addColumn< Robotinstruction >( "instruction" );
 
   QTest::newRow( "MOVE" ) << "MOVE" << MOVE;
+  QTest::newRow( "LOAD" ) << "LOAD" << LOAD;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommand()
@@ -179,6 +186,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAW
   QTest::addColumn< Robotinstruction >( "instruction" );
 
   QTest::newRow( "MOVE" ) << MOVE;
+  QTest::newRow( "LOAD" ) << LOAD;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAWeight()

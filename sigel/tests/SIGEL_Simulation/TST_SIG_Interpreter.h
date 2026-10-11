@@ -116,6 +116,20 @@ namespace SIGEL_Simulation
 
     void moveThatIsNotAllowedIsSkipped();
 
+    void loadPutsTheValueInTheRegister();
+
+    void loadWrapsTheValueToTheRegisterWidth();
+
+    void registerWidthComesFromTheLanguageParameters();
+
+    void loadThatIsNotAllowedIsSkipped();
+
+    void moveGivesTheRegisterValueAsDriveNumber();
+
+    void moveRegisterOperandWraps();
+
+    void negativeRegisterOperandWithEightRegisters();
+
     void timeAccountOfThreeRunsThreeCommands();
 
     void timeAccountOfZeroRunsNothing();
