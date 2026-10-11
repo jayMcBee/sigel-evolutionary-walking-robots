@@ -156,6 +156,10 @@ namespace SIGEL_Simulation
 
     void commandTakesItsOwnDuration();
 
+    void programStartsAgainAfterTheLastLine();
+
+    void stateIsKeptBetweenCalls();
+
     void timeAccountOfThreeRunsThreeCommands();
 
     void timeAccountOfZeroRunsNothing();

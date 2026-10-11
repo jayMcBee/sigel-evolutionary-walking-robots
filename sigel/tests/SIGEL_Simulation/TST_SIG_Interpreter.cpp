@@ -577,6 +577,68 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration()
   QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
 }
 
+void SIGEL_Simulation::TST_SIG_Interpreter::programStartsAgainAfterTheLastLine()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 3, 3 );
+  appendLine( program, SIGEL_Program::ADD, 2, 3 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> firstExpectedValues( 8, 0 );
+  firstExpectedValues[2] = 3;
+  firstExpectedValues[3] = 3;
+  QList<int> secondExpectedValues( 8, 0 );
+  secondExpectedValues[2] = 6;
+  secondExpectedValues[3] = 3;
+
+  interpreter.interprete( 6 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 2 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, firstExpectedValues );
+  QCOMPARE( moveRecords[1].driveNumber, 0 );
+  QCOMPARE( moveRecords[1].registerValues, secondExpectedValues );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::stateIsKeptBetweenCalls()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 3, 3 );
+  appendLine( program, SIGEL_Program::ADD, 2, 3 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> firstExpectedValues( 8, 0 );
+  firstExpectedValues[2] = 3;
+  firstExpectedValues[3] = 3;
+  QList<int> secondExpectedValues( 8, 0 );
+  secondExpectedValues[2] = 6;
+  secondExpectedValues[3] = 3;
+
+  interpreter.interprete( 2 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
+
+  interpreter.interprete( 1 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
+
+  interpreter.interprete( 3 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 2 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, firstExpectedValues );
+  QCOMPARE( moveRecords[1].driveNumber, 0 );
+  QCOMPARE( moveRecords[1].registerValues, secondExpectedValues );
+}
+
 void SIGEL_Simulation::TST_SIG_Interpreter::timeAccountOfThreeRunsThreeCommands()
 {
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
