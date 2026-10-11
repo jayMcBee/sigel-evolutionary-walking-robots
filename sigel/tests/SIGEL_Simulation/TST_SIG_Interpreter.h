@@ -162,6 +162,10 @@ namespace SIGEL_Simulation
 
     void cmpClearsTheFlag();
 
+    void jmpBackwardsMakesALoop();
+
+    void jmpPastTheLastLineWrapsToTheStart();
+
     void cmpThatIsNotAllowedIsSkipped();
 
     void jmpThatIsNotAllowedIsSkipped();

@@ -715,6 +715,73 @@ void SIGEL_Simulation::TST_SIG_Interpreter::cmpClearsTheFlag()
   QCOMPARE( moveRecords[0].registerValues, expectedValues );
 }
 
+void SIGEL_Simulation::TST_SIG_Interpreter::jmpBackwardsMakesALoop()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 3, 1 );
+  appendLine( program, SIGEL_Program::ADD, 2, 3 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::CMP, 0, 0 );
+  appendLine( program, SIGEL_Program::JMP, -4, 0 );
+  appendLine( program, SIGEL_Program::NOP, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> firstExpectedValues( 8, 0 );
+  firstExpectedValues[2] = 1;
+  firstExpectedValues[3] = 1;
+  QList<int> secondExpectedValues( 8, 0 );
+  secondExpectedValues[2] = 2;
+  secondExpectedValues[3] = 1;
+
+  // The JMP on line 4 goes to the ADD on line 1. The time ends with the second MOVE, so a jump to line 0 gives one record only.
+  interpreter.interprete( 7 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 2 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, firstExpectedValues );
+  QCOMPARE( moveRecords[1].driveNumber, 0 );
+  QCOMPARE( moveRecords[1].registerValues, secondExpectedValues );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::jmpPastTheLastLineWrapsToTheStart()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 4, 11 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::CMP, 0, 0 );
+  appendLine( program, SIGEL_Program::JMP, 3, 0 );
+  appendLine( program, SIGEL_Program::LOAD, 4, 22 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[4] = 11;
+
+  interpreter.interprete( 4 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
+
+  // The JMP on line 3 goes to line 3 + 1 + 3 = 7, which is line 1 in a program of 6 lines: the MOVE.
+  interpreter.interprete( 1 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 2 );
+
+  // After the MOVE on line 1 come the CMP and the JMP. After the MOVE on line 5 come the LOAD and the MOVE, with one more record.
+  interpreter.interprete( 2 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 2 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+  QCOMPARE( moveRecords[1].driveNumber, 0 );
+  QCOMPARE( moveRecords[1].registerValues, expectedValues );
+}
+
 void SIGEL_Simulation::TST_SIG_Interpreter::cmpThatIsNotAllowedIsSkipped()
 {
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
