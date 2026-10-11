@@ -420,6 +420,137 @@ void SIGEL_Simulation::TST_SIG_Interpreter::nopThatIsNotAllowedIsSkipped()
   QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
 }
 
+void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultInTheFirstRegister_data()
+{
+  QTest::addColumn< SIGEL_Program::Robotinstruction >( "instruction" );
+  QTest::addColumn< int >( "first" );
+  QTest::addColumn< int >( "second" );
+  QTest::addColumn< int >( "result" );
+
+  QTest::newRow( "COPY" ) << SIGEL_Program::COPY << 20 << 6 << 6;
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultInTheFirstRegister()
+{
+  QFETCH( SIGEL_Program::Robotinstruction, instruction );
+  QFETCH( int, first );
+  QFETCH( int, second );
+  QFETCH( int, result );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 2, first );
+  appendLine( program, SIGEL_Program::LOAD, 5, second );
+  // With 8 registers, the operands 10 and 13 are the registers 2 and 5.
+  appendLine( program, instruction, 10, 13 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[2] = result;
+  expectedValues[5] = second;
+
+  interpreter.interprete( 4 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsSkipped_data()
+{
+  QTest::addColumn< SIGEL_Program::Robotinstruction >( "instruction" );
+  QTest::addColumn< QString >( "name" );
+
+  QTest::newRow( "COPY" ) << SIGEL_Program::COPY << "COPY";
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsSkipped()
+{
+  QFETCH( SIGEL_Program::Robotinstruction, instruction );
+  QFETCH( QString, name );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.removeCommand( name );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 2, 5 );
+  appendLine( program, SIGEL_Program::LOAD, 3, 3 );
+  appendLine( program, instruction, 2, 3 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[2] = 5;
+  expectedValues[3] = 3;
+
+  // The time is enough for the two LOADs and the MOVE only, so the record also shows that the skipped line took no time.
+  interpreter.interprete( 3 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLineZero_data()
+{
+  QTest::addColumn< SIGEL_Program::Robotinstruction >( "instruction" );
+
+  QTest::newRow( "LOAD" ) << SIGEL_Program::LOAD;
+  QTest::newRow( "NOP" ) << SIGEL_Program::NOP;
+  QTest::newRow( "COPY" ) << SIGEL_Program::COPY;
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLineZero()
+{
+  QFETCH( SIGEL_Program::Robotinstruction, instruction );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, instruction, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  interpreter.interprete( 3 );
+
+  QCOMPARE( commandInterface.getMoveRecords().size(), 2 );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration_data()
+{
+  QTest::addColumn< SIGEL_Program::Robotinstruction >( "instruction" );
+  QTest::addColumn< QString >( "name" );
+
+  QTest::newRow( "LOAD" ) << SIGEL_Program::LOAD << "LOAD";
+  QTest::newRow( "NOP" ) << SIGEL_Program::NOP << "NOP";
+  QTest::newRow( "COPY" ) << SIGEL_Program::COPY << "COPY";
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration()
+{
+  QFETCH( SIGEL_Program::Robotinstruction, instruction );
+  QFETCH( QString, name );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.getCommand( name )->setDuration( 2.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, instruction, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  interpreter.interprete( 3 );
+
+  QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
+}
+
 void SIGEL_Simulation::TST_SIG_Interpreter::timeAccountOfThreeRunsThreeCommands()
 {
   SIGEL_Robot::SIG_LanguageParameters languageParameters;

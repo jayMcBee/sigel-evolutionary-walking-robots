@@ -47,6 +47,10 @@ namespace SIGEL_Simulation
     void loadValueWrapsToTheWidth_data();
 
     void loadValueWrapsToTheWidth();
+
+    void copyRegGivesTheExpectedValue_data();
+
+    void copyRegGivesTheExpectedValue();
   };
 
 }

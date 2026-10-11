@@ -43,6 +43,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements_
   QTest::newRow( "MOVE" ) << MOVE << 1 << -12 << 0;
   QTest::newRow( "LOAD" ) << LOAD << 2 << -12 << -34;
   QTest::newRow( "NOP" ) << NOP << 0 << 0 << 0;
+  QTest::newRow( "COPY" ) << COPY << 2 << -12 << -34;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements()
@@ -74,6 +75,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText_data()
   QTest::newRow( "MOVE" ) << MOVE << "MOVE -12\n";
   QTest::newRow( "LOAD" ) << LOAD << "LOAD -12,-34\n";
   QTest::newRow( "NOP" ) << NOP << "NOP\n";
+  QTest::newRow( "COPY" ) << COPY << "COPY -12,-34\n";
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText()
@@ -97,6 +99,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText_data()
   QTest::newRow( "MOVE" ) << MOVE << "       MOVE -12\n";
   QTest::newRow( "LOAD" ) << LOAD << "       LOAD -12,-34\n";
   QTest::newRow( "NOP" ) << NOP << "       NOP \n";
+  QTest::newRow( "COPY" ) << COPY << "       COPY -12,-34\n";
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText()
@@ -131,6 +134,9 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm_data()
   QTest::newRow( "NOP file" ) << "       NOP " << NOP << 0 << 0 << 0;
   QTest::newRow( "NOP shown" ) << "NOP" << NOP << 0 << 0 << 0;
   QTest::newRow( "NOP lower case" ) << "       nop " << NOP << 0 << 0 << 0;
+  QTest::newRow( "COPY file" ) << "       COPY -12,-34" << COPY << 2 << -12 << -34;
+  QTest::newRow( "COPY shown" ) << "COPY -12,-34" << COPY << 2 << -12 << -34;
+  QTest::newRow( "COPY lower case" ) << "       copy -12,-34" << COPY << 2 << -12 << -34;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm()
@@ -164,6 +170,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedComman
   QTest::newRow( "MOVE" ) << "MOVE" << MOVE;
   QTest::newRow( "LOAD" ) << "LOAD" << LOAD;
   QTest::newRow( "NOP" ) << "NOP" << NOP;
+  QTest::newRow( "COPY" ) << "COPY" << COPY;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommand()
@@ -195,6 +202,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAW
   QTest::newRow( "MOVE" ) << MOVE;
   QTest::newRow( "LOAD" ) << LOAD;
   QTest::newRow( "NOP" ) << NOP;
+  QTest::newRow( "COPY" ) << COPY;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAWeight()

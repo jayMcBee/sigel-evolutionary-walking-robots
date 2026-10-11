@@ -138,6 +138,22 @@ namespace SIGEL_Simulation
 
     void nopThatIsNotAllowedIsSkipped();
 
+    void arithmeticInstructionPutsTheResultInTheFirstRegister_data();
+
+    void arithmeticInstructionPutsTheResultInTheFirstRegister();
+
+    void arithmeticCommandThatIsNotAllowedIsSkipped_data();
+
+    void arithmeticCommandThatIsNotAllowedIsSkipped();
+
+    void eachInstructionAsLastLineGoesOnAtLineZero_data();
+
+    void eachInstructionAsLastLineGoesOnAtLineZero();
+
+    void commandTakesItsOwnDuration_data();
+
+    void commandTakesItsOwnDuration();
+
     void timeAccountOfThreeRunsThreeCommands();
 
     void timeAccountOfZeroRunsNothing();

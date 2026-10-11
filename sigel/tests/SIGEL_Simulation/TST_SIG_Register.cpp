@@ -186,3 +186,89 @@ void SIGEL_Simulation::TST_SIG_Register::loadValueWrapsToTheWidth()
 
   QCOMPARE( loadedRegister.getValue(), expected );
 }
+
+void SIGEL_Simulation::TST_SIG_Register::copyRegGivesTheExpectedValue_data()
+{
+  QTest::addColumn< int >( "width" );
+  QTest::addColumn< int >( "value" );
+  QTest::addColumn< int >( "other" );
+  QTest::addColumn< int >( "expected" );
+
+  QTest::newRow( "width 8: 5, 3" ) << 8 << 5 << 3 << 3;
+  QTest::newRow( "width 8: 3, 5" ) << 8 << 3 << 5 << 5;
+  QTest::newRow( "width 8: -5, 3" ) << 8 << -5 << 3 << 3;
+  QTest::newRow( "width 8: 5, -3" ) << 8 << 5 << -3 << -3;
+  QTest::newRow( "width 8: -5, -3" ) << 8 << -5 << -3 << -3;
+  QTest::newRow( "width 8: 0, 0" ) << 8 << 0 << 0 << 0;
+  QTest::newRow( "width 8: 7, 0" ) << 8 << 7 << 0 << 0;
+  QTest::newRow( "width 8: -7, 0" ) << 8 << -7 << 0 << 0;
+  QTest::newRow( "width 8: 0, 7" ) << 8 << 0 << 7 << 7;
+  QTest::newRow( "width 8: 127, 1" ) << 8 << 127 << 1 << 1;
+  QTest::newRow( "width 8: 100, 100" ) << 8 << 100 << 100 << 100;
+  QTest::newRow( "width 8: -128, 1" ) << 8 << -128 << 1 << 1;
+  QTest::newRow( "width 8: -128, -1" ) << 8 << -128 << -1 << -1;
+  QTest::newRow( "width 8: -100, -100" ) << 8 << -100 << -100 << -100;
+  QTest::newRow( "width 8: -100, 100" ) << 8 << -100 << 100 << 100;
+  QTest::newRow( "width 8: 127, 127" ) << 8 << 127 << 127 << 127;
+  QTest::newRow( "width 8: -128, -128" ) << 8 << -128 << -128 << -128;
+  QTest::newRow( "width 8: -128, 127" ) << 8 << -128 << 127 << 127;
+  QTest::newRow( "width 8: 127, -128" ) << 8 << 127 << -128 << -128;
+  QTest::newRow( "width 8: 16, 16" ) << 8 << 16 << 16 << 16;
+  QTest::newRow( "width 8: 7, 2" ) << 8 << 7 << 2 << 2;
+  QTest::newRow( "width 8: -7, 2" ) << 8 << -7 << 2 << 2;
+  QTest::newRow( "width 8: 7, -2" ) << 8 << 7 << -2 << -2;
+  QTest::newRow( "width 8: -7, -2" ) << 8 << -7 << -2 << -2;
+  QTest::newRow( "width 8: 7, 3" ) << 8 << 7 << 3 << 3;
+  QTest::newRow( "width 8: -7, 3" ) << 8 << -7 << 3 << 3;
+  QTest::newRow( "width 8: 7, -3" ) << 8 << 7 << -3 << -3;
+  QTest::newRow( "width 8: -7, -3" ) << 8 << -7 << -3 << -3;
+  QTest::newRow( "width 8: -6, 3" ) << 8 << -6 << 3 << 3;
+  QTest::newRow( "width 8: -4, 2" ) << 8 << -4 << 2 << 2;
+  QTest::newRow( "width 8: -1, -128" ) << 8 << -1 << -128 << -128;
+  QTest::newRow( "width 8: 5, -128" ) << 8 << 5 << -128 << -128;
+  QTest::newRow( "width 8: 6, 3" ) << 8 << 6 << 3 << 3;
+  QTest::newRow( "width 8: 2, 7" ) << 8 << 2 << 7 << 7;
+  QTest::newRow( "width 8: -2, 7" ) << 8 << -2 << 7 << 7;
+  QTest::newRow( "width 8: 5, 5" ) << 8 << 5 << 5 << 5;
+  QTest::newRow( "width 8: -5, -5" ) << 8 << -5 << -5 << -5;
+
+  QTest::newRow( "width 1: 0, 0" ) << 1 << 0 << 0 << 0;
+  QTest::newRow( "width 1: -1, -1" ) << 1 << -1 << -1 << -1;
+  QTest::newRow( "width 1: -1, 0" ) << 1 << -1 << 0 << 0;
+  QTest::newRow( "width 1: 0, -1" ) << 1 << 0 << -1 << -1;
+
+  QTest::newRow( "width 3: 3, 1" ) << 3 << 3 << 1 << 1;
+  QTest::newRow( "width 3: -4, 1" ) << 3 << -4 << 1 << 1;
+  QTest::newRow( "width 3: 3, 3" ) << 3 << 3 << 3 << 3;
+  QTest::newRow( "width 3: -4, -4" ) << 3 << -4 << -4 << -4;
+  QTest::newRow( "width 3: -4, -1" ) << 3 << -4 << -1 << -1;
+  QTest::newRow( "width 3: 3, 2" ) << 3 << 3 << 2 << 2;
+  QTest::newRow( "width 3: -3, 2" ) << 3 << -3 << 2 << 2;
+
+  QTest::newRow( "width 16: 32767, 1" ) << 16 << 32767 << 1 << 1;
+  QTest::newRow( "width 16: -32768, 1" ) << 16 << -32768 << 1 << 1;
+  QTest::newRow( "width 16: -32768, -1" ) << 16 << -32768 << -1 << -1;
+  QTest::newRow( "width 16: 32767, 32767" ) << 16 << 32767 << 32767 << 32767;
+  QTest::newRow( "width 16: -32768, -32768" ) << 16 << -32768 << -32768 << -32768;
+  QTest::newRow( "width 16: -32768, 32767" ) << 16 << -32768 << 32767 << 32767;
+  QTest::newRow( "width 16: 1000, 7" ) << 16 << 1000 << 7 << 7;
+  QTest::newRow( "width 16: -1000, 7" ) << 16 << -1000 << 7 << 7;
+}
+
+void SIGEL_Simulation::TST_SIG_Register::copyRegGivesTheExpectedValue()
+{
+  QFETCH( int, width );
+  QFETCH( int, value );
+  QFETCH( int, other );
+  QFETCH( int, expected );
+
+  SIG_Register firstRegister( width );
+  firstRegister.loadValue( value );
+  SIG_Register otherRegister( width );
+  otherRegister.loadValue( other );
+
+  firstRegister.copyReg( otherRegister );
+
+  QCOMPARE( firstRegister.getValue(), expected );
+  QCOMPARE( otherRegister.getValue(), other );
+}
