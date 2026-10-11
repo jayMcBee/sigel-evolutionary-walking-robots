@@ -35,9 +35,9 @@ namespace SIGEL_Robot {
 
         void calculateAnyJoint (SIG_Vector pointA, SIG_Vector pointB, SIG_Vector pointC,
                                 SIG_Vector otherA, SIG_Vector otherB, SIG_Vector otherC,
-                                double winkel, double verschiebung,
+                                double angleInDegrees, double shift,
                                 SIG_Matrix & orientation, SIG_Vector & translation,
-                                QString someIdentifier);
+                                QString debugLabel);
 
 }
 

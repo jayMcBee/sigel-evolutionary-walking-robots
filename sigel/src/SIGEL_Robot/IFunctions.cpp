@@ -296,12 +296,12 @@ namespace SIGEL_Robot {
 
         void calculateAnyJoint (SIG_Vector pointA, SIG_Vector pointB, SIG_Vector pointC,
                                 SIG_Vector otherA, SIG_Vector otherB, SIG_Vector otherC,
-                                double winkel, double verschiebung,
+                                double angleInDegrees, double shift,
                                 SIG_Matrix & orientation, SIG_Vector & translation,
-                                QString someIdentifier)
+                                QString debugLabel)
         {
                 // Make the points coverable.
-                SIG_Vector r, zw;
+                SIG_Vector r, perpendicularDirection;
                 double h1;
                 
                 r.assign (&pointB);
@@ -310,14 +310,14 @@ namespace SIGEL_Robot {
                 pointB.assign (&pointA);
                 pointB.plusis (&r);
 
-                zw.assign (&pointC);
-                zw.minusis (&pointA);
-                h1 = zw.inprod (&r);
+                perpendicularDirection.assign (&pointC);
+                perpendicularDirection.minusis (&pointA);
+                h1 = perpendicularDirection.inprod (&r);
                 r.timesis (h1);
-                zw.minusis (&r);
-                zw.normalize ();
+                perpendicularDirection.minusis (&r);
+                perpendicularDirection.normalize ();
                 pointC.assign (&pointA);
-                pointC.plusis (&zw);
+                pointC.plusis (&perpendicularDirection);
                 
                 r.assign (&otherB);
                 r.minusis (&otherA);
@@ -325,19 +325,19 @@ namespace SIGEL_Robot {
                 otherB.assign (&otherA);
                 otherB.plusis (&r);
 
-                zw.assign (&otherC);
-                zw.minusis (&otherA);
-                h1 = zw.inprod (&r);
+                perpendicularDirection.assign (&otherC);
+                perpendicularDirection.minusis (&otherA);
+                h1 = perpendicularDirection.inprod (&r);
                 r.timesis (h1);
-                zw.minusis (&r);
-                zw.normalize ();
+                perpendicularDirection.minusis (&r);
+                perpendicularDirection.normalize ();
                 otherC.assign (&otherA);
-                otherC.plusis (&zw);
+                otherC.plusis (&perpendicularDirection);
                 // End of the covering construction
 
 #ifdef SIG_DEBUG
 		SIGEL_Tools::SIG_IO::cerr << "Computing the transformation of "
-					  << someIdentifier
+					  << debugLabel
 					  << Qt::endl;
 #endif
 
@@ -354,24 +354,24 @@ namespace SIGEL_Robot {
                 SIG_Vector v (&pointB);
                 v.minusis (&pointA);
 
-                SIG_Vector schiebung (&v);
-                schiebung.timesis (verschiebung);
-                translation.plusis (&schiebung);
+                SIG_Vector shiftVector (&v);
+                shiftVector.timesis (shift);
+                translation.plusis (&shiftVector);
 
-                double phi = (winkel / 180.0) * std::numbers::pi;
+                double phi = (angleInDegrees / 180.0) * std::numbers::pi;
 
-                SIG_Matrix drehmatrix;
+                SIG_Matrix axisRotation;
 
-		drehmatrix=rotationMatrix(v,-phi);
+		axisRotation=rotationMatrix(v,-phi);
                 translation.minusis (&pointA);
-                SIG_Vector stflorianhilf;
-                drehmatrix.times (&translation, &stflorianhilf);
-                translation.assign (&stflorianhilf);
+                SIG_Vector translationBuffer;
+                axisRotation.times (&translation, &translationBuffer);
+                translation.assign (&translationBuffer);
                 translation.plusis (&pointA);
 
-                SIG_Matrix hilf;
-                drehmatrix.times (&orientation, &hilf);
-                orientation.assign (&hilf);
+                SIG_Matrix orientationBuffer;
+                axisRotation.times (&orientation, &orientationBuffer);
+                orientation.assign (&orientationBuffer);
         }
 
 } // namespace

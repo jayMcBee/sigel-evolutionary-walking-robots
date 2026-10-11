@@ -62,7 +62,6 @@ Paths are relative to `sigel/`, the source tree.
   | `T_Instruktion`, `T_Instruk` | `MT_TranslatedIndividual.h` |
   | `Instruktion` | `MT_Classifier.cpp, createDoubleTransIndi`; `MT_Substitute.cpp, translatedSIGProg` |
   | `set`/`getSelektionValue` | `MT_FitnessTrainer.h`, `MT_GPManager.h` |
-  | `winkel`, `verschiebung`, `schiebung`, `drehmatrix`, `hilf`, `stflorianhilf` | `IFunctions.h`, `IFunctions.cpp` |
 
   `rot` in `getMinRot` and `rotMin` is rotation, not the colour — leave it.
   **Check after each phase:** `./checks/check.sh`, then
