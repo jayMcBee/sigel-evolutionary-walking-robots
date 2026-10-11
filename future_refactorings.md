@@ -295,6 +295,9 @@ touched, because changing one changes behaviour against the reference binary.
   `MT_Substitute::~MT_Substitute` and `MT_GPManager::~MT_GPManager` call
   `pthread_mutex_unlock` on mutexes the destroying thread does not hold, which
   POSIX leaves undefined, and never call `pthread_mutex_destroy`.
+  There may be more to it: nothing waits for the evolution thread to end
+  before these objects are deleted, so check the locking of the MetaGP thread
+  as a whole before changing this.
 
 - [ ] **119. Make a fresh MetaGP able to start beside a SIGEL evolution on
   Linux.** `MT_GPManager::startEvolution` waits for enough training cases
