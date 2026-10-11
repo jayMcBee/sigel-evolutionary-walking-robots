@@ -586,27 +586,33 @@ void SIGEL_Simulation::TST_SIG_Interpreter::programStartsAgainAfterTheLastLine()
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   setAllDurations( languageParameters, 1.0 );
   SIGEL_Program::SIG_Program program;
+  // The MOVE on line 0 gives a record of its own in each pass, so going on at another line after the last line gives other records.
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
   appendLine( program, SIGEL_Program::LOAD, 3, 3 );
   appendLine( program, SIGEL_Program::ADD, 2, 3 );
   appendLine( program, SIGEL_Program::MOVE, 0, 0 );
   TST_RecordingCommandInterface commandInterface;
   TST_FixedSimulationQueries simulationQueries( 55 );
   SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
-  QList<int> firstExpectedValues( 8, 0 );
-  firstExpectedValues[2] = 3;
-  firstExpectedValues[3] = 3;
-  QList<int> secondExpectedValues( 8, 0 );
-  secondExpectedValues[2] = 6;
-  secondExpectedValues[3] = 3;
+  QList<int> expectedValuesAfterTheFirstPass( 8, 0 );
+  expectedValuesAfterTheFirstPass[2] = 3;
+  expectedValuesAfterTheFirstPass[3] = 3;
+  QList<int> expectedValuesAfterTheSecondPass( 8, 0 );
+  expectedValuesAfterTheSecondPass[2] = 6;
+  expectedValuesAfterTheSecondPass[3] = 3;
 
-  interpreter.interprete( 6 );
+  interpreter.interprete( 8 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
-  QCOMPARE( moveRecords.size(), 2 );
+  QCOMPARE( moveRecords.size(), 4 );
   QCOMPARE( moveRecords[0].driveNumber, 0 );
-  QCOMPARE( moveRecords[0].registerValues, firstExpectedValues );
+  QCOMPARE( moveRecords[0].registerValues, QList<int>( 8, 0 ) );
   QCOMPARE( moveRecords[1].driveNumber, 0 );
-  QCOMPARE( moveRecords[1].registerValues, secondExpectedValues );
+  QCOMPARE( moveRecords[1].registerValues, expectedValuesAfterTheFirstPass );
+  QCOMPARE( moveRecords[2].driveNumber, 0 );
+  QCOMPARE( moveRecords[2].registerValues, expectedValuesAfterTheFirstPass );
+  QCOMPARE( moveRecords[3].driveNumber, 0 );
+  QCOMPARE( moveRecords[3].registerValues, expectedValuesAfterTheSecondPass );
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::stateIsKeptBetweenCalls()
