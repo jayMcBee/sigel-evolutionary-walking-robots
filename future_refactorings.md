@@ -401,10 +401,6 @@ problem; the choice is made before any code is written.
 
 ## 8 · The robot language
 
-- [ ] **156. `MOD` gives a wrong result for a negative value that the divisor divides exactly.**
-  `SIG_Register::modReg` gives |divisor| there, not 0: -4 MOD 2 is 2. The
-  result must be from 0 to |divisor| - 1.
-
 - [ ] **159. A program line with a bad operand is read as an instruction with 0.**
   `SIG_ProgramLine::readFromFile` reads an operand that is missing or is
   not a number as 0, with no message: `ADD 1,2 # note` becomes `ADD 1,0`.

@@ -24,6 +24,7 @@
 #include "SIGEL_Simulation/SIG_Register.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 #include <cmath> // needed for computing the power of a number
+#include <cstdlib> // std::abs for int
 
 SIGEL_Simulation::SIG_Register::SIG_Register(int size)
   : value(0)
@@ -99,21 +100,23 @@ void SIGEL_Simulation::SIG_Register::maxReg(SIG_Register const& otherRegister)
 
 void SIGEL_Simulation::SIG_Register::modReg(SIG_Register const& otherRegister)
 {
-  if( otherRegister.getValue() == 0 )
-    value = 0;
-  else
-  {  
-    int modnumber = otherRegister.getValue();
-    if ( modnumber < 0 )
-      {
-        modnumber = -modnumber;
-      }
-    if ( value < 0 )
-      value = modnumber + ( value % modnumber );
-    else
-      value = value % modnumber;
-  };
-  makeValid();
+  int divisor = std::abs( otherRegister.getValue() );
+
+  if ( divisor == 0 )
+    {
+      value = 0;
+      return;
+    }
+
+  int remainder = value % divisor;
+
+  // In C++ the remainder of a negative value is negative or 0.
+  if ( remainder < 0 )
+    {
+      remainder = remainder + divisor;
+    }
+
+  value = remainder;
 };
 
 int SIGEL_Simulation::SIG_Register::getValue() const
