@@ -433,6 +433,8 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultIn
   QTest::newRow( "MUL" ) << SIGEL_Program::MUL << 20 << 6 << 120;
   QTest::newRow( "DIV" ) << SIGEL_Program::DIV << 20 << 6 << 3;
   QTest::newRow( "MOD" ) << SIGEL_Program::MOD << 20 << 6 << 2;
+  QTest::newRow( "MIN first is greater" ) << SIGEL_Program::MIN << 20 << 6 << 6;
+  QTest::newRow( "MIN first is less" ) << SIGEL_Program::MIN << 6 << 20 << 6;
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultInTheFirstRegister()
@@ -497,6 +499,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsS
   QTest::newRow( "MUL" ) << SIGEL_Program::MUL << "MUL";
   QTest::newRow( "DIV" ) << SIGEL_Program::DIV << "DIV";
   QTest::newRow( "MOD" ) << SIGEL_Program::MOD << "MOD";
+  QTest::newRow( "MIN" ) << SIGEL_Program::MIN << "MIN";
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsSkipped()
@@ -539,6 +542,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLin
   QTest::newRow( "MUL" ) << SIGEL_Program::MUL;
   QTest::newRow( "DIV" ) << SIGEL_Program::DIV;
   QTest::newRow( "MOD" ) << SIGEL_Program::MOD;
+  QTest::newRow( "MIN" ) << SIGEL_Program::MIN;
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLineZero()
@@ -571,6 +575,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration_data()
   QTest::newRow( "MUL" ) << SIGEL_Program::MUL << "MUL";
   QTest::newRow( "DIV" ) << SIGEL_Program::DIV << "DIV";
   QTest::newRow( "MOD" ) << SIGEL_Program::MOD << "MOD";
+  QTest::newRow( "MIN" ) << SIGEL_Program::MIN << "MIN";
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration()
