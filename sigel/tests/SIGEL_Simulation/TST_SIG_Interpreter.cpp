@@ -428,6 +428,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultIn
   QTest::addColumn< int >( "result" );
 
   QTest::newRow( "COPY" ) << SIGEL_Program::COPY << 20 << 6 << 6;
+  QTest::newRow( "ADD" ) << SIGEL_Program::ADD << 20 << 6 << 26;
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultInTheFirstRegister()
@@ -459,12 +460,35 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultIn
   QCOMPARE( moveRecords[0].registerValues, expectedValues );
 }
 
+void SIGEL_Simulation::TST_SIG_Interpreter::addWithTheSameRegisterTwice()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 2, 20 );
+  appendLine( program, SIGEL_Program::ADD, 2, 2 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[2] = 40;
+
+  interpreter.interprete( 3 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
 void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsSkipped_data()
 {
   QTest::addColumn< SIGEL_Program::Robotinstruction >( "instruction" );
   QTest::addColumn< QString >( "name" );
 
   QTest::newRow( "COPY" ) << SIGEL_Program::COPY << "COPY";
+  QTest::newRow( "ADD" ) << SIGEL_Program::ADD << "ADD";
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsSkipped()
@@ -502,6 +526,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLin
   QTest::newRow( "LOAD" ) << SIGEL_Program::LOAD;
   QTest::newRow( "NOP" ) << SIGEL_Program::NOP;
   QTest::newRow( "COPY" ) << SIGEL_Program::COPY;
+  QTest::newRow( "ADD" ) << SIGEL_Program::ADD;
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLineZero()
@@ -529,6 +554,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration_data()
   QTest::newRow( "LOAD" ) << SIGEL_Program::LOAD << "LOAD";
   QTest::newRow( "NOP" ) << SIGEL_Program::NOP << "NOP";
   QTest::newRow( "COPY" ) << SIGEL_Program::COPY << "COPY";
+  QTest::newRow( "ADD" ) << SIGEL_Program::ADD << "ADD";
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration()

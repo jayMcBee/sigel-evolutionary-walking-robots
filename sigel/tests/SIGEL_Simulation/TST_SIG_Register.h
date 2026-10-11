@@ -51,6 +51,12 @@ namespace SIGEL_Simulation
     void copyRegGivesTheExpectedValue_data();
 
     void copyRegGivesTheExpectedValue();
+
+    void addRegGivesTheExpectedValue_data();
+
+    void addRegGivesTheExpectedValue();
+
+    void operationWithTheSameRegisterOnBothSides();
   };
 
 }

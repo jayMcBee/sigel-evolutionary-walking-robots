@@ -142,6 +142,8 @@ namespace SIGEL_Simulation
 
     void arithmeticInstructionPutsTheResultInTheFirstRegister();
 
+    void addWithTheSameRegisterTwice();
+
     void arithmeticCommandThatIsNotAllowedIsSkipped_data();
 
     void arithmeticCommandThatIsNotAllowedIsSkipped();
