@@ -148,6 +148,24 @@ namespace SIGEL_Simulation
 
     void arithmeticCommandThatIsNotAllowedIsSkipped();
 
+    void jmpJumpsWhenFirstRegisterIsLess();
+
+    void jmpJumpsWhenRegistersAreEqual();
+
+    void jmpDoesNotJumpWhenFirstRegisterIsGreater();
+
+    void jmpDoesNotJumpBeforeAnyCmp();
+
+    void jmpZeroGoesToTheNextLine();
+
+    void jmpDoesNotClearTheFlag();
+
+    void cmpClearsTheFlag();
+
+    void cmpThatIsNotAllowedIsSkipped();
+
+    void jmpThatIsNotAllowedIsSkipped();
+
     void eachInstructionAsLastLineGoesOnAtLineZero_data();
 
     void eachInstructionAsLastLineGoesOnAtLineZero();

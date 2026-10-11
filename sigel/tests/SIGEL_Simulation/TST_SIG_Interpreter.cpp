@@ -539,6 +539,232 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsS
   QCOMPARE( moveRecords[0].registerValues, expectedValues );
 }
 
+void SIGEL_Simulation::TST_SIG_Interpreter::jmpJumpsWhenFirstRegisterIsLess()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 2, 1 );
+  appendLine( program, SIGEL_Program::LOAD, 3, 2 );
+  appendLine( program, SIGEL_Program::CMP, 10, 11 );
+  appendLine( program, SIGEL_Program::JMP, 1, 0 );
+  appendLine( program, SIGEL_Program::LOAD, 4, 99 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[2] = 1;
+  expectedValues[3] = 2;
+
+  // The operands 10 and 11 of the CMP are the registers 2 and 3.
+  interpreter.interprete( 5 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::jmpJumpsWhenRegistersAreEqual()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 2, 2 );
+  appendLine( program, SIGEL_Program::LOAD, 3, 2 );
+  appendLine( program, SIGEL_Program::CMP, 2, 3 );
+  appendLine( program, SIGEL_Program::JMP, 1, 0 );
+  appendLine( program, SIGEL_Program::LOAD, 4, 99 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[2] = 2;
+  expectedValues[3] = 2;
+
+  interpreter.interprete( 5 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::jmpDoesNotJumpWhenFirstRegisterIsGreater()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 2, 3 );
+  appendLine( program, SIGEL_Program::LOAD, 3, 2 );
+  appendLine( program, SIGEL_Program::CMP, 2, 3 );
+  appendLine( program, SIGEL_Program::JMP, 1, 0 );
+  appendLine( program, SIGEL_Program::LOAD, 4, 99 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[2] = 3;
+  expectedValues[3] = 2;
+  expectedValues[4] = 99;
+
+  interpreter.interprete( 6 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::jmpDoesNotJumpBeforeAnyCmp()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::JMP, 1, 0 );
+  appendLine( program, SIGEL_Program::LOAD, 4, 99 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[4] = 99;
+
+  interpreter.interprete( 3 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::jmpZeroGoesToTheNextLine()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::CMP, 0, 0 );
+  appendLine( program, SIGEL_Program::JMP, 0, 0 );
+  appendLine( program, SIGEL_Program::LOAD, 4, 99 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[4] = 99;
+
+  interpreter.interprete( 4 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::jmpDoesNotClearTheFlag()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::CMP, 0, 0 );
+  appendLine( program, SIGEL_Program::JMP, 1, 0 );
+  appendLine( program, SIGEL_Program::LOAD, 4, 99 );
+  appendLine( program, SIGEL_Program::JMP, 1, 0 );
+  appendLine( program, SIGEL_Program::LOAD, 5, 99 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  // The second JMP jumps only if the first JMP has left the compare flag set.
+  interpreter.interprete( 4 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, QList<int>( 8, 0 ) );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::cmpClearsTheFlag()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 2, 1 );
+  appendLine( program, SIGEL_Program::CMP, 3, 2 );
+  appendLine( program, SIGEL_Program::CMP, 2, 3 );
+  appendLine( program, SIGEL_Program::JMP, 1, 0 );
+  appendLine( program, SIGEL_Program::LOAD, 4, 99 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[2] = 1;
+  expectedValues[4] = 99;
+
+  // The first CMP sets the compare flag, because 0 <= 1. The second CMP clears it.
+  interpreter.interprete( 6 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::cmpThatIsNotAllowedIsSkipped()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.removeCommand( "CMP" );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::CMP, 0, 0 );
+  appendLine( program, SIGEL_Program::JMP, 1, 0 );
+  appendLine( program, SIGEL_Program::LOAD, 4, 99 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[4] = 99;
+
+  // The time is enough for the JMP, the LOAD and the MOVE only, so the record also shows that the skipped CMP took no time.
+  interpreter.interprete( 3 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::jmpThatIsNotAllowedIsSkipped()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.removeCommand( "JMP" );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::CMP, 0, 0 );
+  appendLine( program, SIGEL_Program::JMP, 1, 0 );
+  appendLine( program, SIGEL_Program::LOAD, 4, 99 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[4] = 99;
+
+  // The time is enough for the CMP, the LOAD and the MOVE only, so the record also shows that the skipped JMP took no time.
+  interpreter.interprete( 3 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
 void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLineZero_data()
 {
   QTest::addColumn< SIGEL_Program::Robotinstruction >( "instruction" );
@@ -553,6 +779,8 @@ void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLin
   QTest::newRow( "MOD" ) << SIGEL_Program::MOD;
   QTest::newRow( "MIN" ) << SIGEL_Program::MIN;
   QTest::newRow( "MAX" ) << SIGEL_Program::MAX;
+  QTest::newRow( "CMP" ) << SIGEL_Program::CMP;
+  QTest::newRow( "JMP" ) << SIGEL_Program::JMP;
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLineZero()
@@ -587,6 +815,8 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration_data()
   QTest::newRow( "MOD" ) << SIGEL_Program::MOD << "MOD";
   QTest::newRow( "MIN" ) << SIGEL_Program::MIN << "MIN";
   QTest::newRow( "MAX" ) << SIGEL_Program::MAX << "MAX";
+  QTest::newRow( "CMP" ) << SIGEL_Program::CMP << "CMP";
+  QTest::newRow( "JMP" ) << SIGEL_Program::JMP << "JMP";
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration()

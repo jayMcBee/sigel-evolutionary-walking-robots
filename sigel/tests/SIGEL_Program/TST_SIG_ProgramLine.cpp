@@ -51,6 +51,8 @@ void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements_
   QTest::newRow( "MOD" ) << MOD << 2 << -12 << -34;
   QTest::newRow( "MIN" ) << MIN << 2 << -12 << -34;
   QTest::newRow( "MAX" ) << MAX << 2 << -12 << -34;
+  QTest::newRow( "CMP" ) << CMP << 2 << -12 << -34;
+  QTest::newRow( "JMP" ) << JMP << 1 << -12 << 0;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements()
@@ -90,6 +92,8 @@ void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText_data()
   QTest::newRow( "MOD" ) << MOD << "MOD -12,-34\n";
   QTest::newRow( "MIN" ) << MIN << "MIN -12,-34\n";
   QTest::newRow( "MAX" ) << MAX << "MAX -12,-34\n";
+  QTest::newRow( "CMP" ) << CMP << "CMP -12,-34\n";
+  QTest::newRow( "JMP" ) << JMP << "JMP -12\n";
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText()
@@ -121,6 +125,8 @@ void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText_data()
   QTest::newRow( "MOD" ) << MOD << "       MOD -12,-34\n";
   QTest::newRow( "MIN" ) << MIN << "       MIN -12,-34\n";
   QTest::newRow( "MAX" ) << MAX << "       MAX -12,-34\n";
+  QTest::newRow( "CMP" ) << CMP << "       CMP -12,-34\n";
+  QTest::newRow( "JMP" ) << JMP << "       JMP -12\n";
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText()
@@ -179,6 +185,12 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm_data()
   QTest::newRow( "MAX file" ) << "       MAX -12,-34" << MAX << 2 << -12 << -34;
   QTest::newRow( "MAX shown" ) << "MAX -12,-34" << MAX << 2 << -12 << -34;
   QTest::newRow( "MAX lower case" ) << "       max -12,-34" << MAX << 2 << -12 << -34;
+  QTest::newRow( "CMP file" ) << "       CMP -12,-34" << CMP << 2 << -12 << -34;
+  QTest::newRow( "CMP shown" ) << "CMP -12,-34" << CMP << 2 << -12 << -34;
+  QTest::newRow( "CMP lower case" ) << "       cmp -12,-34" << CMP << 2 << -12 << -34;
+  QTest::newRow( "JMP file" ) << "       JMP -12" << JMP << 1 << -12 << 0;
+  QTest::newRow( "JMP shown" ) << "JMP -12" << JMP << 1 << -12 << 0;
+  QTest::newRow( "JMP lower case" ) << "       jmp -12" << JMP << 1 << -12 << 0;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm()
@@ -220,6 +232,8 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedComman
   QTest::newRow( "MOD" ) << "MOD" << MOD;
   QTest::newRow( "MIN" ) << "MIN" << MIN;
   QTest::newRow( "MAX" ) << "MAX" << MAX;
+  QTest::newRow( "CMP" ) << "CMP" << CMP;
+  QTest::newRow( "JMP" ) << "JMP" << JMP;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommand()
@@ -259,6 +273,8 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAW
   QTest::newRow( "MOD" ) << MOD;
   QTest::newRow( "MIN" ) << MIN;
   QTest::newRow( "MAX" ) << MAX;
+  QTest::newRow( "CMP" ) << CMP;
+  QTest::newRow( "JMP" ) << JMP;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAWeight()
