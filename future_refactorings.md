@@ -433,16 +433,6 @@ problem; the choice is made before any code is written.
   it modulo 32000, so the values 0 to 767 are drawn twice as often as the
   others.
 
-- [ ] **166. Ship a second set of experiments that fits today's instructions.**
-  The fixes to the robot instructions change how a saved program runs, so the
-  stored fitness values in the shipped experiments no longer match, and some
-  programs depend on a result that is now fixed. Keep the shipped files as the
-  original 1.3 set. Add a second set: each experiment loaded and evolved for
-  10 to 25 generations, so that the fitness values come from today's code and
-  such programs are selected away. Do this after the instruction fixes (items
-  159 and 161) are in. In the same pass, give the robot models less saturated
-  colours. To decide: the name of the second set and where the two sets live.
-
 ---
 
 ## 9 · Removals
@@ -457,6 +447,20 @@ problem; the choice is made before any code is written.
   "ZorcWalkingFitnessFunction"; it stays. To decide: where the switch lives
   (the `Makefile` or a header), and what an experiment file naming
   "RemoteZORCFitnessFunction" does when the switch is off.
+
+---
+
+## 10 · Experiments and robot models
+
+- [ ] **166. Ship a second set of experiments that fits today's instructions.**
+  The fixes to the robot instructions change how a saved program runs, so the
+  stored fitness values in the shipped experiments no longer match, and some
+  programs depend on a result that is now fixed. Keep the shipped files as the
+  original 1.3 set. Add a second set: each experiment loaded and evolved for
+  10 to 25 generations, so that the fitness values come from today's code and
+  such programs are selected away. Do this after the instruction fixes (items
+  159 and 161) are in. In the same pass, give the robot models less saturated
+  colours. To decide: the name of the second set and where the two sets live.
 
 ---
 
