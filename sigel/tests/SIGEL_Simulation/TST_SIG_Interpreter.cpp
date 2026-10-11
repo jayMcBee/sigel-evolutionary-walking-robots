@@ -341,6 +341,41 @@ void SIGEL_Simulation::TST_SIG_Interpreter::negativeRegisterOperandWithEightRegi
   QCOMPARE( moveRecords[0].registerValues, expectedValues );
 }
 
+void SIGEL_Simulation::TST_SIG_Interpreter::negativeRegisterOperandWithSixRegisters_data()
+{
+  QTest::addColumn< int >( "operand" );
+  QTest::addColumn< int >( "registerNumber" );
+
+  QTest::newRow( "-1" ) << -1 << 5;
+  QTest::newRow( "-3" ) << -3 << 3;
+  QTest::newRow( "-6" ) << -6 << 0;
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::negativeRegisterOperandWithSixRegisters()
+{
+  QFETCH( int, operand );
+  QFETCH( int, registerNumber );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.setMemorySize( 6 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, operand, 5 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 6, 0 );
+  expectedValues[registerNumber] = 5;
+
+  interpreter.interprete( 2 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  // MOVE 0 gives the value of register 0 as drive number.
+  QCOMPARE( moveRecords[0].driveNumber, expectedValues[0] );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
 void SIGEL_Simulation::TST_SIG_Interpreter::timeAccountOfThreeRunsThreeCommands()
 {
   SIGEL_Robot::SIG_LanguageParameters languageParameters;

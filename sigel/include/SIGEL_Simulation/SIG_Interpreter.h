@@ -91,6 +91,15 @@ class SIG_Interpreter
  private:
 
   /**
+   * Gives the number of the register that an operand of an instruction names.
+   * The registers are counted in a ring: operand -1 is the last register.
+   *
+   * @param operand The register operand of a program line.
+   * @return A number from 0 to the number of registers - 1.
+   */
+  int getRegisterNumber( int operand ) const;
+
+  /**
    * The robot-program to interprete.
    */
   SIGEL_Program::SIG_Program const &robotProgram;

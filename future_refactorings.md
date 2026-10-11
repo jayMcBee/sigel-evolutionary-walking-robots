@@ -406,11 +406,6 @@ problem; the choice is made before any code is written.
   `SIG_Register::modReg` gives |divisor| there, not 0: -4 MOD 2 is 2. The
   result must be from 0 to |divisor| - 1.
 
-- [ ] **157. A negative register operand picks the wrong register when the memory size is not a power of two.**
-  `SIG_Interpreter::interprete` takes the operand modulo the number of
-  registers as an unsigned number. With 6 registers, operand -1 is register
-  3, not 5.
-
 - [ ] **159. A program line with a bad operand is read as an instruction with 0.**
   `SIG_ProgramLine::readFromFile` reads an operand that is missing or is
   not a number as 0, with no message: `ADD 1,2 # note` becomes `ADD 1,0`.

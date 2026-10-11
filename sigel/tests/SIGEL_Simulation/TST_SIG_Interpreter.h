@@ -130,6 +130,10 @@ namespace SIGEL_Simulation
 
     void negativeRegisterOperandWithEightRegisters();
 
+    void negativeRegisterOperandWithSixRegisters_data();
+
+    void negativeRegisterOperandWithSixRegisters();
+
     void timeAccountOfThreeRunsThreeCommands();
 
     void timeAccountOfZeroRunsNothing();
