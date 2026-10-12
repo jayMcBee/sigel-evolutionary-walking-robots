@@ -71,7 +71,7 @@ class SIG_Interpreter
 
   /**
    * Interpretes the program until the executes robot-commands
-   * have exceeded the time supplied in timeAccountSize.
+   * have exceeded the time supplied in timeAccount.
    *
    * The SIG_Interpreter resumes its work at the program position
    * refered to by the program counter. Every executed command decreases
@@ -81,12 +81,12 @@ class SIG_Interpreter
    * may be manipulated through the commandInterface and queried through
    * the simulationQueries.
    *
-   * @param timeAccountSize The amount of model-time that the interpretation
-   *                        may consume until the control is returned to the
-   *                        calling method. Usually this is the stepsize
-   *                        of the simulation.
+   * @param timeAccount The amount of model-time that the interpretation
+   *                    may consume until the control is returned to the
+   *                    calling method. Usually this is the stepsize
+   *                    of the simulation.
    */
-  void interprete(double timeAccountSize);
+  void interprete(double timeAccount);
 
  private:
 
@@ -102,7 +102,7 @@ class SIG_Interpreter
   /**
    * Prints the remaining time, the program counter, the compare flag, programLine and the registers.
    */
-  void debugPrintInterpreterState( double timeAccountSize, SIGEL_Program::SIG_ProgramLine const &programLine ) const;
+  void debugPrintInterpreterState( double timeAccount, SIGEL_Program::SIG_ProgramLine const &programLine ) const;
 
   /**
    * The robot-program to interprete.

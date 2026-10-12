@@ -2052,7 +2052,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::delaySubtractsTheDelayTimeFirstAndIt
 {
   QTest::addColumn< int >( "registerValue" );
   QTest::addColumn< double >( "durationOfTheDelayCommand" );
-  QTest::addColumn< double >( "timeAccountSize" );
+  QTest::addColumn< double >( "timeAccount" );
   QTest::addColumn< int >( "numberOfMoveRecords" );
 
   // The register value is the delay time in milliseconds: 80 is 0.08 s and 100 is 0.1 s.
@@ -2072,7 +2072,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::delaySubtractsTheDelayTimeFirstAndIt
 {
   QFETCH( int, registerValue );
   QFETCH( double, durationOfTheDelayCommand );
-  QFETCH( double, timeAccountSize );
+  QFETCH( double, timeAccount );
   QFETCH( int, numberOfMoveRecords );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   setAllDurations( languageParameters, 1.0 );
@@ -2089,7 +2089,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::delaySubtractsTheDelayTimeFirstAndIt
   interpreter.interprete( 1 );
   QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 
-  interpreter.interprete( timeAccountSize );
+  interpreter.interprete( timeAccount );
 
   QCOMPARE( commandInterface.getMoveRecords().size(), numberOfMoveRecords );
 }

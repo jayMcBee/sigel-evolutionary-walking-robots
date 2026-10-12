@@ -53,16 +53,16 @@ namespace SIGEL_Simulation
 		}
 	};
 
-	void SIG_Interpreter::interprete(double timeAccountSize)
+	void SIG_Interpreter::interprete(double timeAccount)
 	{
 		long programLength = robotProgram.getProgramLength();
 
 		// save the maximalDelayTime
 		double maxDelayTime = static_cast<double>( languageParameters.getMaximalDelayTime() ) * 0.001 ;
 
-		if ( timeAccountSize <= remainingLastCommandTime )
+		if ( timeAccount <= remainingLastCommandTime )
 		{
-			remainingLastCommandTime -= timeAccountSize;
+			remainingLastCommandTime -= timeAccount;
 #ifdef SIG_DEBUG
 			SIGEL_Tools::SIG_IO::cerr << "Remaining Last Command Time: " << remainingLastCommandTime << Qt::endl;
 #endif
@@ -70,17 +70,17 @@ namespace SIGEL_Simulation
 		}
 
 		// use the rest of remaining and interprete on! :)
-		timeAccountSize -= remainingLastCommandTime;
+		timeAccount -= remainingLastCommandTime;
 		remainingLastCommandTime = 0;
 
 		// we still got time to do something
-		while ( timeAccountSize > 0)
+		while ( timeAccount > 0)
 		{
 			// fetch the next command
 			SIGEL_Program::SIG_ProgramLine const &programLine = robotProgram.getLine( programCounter );
 
 #ifdef SIG_DEBUG
-			debugPrintInterpreterState( timeAccountSize, programLine );
+			debugPrintInterpreterState( timeAccount, programLine );
 #endif
 
 			// commandNames is in the order of Robotinstruction.
@@ -236,7 +236,7 @@ namespace SIGEL_Simulation
 				delayTime = std::abs( delayTime );
 				if( delayTime > maxDelayTime )
 					delayTime = maxDelayTime;
-				timeAccountSize -= delayTime;
+				timeAccount -= delayTime;
 			}
 			break;
 
@@ -245,22 +245,22 @@ namespace SIGEL_Simulation
 			} // close switch
 
 			programCounter = nextProgramCounter;
-			timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+			timeAccount -= languageParameters.getCommand( commandName )->getDuration();
 		} // close while
 
 		// The last command took more time than was left: the excess is taken off the time of the next call.
-		if ( timeAccountSize < 0 )
-			remainingLastCommandTime = - timeAccountSize;
+		if ( timeAccount < 0 )
+			remainingLastCommandTime = - timeAccount;
 
 #ifdef SIG_DEBUG
 		SIGEL_Tools::SIG_IO::cerr << "Remaining Last Command Time: " << remainingLastCommandTime << Qt::endl; // debug! delete!
 #endif
 	};
 
-	void SIG_Interpreter::debugPrintInterpreterState( double timeAccountSize, SIGEL_Program::SIG_ProgramLine const &programLine ) const
+	void SIG_Interpreter::debugPrintInterpreterState( double timeAccount, SIGEL_Program::SIG_ProgramLine const &programLine ) const
 	{
 		SIGEL_Tools::SIG_IO::cerr << "--------------------------------------------------------" << Qt::endl;
-		SIGEL_Tools::SIG_IO::cerr << "Remaining Time:" << timeAccountSize<< Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Remaining Time:" << timeAccount<< Qt::endl;
 		SIGEL_Tools::SIG_IO::cerr << "PC: " << programCounter << Qt::endl;
 
 		if( compareFlag )
