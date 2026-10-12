@@ -423,11 +423,23 @@ problem; the choice is made before any code is written.
   others.
 
 - [ ] **167. Take the repeated block out of `SIG_Interpreter::interprete`.**
-  Each of the 15 cases of the `switch` repeats the same steps around its own
-  few lines: is the command allowed, go to the next line, take the duration
-  off the time account, keep the excess time. Write these steps once, so a
-  case holds only what its instruction does. Do this when the unit tests
-  cover all 15 instructions.
+  Each of the 15 cases of the `switch` still repeats two steps after its own
+  few lines: take the duration off the time account, keep the excess time.
+  Write these steps once after the `switch`, so a case holds only what its
+  instruction does. One step for each move, as for the steps before it.
+
+- [ ] **169. State the names of the robot instructions once.** The 15 names
+  are written out in each place that needs them, so a new instruction or a
+  changed name needs many edits. Put them in one list in the header of
+  `SIG_ProgramLine`, next to `Robotinstruction` and in its order:
+  `static inline const QStringList instructionNames`. Then, one step at a
+  time, let the code take its names from the list:
+  `SIG_Interpreter::interprete`, which loses its local `commandNames`, and
+  `randomRobotinstruction`, `printToString` and `writeToFile` of
+  `SIG_ProgramLine`. Leave the places whose order is saved or shown: the
+  constructor of `SIGEL_Robot::SIG_LanguageParameters`, the list in the
+  language parameters dialog, and the `PROBABILITY_` keys of
+  `SIG_GPParameter`. Item 168 can build on this list.
 
 - [ ] **168. Consider one description for each robot instruction.** The name
   of an instruction and its number of operands are written out for each
