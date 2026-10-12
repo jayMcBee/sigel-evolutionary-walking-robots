@@ -25,6 +25,7 @@
 
 #include "SIGEL_Program/SIG_ProgramLine.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 
 #include <QList>
@@ -270,6 +271,40 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileRefusesTextWithoutAnInstruc
   const bool lineRead = programLine.readFromFile( text, &programLine );
 
   QVERIFY( !lineRead );
+  QCOMPARE( programLine.getRobotinstructionType(), LOAD );
+  QCOMPARE( programLine.getElementsArray(), expectedElements );
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::readFromFileGivesAnErrorForABadOperand_data()
+{
+  QTest::addColumn< QString >( "text" );
+  QTest::addColumn< QString >( "message" );
+
+  QTest::newRow( "second operand missing" ) << "ADD 1" << "Program line 'ADD 1' has a bad operand.";
+  QTest::newRow( "operands are not numbers" ) << "ADD x,y" << "Program line 'ADD x,y' has a bad operand.";
+  QTest::newRow( "operand missing" ) << "MOVE" << "Program line 'MOVE' has a bad operand.";
+  QTest::newRow( "text after the operands" ) << "ADD 1,2 # note" << "Program line 'ADD 1,2 # note' has a bad operand.";
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::readFromFileGivesAnErrorForABadOperand()
+{
+  QFETCH( QString, text );
+  QFETCH( QString, message );
+  const QList<int> expectedElements = { 3, 4 };
+  SIG_ProgramLine programLine;
+  programLine.setRobotinstruction( LOAD, 3, 4 );
+  QString thrown;
+
+  try
+    {
+      programLine.readFromFile( text, &programLine );
+    }
+  catch ( const SIGEL_Tools::SIG_Exception &e )
+    {
+      thrown = e.getMessage();
+    }
+
+  QVERIFY2( thrown.contains( message ), qPrintable( thrown ) );
   QCOMPARE( programLine.getRobotinstructionType(), LOAD );
   QCOMPARE( programLine.getElementsArray(), expectedElements );
 }

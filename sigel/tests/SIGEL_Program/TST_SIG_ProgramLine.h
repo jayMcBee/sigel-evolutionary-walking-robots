@@ -62,6 +62,10 @@ namespace SIGEL_Program
 
     void readFromFileRefusesTextWithoutAnInstruction();
 
+    void readFromFileGivesAnErrorForABadOperand_data();
+
+    void readFromFileGivesAnErrorForABadOperand();
+
     void getElementOutsideTheElementsGivesZero();
 
     void setElementChangesOneElement();

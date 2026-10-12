@@ -22,6 +22,7 @@
 */
 #include "SIGEL_Program/SIG_ProgramLine.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
 #include "stdlib.h"
@@ -342,11 +343,20 @@ void SIGEL_Program::SIG_ProgramLine::resizeElements(int size)
   element.resize(size);
 }
 
+int SIGEL_Program::SIG_ProgramLine::operandTextToInteger( const QString &operandText, const QString &lineText ) const
+{
+  bool isNumber = false;
+  const int value = operandText.toInt( &isNumber, 10 );
+  if ( !isNumber )
+    throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "Program line '" + lineText.trimmed() + "' has a bad operand." );
+
+  return value;
+}
+
 void SIGEL_Program::SIG_ProgramLine::readOneRegister(QString &str, int &reg)
 {
      int     pos1 = -1,pos2 = -1;
      QString regStr1;
-     bool    ok;
 
      str=str.simplified() + '\n' ;
 
@@ -354,7 +364,7 @@ void SIGEL_Program::SIG_ProgramLine::readOneRegister(QString &str, int &reg)
      pos2    = str.indexOf(QChar('\n'), 1, Qt::CaseInsensitive);
 
      regStr1 = str.mid( pos1 + 1, pos2 - pos1 - 1 );
-     reg     = regStr1.toInt( &ok, 10 );
+     reg     = operandTextToInteger( regStr1, str );
 }
 
 void SIGEL_Program::SIG_ProgramLine::readOneRegisterAndIntegerConstant(QString &str,int &reg1,int &cnst)
@@ -362,7 +372,6 @@ void SIGEL_Program::SIG_ProgramLine::readOneRegisterAndIntegerConstant(QString &
      int     pos1=-1, pos2=-1, pos3=-1, pos4=-1;
      QString regStr1;
      QString cnstStr1;
-     bool    ok;
 
      str=str.simplified() + '\n';
 
@@ -373,16 +382,15 @@ void SIGEL_Program::SIG_ProgramLine::readOneRegisterAndIntegerConstant(QString &
      pos4     = str.indexOf(QChar('\n'), pos2 + 1, Qt::CaseInsensitive);
 
      regStr1  = str.mid( pos1 + 1, pos2 - pos1 - 1 );        
-     reg1     = regStr1.toInt( &ok, 10 );
+     reg1     = operandTextToInteger( regStr1, str );
 
      cnstStr1 = str.mid( pos3 + 1, pos4 - pos3 - 1 );         
-     cnst     = cnstStr1.toInt( &ok, 10 );
+     cnst     = operandTextToInteger( cnstStr1, str );
 }
 
 void SIGEL_Program::SIG_ProgramLine::readTwoRegisters(QString &str,int &reg1,int &reg2)
 {
      int     pos1 = -1, pos2 = -1, pos3 = -1, pos4 = -1;
-     bool    ok;
      QString regStr1,regStr2;
 
      str  = str.simplified() + '\n';
@@ -396,10 +404,10 @@ void SIGEL_Program::SIG_ProgramLine::readTwoRegisters(QString &str,int &reg1,int
      pos4    = str.indexOf(QChar('\n'), pos2 + 1, Qt::CaseInsensitive);
 
      regStr1 = str.mid( pos1 + 1, pos2 - pos1 - 1 );        
-     reg1    = regStr1.toInt( &ok, 10);
+     reg1    = operandTextToInteger( regStr1, str );
 
      regStr2 = str.mid( pos3 + 1, pos4 - pos3 - 1 );         
-     reg2    = regStr2.toInt( &ok, 10 );
+     reg2    = operandTextToInteger( regStr2, str );
 }
 
 bool SIGEL_Program::SIG_ProgramLine::readFromFile(QString &str, SIGEL_Program::SIG_ProgramLine *line)

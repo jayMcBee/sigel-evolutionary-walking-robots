@@ -203,21 +203,13 @@ class SIG_ProgramLine
    void writeToFile( QTextStream &file ) const;
 
 /**
- * This function will generate a program line from the read QTextStream.It will return
- * true if a robot instruction could be generated. If no defined instruction could
- * be generated, the current read line will be ignored. So comments can be used
- * within a robot program. Comments always have to use a complete line, and
- * comments are not allowed to contain any keywords (=robot instructions, e.g. ADD).
+ * Reads the program line in str into line and returns true. The former content of line is replaced.
+ * Returns false and ignores str if it holds no robot instruction, so a program can have comments.
+ * A comment must take a complete line and must not contain an instruction name, for example ADD.
+ * Throws a SIG_Exception if an operand is missing or is not an integer.
  * @pre
- * The QTextStream file must exist, and it has to contain a complete program line.
- * Either this text stream has been created by writeToFile, or the stream has
- * been edited by the user. The stream has to have a defined format, which is
- * described more in detail in the corresponding specification.
- * @post
- * The program line, which is described in the text stream, has been transfered
- * (and translated) into a (new created) program line. All neccessary data is
- * prepared. WARNING: An existing program line will be deleted by calling this
- * function.
+ * str holds one complete program line, written by writeToFile or edited by the user,
+ * in the format that the specification describes.
  */
  
    public:
@@ -323,6 +315,13 @@ class SIG_ProgramLine
  
    protected:
    void readOneRegister(QString &str,int &reg);   
+
+/**
+ * Converts operandText to an integer, or throws a SIG_Exception that names lineText.
+ */
+
+   protected:
+   int operandTextToInteger( const QString &operandText, const QString &lineText ) const;
    };
 
 };
