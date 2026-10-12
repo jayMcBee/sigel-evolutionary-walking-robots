@@ -428,18 +428,12 @@ problem; the choice is made before any code is written.
   Write these steps once after the `switch`, so a case holds only what its
   instruction does. One step for each move, as for the steps before it.
 
-- [ ] **169. State the names of the robot instructions once.** The 15 names
-  are written out in each place that needs them, so a new instruction or a
-  changed name needs many edits. Put them in one list in the header of
-  `SIG_ProgramLine`, next to `Robotinstruction` and in its order:
-  `static inline const QStringList instructionNames`. Then, one step at a
-  time, let the code take its names from the list:
-  `SIG_Interpreter::interprete`, which loses its local `commandNames`, and
-  `randomRobotinstruction`, `printToString` and `writeToFile` of
-  `SIG_ProgramLine`. Leave the places whose order is saved or shown: the
-  constructor of `SIGEL_Robot::SIG_LanguageParameters`, the list in the
-  language parameters dialog, and the `PROBABILITY_` keys of
-  `SIG_GPParameter`. Item 168 can build on this list.
+- [ ] **169. Declare the robot instructions once, in one central place.**
+  Today each place that needs the 15 instructions writes them out itself.
+  Declare them once in the header of `SIG_ProgramLine`, next to
+  `Robotinstruction`: `static inline const QStringList instructionNames`.
+  Make the change in ordered, separate steps. Refactorings and clean-ups
+  that the list makes possible can go along with it once the list is there.
 
 - [ ] **168. Consider one description for each robot instruction.** The name
   of an instruction and its number of operands are written out for each
