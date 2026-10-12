@@ -23,7 +23,6 @@
 #include "SIGEL_Simulation/SIG_Interpreter.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_IO.h"
-#include <QStringList>
 #include <algorithm>
 #include <cmath>
 
@@ -83,10 +82,8 @@ namespace SIGEL_Simulation
 			debugPrintInterpreterState( timeAccount, programLine );
 #endif
 
-			// commandNames is in the order of Robotinstruction.
-			static const QStringList commandNames = { "COPY", "LOAD", "ADD", "SUB", "MUL", "DIV", "MOD", "MIN", "MAX", "CMP", "JMP", "SENSE", "MOVE", "DELAY", "NOP" };
-			// An instruction type that is not in commandNames gets an empty name.
-			const QString commandName = commandNames.value( programLine.getRobotinstructionType() );
+			// An instruction type that is not in robotInstructionNames gets an empty name.
+			const QString commandName = SIGEL_Program::robotInstructionNames.value( programLine.getRobotinstructionType() );
 
 			// A line whose instruction type is not in Robotinstruction is invalid.
 			if ( commandName.isEmpty() )

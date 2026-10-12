@@ -33,6 +33,7 @@
 
 #include <QList>
 #include <QString>
+#include <QStringList>
 #include <QTextStream>
 
 #include "SIGEL_Tools/SIG_Randomizer.h"
@@ -70,6 +71,11 @@ namespace SIGEL_Program
 		DELAY,
 		NOP,
 	};
+
+	/**
+	 * The names of the robot instructions, in the order of Robotinstruction.
+	 */
+	inline const QStringList robotInstructionNames = { "COPY", "LOAD", "ADD", "SUB", "MUL", "DIV", "MOD", "MIN", "MAX", "CMP", "JMP", "SENSE", "MOVE", "DELAY", "NOP" };
 
 	/**
 	 * This class represents a program line that contains robot instructions (and more).
