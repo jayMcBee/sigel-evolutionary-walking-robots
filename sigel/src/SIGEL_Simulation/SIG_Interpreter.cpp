@@ -105,10 +105,12 @@ namespace SIGEL_Simulation
 				// An instruction type that is not in commandNames gets an empty name.
 				const QString commandName = commandNames.value( programLine.getRobotinstructionType() );
 
+				long nextProgramCounter = (programCounter + 1) % programLength;
+
 				// A command that is not allowed is skipped: the program goes to the next line and no time is used.
 				if ( !languageParameters.hasCommand( commandName ) )
 				{
-					programCounter = (programCounter + 1) % programLength;
+					programCounter = nextProgramCounter;
 					continue;
 				}
 
@@ -121,7 +123,6 @@ namespace SIGEL_Simulation
 					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 					registers[reg0].copyReg( registers[reg1] );
-					programCounter = (programCounter + 1) % programLength;
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
@@ -138,7 +139,6 @@ namespace SIGEL_Simulation
 					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 					int value = programLine.getInstructionElement(1);
 					registers[reg0].loadValue( value );
-					programCounter = (programCounter + 1) % programLength;
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
@@ -155,7 +155,6 @@ namespace SIGEL_Simulation
 					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 					registers[reg0].addReg( registers[reg1] );
-					programCounter = (programCounter + 1) % programLength;
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
@@ -172,7 +171,6 @@ namespace SIGEL_Simulation
 					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 					registers[reg0].subReg( registers[reg1] );
-					programCounter = (programCounter + 1) % programLength;
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
@@ -189,7 +187,6 @@ namespace SIGEL_Simulation
 					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 					registers[reg0].mulReg( registers[reg1] );
-					programCounter = (programCounter + 1) % programLength;
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
@@ -206,7 +203,6 @@ namespace SIGEL_Simulation
 					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 					registers[reg0].divReg( registers[reg1] );
-					programCounter = (programCounter + 1) % programLength;
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
@@ -223,7 +219,6 @@ namespace SIGEL_Simulation
 					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 					registers[reg0].modReg( registers[reg1] );
-					programCounter = (programCounter + 1) % programLength;
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
@@ -240,7 +235,6 @@ namespace SIGEL_Simulation
 					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 					registers[reg0].minReg( registers[reg1] );
-					programCounter = (programCounter + 1) % programLength;
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
@@ -257,7 +251,6 @@ namespace SIGEL_Simulation
 					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 					registers[reg0].maxReg( registers[reg1] );
-					programCounter = (programCounter + 1) % programLength;
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
@@ -280,7 +273,6 @@ namespace SIGEL_Simulation
 #ifdef SIG_DEBUG
 					SIGEL_Tools::SIG_IO::cerr << "Reg0: " << reg0 << "; Reg1: " << reg1 << Qt::endl;
 #endif
-					programCounter = (programCounter + 1) % programLength;
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
@@ -295,19 +287,16 @@ namespace SIGEL_Simulation
 				{
 					// do it!
 					int lineOffset = programLine.getInstructionElement(0);
-					long nextLine = programCounter + 1;
 
 					if ( compareFlag )
 					{
-						nextLine = nextLine + lineOffset;
-					}
+						// The remainder of a negative line number is negative in C++.
+						nextProgramCounter = (programCounter + 1 + lineOffset) % programLength;
 
-					// The remainder of a negative line number is negative in C++.
-					programCounter = nextLine % programLength;
-
-					if ( programCounter < 0 )
-					{
-						programCounter = programCounter + programLength;
+						if ( nextProgramCounter < 0 )
+						{
+							nextProgramCounter = nextProgramCounter + programLength;
+						}
 					}
 
 					// subtract the needed time for the command
@@ -327,7 +316,6 @@ namespace SIGEL_Simulation
 
 					int numberOfSensor = registers[reg0].getValue();
 					simulationQueries.sense( numberOfSensor, registers );
-					programCounter = (programCounter + 1) % programLength;
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
@@ -347,7 +335,6 @@ namespace SIGEL_Simulation
 					SIGEL_Tools::SIG_IO::cerr << "Moving drive " << numberOfJoint << "." << Qt::endl;
 #endif
 					commandInterface.moveDrive( numberOfJoint, registers );
-					programCounter = (programCounter + 1) % programLength;
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
@@ -369,7 +356,6 @@ namespace SIGEL_Simulation
 					if( delayTime > maxDelayTime )
 						delayTime = maxDelayTime;
 					timeAccountSize -= delayTime;
-					programCounter = (programCounter + 1) % programLength;
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
@@ -382,7 +368,6 @@ namespace SIGEL_Simulation
 
 				case SIGEL_Program::NOP:
 					// do it!
-					programCounter = (programCounter + 1) % programLength;
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
@@ -396,9 +381,10 @@ namespace SIGEL_Simulation
 #ifdef SIG_DEBUG
 					SIGEL_Tools::SIG_IO::cerr << "Something went horribly wrong in the interpreter! Default was called!!! Didn't recognize command. PC++" << Qt::endl;
 #endif
-					programCounter = (programCounter + 1) % programLength;
 					break;
 				} // close switch
+
+				programCounter = nextProgramCounter;
 			} // close while
 #ifdef SIG_DEBUG
 			SIGEL_Tools::SIG_IO::cerr << "Remaining Last Command Time: " << remainingLastCommandTime << Qt::endl; // debug! delete!
