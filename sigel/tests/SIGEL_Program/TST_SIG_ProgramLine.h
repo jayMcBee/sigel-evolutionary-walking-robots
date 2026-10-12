@@ -89,6 +89,12 @@ namespace SIGEL_Program
     void randomInstructionIsTheOnlyCommandWithAWeight_data();
 
     void randomInstructionIsTheOnlyCommandWithAWeight();
+
+    void randomOperandsAreInsideTheRange();
+
+    void sameSeedGivesTheSameInstructions();
+
+    void seedOneGivesKnownInstructions();
   };
 
 }

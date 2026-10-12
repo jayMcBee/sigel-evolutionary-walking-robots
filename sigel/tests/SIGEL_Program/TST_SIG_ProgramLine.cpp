@@ -485,3 +485,74 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAW
       QCOMPARE( programLine.getRobotinstructionType(), instruction );
     }
 }
+
+void SIGEL_Program::TST_SIG_ProgramLine::randomOperandsAreInsideTheRange()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  QList<int> probabilities( 15, 1 );
+  SIGEL_Tools::SIG_Randomizer randomizer( 42 );
+  bool negativeElementSeen = false;
+  bool positiveElementSeen = false;
+  // typeSeen has one entry for each instruction, in the order of Robotinstruction.
+  QList<bool> typeSeen( 15, false );
+
+  for ( int count = 0; count < 10000; count++ )
+    {
+      SIG_ProgramLine programLine( randomizer, languageParameters, probabilities );
+
+      typeSeen[programLine.getRobotinstructionType()] = true;
+      for ( int element : programLine.getElementsArray() )
+        {
+          QVERIFY( element >= -31999 );
+          QVERIFY( element <= 31999 );
+          if ( element < 0 )
+            negativeElementSeen = true;
+          if ( element > 0 )
+            positiveElementSeen = true;
+        }
+    }
+
+  QVERIFY( negativeElementSeen );
+  QVERIFY( positiveElementSeen );
+  QCOMPARE( typeSeen, QList<bool>( 15, true ) );
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::sameSeedGivesTheSameInstructions()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  QList<int> probabilities( 15, 1 );
+  SIGEL_Tools::SIG_Randomizer firstRandomizer( 7 );
+  SIGEL_Tools::SIG_Randomizer secondRandomizer( 7 );
+
+  for ( int count = 0; count < 100; count++ )
+    {
+      SIG_ProgramLine firstProgramLine( firstRandomizer, languageParameters, probabilities );
+      SIG_ProgramLine secondProgramLine( secondRandomizer, languageParameters, probabilities );
+      QString firstShownText;
+      QString secondShownText;
+
+      firstProgramLine.printToString( firstShownText );
+      secondProgramLine.printToString( secondShownText );
+
+      QCOMPARE( firstShownText, secondShownText );
+    }
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::seedOneGivesKnownInstructions()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  QList<int> probabilities( 15, 1 );
+  SIGEL_Tools::SIG_Randomizer randomizer( 1 );
+  // The known lines fix the order in which a random instruction takes its numbers from the randomizer.
+  const QStringList expectedShownTexts = { "LOAD -16838,-5758\n", "MOD -5627,23010\n", "DIV 2749, 12767\n" };
+
+  for ( const QString &expectedShownText : expectedShownTexts )
+    {
+      SIG_ProgramLine programLine( randomizer, languageParameters, probabilities );
+      QString shownText;
+
+      programLine.printToString( shownText );
+
+      QCOMPARE( shownText, expectedShownText );
+    }
+}
