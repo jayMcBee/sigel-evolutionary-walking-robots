@@ -345,6 +345,64 @@ void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionTypeKeepsTheElements
   QCOMPARE( programLine.getElementsArray(), expectedElements );
 }
 
+void SIGEL_Program::TST_SIG_ProgramLine::assignmentCopiesTypeAndElements()
+{
+  SIG_ProgramLine source;
+  source.setRobotinstruction( LOAD, 3, 4 );
+  SIG_ProgramLine destination;
+  destination.setRobotinstruction( NOP, 0, 0 );
+  const QList<int> expectedElements = { 3, 4 };
+
+  destination = source;
+  // A change of the source after the copy must not reach the destination.
+  source.setElement( 0, 8 );
+
+  QCOMPARE( destination.getRobotinstructionType(), LOAD );
+  QCOMPARE( destination.getElementsArray(), expectedElements );
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::copyLineCopiesTypeAndElements()
+{
+  SIG_ProgramLine source;
+  source.setRobotinstruction( LOAD, 3, 4 );
+  SIG_ProgramLine destination;
+  destination.setRobotinstruction( NOP, 0, 0 );
+  const QList<int> expectedElements = { 3, 4 };
+
+  destination.copyLine( &source, &destination );
+  // A change of the source after the copy must not reach the destination.
+  source.setElement( 0, 8 );
+
+  QCOMPARE( destination.getRobotinstructionType(), LOAD );
+  QCOMPARE( destination.getElementsArray(), expectedElements );
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::assignmentOfAShorterLineRemovesTheElements()
+{
+  SIG_ProgramLine source;
+  source.setRobotinstruction( NOP, 0, 0 );
+  SIG_ProgramLine destination;
+  destination.setRobotinstruction( LOAD, 3, 4 );
+
+  destination = source;
+
+  QCOMPARE( destination.getRobotinstructionType(), NOP );
+  QCOMPARE( destination.getNumberOfElements(), 0 );
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::copyLineOfAShorterLineRemovesTheElements()
+{
+  SIG_ProgramLine source;
+  source.setRobotinstruction( NOP, 0, 0 );
+  SIG_ProgramLine destination;
+  destination.setRobotinstruction( LOAD, 3, 4 );
+
+  destination.copyLine( &source, &destination );
+
+  QCOMPARE( destination.getRobotinstructionType(), NOP );
+  QCOMPARE( destination.getNumberOfElements(), 0 );
+}
+
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommand_data()
 {
   QTest::addColumn< QString >( "name" );

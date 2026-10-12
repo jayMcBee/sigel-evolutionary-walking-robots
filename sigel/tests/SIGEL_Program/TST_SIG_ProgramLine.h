@@ -74,6 +74,14 @@ namespace SIGEL_Program
 
     void setRobotinstructionTypeKeepsTheElements();
 
+    void assignmentCopiesTypeAndElements();
+
+    void copyLineCopiesTypeAndElements();
+
+    void assignmentOfAShorterLineRemovesTheElements();
+
+    void copyLineOfAShorterLineRemovesTheElements();
+
     void randomInstructionIsTheOnlyAllowedCommand_data();
 
     void randomInstructionIsTheOnlyAllowedCommand();
