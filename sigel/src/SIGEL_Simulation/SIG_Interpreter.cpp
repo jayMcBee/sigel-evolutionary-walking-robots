@@ -24,6 +24,7 @@
 #include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_IO.h"
 #include <QStringList>
+#include <algorithm>
 #include <cmath>
 
 namespace SIGEL_Simulation
@@ -57,7 +58,6 @@ namespace SIGEL_Simulation
 	{
 		long programLength = robotProgram.getProgramLength();
 
-		// save the maximalDelayTime
 		double maxDelayTime = static_cast<double>( languageParameters.getMaximalDelayTime() ) * 0.001 ;
 
 		if ( timeAccount <= remainingLastCommandTime )
@@ -101,7 +101,6 @@ namespace SIGEL_Simulation
 				continue;
 			}
 
-			// what command was fetched?
 			switch ( programLine.getRobotinstructionType() )
 			{
 			case SIGEL_Program::COPY:
@@ -229,13 +228,11 @@ namespace SIGEL_Simulation
 
 			case SIGEL_Program::DELAY:
 			{
-				// get the register
 				int reg = getRegisterNumber( programLine.getInstructionElement(0) );
 				int readOut = registers[reg].getValue();
 				double delayTime = static_cast<double>( readOut ) * 0.001;
 				delayTime = std::abs( delayTime );
-				if( delayTime > maxDelayTime )
-					delayTime = maxDelayTime;
+				delayTime = std::min( delayTime, maxDelayTime );
 				timeAccount -= delayTime;
 			}
 			break;
