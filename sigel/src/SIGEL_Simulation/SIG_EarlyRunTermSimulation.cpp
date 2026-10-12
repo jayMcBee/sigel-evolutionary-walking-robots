@@ -94,10 +94,10 @@ int SIGEL_Simulation::SIG_EarlyRunTermSimulation::getMaxRecorderSteps(int inRecF
    int    steps;
 
    // max. ticks in simulation = timeToSimulate / step
-   QTime maxT = simulationData->simulationParameter.getTimeToSimulate();
+   QTime timeToSimulate = simulationData->simulationParameter.getTimeToSimulate();
 
    // get sim.time in seconds
-   tts = zeroHour.secsTo(maxT);
+   tts = zeroHour.secsTo(timeToSimulate);
 
    const double stepSize = simulationData->simulationParameter.getStepSize();
    const double recFrequency = inRecFrequency;

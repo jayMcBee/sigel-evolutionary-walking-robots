@@ -57,9 +57,9 @@ void SIGEL_Simulation::SIG_Simulation::start()
 {
 	try
 	{
-		// max is the time which is specified in "Simulation Parameters"-"General Settings"-"Time To Simulate"
-		QTime max=simulationData->simulationParameter.getTimeToSimulate();
-		QTime act=simulationQueries->getCurrentSimulationWholeSeconds();
+		// timeToSimulate is the time which is specified in "Simulation Parameters"-"General Settings"-"Time To Simulate"
+		QTime timeToSimulate=simulationData->simulationParameter.getTimeToSimulate();
+		QTime currentSimulationTime=simulationQueries->getCurrentSimulationWholeSeconds();
 
 		// make a timestep in our simulation until simulation time is over
 		// or the premature termination method tells us to
@@ -67,14 +67,14 @@ void SIGEL_Simulation::SIG_Simulation::start()
 		do
 		{
 			makeTimeSteps(1);
-			act=simulationQueries->getCurrentSimulationWholeSeconds();
+			currentSimulationTime=simulationQueries->getCurrentSimulationWholeSeconds();
 
 			// premature means "early"
 			if ( prematureTermination() )
 			{
 				break;
 			}
-		} while (act<max);
+		} while (currentSimulationTime<timeToSimulate);
 
 		recorder.finish();
 	}
