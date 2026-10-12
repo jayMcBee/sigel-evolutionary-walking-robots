@@ -246,11 +246,12 @@ namespace SIGEL_Simulation
 
 			programCounter = nextProgramCounter;
 			timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-			// The command took more time than was left: the excess is taken off the time of the next call.
-			if ( timeAccountSize < 0 )
-				remainingLastCommandTime = - timeAccountSize;
 		} // close while
+
+		// The last command took more time than was left: the excess is taken off the time of the next call.
+		if ( timeAccountSize < 0 )
+			remainingLastCommandTime = - timeAccountSize;
+
 #ifdef SIG_DEBUG
 		SIGEL_Tools::SIG_IO::cerr << "Remaining Last Command Time: " << remainingLastCommandTime << Qt::endl; // debug! delete!
 #endif
