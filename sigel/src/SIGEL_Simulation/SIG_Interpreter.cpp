@@ -126,10 +126,6 @@ namespace SIGEL_Simulation
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 				}
 				break;
 
@@ -142,10 +138,6 @@ namespace SIGEL_Simulation
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 				}
 				break;
 
@@ -158,10 +150,6 @@ namespace SIGEL_Simulation
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 				}
 				break;
 
@@ -174,10 +162,6 @@ namespace SIGEL_Simulation
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 				}
 				break;
 
@@ -190,10 +174,6 @@ namespace SIGEL_Simulation
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 				}
 				break;
 
@@ -206,10 +186,6 @@ namespace SIGEL_Simulation
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 				}
 				break;
 
@@ -222,10 +198,6 @@ namespace SIGEL_Simulation
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 				}
 				break;
 
@@ -238,10 +210,6 @@ namespace SIGEL_Simulation
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 				}
 				break;
 
@@ -254,10 +222,6 @@ namespace SIGEL_Simulation
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 				}
 				break;
 
@@ -276,10 +240,6 @@ namespace SIGEL_Simulation
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 				}
 				break;
 
@@ -302,10 +262,6 @@ namespace SIGEL_Simulation
 					// subtract the needed time for the command
 
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 				}
 				break;
 
@@ -319,10 +275,6 @@ namespace SIGEL_Simulation
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 				}
 				break;
 
@@ -338,10 +290,6 @@ namespace SIGEL_Simulation
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 				}
 				break;
 
@@ -359,10 +307,6 @@ namespace SIGEL_Simulation
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 				}
 				break;
 
@@ -371,10 +315,6 @@ namespace SIGEL_Simulation
 
 					// subtract the needed time for the command
 					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-					// The command took more time than was left: the excess is taken off the time of the next call.
-					if ( timeAccountSize < 0 )
-						remainingLastCommandTime = - timeAccountSize;
 					break;
 
 				default:
@@ -385,6 +325,10 @@ namespace SIGEL_Simulation
 				} // close switch
 
 				programCounter = nextProgramCounter;
+
+				// The command took more time than was left: the excess is taken off the time of the next call.
+				if ( timeAccountSize < 0 )
+					remainingLastCommandTime = - timeAccountSize;
 			} // close while
 #ifdef SIG_DEBUG
 			SIGEL_Tools::SIG_IO::cerr << "Remaining Last Command Time: " << remainingLastCommandTime << Qt::endl; // debug! delete!
