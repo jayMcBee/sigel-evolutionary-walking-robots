@@ -400,11 +400,6 @@ problem; the choice is made before any code is written.
   compares the new length with that 0, so it never adds a line. Crossover
   and `SIG_Program::checkLength` read 0 as "no maximum".
 
-- [ ] **170. Log an exception before `SIG_Simulation` terminates the
-  program.** `SIG_Simulation::start` and `SIG_Simulation::makeTimeSteps`
-  catch every exception and call `std::terminate()`, so the text of the
-  exception is never shown. Write it to the error stream first.
-
 ---
 
 ## 8 · The robot language
