@@ -228,6 +228,52 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm()
   QCOMPARE( programLine.getElementsArray(), expectedElements );
 }
 
+void SIGEL_Program::TST_SIG_ProgramLine::readFromFileAllowsExtraWhiteSpace_data()
+{
+  QTest::addColumn< QString >( "text" );
+
+  QTest::newRow( "spaces around the comma" ) << "ADD  1 , 2";
+  QTest::newRow( "space at the end" ) << "ADD 1,2 ";
+  QTest::newRow( "tabs" ) << "\tADD\t1,2";
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::readFromFileAllowsExtraWhiteSpace()
+{
+  QFETCH( QString, text );
+  const QList<int> expectedElements = { 1, 2 };
+  SIG_ProgramLine programLine;
+  programLine.setRobotinstruction( NOP, 0, 0 );
+
+  const bool lineRead = programLine.readFromFile( text, &programLine );
+
+  QVERIFY( lineRead );
+  QCOMPARE( programLine.getRobotinstructionType(), ADD );
+  QCOMPARE( programLine.getElementsArray(), expectedElements );
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::readFromFileRefusesTextWithoutAnInstruction_data()
+{
+  QTest::addColumn< QString >( "text" );
+
+  QTest::newRow( "empty" ) << "";
+  QTest::newRow( "spaces" ) << "   ";
+  QTest::newRow( "comment without an instruction name" ) << "# a comment";
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::readFromFileRefusesTextWithoutAnInstruction()
+{
+  QFETCH( QString, text );
+  const QList<int> expectedElements = { 3, 4 };
+  SIG_ProgramLine programLine;
+  programLine.setRobotinstruction( LOAD, 3, 4 );
+
+  const bool lineRead = programLine.readFromFile( text, &programLine );
+
+  QVERIFY( !lineRead );
+  QCOMPARE( programLine.getRobotinstructionType(), LOAD );
+  QCOMPARE( programLine.getElementsArray(), expectedElements );
+}
+
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommand_data()
 {
   QTest::addColumn< QString >( "name" );

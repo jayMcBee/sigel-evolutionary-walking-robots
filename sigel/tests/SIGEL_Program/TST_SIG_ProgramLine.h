@@ -54,6 +54,14 @@ namespace SIGEL_Program
 
     void readFromFileReadsEachTextForm();
 
+    void readFromFileAllowsExtraWhiteSpace_data();
+
+    void readFromFileAllowsExtraWhiteSpace();
+
+    void readFromFileRefusesTextWithoutAnInstruction_data();
+
+    void readFromFileRefusesTextWithoutAnInstruction();
+
     void randomInstructionIsTheOnlyAllowedCommand_data();
 
     void randomInstructionIsTheOnlyAllowedCommand();
