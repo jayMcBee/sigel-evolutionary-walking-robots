@@ -114,6 +114,8 @@ namespace SIGEL_Simulation
 
     void invalidProgramLineThrows();
 
+    void invalidProgramLineThrowsOnlyWhenItIsReached();
+
     void programTextLineWithoutAnInstructionIsNotAProgramLine_data();
 
     void programTextLineWithoutAnInstructionIsNotAProgramLine();
@@ -220,12 +222,63 @@ namespace SIGEL_Simulation
 
     void remainingLastCommandTimeIsSubtractedOnlyOnce();
 
+    void commandTakesItsOwnDurationAmongDifferentDurations_data();
+
+    void commandTakesItsOwnDurationAmongDifferentDurations();
+
+    void moveTakesItsOwnDurationAmongDifferentDurations();
+
+    void cmpThatDoesNotSetTheCompareFlagTakesItsOwnDuration();
+
+    void jmpThatJumpsTakesItsOwnDuration();
+
+    void jmpThatExceedsTheTimeAccountJumps();
+
+    void programWithAllCommandsTakesTheSumOfTheirDurations();
+
+    void differentDurationsAddUpOverSeveralProgramPasses();
+
+    void commandWithADurationOfZeroRunsAndTakesNoTime();
+
+    void moveWithADurationOfZeroTakesNoTime();
+
+    void commandThatIsNotAllowedTakesNoTimeAmongDifferentDurations();
+
+    void exceededTimeOfACommandIsSubtractedFromTheNextCall_data();
+
+    void exceededTimeOfACommandIsSubtractedFromTheNextCall();
+
+    void exceededTimeIsKeptOverSeveralCallsAndProgramPasses();
+
+    void timeAccountOfZeroKeepsTheExceededTime();
+
+    void delayTakesTheLimitedDelayTimeAndItsOwnDuration_data();
+
+    void delayTakesTheLimitedDelayTimeAndItsOwnDuration();
+
+    void delayTakesTheWholeDelayTimeAtTheLimitsOfTheRegister_data();
+
+    void delayTakesTheWholeDelayTimeAtTheLimitsOfTheRegister();
+
+    void exceededTimeOfADelayIsSubtractedOverSeveralCalls();
+
+    void delaySubtractsTheDelayTimeFirstAndItsDurationSecond_data();
+
+    void delaySubtractsTheDelayTimeFirstAndItsDurationSecond();
+
   private:
 
     /**
      * Gives each allowed command the same duration.
      */
     void setAllDurations( SIGEL_Robot::SIG_LanguageParameters &languageParameters, double duration );
+
+    /**
+     * Gives each command a duration of its own, in steps of 0.25 in the order of Robotinstruction:
+     * COPY 0.5, LOAD 0.75, ADD 1, SUB 1.25, MUL 1.5, DIV 1.75, MOD 2, MIN 2.25, MAX 2.5,
+     * CMP 2.75, JMP 3, SENSE 3.25, MOVE 3.5, DELAY 3.75, NOP 4.
+     */
+    void setDifferentDurations( SIGEL_Robot::SIG_LanguageParameters &languageParameters );
 
     void appendLine( SIGEL_Program::SIG_Program &program, SIGEL_Program::Robotinstruction instruction, int operand1, int operand2 );
   };
