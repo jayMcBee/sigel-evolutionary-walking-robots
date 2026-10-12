@@ -427,12 +427,6 @@ problem; the choice is made before any code is written.
   it modulo 32000, so the values 0 to 767 are drawn twice as often as the
   others.
 
-- [ ] **167. Take the repeated block out of `SIG_Interpreter::interprete`.**
-  Each of the 15 cases of the `switch` still repeats two steps after its own
-  few lines: take the duration off the time account, keep the excess time.
-  Write these steps once after the `switch`, so a case holds only what its
-  instruction does. One step for each move, as for the steps before it.
-
 - [ ] **169. Declare the robot instructions once, in one central place.**
   Today each place that needs the 15 instructions writes them out itself.
   Declare them once in the header of `SIG_ProgramLine`, next to
