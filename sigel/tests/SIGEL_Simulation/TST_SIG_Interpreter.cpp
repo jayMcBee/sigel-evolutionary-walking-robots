@@ -447,6 +447,144 @@ void SIGEL_Simulation::TST_SIG_Interpreter::senseThatIsNotAllowedIsSkipped()
   QCOMPARE( moveRecords[0].registerValues, QList<int>( 8, 0 ) );
 }
 
+void SIGEL_Simulation::TST_SIG_Interpreter::delayTakesTheRegisterValueInMilliseconds()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.setRegisterWidth( 16 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 2, 2000 );
+  appendLine( program, SIGEL_Program::DELAY, 2, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  // The LOAD takes 1 s and the DELAY 2 s + 1 s, so the time account is exceeded by 0.5 s.
+  interpreter.interprete( 3.5 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
+
+  interpreter.interprete( 1 );
+
+  QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::delayTakesTheAbsoluteValue()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.setRegisterWidth( 16 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 2, -2000 );
+  appendLine( program, SIGEL_Program::DELAY, 2, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  // The LOAD takes 1 s and the DELAY 2 s + 1 s, so the time account is exceeded by 0.5 s.
+  interpreter.interprete( 3.5 );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
+
+  interpreter.interprete( 1 );
+
+  QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::delayOfZeroTakesOnlyTheCommandTime()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::DELAY, 2, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  interpreter.interprete( 3.5 );
+
+  QCOMPARE( commandInterface.getMoveRecords().size(), 3 );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::delayIsLimitedToTheMaximalDelayTime()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.setRegisterWidth( 16 );
+  languageParameters.setMaximalDelayTime( 1000 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 2, 2000 );
+  appendLine( program, SIGEL_Program::DELAY, 2, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  // The LOAD takes 1 s and the DELAY 1 s + 1 s, so 0.5 s is left for one MOVE.
+  interpreter.interprete( 3.5 );
+
+  QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::delayRegisterOperandWraps()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.setRegisterWidth( 16 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 3, 2000 );
+  appendLine( program, SIGEL_Program::DELAY, 11, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  // The LOAD takes 1 s and the DELAY 2 s + 1 s, so no time is left for a MOVE.
+  interpreter.interprete( 3.5 );
+
+  QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::delayThatIsNotAllowedIsSkipped()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.setRegisterWidth( 16 );
+  languageParameters.removeCommand( "DELAY" );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 2, 2000 );
+  appendLine( program, SIGEL_Program::DELAY, 2, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[2] = 2000;
+
+  // The time is enough for the LOAD and the MOVE only, so the record also shows that the skipped DELAY took no time.
+  interpreter.interprete( 2 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
 void SIGEL_Simulation::TST_SIG_Interpreter::nopChangesNothingAndTakesItsTime()
 {
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
@@ -948,6 +1086,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLin
   QTest::newRow( "CMP" ) << SIGEL_Program::CMP;
   QTest::newRow( "JMP" ) << SIGEL_Program::JMP;
   QTest::newRow( "SENSE" ) << SIGEL_Program::SENSE;
+  QTest::newRow( "DELAY" ) << SIGEL_Program::DELAY;
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLineZero()
@@ -985,6 +1124,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration_data()
   QTest::newRow( "CMP" ) << SIGEL_Program::CMP << "CMP";
   QTest::newRow( "JMP" ) << SIGEL_Program::JMP << "JMP";
   QTest::newRow( "SENSE" ) << SIGEL_Program::SENSE << "SENSE";
+  QTest::newRow( "DELAY" ) << SIGEL_Program::DELAY << "DELAY";
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration()

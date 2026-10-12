@@ -54,6 +54,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements_
   QTest::newRow( "CMP" ) << CMP << 2 << -12 << -34;
   QTest::newRow( "JMP" ) << JMP << 1 << -12 << 0;
   QTest::newRow( "SENSE" ) << SENSE << 1 << -12 << 0;
+  QTest::newRow( "DELAY" ) << DELAY << 1 << -12 << 0;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements()
@@ -96,6 +97,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText_data()
   QTest::newRow( "CMP" ) << CMP << "CMP -12,-34\n";
   QTest::newRow( "JMP" ) << JMP << "JMP -12\n";
   QTest::newRow( "SENSE" ) << SENSE << "SENSE -12\n";
+  QTest::newRow( "DELAY" ) << DELAY << "DELAY -12\n";
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText()
@@ -130,6 +132,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText_data()
   QTest::newRow( "CMP" ) << CMP << "       CMP -12,-34\n";
   QTest::newRow( "JMP" ) << JMP << "       JMP -12\n";
   QTest::newRow( "SENSE" ) << SENSE << "       SENSE -12\n";
+  QTest::newRow( "DELAY" ) << DELAY << "       DELAY -12\n";
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText()
@@ -197,6 +200,9 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm_data()
   QTest::newRow( "SENSE file" ) << "       SENSE -12" << SENSE << 1 << -12 << 0;
   QTest::newRow( "SENSE shown" ) << "SENSE -12" << SENSE << 1 << -12 << 0;
   QTest::newRow( "SENSE lower case" ) << "       sense -12" << SENSE << 1 << -12 << 0;
+  QTest::newRow( "DELAY file" ) << "       DELAY -12" << DELAY << 1 << -12 << 0;
+  QTest::newRow( "DELAY shown" ) << "DELAY -12" << DELAY << 1 << -12 << 0;
+  QTest::newRow( "DELAY lower case" ) << "       delay -12" << DELAY << 1 << -12 << 0;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm()
@@ -241,6 +247,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedComman
   QTest::newRow( "CMP" ) << "CMP" << CMP;
   QTest::newRow( "JMP" ) << "JMP" << JMP;
   QTest::newRow( "SENSE" ) << "SENSE" << SENSE;
+  QTest::newRow( "DELAY" ) << "DELAY" << DELAY;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommand()
@@ -283,6 +290,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAW
   QTest::newRow( "CMP" ) << CMP;
   QTest::newRow( "JMP" ) << JMP;
   QTest::newRow( "SENSE" ) << SENSE;
+  QTest::newRow( "DELAY" ) << DELAY;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAWeight()

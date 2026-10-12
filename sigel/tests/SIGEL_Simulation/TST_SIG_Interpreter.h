@@ -140,6 +140,18 @@ namespace SIGEL_Simulation
 
     void senseThatIsNotAllowedIsSkipped();
 
+    void delayTakesTheRegisterValueInMilliseconds();
+
+    void delayTakesTheAbsoluteValue();
+
+    void delayOfZeroTakesOnlyTheCommandTime();
+
+    void delayIsLimitedToTheMaximalDelayTime();
+
+    void delayRegisterOperandWraps();
+
+    void delayThatIsNotAllowedIsSkipped();
+
     void nopChangesNothingAndTakesItsTime();
 
     void nopThatIsNotAllowedIsSkipped();
