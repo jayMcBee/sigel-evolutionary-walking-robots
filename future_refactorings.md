@@ -425,13 +425,6 @@ problem; the choice is made before any code is written.
   it modulo 32000, so the values 0 to 767 are drawn twice as often as the
   others.
 
-- [ ] **169. Declare the robot instructions once, in one central place.**
-  Today each place that needs the 15 instructions writes them out itself.
-  Declare them once in the header of `SIG_ProgramLine`, next to
-  `Robotinstruction`: `static inline const QStringList instructionNames`.
-  Make the change in ordered, separate steps. Refactorings and clean-ups
-  that the list makes possible can go along with it once the list is there.
-
 - [ ] **168. Consider one description for each robot instruction.** The name
   of an instruction and its number of operands are written out for each
   instruction in `SIG_ProgramLine` (`setRobotinstruction`, `printToString`,
