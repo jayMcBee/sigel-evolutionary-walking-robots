@@ -27,6 +27,7 @@
 #include "SIGEL_Simulation/SIG_RegisterWrongSizeException.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
+#include <QTextStream>
 #include <QtTest>
 
 void SIGEL_Simulation::TST_RecordingCommandInterface::moveDrive( int driveNumber, QList<SIG_Register> const &registers )
@@ -155,6 +156,38 @@ void SIGEL_Simulation::TST_SIG_Interpreter::emptyProgramThrows()
   SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
 
   QVERIFY_THROWS_EXCEPTION( SIGEL_Tools::SIG_Exception, interpreter.interprete( 1 ) );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::programTextLineWithoutAnInstructionIsNotAProgramLine_data()
+{
+  QTest::addColumn< QString >( "programText" );
+
+  QTest::newRow( "comment line" ) << "LOAD 2,5\n# a comment\nMOVE 0\n";
+  QTest::newRow( "empty line" ) << "LOAD 2,5\n\nMOVE 0\n";
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::programTextLineWithoutAnInstructionIsNotAProgramLine()
+{
+  QFETCH( QString, programText );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  QTextStream programStream( &programText, QIODeviceBase::ReadOnly );
+  program.readFromFile( programStream );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[2] = 5;
+
+  // The time is enough for the LOAD and the MOVE.
+  interpreter.interprete( 2 );
+
+  QCOMPARE( program.getProgramLength(), 2L );
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::moveTakesItsOwnDuration()

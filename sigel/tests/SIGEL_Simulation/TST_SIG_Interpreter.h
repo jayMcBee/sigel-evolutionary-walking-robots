@@ -112,6 +112,10 @@ namespace SIGEL_Simulation
 
     void emptyProgramThrows();
 
+    void programTextLineWithoutAnInstructionIsNotAProgramLine_data();
+
+    void programTextLineWithoutAnInstructionIsNotAProgramLine();
+
     void moveTakesItsOwnDuration();
 
     void moveThatIsNotAllowedIsSkipped();
