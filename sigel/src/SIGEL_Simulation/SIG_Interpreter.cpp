@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include "SIGEL_Simulation/SIG_Interpreter.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_IO.h"
 #include <QStringList>
 #include <cmath>
@@ -86,6 +87,10 @@ namespace SIGEL_Simulation
 			static const QStringList commandNames = { "COPY", "LOAD", "ADD", "SUB", "MUL", "DIV", "MOD", "MIN", "MAX", "CMP", "JMP", "SENSE", "MOVE", "DELAY", "NOP" };
 			// An instruction type that is not in commandNames gets an empty name.
 			const QString commandName = commandNames.value( programLine.getRobotinstructionType() );
+
+			// A line whose instruction type is not in Robotinstruction is invalid.
+			if ( commandName.isEmpty() )
+				throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, QString( "Program line %1 is invalid." ).arg( programCounter ) );
 
 			long nextProgramCounter = (programCounter + 1) % programLength;
 
@@ -297,12 +302,6 @@ namespace SIGEL_Simulation
 
 				// subtract the needed time for the command
 				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-				break;
-
-			default:
-#ifdef SIG_DEBUG
-				SIGEL_Tools::SIG_IO::cerr << "Something went horribly wrong in the interpreter! Default was called!!! Didn't recognize command. PC++" << Qt::endl;
-#endif
 				break;
 			} // close switch
 

@@ -158,6 +158,33 @@ void SIGEL_Simulation::TST_SIG_Interpreter::emptyProgramThrows()
   QVERIFY_THROWS_EXCEPTION( SIGEL_Tools::SIG_Exception, interpreter.interprete( 1 ) );
 }
 
+void SIGEL_Simulation::TST_SIG_Interpreter::invalidProgramLineThrows()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  SIGEL_Program::SIG_ProgramLine programLine;
+  // 15 is the first value after the last instruction of Robotinstruction.
+  programLine.setRobotinstructionType( static_cast<SIGEL_Program::Robotinstruction>( 15 ) );
+  program.appendLine( programLine );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QString thrown;
+
+  try
+    {
+      interpreter.interprete( 1 );
+    }
+  catch ( const SIGEL_Tools::SIG_Exception &e )
+    {
+      thrown = e.getMessage();
+    }
+
+  QVERIFY2( thrown.contains( "Program line 0 is invalid." ), qPrintable( thrown ) );
+}
+
 void SIGEL_Simulation::TST_SIG_Interpreter::programTextLineWithoutAnInstructionIsNotAProgramLine_data()
 {
   QTest::addColumn< QString >( "programText" );

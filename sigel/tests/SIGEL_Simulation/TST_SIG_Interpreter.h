@@ -112,6 +112,8 @@ namespace SIGEL_Simulation
 
     void emptyProgramThrows();
 
+    void invalidProgramLineThrows();
+
     void programTextLineWithoutAnInstructionIsNotAProgramLine_data();
 
     void programTextLineWithoutAnInstructionIsNotAProgramLine();
