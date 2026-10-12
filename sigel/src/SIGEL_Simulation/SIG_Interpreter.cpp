@@ -78,26 +78,8 @@ namespace SIGEL_Simulation
 			// fetch the next command
 			SIGEL_Program::SIG_ProgramLine const &programLine = robotProgram.getLine( programCounter );
 
-			/*
-			 * ONLY FOR DEBUGGING-PURPOSES!
-			 */
 #ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "--------------------------------------------------------" << Qt::endl;
-			SIGEL_Tools::SIG_IO::cerr << "Remaining Time:" << timeAccountSize<< Qt::endl;
-			SIGEL_Tools::SIG_IO::cerr << "PC: " << programCounter << Qt::endl;
-			if( compareFlag )
-				SIGEL_Tools::SIG_IO::cerr << "CF: 1" << Qt::endl;
-			else
-				SIGEL_Tools::SIG_IO::cerr << "CF: 0" << Qt::endl;
-			QString theQLine;
-			programLine.printToString( theQLine );
-			SIGEL_Tools::SIG_IO::cerr << theQLine;
-			SIGEL_Tools::SIG_IO::cerr << "Registers:" << Qt::endl;
-			for( int loop=0; loop < registers.size(); loop++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << "R" << loop << ":" << registers[loop].getValue() << "  ";
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+			debugPrintInterpreterState( timeAccountSize, programLine );
 #endif
 
 			// commandNames is in the order of Robotinstruction.
@@ -334,6 +316,29 @@ namespace SIGEL_Simulation
 		SIGEL_Tools::SIG_IO::cerr << "Remaining Last Command Time: " << remainingLastCommandTime << Qt::endl; // debug! delete!
 #endif
 	};
+
+	void SIG_Interpreter::debugPrintInterpreterState( double timeAccountSize, SIGEL_Program::SIG_ProgramLine const &programLine ) const
+	{
+		SIGEL_Tools::SIG_IO::cerr << "--------------------------------------------------------" << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Remaining Time:" << timeAccountSize<< Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "PC: " << programCounter << Qt::endl;
+
+		if( compareFlag )
+			SIGEL_Tools::SIG_IO::cerr << "CF: 1" << Qt::endl;
+		else
+			SIGEL_Tools::SIG_IO::cerr << "CF: 0" << Qt::endl;
+
+		QString theQLine;
+		programLine.printToString( theQLine );
+		SIGEL_Tools::SIG_IO::cerr << theQLine;
+
+		SIGEL_Tools::SIG_IO::cerr << "Registers:" << Qt::endl;
+		for( int loop=0; loop < registers.size(); loop++ )
+		{
+			SIGEL_Tools::SIG_IO::cerr << "R" << loop << ":" << registers[loop].getValue() << "  ";
+		}
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+	}
 
 	int SIG_Interpreter::getRegisterNumber( int operand ) const
 	{

@@ -100,6 +100,11 @@ class SIG_Interpreter
   int getRegisterNumber( int operand ) const;
 
   /**
+   * Prints the remaining time, the program counter, the compare flag, programLine and the registers.
+   */
+  void debugPrintInterpreterState( double timeAccountSize, SIGEL_Program::SIG_ProgramLine const &programLine ) const;
+
+  /**
    * The robot-program to interprete.
    */
   SIGEL_Program::SIG_Program const &robotProgram;
