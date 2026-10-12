@@ -19,7 +19,7 @@
   You should have received a copy of the GNU General Public License
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 #include <QTimer>
 #include <QLineEdit>
 #include <qapplication.h>
@@ -48,464 +48,470 @@
 
 namespace SIGEL_MasterGUI
 {
-  
-SIG_AllIndividualsView::SIG_AllIndividualsView( QWidget * parent, const char * name, SIGEL_GP::SIG_GPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment )
-  : QSplitter( parent ), theExperiment( theExperiment ), guiExperiment( guiExperiment )
-{
-  // change some splitter settings
-  setOrientation( Qt::Vertical );
-  setOpaqueResize( true );
 
-  // create the upper part of the splitter (the individual list)
-  individualList = new SIG_IndividualList( this, "IndividualListAndButtons" );
-
-  // create the lower part of the splitter (the individual view)
-  individualView = new SIG_IndividualView( this, "IndividualView" );
-
-  // create the menu which pops up if one clicks on an individual
-  individualMenu = new QMenu( this );
-  individualMenu->addAction( "&Visualize", this, SLOT( slotVisualize() ) )->setShortcut( Qt::ALT | Qt::Key_V );
-  individualMenu->addSeparator();
-  individualMenu->addAction( "&Delete", this, SLOT( slotDeleteIndividuals() ) )->setShortcut( Qt::ALT | Qt::Key_D );
-  individualMenu->addSeparator();
-  individualMenu->addAction( "Import Program...", this, SLOT( slotImportProgram() ) )->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_K );
-  individualMenu->addAction( "Export Program...", this, SLOT( slotExportProgram() ) )->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_K );
-  individualMenu->addAction( "Export Individual...", this, SLOT( slotExportIndividual() ) )->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_L );
- 
-  // create the menu that pops up if one clicks on an empty spot in the list view
-  listviewMenu = new QMenu( this );
-  listviewMenu->addAction( "&Add...", this, SLOT( slotAddIndividuals() ) )->setShortcut( Qt::ALT | Qt::Key_A );
-  listviewMenu->addSeparator();
-  listviewMenu->addAction( "Import Individual...", this, SLOT( slotImportIndividual() ) )->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_L );
-
-  // connect some stuff
-  individualList->listviewIndividuals->setContextMenuPolicy( Qt::CustomContextMenu );
-  QObject::connect( individualList->listviewIndividuals,
-		    SIGNAL( customContextMenuRequested( const QPoint & ) ),
-		    this,
-		    SLOT(slotRightButtonClicked( const QPoint & ) ) );
-  
-  QObject::connect( individualList->listviewIndividuals,
-		    SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
-		    this,
-		    SLOT( slotDoubleClicked( QTreeWidgetItem * ) ) );
-
-  QObject::connect( individualList->listviewIndividuals,
-		    SIGNAL( itemSelectionChanged() ),
-		    this,
-		    SLOT( slotSelectionChanged() ) );
-
-  /*
-   * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-   * Perhaps also enable set AutoDelete!!!
-   * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-   */
-
-  QList<int> valList;
-  valList += 5;
-  valList += 6;
-  setSizes( valList );
-};
-
-int SIG_AllIndividualsView::numberOfSelectedItems()
-{
-  int numberOfSelectedItems = 0;
-
-  // count the number of selected items
-  QTreeWidgetItemIterator it( individualList->listviewIndividuals );
-  for ( ; *it; ++it )
-    {
-      if( (*it)->isSelected() )
+	SIG_AllIndividualsView::SIG_AllIndividualsView( QWidget * parent, const char * name, SIGEL_GP::SIG_GPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment )
+		: QSplitter( parent ), theExperiment( theExperiment ), guiExperiment( guiExperiment )
 	{
-	  numberOfSelectedItems++;
-	}
-    }
-  return numberOfSelectedItems;
-};
+		// change some splitter settings
+		setOrientation( Qt::Vertical );
+		setOpaqueResize( true );
 
-void SIG_AllIndividualsView::slotCompleteRefreshList()
-{
-  int poolSize = theExperiment.population.getSize();
+		// create the upper part of the splitter (the individual list)
+		individualList = new SIG_IndividualList( this, "IndividualListAndButtons" );
 
-  QProgressDialog progress( "Updating pool...", QString(), 0, poolSize, this );
-  progress.setWindowModality( Qt::ApplicationModal );
-  progress.setWindowTitle( "Updating" );
-  progress.show();
-  
-  // clear() emits itemSelectionChanged while currentItem() still points into
-  // the old pool, and getIndividual() calls exit(1) on a position that is gone.
-  {
-    const bool wasBlocked = individualList->listviewIndividuals->blockSignals( true );
-    individualList->listviewIndividuals->clear();
-    individualList->listviewIndividuals->blockSignals( wasBlocked );
-  }
-  individualList->listviewIndividuals->setSortingEnabled( false );
-  for( int counter = 0; counter < poolSize; counter++ )
-    {
-      // Every 100 rows: each update makes the list measure all its rows again.
-      if( counter % 100 == 0 )
-        {
-          progress.setValue( counter );
-          qApp->processEvents();
-        }
-      SIGEL_GP::SIG_GPIndividual *theGPIndividual = &theExperiment.population.getIndividual( counter );
-      SIG_IndividualListItem *theItem = new SIG_IndividualListItem( individualList->listviewIndividuals, counter, theGPIndividual );
-    }
-  individualList->listviewIndividuals->setSortingEnabled( true );
-  individualList->lcdnumberNumberOfIndividuals->display(theExperiment.population.getSize() );
-};
+		// create the lower part of the splitter (the individual view)
+		individualView = new SIG_IndividualView( this, "IndividualView" );
 
-void SIG_AllIndividualsView::slotAddIndividuals()
-{
-  SIG_AddIndividualsDialog addDialog( this, "Add Individual Dialog", true );
-  addDialog.spinboxNumber->setFocus();
-  // The value must stay unselected, or a typed 2 replaces the 1.
-  // Queued: the selection does not exist until exec() shows the dialog.
-  if ( QLineEdit *le = addDialog.spinboxNumber->findChild<QLineEdit *>() )
-    QTimer::singleShot( 0, le, [le]{ le->end( false ); } );
-  switch( addDialog.exec() )
-    {
-    case QDialog::Accepted:
-      emit signalDataRefreshNeeded();
-      {
-        // New individuals are appended to the pool, so only their rows are added.
-        int firstNew = theExperiment.population.getSize();
-        int requested = addDialog.spinboxNumber->value();
-        int added = theExperiment.population.addRandomIndividuals( requested, theExperiment.gpParameter, *theExperiment.robot.getLangParam() );
-        if( added < requested )
-          {
-            QString message = QString( "The pool is limited to %1 individuals." ).arg( SIGEL_GP::SIG_GPPopulation::maximumSize );
-            QMessageBox::information( this, "Pool Full", message );
-          }
-        // Sorting stays off while the rows go in; switching it on sorts once.
-        individualList->listviewIndividuals->setSortingEnabled( false );
-        for( int counter = firstNew; counter < theExperiment.population.getSize(); counter++ )
-          new SIG_IndividualListItem( individualList->listviewIndividuals, counter, &theExperiment.population.getIndividual( counter ) );
-        individualList->listviewIndividuals->setSortingEnabled( true );
-      }
-      break;
-    }
-  individualList->lcdnumberNumberOfIndividuals->display( theExperiment.population.getSize() );
-};
+		// create the menu which pops up if one clicks on an individual
+		individualMenu = new QMenu( this );
+		individualMenu->addAction( "&Visualize", this, SLOT( slotVisualize() ) )->setShortcut( Qt::ALT | Qt::Key_V );
+		individualMenu->addSeparator();
+		individualMenu->addAction( "&Delete", this, SLOT( slotDeleteIndividuals() ) )->setShortcut( Qt::ALT | Qt::Key_D );
+		individualMenu->addSeparator();
+		individualMenu->addAction( "Import Program...", this, SLOT( slotImportProgram() ) )->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_K );
+		individualMenu->addAction( "Export Program...", this, SLOT( slotExportProgram() ) )->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_K );
+		individualMenu->addAction( "Export Individual...", this, SLOT( slotExportIndividual() ) )->setShortcut( Qt::CTRL | Qt::ALT | Qt::Key_L );
 
-void SIG_AllIndividualsView::slotDeleteIndividuals()
-{
-  /*
-   * Delete works as follows. First we iterate over the list and save the position of each individual
-   * that shall be deleted into an array. While iterating over the list each QTreeWidgetItem is deleted.
-   * The the list gets sorted and every individual deleted. As the pool is rearranged each time an individual
-   * gets deleted, we have to be careful that the right individual is deleted.
-   */
-  QList<int> positions;
+		// create the menu that pops up if one clicks on an empty spot in the list view
+		listviewMenu = new QMenu( this );
+		listviewMenu->addAction( "&Add...", this, SLOT( slotAddIndividuals() ) )->setShortcut( Qt::ALT | Qt::Key_A );
+		listviewMenu->addSeparator();
+		listviewMenu->addAction( "Import Individual...", this, SLOT( slotImportIndividual() ) )->setShortcut( Qt::CTRL | Qt::SHIFT | Qt::Key_L );
 
-  int numberOfSelectedItems = 0;
+		// connect some stuff
+		individualList->listviewIndividuals->setContextMenuPolicy( Qt::CustomContextMenu );
+		QObject::connect( individualList->listviewIndividuals,
+		                  SIGNAL( customContextMenuRequested( const QPoint & ) ),
+		                  this,
+		                  SLOT(slotRightButtonClicked( const QPoint & ) ) );
 
-  // first count the number of selected items
-  QTreeWidgetItemIterator it( individualList->listviewIndividuals );
-  for ( ; *it; ++it )
-    {
-      if( (*it)->isSelected() )
+		QObject::connect( individualList->listviewIndividuals,
+		                  SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
+		                  this,
+		                  SLOT( slotDoubleClicked( QTreeWidgetItem * ) ) );
+
+		QObject::connect( individualList->listviewIndividuals,
+		                  SIGNAL( itemSelectionChanged() ),
+		                  this,
+		                  SLOT( slotSelectionChanged() ) );
+
+		/*
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 * Perhaps also enable set AutoDelete!!!
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 */
+
+		QList<int> valList;
+		valList += 5;
+		valList += 6;
+		setSizes( valList );
+	};
+
+	int SIG_AllIndividualsView::numberOfSelectedItems()
 	{
-	  numberOfSelectedItems++;
-	}
-    }
+		int numberOfSelectedItems = 0;
 
-  if( numberOfSelectedItems != 0 )
-    {
-      QString question;
-      if( numberOfSelectedItems == 1 )
-	question = "selected individual?";
-      else
-	question = QString::number( numberOfSelectedItems ) + " selected individuals?";
-      
-      if( QMessageBox::warning( this, "Continue Deletion?" , "Do you really want to delete the " + question , QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes ) == QMessageBox::Yes )
-	{
-	  // resize the array, so we can save all positions
-	  positions.resize( numberOfSelectedItems );
-	  
-	  int counter = 0;
-	  
-	  QTreeWidgetItemIterator it2( individualList->listviewIndividuals );
-	  for ( ; *it2; ++it2 )
-	    {
-	      if( (*it2)->isSelected() )
+		// count the number of selected items
+		QTreeWidgetItemIterator it( individualList->listviewIndividuals );
+		for ( ; *it; ++it )
 		{
-		  SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( (*it2) );
-		  positions[ counter++ ] = individualListItem->poolPosition;
+			if( (*it)->isSelected() )
+			{
+				numberOfSelectedItems++;
+			}
 		}
-	    }
-	  
-	  std::sort( positions.begin(), positions.end() );
-	  
-	  for( int count = 0; count < positions.size(); count++ )
-	    {
-	      theExperiment.population.deleteIndividual( positions[ count ] - count );
-	    }
-	  
-	  slotCompleteRefreshList();
-	  if( individualList->listviewIndividuals->topLevelItemCount() == 0 )
-	    individualView->clear();
-	}
-    } // if( numbeOfSelectedItems != 0 )
-};
+		return numberOfSelectedItems;
+	};
 
-void SIG_AllIndividualsView::slotResetAllFitnessValues()
-{
-  theExperiment.population.resetAllFitnessValues();
-  slotCompleteRefreshList();
-};
+	void SIG_AllIndividualsView::slotCompleteRefreshList()
+	{
+		int poolSize = theExperiment.population.getSize();
 
-void SIG_AllIndividualsView::slotStatsClicked()
-{
-  SIGEL_Tools::SIG_IO::cerr << "Pool Size:" << theExperiment.population.getSize() << Qt::endl;
-};
+		QProgressDialog progress( "Updating pool...", QString(), 0, poolSize, this );
+		progress.setWindowModality( Qt::ApplicationModal );
+		progress.setWindowTitle( "Updating" );
+		progress.show();
 
-void SIG_AllIndividualsView::slotRightButtonClicked( const QPoint &pos )
-{
-  QTreeWidget *theTree = individualList->listviewIndividuals;
-  QTreeWidgetItem *theItem = theTree->itemAt( pos );
-  const QPoint thePoint = theTree->viewport()->mapToGlobal( pos );
-  if( !theItem ) // the click was outside
-    {
-      theTree->clearSelection();
-      listviewMenu->popup( thePoint );
-    }
-  else
-    {
-      individualMenu->popup( thePoint );
-    }
-};    
+		// clear() emits itemSelectionChanged while currentItem() still points into
+		// the old pool, and getIndividual() calls exit(1) on a position that is gone.
+		{
+			const bool wasBlocked = individualList->listviewIndividuals->blockSignals( true );
+			individualList->listviewIndividuals->clear();
+			individualList->listviewIndividuals->blockSignals( wasBlocked );
+		}
+		individualList->listviewIndividuals->setSortingEnabled( false );
+		for( int counter = 0; counter < poolSize; counter++ )
+		{
+			// Every 100 rows: each update makes the list measure all its rows again.
+			if( counter % 100 == 0 )
+			{
+				progress.setValue( counter );
+				qApp->processEvents();
+			}
+			SIGEL_GP::SIG_GPIndividual *theGPIndividual = &theExperiment.population.getIndividual( counter );
+			SIG_IndividualListItem *theItem = new SIG_IndividualListItem( individualList->listviewIndividuals, counter, theGPIndividual );
+		}
+		individualList->listviewIndividuals->setSortingEnabled( true );
+		individualList->lcdnumberNumberOfIndividuals->display(theExperiment.population.getSize() );
+	};
 
-void SIG_AllIndividualsView::slotDoubleClicked( QTreeWidgetItem *theItem )
-{
-  if( theItem )
-    {
-      SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( theItem );
-      SIGEL_GP::SIG_GPIndividual *theGPIndividual = &theExperiment.population.getIndividual( individualListItem->poolPosition );
-      SIG_IndividualView *theView = new SIG_IndividualView( nullptr, "IndividualViewDoubleClicked", Qt::WindowFlags(), theGPIndividual );
-      // No parent owns this window, so it deletes itself when closed.
-      theView->setAttribute( Qt::WA_DeleteOnClose );
-      theView->show();
-    }
-};
+	void SIG_AllIndividualsView::slotAddIndividuals()
+	{
+		SIG_AddIndividualsDialog addDialog( this, "Add Individual Dialog", true );
+		addDialog.spinboxNumber->setFocus();
+		// The value must stay unselected, or a typed 2 replaces the 1.
+		// Queued: the selection does not exist until exec() shows the dialog.
+		if ( QLineEdit *le = addDialog.spinboxNumber->findChild<QLineEdit *>() )
+			QTimer::singleShot( 0, le, [le]{ le->end( false ); } );
+		switch( addDialog.exec() )
+		{
+		case QDialog::Accepted:
+			emit signalDataRefreshNeeded();
+			{
+				// New individuals are appended to the pool, so only their rows are added.
+				int firstNew = theExperiment.population.getSize();
+				int requested = addDialog.spinboxNumber->value();
+				int added = theExperiment.population.addRandomIndividuals( requested, theExperiment.gpParameter, *theExperiment.robot.getLangParam() );
+				if( added < requested )
+				{
+					QString message = QString( "The pool is limited to %1 individuals." ).arg( SIGEL_GP::SIG_GPPopulation::maximumSize );
+					QMessageBox::information( this, "Pool Full", message );
+				}
+				// Sorting stays off while the rows go in; switching it on sorts once.
+				individualList->listviewIndividuals->setSortingEnabled( false );
+				for( int counter = firstNew; counter < theExperiment.population.getSize(); counter++ )
+					new SIG_IndividualListItem( individualList->listviewIndividuals, counter, &theExperiment.population.getIndividual( counter ) );
+				individualList->listviewIndividuals->setSortingEnabled( true );
+			}
+			break;
+		}
+		individualList->lcdnumberNumberOfIndividuals->display( theExperiment.population.getSize() );
+	};
 
-void SIG_AllIndividualsView::slotVisualize()
-{
+	void SIG_AllIndividualsView::slotDeleteIndividuals()
+	{
+		/*
+		 * Delete works as follows. First we iterate over the list and save the position of each individual
+		 * that shall be deleted into an array. While iterating over the list each QTreeWidgetItem is deleted.
+		 * The the list gets sorted and every individual deleted. As the pool is rearranged each time an individual
+		 * gets deleted, we have to be careful that the right individual is deleted.
+		 */
+		QList<int> positions;
+
+		int numberOfSelectedItems = 0;
+
+		// first count the number of selected items
+		QTreeWidgetItemIterator it( individualList->listviewIndividuals );
+		for ( ; *it; ++it )
+		{
+			if( (*it)->isSelected() )
+			{
+				numberOfSelectedItems++;
+			}
+		}
+
+		if( numberOfSelectedItems != 0 )
+		{
+			QString question;
+			if( numberOfSelectedItems == 1 )
+				question = "selected individual?";
+			else
+				question = QString::number( numberOfSelectedItems ) + " selected individuals?";
+
+			if( QMessageBox::warning( this, "Continue Deletion?" , "Do you really want to delete the " + question , QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes ) == QMessageBox::Yes )
+			{
+				// resize the array, so we can save all positions
+				positions.resize( numberOfSelectedItems );
+
+				int counter = 0;
+
+				QTreeWidgetItemIterator it2( individualList->listviewIndividuals );
+				for ( ; *it2; ++it2 )
+				{
+					if( (*it2)->isSelected() )
+					{
+						SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( (*it2) );
+						positions[ counter++ ] = individualListItem->poolPosition;
+					}
+				}
+
+				std::sort( positions.begin(), positions.end() );
+
+				for( int count = 0; count < positions.size(); count++ )
+				{
+					theExperiment.population.deleteIndividual( positions[ count ] - count );
+				}
+
+				slotCompleteRefreshList();
+				if( individualList->listviewIndividuals->topLevelItemCount() == 0 )
+					individualView->clear();
+			}
+		} // if( numbeOfSelectedItems != 0 )
+	};
+
+	void SIG_AllIndividualsView::slotResetAllFitnessValues()
+	{
+		theExperiment.population.resetAllFitnessValues();
+		slotCompleteRefreshList();
+	};
+
+	void SIG_AllIndividualsView::slotStatsClicked()
+	{
+		SIGEL_Tools::SIG_IO::cerr << "Pool Size:" << theExperiment.population.getSize() << Qt::endl;
+	};
+
+	void SIG_AllIndividualsView::slotRightButtonClicked( const QPoint &pos )
+	{
+		QTreeWidget *theTree = individualList->listviewIndividuals;
+		QTreeWidgetItem *theItem = theTree->itemAt( pos );
+		const QPoint thePoint = theTree->viewport()->mapToGlobal( pos );
+		if( !theItem ) // the click was outside
+		{
+			theTree->clearSelection();
+			listviewMenu->popup( thePoint );
+		}
+		else
+		{
+			individualMenu->popup( thePoint );
+		}
+	};
+
+	void SIG_AllIndividualsView::slotDoubleClicked( QTreeWidgetItem *theItem )
+	{
+		if( theItem )
+		{
+			SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( theItem );
+			SIGEL_GP::SIG_GPIndividual *theGPIndividual = &theExperiment.population.getIndividual( individualListItem->poolPosition );
+			SIG_IndividualView *theView = new SIG_IndividualView( nullptr, "IndividualViewDoubleClicked", Qt::WindowFlags(), theGPIndividual );
+			// No parent owns this window, so it deletes itself when closed.
+			theView->setAttribute( Qt::WA_DeleteOnClose );
+			theView->show();
+		}
+	};
+
+	void SIG_AllIndividualsView::slotVisualize()
+	{
 #ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cerr << "Starting visualization!" << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Starting visualization!" << Qt::endl;
 #endif
 
-  QTreeWidgetItemIterator it( individualList->listviewIndividuals );
-  for ( ; *it; ++it ) {
-    if( (*it)->isSelected() ) {
-   	  SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( (*it) );
-   	  SIGEL_GP::SIG_GPIndividual *theGPIndividual = individualListItem->theIndividual;
+		QTreeWidgetItemIterator it( individualList->listviewIndividuals );
+		for ( ; *it; ++it )
+		{
+			if( (*it)->isSelected() )
+			{
+				SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( (*it) );
+				SIGEL_GP::SIG_GPIndividual *theGPIndividual = individualListItem->theIndividual;
 
-   	  emit signalDataRefreshNeeded();
+				emit signalDataRefreshNeeded();
 
-   	  SIGEL_Program::SIG_Program &theProgram = theGPIndividual->getProgramVar();
+				SIGEL_Program::SIG_Program &theProgram = theGPIndividual->getProgramVar();
 
-   	  SIGEL_Robot::SIG_Robot modifiedRobot( theExperiment.robot );
+				SIGEL_Robot::SIG_Robot modifiedRobot( theExperiment.robot );
 
-   	  try {
-   	    modifiedRobot.prepareDynaMechs();
-   	  }
-   	  catch (SIGEL_Tools::SIG_Exception &e) {
-   	    QMessageBox::warning( this, "Robot Exception", e.getMessage() );
-   	    return;
-   	  };
+				try
+				{
+					modifiedRobot.prepareDynaMechs();
+				}
+				catch (SIGEL_Tools::SIG_Exception &e)
+				{
+					QMessageBox::warning( this, "Robot Exception", e.getMessage() );
+					return;
+				};
 
-   	  QList< char > hostNameBuffer( 100 );
+				QList< char > hostNameBuffer( 100 );
 
-   	  gethostname( hostNameBuffer.data(), 100 );
+				gethostname( hostNameBuffer.data(), 100 );
 
-   	  char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
+				char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
 
-   	  QString sigelRootString( sigelRootCString );
+				QString sigelRootString( sigelRootCString );
 
-   	  QString executableName = sigelRootString + "/sigel_slave";
-   	  QByteArray executableNameQCString = executableName.toUtf8();
-   	  char const *executableNameCString = executableNameQCString;
+				QString executableName = sigelRootString + "/sigel_slave";
+				QByteArray executableNameQCString = executableName.toUtf8();
+				char const *executableNameCString = executableNameQCString;
 
-   	  int taskId = 0;
-   	  int spawnInfo = pvm_spawn( const_cast< char* >(executableNameCString),
-   				     nullptr,
-   				     PvmTaskHost,
-   				     hostNameBuffer.data(),
-   				     1,
-   				     &taskId );
+				int taskId = 0;
+				int spawnInfo = pvm_spawn( const_cast< char* >(executableNameCString),
+				                           nullptr,
+				                           PvmTaskHost,
+				                           hostNameBuffer.data(),
+				                           1,
+				                           &taskId );
 
-   	  if (spawnInfo == 1) {
-         SIGEL_GP::SIG_GPPVMData pvmData( modifiedRobot,
-     			       theExperiment.environment,
-     			       theExperiment.simulationParameter,
-						 theExperiment.gpParameter.getFitnessName(),
-     			       true );
+				if (spawnInfo == 1)
+				{
+					SIGEL_GP::SIG_GPPVMData pvmData( modifiedRobot,
+					                      theExperiment.environment,
+					                      theExperiment.simulationParameter,
+					                                        theExperiment.gpParameter.getFitnessName(),
+					                      true );
 
-         pvmData.setExperimentName( guiExperiment.getName() );
-         pvmData.setIndividualName( theGPIndividual->getName() );
-         pvmData.setIndividualFitness( theGPIndividual->getFitness() );
+					pvmData.setExperimentName( guiExperiment.getName() );
+					pvmData.setIndividualName( theGPIndividual->getName() );
+					pvmData.setIndividualFitness( theGPIndividual->getFitness() );
 
-         QString pvmDataString;
-         QTextStream pvmDataStream( &pvmDataString, QIODevice::ReadWrite );
-         pvmData.savePVMDataTransfer( pvmDataStream, theProgram );
-         pvmData.sendQStringToPVM( pvmDataString, taskId, 23 );
-   	  }
-   	  else {
-   	      QMessageBox::critical( this, "Error While Starting Slave", "The slave could not be started.\nEither there is no executable or a PVM problem occurred." );
-   	  };
-   	} // if-statement
-  } //for-loop
-};
+					QString pvmDataString;
+					QTextStream pvmDataStream( &pvmDataString, QIODevice::ReadWrite );
+					pvmData.savePVMDataTransfer( pvmDataStream, theProgram );
+					pvmData.sendQStringToPVM( pvmDataString, taskId, 23 );
+				}
+				else
+				{
+					QMessageBox::critical( this, "Error While Starting Slave", "The slave could not be started.\nEither there is no executable or a PVM problem occurred." );
+				};
+			} // if-statement
+		} //for-loop
+	};
 
-void SIG_AllIndividualsView::slotSelectionChanged()
-{
-  QTreeWidgetItem *currentItem = individualList->listviewIndividuals->currentItem();
-  if( currentItem )
-    {
-      SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( currentItem );
-      SIGEL_GP::SIG_GPIndividual *theGPIndividual = &theExperiment.population.getIndividual( individualListItem->poolPosition );
-      individualView->textlabelShowName->setText( theGPIndividual->getName() );
-      QString age = QString::number( theGPIndividual->getAge() );
-      individualView->textlabelShowAge->setText( age );
-      QString fitness = QString::number( theGPIndividual->getFitness() );
-      individualView->textlabelShowFitness->setText( fitness );
-      QString programCode;
-      theGPIndividual->getProgramPointer()->printToString( programCode );
-      individualView->multilineeditProgramCode->setText( programCode );
-      QString history = theGPIndividual->getHistory().join( "\n" );
-      individualView->multilineeditHistory->setText( history );
-    }
-};
-
-void SIG_AllIndividualsView::slotEvolutionNotRunning( bool isNotRunning )
-{
-  if( !isNotRunning ) // means that the evolution is running...
-    {
-      individualView->clear();
-      // Name the receiver. A wildcard also cuts QTreeWidget's own relays, so
-      // itemDoubleClicked stops being emitted at all and slotDoubleClicked is
-      // reconnected below to a signal nothing raises.
-      QObject::disconnect( individualList->listviewIndividuals,
-			   nullptr,
-			   this,
-			   nullptr );
-    }
-  else
-    {
-      QObject::disconnect( individualList->listviewIndividuals,
-			   nullptr,
-			   this,
-			   nullptr );
-
-      individualList->listviewIndividuals->setContextMenuPolicy( Qt::CustomContextMenu );
-      QObject::connect( individualList->listviewIndividuals,
-			SIGNAL( customContextMenuRequested( const QPoint & ) ),
-			this,
-			SLOT(slotRightButtonClicked( const QPoint & ) ) );
-      
-      QObject::connect( individualList->listviewIndividuals,
-			SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
-			this,
-			SLOT( slotDoubleClicked( QTreeWidgetItem * ) ) );
-      
-      QObject::connect( individualList->listviewIndividuals,
-			SIGNAL( itemSelectionChanged() ),
-			this,
-			SLOT( slotSelectionChanged() ) );
-    }
-};
-
-void SIG_AllIndividualsView::slotImportProgram()
-{
-  QTreeWidgetItem *currentItem = individualList->listviewIndividuals->currentItem();
-  if( currentItem )
-    {
-      SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( currentItem );
-      if( numberOfSelectedItems() == 1 )
+	void SIG_AllIndividualsView::slotSelectionChanged()
 	{
-	  QString fileName = QFileDialog::getOpenFileName( this, "Import Program", QString(), "Program Files (*.prg);;All Files (*)" );
-	  if( !fileName.isEmpty() )
-	    {
-	      individualListItem->theIndividual->importProgram( fileName );
-	    }
-	  slotSelectionChanged();
-	  slotCompleteRefreshList(); // can be done more efficiently!!!
-	}
-      else
-	QMessageBox::information( this, "Select Exactly One Individual", "There must be exactly one individual selected." );
-    } // if( currentitem )
-  else
-    QMessageBox::information( this, "No Individual Selected", "There is no individual selected." );
-};
+		QTreeWidgetItem *currentItem = individualList->listviewIndividuals->currentItem();
+		if( currentItem )
+		{
+			SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( currentItem );
+			SIGEL_GP::SIG_GPIndividual *theGPIndividual = &theExperiment.population.getIndividual( individualListItem->poolPosition );
+			individualView->textlabelShowName->setText( theGPIndividual->getName() );
+			QString age = QString::number( theGPIndividual->getAge() );
+			individualView->textlabelShowAge->setText( age );
+			QString fitness = QString::number( theGPIndividual->getFitness() );
+			individualView->textlabelShowFitness->setText( fitness );
+			QString programCode;
+			theGPIndividual->getProgramPointer()->printToString( programCode );
+			individualView->multilineeditProgramCode->setText( programCode );
+			QString history = theGPIndividual->getHistory().join( "\n" );
+			individualView->multilineeditHistory->setText( history );
+		}
+	};
 
-void SIG_AllIndividualsView::slotExportProgram()
-{
-  QTreeWidgetItem *currentItem = individualList->listviewIndividuals->currentItem();
-  if( currentItem )
-    {
-      SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( currentItem );
-      if( numberOfSelectedItems() == 1 )
+	void SIG_AllIndividualsView::slotEvolutionNotRunning( bool isNotRunning )
 	{
-	  QString individualName = individualListItem->theIndividual->getName();
-	  QString fileName = QFileDialog::getSaveFileName( this, "Export Program", QString(), "Program Files (*.prg);;All Files (*)" );
-	  if( !fileName.isEmpty() )
-	    {
-	      if( fileName.right(4) != ".prg" )
-		fileName.append( ".prg" );
-	      individualListItem->theIndividual->exportProgram( fileName );
-	    }
-	}
-      else
-	QMessageBox::information( this, "More Than One Individual Selected", "There is more than one individual selected." );
-    }
-  else
-    QMessageBox::information( this, "No Individual Selected", "There is no individual selected." );
-};
+		if( !isNotRunning ) // means that the evolution is running...
+		{
+			individualView->clear();
+			// Name the receiver. A wildcard also cuts QTreeWidget's own relays, so
+			// itemDoubleClicked stops being emitted at all and slotDoubleClicked is
+			// reconnected below to a signal nothing raises.
+			QObject::disconnect( individualList->listviewIndividuals,
+			                     nullptr,
+			                     this,
+			                     nullptr );
+		}
+		else
+		{
+			QObject::disconnect( individualList->listviewIndividuals,
+			                     nullptr,
+			                     this,
+			                     nullptr );
 
-void SIG_AllIndividualsView::slotImportIndividual()
-{
-  QString fileName = QFileDialog::getOpenFileName( this, "Import Individual", QString(), "Individual Files (*.ind);;All Files (*)" );
-  if( !fileName.isEmpty() )
-    {
-      try
-        {
-          if( !theExperiment.population.importNewIndividual( fileName ) )
-            {
-              QString message = QString( "Nothing imported: the pool is limited to %1." ).arg( SIGEL_GP::SIG_GPPopulation::maximumSize );
-              QMessageBox::information( this, "Pool Full", message );
-            }
-        }
-      catch ( const SIGEL_Tools::SIG_Exception &e )
-        {
-          QMessageBox::warning( this, "Import Individual", e.getMessage() );
-        }
-    }
-  slotCompleteRefreshList(); // can be done more efficiently!!!
-};
+			individualList->listviewIndividuals->setContextMenuPolicy( Qt::CustomContextMenu );
+			QObject::connect( individualList->listviewIndividuals,
+			                  SIGNAL( customContextMenuRequested( const QPoint & ) ),
+			                  this,
+			                  SLOT(slotRightButtonClicked( const QPoint & ) ) );
 
-void SIG_AllIndividualsView::slotExportIndividual()
-{
-  QTreeWidgetItem *currentItem = individualList->listviewIndividuals->currentItem();
-  if( currentItem )
-    {
-      SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( currentItem );
-      if( numberOfSelectedItems() == 1 )
+			QObject::connect( individualList->listviewIndividuals,
+			                  SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
+			                  this,
+			                  SLOT( slotDoubleClicked( QTreeWidgetItem * ) ) );
+
+			QObject::connect( individualList->listviewIndividuals,
+			                  SIGNAL( itemSelectionChanged() ),
+			                  this,
+			                  SLOT( slotSelectionChanged() ) );
+		}
+	};
+
+	void SIG_AllIndividualsView::slotImportProgram()
 	{
-	  QString individualName = individualListItem->theIndividual->getName();
-	  QString fileName = QFileDialog::getSaveFileName( this, "Export Individual", QString(), "Individual Files (*.ind);;All Files (*)" );
-	  if( !fileName.isEmpty() )
-	    {
-	      if( fileName.right(4) != ".ind" )
-		fileName.append( ".ind" );
-	      individualListItem->theIndividual->exportIndividual( fileName );
-	    }
-	}
-      else
-	QMessageBox::information( this, "More Than One Individual Selected", "There is more than one individual selected." );
-    }
-  else
-    QMessageBox::information( this, "No Individual Selected", "There is no individual selected." );
-};
+		QTreeWidgetItem *currentItem = individualList->listviewIndividuals->currentItem();
+		if( currentItem )
+		{
+			SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( currentItem );
+			if( numberOfSelectedItems() == 1 )
+			{
+				QString fileName = QFileDialog::getOpenFileName( this, "Import Program", QString(), "Program Files (*.prg);;All Files (*)" );
+				if( !fileName.isEmpty() )
+				{
+					individualListItem->theIndividual->importProgram( fileName );
+				}
+				slotSelectionChanged();
+				slotCompleteRefreshList(); // can be done more efficiently!!!
+			}
+			else
+				QMessageBox::information( this, "Select Exactly One Individual", "There must be exactly one individual selected." );
+		} // if( currentitem )
+		else
+			QMessageBox::information( this, "No Individual Selected", "There is no individual selected." );
+	};
+
+	void SIG_AllIndividualsView::slotExportProgram()
+	{
+		QTreeWidgetItem *currentItem = individualList->listviewIndividuals->currentItem();
+		if( currentItem )
+		{
+			SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( currentItem );
+			if( numberOfSelectedItems() == 1 )
+			{
+				QString individualName = individualListItem->theIndividual->getName();
+				QString fileName = QFileDialog::getSaveFileName( this, "Export Program", QString(), "Program Files (*.prg);;All Files (*)" );
+				if( !fileName.isEmpty() )
+				{
+					if( fileName.right(4) != ".prg" )
+						fileName.append( ".prg" );
+					individualListItem->theIndividual->exportProgram( fileName );
+				}
+			}
+			else
+				QMessageBox::information( this, "More Than One Individual Selected", "There is more than one individual selected." );
+		}
+		else
+			QMessageBox::information( this, "No Individual Selected", "There is no individual selected." );
+	};
+
+	void SIG_AllIndividualsView::slotImportIndividual()
+	{
+		QString fileName = QFileDialog::getOpenFileName( this, "Import Individual", QString(), "Individual Files (*.ind);;All Files (*)" );
+		if( !fileName.isEmpty() )
+		{
+			try
+			{
+				if( !theExperiment.population.importNewIndividual( fileName ) )
+				{
+					QString message = QString( "Nothing imported: the pool is limited to %1." ).arg( SIGEL_GP::SIG_GPPopulation::maximumSize );
+					QMessageBox::information( this, "Pool Full", message );
+				}
+			}
+			catch ( const SIGEL_Tools::SIG_Exception &e )
+			{
+				QMessageBox::warning( this, "Import Individual", e.getMessage() );
+			}
+		}
+		slotCompleteRefreshList(); // can be done more efficiently!!!
+	};
+
+	void SIG_AllIndividualsView::slotExportIndividual()
+	{
+		QTreeWidgetItem *currentItem = individualList->listviewIndividuals->currentItem();
+		if( currentItem )
+		{
+			SIG_IndividualListItem *individualListItem = static_cast<SIG_IndividualListItem *> ( currentItem );
+			if( numberOfSelectedItems() == 1 )
+			{
+				QString individualName = individualListItem->theIndividual->getName();
+				QString fileName = QFileDialog::getSaveFileName( this, "Export Individual", QString(), "Individual Files (*.ind);;All Files (*)" );
+				if( !fileName.isEmpty() )
+				{
+					if( fileName.right(4) != ".ind" )
+						fileName.append( ".ind" );
+					individualListItem->theIndividual->exportIndividual( fileName );
+				}
+			}
+			else
+				QMessageBox::information( this, "More Than One Individual Selected", "There is more than one individual selected." );
+		}
+		else
+			QMessageBox::information( this, "No Individual Selected", "There is no individual selected." );
+	};
 
 }
