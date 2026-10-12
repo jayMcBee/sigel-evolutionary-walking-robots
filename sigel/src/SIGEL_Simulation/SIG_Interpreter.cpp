@@ -115,10 +115,7 @@ namespace SIGEL_Simulation
 						// subtract the needed time for the command
 						timeAccountSize -= languageParameters.getCommand( "COPY" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time).
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
@@ -143,10 +140,7 @@ namespace SIGEL_Simulation
 						// subtract the needed time for the command
 						timeAccountSize -= languageParameters.getCommand( "LOAD" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time). else do it!
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
@@ -169,10 +163,7 @@ namespace SIGEL_Simulation
 						// subtract the needed time for the command
 						timeAccountSize -= languageParameters.getCommand( "ADD" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time). else do it!
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
@@ -195,10 +186,7 @@ namespace SIGEL_Simulation
 						// subtract the needed time for the command
 						timeAccountSize -= languageParameters.getCommand( "SUB" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time). else do it!
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
@@ -221,10 +209,7 @@ namespace SIGEL_Simulation
 						// subtract the needed time for the command
 						timeAccountSize -= languageParameters.getCommand( "MUL" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time). else do it!
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
@@ -247,10 +232,7 @@ namespace SIGEL_Simulation
 						// subtract the needed time for the command
 						timeAccountSize -= languageParameters.getCommand( "DIV" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time). else do it!
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
@@ -273,10 +255,7 @@ namespace SIGEL_Simulation
 						// subtract the needed time for the command
 						timeAccountSize -= languageParameters.getCommand( "MOD" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time). else do it!
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
@@ -299,10 +278,7 @@ namespace SIGEL_Simulation
 						// subtract the needed time for the command
 						timeAccountSize -= languageParameters.getCommand( "MIN" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time). else do it!
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
@@ -325,10 +301,7 @@ namespace SIGEL_Simulation
 						// subtract the needed time for the command
 						timeAccountSize -= languageParameters.getCommand( "MAX" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time). else do it!
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
@@ -357,10 +330,7 @@ namespace SIGEL_Simulation
 						// subtract the needed time for the command
 						timeAccountSize -= languageParameters.getCommand( "CMP" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time). else do it!
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
@@ -395,10 +365,7 @@ namespace SIGEL_Simulation
 
 						timeAccountSize -= languageParameters.getCommand( "JMP" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time). else do it!
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
@@ -422,10 +389,7 @@ namespace SIGEL_Simulation
 						// subtract the needed time for the command
 						timeAccountSize -= languageParameters.getCommand( "SENSE" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time). else do it!
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
@@ -451,10 +415,7 @@ namespace SIGEL_Simulation
 						// subtract the needed time for the command
 						timeAccountSize -= languageParameters.getCommand( "MOVE" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time). else do it!
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
@@ -482,10 +443,7 @@ namespace SIGEL_Simulation
 						// subtract the needed time for the command
 						timeAccountSize -= languageParameters.getCommand( "DELAY" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time). else do it!
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
@@ -505,10 +463,7 @@ namespace SIGEL_Simulation
 						// subtract the needed time for the command
 						timeAccountSize -= languageParameters.getCommand( "NOP" )->getDuration();
 
-						/*
-						 * have we exeeded the allowed time? if so, set remainingLastCommandTime to the amout
-						 * by which we have exeeded it and do nothing (will be done the next time). else do it!
-						 */
+						// The command took more time than was left: the excess is taken off the time of the next call.
 						if ( timeAccountSize < 0 )
 							remainingLastCommandTime = - timeAccountSize;
 					}
