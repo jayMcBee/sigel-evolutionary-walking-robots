@@ -134,6 +134,12 @@ namespace SIGEL_Simulation
 
     void negativeRegisterOperandWithSixRegisters();
 
+    void senseGivesTheRegisterValueAsSensorNumber();
+
+    void senseRegisterOperandWraps();
+
+    void senseThatIsNotAllowedIsSkipped();
+
     void nopChangesNothingAndTakesItsTime();
 
     void nopThatIsNotAllowedIsSkipped();

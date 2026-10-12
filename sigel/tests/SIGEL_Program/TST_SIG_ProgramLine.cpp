@@ -53,6 +53,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements_
   QTest::newRow( "MAX" ) << MAX << 2 << -12 << -34;
   QTest::newRow( "CMP" ) << CMP << 2 << -12 << -34;
   QTest::newRow( "JMP" ) << JMP << 1 << -12 << 0;
+  QTest::newRow( "SENSE" ) << SENSE << 1 << -12 << 0;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements()
@@ -94,6 +95,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText_data()
   QTest::newRow( "MAX" ) << MAX << "MAX -12,-34\n";
   QTest::newRow( "CMP" ) << CMP << "CMP -12,-34\n";
   QTest::newRow( "JMP" ) << JMP << "JMP -12\n";
+  QTest::newRow( "SENSE" ) << SENSE << "SENSE -12\n";
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText()
@@ -127,6 +129,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText_data()
   QTest::newRow( "MAX" ) << MAX << "       MAX -12,-34\n";
   QTest::newRow( "CMP" ) << CMP << "       CMP -12,-34\n";
   QTest::newRow( "JMP" ) << JMP << "       JMP -12\n";
+  QTest::newRow( "SENSE" ) << SENSE << "       SENSE -12\n";
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText()
@@ -191,6 +194,9 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm_data()
   QTest::newRow( "JMP file" ) << "       JMP -12" << JMP << 1 << -12 << 0;
   QTest::newRow( "JMP shown" ) << "JMP -12" << JMP << 1 << -12 << 0;
   QTest::newRow( "JMP lower case" ) << "       jmp -12" << JMP << 1 << -12 << 0;
+  QTest::newRow( "SENSE file" ) << "       SENSE -12" << SENSE << 1 << -12 << 0;
+  QTest::newRow( "SENSE shown" ) << "SENSE -12" << SENSE << 1 << -12 << 0;
+  QTest::newRow( "SENSE lower case" ) << "       sense -12" << SENSE << 1 << -12 << 0;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm()
@@ -234,6 +240,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedComman
   QTest::newRow( "MAX" ) << "MAX" << MAX;
   QTest::newRow( "CMP" ) << "CMP" << CMP;
   QTest::newRow( "JMP" ) << "JMP" << JMP;
+  QTest::newRow( "SENSE" ) << "SENSE" << SENSE;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommand()
@@ -275,6 +282,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAW
   QTest::newRow( "MAX" ) << MAX;
   QTest::newRow( "CMP" ) << CMP;
   QTest::newRow( "JMP" ) << JMP;
+  QTest::newRow( "SENSE" ) << SENSE;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAWeight()

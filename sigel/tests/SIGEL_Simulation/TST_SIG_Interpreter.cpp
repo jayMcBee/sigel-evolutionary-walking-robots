@@ -376,6 +376,77 @@ void SIGEL_Simulation::TST_SIG_Interpreter::negativeRegisterOperandWithSixRegist
   QCOMPARE( moveRecords[0].registerValues, expectedValues );
 }
 
+void SIGEL_Simulation::TST_SIG_Interpreter::senseGivesTheRegisterValueAsSensorNumber()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 3, 42 );
+  appendLine( program, SIGEL_Program::SENSE, 3, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 7, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[0] = 55;
+  expectedValues[1] = 42;
+  expectedValues[3] = 42;
+
+  // TST_FixedSimulationQueries::sense puts its sensor value in register 0 and the sensor number in register 1.
+  interpreter.interprete( 3 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::senseRegisterOperandWraps()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 3, 42 );
+  appendLine( program, SIGEL_Program::SENSE, 11, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 7, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+  QList<int> expectedValues( 8, 0 );
+  expectedValues[0] = 55;
+  expectedValues[1] = 42;
+  expectedValues[3] = 42;
+
+  // TST_FixedSimulationQueries::sense puts its sensor value in register 0 and the sensor number in register 1.
+  interpreter.interprete( 3 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, expectedValues );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::senseThatIsNotAllowedIsSkipped()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.removeCommand( "SENSE" );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::SENSE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 7, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  // The time is enough for the MOVE only, so its record also shows that the skipped SENSE took no time.
+  interpreter.interprete( 1 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 0 );
+  QCOMPARE( moveRecords[0].registerValues, QList<int>( 8, 0 ) );
+}
+
 void SIGEL_Simulation::TST_SIG_Interpreter::nopChangesNothingAndTakesItsTime()
 {
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
@@ -876,6 +947,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLin
   QTest::newRow( "MAX" ) << SIGEL_Program::MAX;
   QTest::newRow( "CMP" ) << SIGEL_Program::CMP;
   QTest::newRow( "JMP" ) << SIGEL_Program::JMP;
+  QTest::newRow( "SENSE" ) << SIGEL_Program::SENSE;
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLineZero()
@@ -912,6 +984,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration_data()
   QTest::newRow( "MAX" ) << SIGEL_Program::MAX << "MAX";
   QTest::newRow( "CMP" ) << SIGEL_Program::CMP << "CMP";
   QTest::newRow( "JMP" ) << SIGEL_Program::JMP << "JMP";
+  QTest::newRow( "SENSE" ) << SIGEL_Program::SENSE << "SENSE";
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration()
