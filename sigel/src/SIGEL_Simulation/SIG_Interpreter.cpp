@@ -102,381 +102,294 @@ namespace SIGEL_Simulation
 
 				// commandNames is in the order of Robotinstruction.
 				static const QStringList commandNames = { "COPY", "LOAD", "ADD", "SUB", "MUL", "DIV", "MOD", "MIN", "MAX", "CMP", "JMP", "SENSE", "MOVE", "DELAY", "NOP" };
-				// An instruction type that is not in commandNames gets an empty name; only the default case runs for it.
+				// An instruction type that is not in commandNames gets an empty name.
 				const QString commandName = commandNames.value( programLine.getRobotinstructionType() );
+
+				// A command that is not allowed is skipped: the program goes to the next line and no time is used.
+				if ( !languageParameters.hasCommand( commandName ) )
+				{
+					programCounter = (programCounter + 1) % programLength;
+					continue;
+				}
 
 				// what command was fetched?
 				switch ( programLine.getRobotinstructionType() )
 				{
 				case SIGEL_Program::COPY:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
-					{
-						// do it!
-						int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
-						int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
-						registers[reg0].copyReg( registers[reg1] );
-						programCounter = (programCounter + 1) % programLength;
+				{
+					// do it!
+					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
+					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
+					registers[reg0].copyReg( registers[reg1] );
+					programCounter = (programCounter + 1) % programLength;
 
-						// subtract the needed time for the command
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+					// subtract the needed time for the command
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
-					}
-					// the command is not allowed but we have to increase the PC so we don't get the
-					// same line again
-					else
-					{
-						programCounter = (programCounter + 1) % programLength;
-					}
-					break;
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
+				}
+				break;
 
 				case SIGEL_Program::LOAD:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
-					{
-						// do it!
-						int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
-						int value = programLine.getInstructionElement(1);
-						registers[reg0].loadValue( value );
-						programCounter = (programCounter + 1) % programLength;
+				{
+					// do it!
+					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
+					int value = programLine.getInstructionElement(1);
+					registers[reg0].loadValue( value );
+					programCounter = (programCounter + 1) % programLength;
 
-						// subtract the needed time for the command
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+					// subtract the needed time for the command
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
-					}
-					else
-					{
-						programCounter = (programCounter + 1) % programLength;
-					}
-					break;
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
+				}
+				break;
 
 				case SIGEL_Program::ADD:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
-					{
-						// do it!
-						int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
-						int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
-						registers[reg0].addReg( registers[reg1] );
-						programCounter = (programCounter + 1) % programLength;
+				{
+					// do it!
+					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
+					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
+					registers[reg0].addReg( registers[reg1] );
+					programCounter = (programCounter + 1) % programLength;
 
-						// subtract the needed time for the command
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+					// subtract the needed time for the command
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
-					}
-					else
-					{
-						programCounter = (programCounter + 1) % programLength;
-					}
-					break;
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
+				}
+				break;
 
 				case SIGEL_Program::SUB:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
-					{
-						// do it!
-						int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
-						int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
-						registers[reg0].subReg( registers[reg1] );
-						programCounter = (programCounter + 1) % programLength;
+				{
+					// do it!
+					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
+					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
+					registers[reg0].subReg( registers[reg1] );
+					programCounter = (programCounter + 1) % programLength;
 
-						// subtract the needed time for the command
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+					// subtract the needed time for the command
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
-					}
-					else
-					{
-						programCounter = (programCounter + 1) % programLength;
-					}
-					break;
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
+				}
+				break;
 
 				case SIGEL_Program::MUL:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
-					{
-						// do it!
-						int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
-						int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
-						registers[reg0].mulReg( registers[reg1] );
-						programCounter = (programCounter + 1) % programLength;
+				{
+					// do it!
+					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
+					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
+					registers[reg0].mulReg( registers[reg1] );
+					programCounter = (programCounter + 1) % programLength;
 
-						// subtract the needed time for the command
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+					// subtract the needed time for the command
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
-					}
-					else
-					{
-						programCounter = (programCounter + 1) % programLength;
-					}
-					break;
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
+				}
+				break;
 
 				case SIGEL_Program::DIV:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
-					{
-						// do it!
-						int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
-						int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
-						registers[reg0].divReg( registers[reg1] );
-						programCounter = (programCounter + 1) % programLength;
+				{
+					// do it!
+					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
+					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
+					registers[reg0].divReg( registers[reg1] );
+					programCounter = (programCounter + 1) % programLength;
 
-						// subtract the needed time for the command
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+					// subtract the needed time for the command
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
-					}
-					else
-					{
-						programCounter = (programCounter + 1) % programLength;
-					}
-					break;
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
+				}
+				break;
 
 				case SIGEL_Program::MOD:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
-					{
-						// do it!
-						int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
-						int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
-						registers[reg0].modReg( registers[reg1] );
-						programCounter = (programCounter + 1) % programLength;
+				{
+					// do it!
+					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
+					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
+					registers[reg0].modReg( registers[reg1] );
+					programCounter = (programCounter + 1) % programLength;
 
-						// subtract the needed time for the command
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+					// subtract the needed time for the command
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
-					}
-					else
-					{
-						programCounter = (programCounter + 1) % programLength;
-					}
-					break;
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
+				}
+				break;
 
 				case SIGEL_Program::MIN:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
-					{
-						// do it!
-						int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
-						int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
-						registers[reg0].minReg( registers[reg1] );
-						programCounter = (programCounter + 1) % programLength;
+				{
+					// do it!
+					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
+					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
+					registers[reg0].minReg( registers[reg1] );
+					programCounter = (programCounter + 1) % programLength;
 
-						// subtract the needed time for the command
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+					// subtract the needed time for the command
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
-					}
-					else
-					{
-						programCounter = (programCounter + 1) % programLength;
-					}
-					break;
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
+				}
+				break;
 
 				case SIGEL_Program::MAX:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
-					{
-						// do it!
-						int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
-						int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
-						registers[reg0].maxReg( registers[reg1] );
-						programCounter = (programCounter + 1) % programLength;
+				{
+					// do it!
+					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
+					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
+					registers[reg0].maxReg( registers[reg1] );
+					programCounter = (programCounter + 1) % programLength;
 
-						// subtract the needed time for the command
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+					// subtract the needed time for the command
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
-					}
-					else
-					{
-						programCounter = (programCounter + 1) % programLength;
-					}
-					break;
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
+				}
+				break;
 
 				case SIGEL_Program::CMP:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
-					{
-						// do it!
-						int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
-						int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
-						if ( registers[reg0].getValue() <= registers[reg1].getValue() )
-							compareFlag = true;
-						else
-							compareFlag = false;
-#ifdef SIG_DEBUG
-						SIGEL_Tools::SIG_IO::cerr << "Reg0: " << reg0 << "; Reg1: " << reg1 << Qt::endl;
-#endif
-						programCounter = (programCounter + 1) % programLength;
-
-						// subtract the needed time for the command
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
-					}
+				{
+					// do it!
+					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
+					int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
+					if ( registers[reg0].getValue() <= registers[reg1].getValue() )
+						compareFlag = true;
 					else
-					{
-						programCounter = (programCounter + 1) % programLength;
-					}
-					break;
+						compareFlag = false;
+#ifdef SIG_DEBUG
+					SIGEL_Tools::SIG_IO::cerr << "Reg0: " << reg0 << "; Reg1: " << reg1 << Qt::endl;
+#endif
+					programCounter = (programCounter + 1) % programLength;
+
+					// subtract the needed time for the command
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
+				}
+				break;
 
 				case SIGEL_Program::JMP:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
+				{
+					// do it!
+					int lineOffset = programLine.getInstructionElement(0);
+					long nextLine = programCounter + 1;
+
+					if ( compareFlag )
 					{
-						// do it!
-						int lineOffset = programLine.getInstructionElement(0);
-						long nextLine = programCounter + 1;
-
-						if ( compareFlag )
-						{
-							nextLine = nextLine + lineOffset;
-						}
-
-						// The remainder of a negative line number is negative in C++.
-						programCounter = nextLine % programLength;
-
-						if ( programCounter < 0 )
-						{
-							programCounter = programCounter + programLength;
-						}
-
-						// subtract the needed time for the command
-
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
-
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
+						nextLine = nextLine + lineOffset;
 					}
-					else
+
+					// The remainder of a negative line number is negative in C++.
+					programCounter = nextLine % programLength;
+
+					if ( programCounter < 0 )
 					{
-						programCounter = (programCounter + 1) % programLength;
+						programCounter = programCounter + programLength;
 					}
-					break;
+
+					// subtract the needed time for the command
+
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
+				}
+				break;
 
 				case SIGEL_Program::SENSE:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
-					{
-						// do it!
-						int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
+				{
+					// do it!
+					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 
-						int numberOfSensor = registers[reg0].getValue();
-						simulationQueries.sense( numberOfSensor, registers );
-						programCounter = (programCounter + 1) % programLength;
+					int numberOfSensor = registers[reg0].getValue();
+					simulationQueries.sense( numberOfSensor, registers );
+					programCounter = (programCounter + 1) % programLength;
 
-						// subtract the needed time for the command
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+					// subtract the needed time for the command
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
-					}
-					else
-					{
-						programCounter = (programCounter + 1) % programLength;
-					}
-					break;
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
+				}
+				break;
 
 				case SIGEL_Program::MOVE:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
-					{
-						// do it!
-						int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
-						int numberOfJoint = registers[reg0].getValue();
+				{
+					// do it!
+					int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
+					int numberOfJoint = registers[reg0].getValue();
 #ifdef SIG_DEBUG
-						SIGEL_Tools::SIG_IO::cerr << "Moving drive " << numberOfJoint << "." << Qt::endl;
+					SIGEL_Tools::SIG_IO::cerr << "Moving drive " << numberOfJoint << "." << Qt::endl;
 #endif
-						commandInterface.moveDrive( numberOfJoint, registers );
-						programCounter = (programCounter + 1) % programLength;
+					commandInterface.moveDrive( numberOfJoint, registers );
+					programCounter = (programCounter + 1) % programLength;
 
-						// subtract the needed time for the command
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+					// subtract the needed time for the command
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
-					}
-					else
-					{
-						programCounter = (programCounter + 1) % programLength;
-					}
-					break;
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
+				}
+				break;
 
 				case SIGEL_Program::DELAY:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
-					{
-						// do it!
-						// get the register
-						int reg = getRegisterNumber( programLine.getInstructionElement(0) );
-						int readOut = registers[reg].getValue();
-						double delayTime = static_cast<double>( readOut ) * 0.001;
-						delayTime = std::abs( delayTime );
-						if( delayTime > maxDelayTime )
-							delayTime = maxDelayTime;
-						timeAccountSize -= delayTime;
-						programCounter = (programCounter + 1) % programLength;
+				{
+					// do it!
+					// get the register
+					int reg = getRegisterNumber( programLine.getInstructionElement(0) );
+					int readOut = registers[reg].getValue();
+					double delayTime = static_cast<double>( readOut ) * 0.001;
+					delayTime = std::abs( delayTime );
+					if( delayTime > maxDelayTime )
+						delayTime = maxDelayTime;
+					timeAccountSize -= delayTime;
+					programCounter = (programCounter + 1) % programLength;
 
-						// subtract the needed time for the command
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+					// subtract the needed time for the command
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
-					}
-					else
-					{
-						programCounter = (programCounter + 1) % programLength;
-					}
-					break;
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
+				}
+				break;
 
 				case SIGEL_Program::NOP:
-					// is the command allowed?
-					if ( languageParameters.hasCommand( commandName ) )
-					{
-						// do it!
-						programCounter = (programCounter + 1) % programLength;
+					// do it!
+					programCounter = (programCounter + 1) % programLength;
 
-						// subtract the needed time for the command
-						timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
+					// subtract the needed time for the command
+					timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 
-						// The command took more time than was left: the excess is taken off the time of the next call.
-						if ( timeAccountSize < 0 )
-							remainingLastCommandTime = - timeAccountSize;
-					}
-					else
-					{
-						programCounter = (programCounter + 1) % programLength;
-					}
+					// The command took more time than was left: the excess is taken off the time of the next call.
+					if ( timeAccountSize < 0 )
+						remainingLastCommandTime = - timeAccountSize;
 					break;
 
 				default:
