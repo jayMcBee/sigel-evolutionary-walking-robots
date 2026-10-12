@@ -62,6 +62,18 @@ namespace SIGEL_Program
 
     void readFromFileRefusesTextWithoutAnInstruction();
 
+    void getElementOutsideTheElementsGivesZero();
+
+    void setElementChangesOneElement();
+
+    void setElementOutsideTheElementsChangesNothing();
+
+    void resizeElementsKeepsTheFirstElementsAndAddsZeros();
+
+    void clearLineRemovesTheElementsAndKeepsTheType();
+
+    void setRobotinstructionTypeKeepsTheElements();
+
     void randomInstructionIsTheOnlyAllowedCommand_data();
 
     void randomInstructionIsTheOnlyAllowedCommand();

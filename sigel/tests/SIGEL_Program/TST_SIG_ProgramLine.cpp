@@ -274,6 +274,77 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileRefusesTextWithoutAnInstruc
   QCOMPARE( programLine.getElementsArray(), expectedElements );
 }
 
+void SIGEL_Program::TST_SIG_ProgramLine::getElementOutsideTheElementsGivesZero()
+{
+  SIG_ProgramLine programLine;
+  programLine.setRobotinstruction( ADD, 1, 2 );
+
+  QCOMPARE( programLine.getElement( 2 ), 0 );
+  QCOMPARE( programLine.getElement( -1 ), 0 );
+  QCOMPARE( programLine.getInstructionElement( 2 ), 0 );
+  QCOMPARE( programLine.getInstructionElement( -1 ), 0 );
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::setElementChangesOneElement()
+{
+  SIG_ProgramLine programLine;
+  programLine.setRobotinstruction( ADD, 1, 2 );
+  const QList<int> expectedElements = { 1, 9 };
+
+  programLine.setElement( 1, 9 );
+
+  QCOMPARE( programLine.getElementsArray(), expectedElements );
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::setElementOutsideTheElementsChangesNothing()
+{
+  SIG_ProgramLine programLine;
+  programLine.setRobotinstruction( ADD, 1, 2 );
+  const QList<int> expectedElements = { 1, 2 };
+
+  programLine.setElement( 2, 9 );
+  programLine.setElement( -1, 9 );
+
+  QCOMPARE( programLine.getElementsArray(), expectedElements );
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::resizeElementsKeepsTheFirstElementsAndAddsZeros()
+{
+  SIG_ProgramLine programLine;
+  programLine.setRobotinstruction( ADD, 1, 2 );
+  const QList<int> expectedElementsAfterTheFirstResize = { 1 };
+  const QList<int> expectedElementsAfterTheSecondResize = { 1, 0, 0 };
+
+  programLine.resizeElements( 1 );
+  QCOMPARE( programLine.getElementsArray(), expectedElementsAfterTheFirstResize );
+
+  programLine.resizeElements( 3 );
+  QCOMPARE( programLine.getElementsArray(), expectedElementsAfterTheSecondResize );
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::clearLineRemovesTheElementsAndKeepsTheType()
+{
+  SIG_ProgramLine programLine;
+  programLine.setRobotinstruction( ADD, 1, 2 );
+
+  programLine.clearLine();
+
+  QCOMPARE( programLine.getNumberOfElements(), 0 );
+  QCOMPARE( programLine.getRobotinstructionType(), ADD );
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionTypeKeepsTheElements()
+{
+  SIG_ProgramLine programLine;
+  programLine.setRobotinstruction( ADD, 1, 2 );
+  const QList<int> expectedElements = { 1, 2 };
+
+  programLine.setRobotinstructionType( JMP );
+
+  QCOMPARE( programLine.getRobotinstructionType(), JMP );
+  QCOMPARE( programLine.getElementsArray(), expectedElements );
+}
+
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommand_data()
 {
   QTest::addColumn< QString >( "name" );
