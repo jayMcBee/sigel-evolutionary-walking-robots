@@ -106,115 +106,78 @@ namespace SIGEL_Simulation
 			{
 			case SIGEL_Program::COPY:
 			{
-				// do it!
 				int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 				int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 				registers[reg0].copyReg( registers[reg1] );
-
-				// subtract the needed time for the command
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 			}
 			break;
 
 			case SIGEL_Program::LOAD:
 			{
-				// do it!
 				int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 				int value = programLine.getInstructionElement(1);
 				registers[reg0].loadValue( value );
-
-				// subtract the needed time for the command
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 			}
 			break;
 
 			case SIGEL_Program::ADD:
 			{
-				// do it!
 				int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 				int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 				registers[reg0].addReg( registers[reg1] );
-
-				// subtract the needed time for the command
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 			}
 			break;
 
 			case SIGEL_Program::SUB:
 			{
-				// do it!
 				int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 				int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 				registers[reg0].subReg( registers[reg1] );
-
-				// subtract the needed time for the command
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 			}
 			break;
 
 			case SIGEL_Program::MUL:
 			{
-				// do it!
 				int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 				int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 				registers[reg0].mulReg( registers[reg1] );
-
-				// subtract the needed time for the command
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 			}
 			break;
 
 			case SIGEL_Program::DIV:
 			{
-				// do it!
 				int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 				int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 				registers[reg0].divReg( registers[reg1] );
-
-				// subtract the needed time for the command
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 			}
 			break;
 
 			case SIGEL_Program::MOD:
 			{
-				// do it!
 				int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 				int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 				registers[reg0].modReg( registers[reg1] );
-
-				// subtract the needed time for the command
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 			}
 			break;
 
 			case SIGEL_Program::MIN:
 			{
-				// do it!
 				int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 				int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 				registers[reg0].minReg( registers[reg1] );
-
-				// subtract the needed time for the command
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 			}
 			break;
 
 			case SIGEL_Program::MAX:
 			{
-				// do it!
 				int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 				int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 				registers[reg0].maxReg( registers[reg1] );
-
-				// subtract the needed time for the command
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 			}
 			break;
 
 			case SIGEL_Program::CMP:
 			{
-				// do it!
 				int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 				int reg1 = getRegisterNumber( programLine.getInstructionElement(1) );
 				if ( registers[reg0].getValue() <= registers[reg1].getValue() )
@@ -224,15 +187,11 @@ namespace SIGEL_Simulation
 #ifdef SIG_DEBUG
 				SIGEL_Tools::SIG_IO::cerr << "Reg0: " << reg0 << "; Reg1: " << reg1 << Qt::endl;
 #endif
-
-				// subtract the needed time for the command
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 			}
 			break;
 
 			case SIGEL_Program::JMP:
 			{
-				// do it!
 				int lineOffset = programLine.getInstructionElement(0);
 
 				if ( compareFlag )
@@ -245,44 +204,31 @@ namespace SIGEL_Simulation
 						nextProgramCounter = nextProgramCounter + programLength;
 					}
 				}
-
-				// subtract the needed time for the command
-
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 			}
 			break;
 
 			case SIGEL_Program::SENSE:
 			{
-				// do it!
 				int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 
 				int numberOfSensor = registers[reg0].getValue();
 				simulationQueries.sense( numberOfSensor, registers );
-
-				// subtract the needed time for the command
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 			}
 			break;
 
 			case SIGEL_Program::MOVE:
 			{
-				// do it!
 				int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 				int numberOfJoint = registers[reg0].getValue();
 #ifdef SIG_DEBUG
 				SIGEL_Tools::SIG_IO::cerr << "Moving drive " << numberOfJoint << "." << Qt::endl;
 #endif
 				commandInterface.moveDrive( numberOfJoint, registers );
-
-				// subtract the needed time for the command
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 			}
 			break;
 
 			case SIGEL_Program::DELAY:
 			{
-				// do it!
 				// get the register
 				int reg = getRegisterNumber( programLine.getInstructionElement(0) );
 				int readOut = registers[reg].getValue();
@@ -291,21 +237,15 @@ namespace SIGEL_Simulation
 				if( delayTime > maxDelayTime )
 					delayTime = maxDelayTime;
 				timeAccountSize -= delayTime;
-
-				// subtract the needed time for the command
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 			}
 			break;
 
 			case SIGEL_Program::NOP:
-				// do it!
-
-				// subtract the needed time for the command
-				timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 				break;
 			} // close switch
 
 			programCounter = nextProgramCounter;
+			timeAccountSize -= languageParameters.getCommand( commandName )->getDuration();
 
 			// The command took more time than was left: the excess is taken off the time of the next call.
 			if ( timeAccountSize < 0 )
