@@ -427,6 +427,23 @@ problem; the choice is made before any code is written.
   it modulo 32000, so the values 0 to 767 are drawn twice as often as the
   others.
 
+- [ ] **167. Take the repeated block out of `SIG_Interpreter::interprete`.**
+  Each of the 15 cases of the `switch` repeats the same steps around its own
+  few lines: is the command allowed, go to the next line, take the duration
+  off the time account, keep the excess time. Write these steps once, so a
+  case holds only what its instruction does. Do this when the unit tests
+  cover all 15 instructions.
+
+- [ ] **168. Consider one description for each robot instruction.** The name
+  of an instruction and its number of operands are written out for each
+  instruction in `SIG_ProgramLine` (`setRobotinstruction`, `printToString`,
+  `writeToFile`, `readFromFile`, `randomRobotinstruction`), in the command
+  list of `SIGEL_MasterGUI::SIG_LanguageParameters`, and by number of
+  operands in `MT_Classifier::createDoubleTransIndi` and
+  `MT_Substitute::translatedSIGProg`. A new instruction needs an edit in each
+  place. Assess first if one table can serve these places; the call sites
+  differ, so the gain is not certain.
+
 ---
 
 ## 9 · Removals
