@@ -166,6 +166,8 @@ namespace SIGEL_Simulation
 
     void jmpPastTheLastLineWrapsToTheStart();
 
+    void jmpBeforeLineZeroWrapsFromTheEnd();
+
     void cmpThatIsNotAllowedIsSkipped();
 
     void jmpThatIsNotAllowedIsSkipped();

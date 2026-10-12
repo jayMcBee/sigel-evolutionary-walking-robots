@@ -375,13 +375,22 @@ namespace SIGEL_Simulation
 					if ( languageParameters.hasCommand( "JMP" ) )
 					{
 						// do it!
-						int reg0 = programLine.getInstructionElement(0);
-						if( compareFlag )
-							programCounter = ( programCounter + 1 + reg0 ) % programLength;
-						else
-							programCounter = (programCounter + 1) % programLength;
-						if( programCounter < 0 )
-							programCounter = -programCounter;
+						int lineOffset = programLine.getInstructionElement(0);
+						long nextLine = programCounter + 1;
+
+						if ( compareFlag )
+						{
+							nextLine = nextLine + lineOffset;
+						}
+
+						// The remainder of a negative line number is negative in C++.
+						programCounter = nextLine % programLength;
+
+						if ( programCounter < 0 )
+						{
+							programCounter = programCounter + programLength;
+						}
+
 						// subtract the needed time for the command
 
 						timeAccountSize -= languageParameters.getCommand( "JMP" )->getDuration();

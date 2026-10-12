@@ -416,12 +416,6 @@ problem; the choice is made before any code is written.
   | `JLE n` | Jumps n lines when the compare flag is set. Today's `JMP`. |
   | `JMP n` | Jumps n lines always. |
 
-- [ ] **161. A jump to a line before line 0 goes to the wrong line.**
-  `SIG_Interpreter::interprete` negates a negative target: in a program of
-  6 lines, `JMP -6` on line 1 goes to line 4. The target must wrap from the
-  end of the program, as a target past the last line wraps from the start:
-  line 2.
-
 - [ ] **162. Two buttons for two sets of default instruction probabilities.**
   On the GP parameters page: one sets all probabilities equal, one sets
   the conditional instructions `CMP`, `JLE` and `JMP` (item 160) lower than
@@ -458,8 +452,8 @@ problem; the choice is made before any code is written.
   programs depend on a result that is now fixed. Keep the shipped files as the
   original 1.3 set. Add a second set: each experiment loaded and evolved for
   10 to 25 generations, so that the fitness values come from today's code and
-  such programs are selected away. Do this after the instruction fixes (items
-  159 and 161) are in. In the same pass, give the robot models less saturated
+  such programs are selected away. Do this after the last instruction fix (item
+  159) is in. In the same pass, give the robot models less saturated
   colours. To decide: the name of the second set and where the two sets live.
 
 ---
