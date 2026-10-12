@@ -26,6 +26,8 @@
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationQueries.h"
 #include "SIGEL_Simulation/SIG_DynaMechsCommandInterface.h"
+#include "SIGEL_Tools/SIG_Exception.h"
+#include "SIGEL_Tools/SIG_IO.h"
 
 SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & robot,
 						 SIGEL_Environment::SIG_Environment const & environment,
@@ -74,6 +76,10 @@ void SIGEL_Simulation::SIG_Simulation::start()
 
   recorder.finish();
   }
+  catch (SIGEL_Tools::SIG_Exception &e) {
+    SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+    std::terminate();
+  }
   catch (...) {
     // Any exception terminates, deliberately: the alternative is a fitness
     // function silently scoring a partial run.
@@ -97,6 +103,10 @@ void SIGEL_Simulation::SIG_Simulation::makeTimeSteps(int numTimeSteps)
 
       recorder.record();
     };
+  }
+  catch (SIGEL_Tools::SIG_Exception &e) {
+    SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+    std::terminate();
   }
   catch (...) {
     // Any exception terminates, deliberately: the alternative is a fitness
