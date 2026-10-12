@@ -223,10 +223,10 @@ void SIGEL_Program::SIG_Program::checkLength( long minimumLength,
         // If there is a problem during the evolution, try to delete the following
         // instruction:
 
-        newLine.setRobotinstruction( SIGEL_Program::NOP, 0, 0 );
+        newLine.setRobotInstruction( SIGEL_Program::NOP, 0, 0 );
 
         // If the problem is still existing, please try to delete the line 135 (resizeElements( 0 );)
-        // within the function SIGEL_Program::SIG_ProgramLine::setRobotinstruction.
+        // within the function SIGEL_Program::SIG_ProgramLine::setRobotInstruction.
   
         appendLine( newLine );
        } 

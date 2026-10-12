@@ -34,9 +34,9 @@
 #include <QTextStream>
 #include <QtTest>
 
-void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements_data()
+void SIGEL_Program::TST_SIG_ProgramLine::setRobotInstructionSetsTypeAndElements_data()
 {
-  QTest::addColumn< Robotinstruction >( "instruction" );
+  QTest::addColumn< RobotInstruction >( "instruction" );
   QTest::addColumn< int >( "numberOfElements" );
   QTest::addColumn< int >( "element0" );
   QTest::addColumn< int >( "element1" );
@@ -58,9 +58,9 @@ void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements_
   QTest::newRow( "DELAY" ) << DELAY << 1 << -12 << 0;
 }
 
-void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements()
+void SIGEL_Program::TST_SIG_ProgramLine::setRobotInstructionSetsTypeAndElements()
 {
-  QFETCH( Robotinstruction, instruction );
+  QFETCH( RobotInstruction, instruction );
   QFETCH( int, numberOfElements );
   QFETCH( int, element0 );
   QFETCH( int, element1 );
@@ -68,9 +68,9 @@ void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements(
   expectedElements.resize( numberOfElements );
   SIG_ProgramLine programLine;
 
-  programLine.setRobotinstruction( instruction, -12, -34 );
+  programLine.setRobotInstruction( instruction, -12, -34 );
 
-  QCOMPARE( programLine.getRobotinstructionType(), instruction );
+  QCOMPARE( programLine.getRobotInstructionType(), instruction );
   QCOMPARE( programLine.getNumberOfElements(), numberOfElements );
   QCOMPARE( programLine.getElement( 0 ), element0 );
   QCOMPARE( programLine.getElement( 1 ), element1 );
@@ -81,7 +81,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionSetsTypeAndElements(
 
 void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText_data()
 {
-  QTest::addColumn< Robotinstruction >( "instruction" );
+  QTest::addColumn< RobotInstruction >( "instruction" );
   QTest::addColumn< QString >( "text" );
 
   QTest::newRow( "MOVE" ) << MOVE << "MOVE -12\n";
@@ -103,10 +103,10 @@ void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText_data()
 
 void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText()
 {
-  QFETCH( Robotinstruction, instruction );
+  QFETCH( RobotInstruction, instruction );
   QFETCH( QString, text );
   SIG_ProgramLine programLine;
-  programLine.setRobotinstruction( instruction, -12, -34 );
+  programLine.setRobotInstruction( instruction, -12, -34 );
   QString shownText;
 
   programLine.printToString( shownText );
@@ -116,7 +116,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText()
 
 void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText_data()
 {
-  QTest::addColumn< Robotinstruction >( "instruction" );
+  QTest::addColumn< RobotInstruction >( "instruction" );
   QTest::addColumn< QString >( "text" );
 
   QTest::newRow( "MOVE" ) << MOVE << "       MOVE -12\n";
@@ -138,10 +138,10 @@ void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText_data()
 
 void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText()
 {
-  QFETCH( Robotinstruction, instruction );
+  QFETCH( RobotInstruction, instruction );
   QFETCH( QString, text );
   SIG_ProgramLine programLine;
-  programLine.setRobotinstruction( instruction, -12, -34 );
+  programLine.setRobotInstruction( instruction, -12, -34 );
   QString fileText;
   QTextStream file( &fileText );
 
@@ -154,7 +154,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::writeToFileGivesTheFileText()
 void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm_data()
 {
   QTest::addColumn< QString >( "text" );
-  QTest::addColumn< Robotinstruction >( "instruction" );
+  QTest::addColumn< RobotInstruction >( "instruction" );
   QTest::addColumn< int >( "numberOfElements" );
   QTest::addColumn< int >( "element0" );
   QTest::addColumn< int >( "element1" );
@@ -209,7 +209,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm_data()
 void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm()
 {
   QFETCH( QString, text );
-  QFETCH( Robotinstruction, instruction );
+  QFETCH( RobotInstruction, instruction );
   QFETCH( int, numberOfElements );
   QFETCH( int, element0 );
   QFETCH( int, element1 );
@@ -218,14 +218,14 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm()
   // The line starts as a different instruction, so that the read must change it.
   SIG_ProgramLine programLine;
   if ( instruction == NOP )
-    programLine.setRobotinstruction( COPY, 1, 1 );
+    programLine.setRobotInstruction( COPY, 1, 1 );
   else
-    programLine.setRobotinstruction( NOP, 0, 0 );
+    programLine.setRobotInstruction( NOP, 0, 0 );
 
   const bool lineRead = programLine.readFromFile( text, &programLine );
 
   QVERIFY( lineRead );
-  QCOMPARE( programLine.getRobotinstructionType(), instruction );
+  QCOMPARE( programLine.getRobotInstructionType(), instruction );
   QCOMPARE( programLine.getElementsArray(), expectedElements );
 }
 
@@ -243,12 +243,12 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileAllowsExtraWhiteSpace()
   QFETCH( QString, text );
   const QList<int> expectedElements = { 1, 2 };
   SIG_ProgramLine programLine;
-  programLine.setRobotinstruction( NOP, 0, 0 );
+  programLine.setRobotInstruction( NOP, 0, 0 );
 
   const bool lineRead = programLine.readFromFile( text, &programLine );
 
   QVERIFY( lineRead );
-  QCOMPARE( programLine.getRobotinstructionType(), ADD );
+  QCOMPARE( programLine.getRobotInstructionType(), ADD );
   QCOMPARE( programLine.getElementsArray(), expectedElements );
 }
 
@@ -266,12 +266,12 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileRefusesTextWithoutAnInstruc
   QFETCH( QString, text );
   const QList<int> expectedElements = { 3, 4 };
   SIG_ProgramLine programLine;
-  programLine.setRobotinstruction( LOAD, 3, 4 );
+  programLine.setRobotInstruction( LOAD, 3, 4 );
 
   const bool lineRead = programLine.readFromFile( text, &programLine );
 
   QVERIFY( !lineRead );
-  QCOMPARE( programLine.getRobotinstructionType(), LOAD );
+  QCOMPARE( programLine.getRobotInstructionType(), LOAD );
   QCOMPARE( programLine.getElementsArray(), expectedElements );
 }
 
@@ -292,7 +292,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileGivesAnErrorForABadOperand(
   QFETCH( QString, message );
   const QList<int> expectedElements = { 3, 4 };
   SIG_ProgramLine programLine;
-  programLine.setRobotinstruction( LOAD, 3, 4 );
+  programLine.setRobotInstruction( LOAD, 3, 4 );
   QString thrown;
 
   try
@@ -305,14 +305,14 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileGivesAnErrorForABadOperand(
     }
 
   QVERIFY2( thrown.contains( message ), qPrintable( thrown ) );
-  QCOMPARE( programLine.getRobotinstructionType(), LOAD );
+  QCOMPARE( programLine.getRobotInstructionType(), LOAD );
   QCOMPARE( programLine.getElementsArray(), expectedElements );
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::getElementOutsideTheElementsGivesZero()
 {
   SIG_ProgramLine programLine;
-  programLine.setRobotinstruction( ADD, 1, 2 );
+  programLine.setRobotInstruction( ADD, 1, 2 );
 
   QCOMPARE( programLine.getElement( 2 ), 0 );
   QCOMPARE( programLine.getElement( -1 ), 0 );
@@ -323,7 +323,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::getElementOutsideTheElementsGivesZero()
 void SIGEL_Program::TST_SIG_ProgramLine::setElementChangesOneElement()
 {
   SIG_ProgramLine programLine;
-  programLine.setRobotinstruction( ADD, 1, 2 );
+  programLine.setRobotInstruction( ADD, 1, 2 );
   const QList<int> expectedElements = { 1, 9 };
 
   programLine.setElement( 1, 9 );
@@ -334,7 +334,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::setElementChangesOneElement()
 void SIGEL_Program::TST_SIG_ProgramLine::setElementOutsideTheElementsChangesNothing()
 {
   SIG_ProgramLine programLine;
-  programLine.setRobotinstruction( ADD, 1, 2 );
+  programLine.setRobotInstruction( ADD, 1, 2 );
   const QList<int> expectedElements = { 1, 2 };
 
   programLine.setElement( 2, 9 );
@@ -346,7 +346,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::setElementOutsideTheElementsChangesNoth
 void SIGEL_Program::TST_SIG_ProgramLine::resizeElementsKeepsTheFirstElementsAndAddsZeros()
 {
   SIG_ProgramLine programLine;
-  programLine.setRobotinstruction( ADD, 1, 2 );
+  programLine.setRobotInstruction( ADD, 1, 2 );
   const QList<int> expectedElementsAfterTheFirstResize = { 1 };
   const QList<int> expectedElementsAfterTheSecondResize = { 1, 0, 0 };
 
@@ -360,88 +360,88 @@ void SIGEL_Program::TST_SIG_ProgramLine::resizeElementsKeepsTheFirstElementsAndA
 void SIGEL_Program::TST_SIG_ProgramLine::clearLineRemovesTheElementsAndKeepsTheType()
 {
   SIG_ProgramLine programLine;
-  programLine.setRobotinstruction( ADD, 1, 2 );
+  programLine.setRobotInstruction( ADD, 1, 2 );
 
   programLine.clearLine();
 
   QCOMPARE( programLine.getNumberOfElements(), 0 );
-  QCOMPARE( programLine.getRobotinstructionType(), ADD );
+  QCOMPARE( programLine.getRobotInstructionType(), ADD );
 }
 
-void SIGEL_Program::TST_SIG_ProgramLine::setRobotinstructionTypeKeepsTheElements()
+void SIGEL_Program::TST_SIG_ProgramLine::setRobotInstructionTypeKeepsTheElements()
 {
   SIG_ProgramLine programLine;
-  programLine.setRobotinstruction( ADD, 1, 2 );
+  programLine.setRobotInstruction( ADD, 1, 2 );
   const QList<int> expectedElements = { 1, 2 };
 
-  programLine.setRobotinstructionType( JMP );
+  programLine.setRobotInstructionType( JMP );
 
-  QCOMPARE( programLine.getRobotinstructionType(), JMP );
+  QCOMPARE( programLine.getRobotInstructionType(), JMP );
   QCOMPARE( programLine.getElementsArray(), expectedElements );
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::assignmentCopiesTypeAndElements()
 {
   SIG_ProgramLine source;
-  source.setRobotinstruction( LOAD, 3, 4 );
+  source.setRobotInstruction( LOAD, 3, 4 );
   SIG_ProgramLine destination;
-  destination.setRobotinstruction( NOP, 0, 0 );
+  destination.setRobotInstruction( NOP, 0, 0 );
   const QList<int> expectedElements = { 3, 4 };
 
   destination = source;
   // A change of the source after the copy must not reach the destination.
   source.setElement( 0, 8 );
 
-  QCOMPARE( destination.getRobotinstructionType(), LOAD );
+  QCOMPARE( destination.getRobotInstructionType(), LOAD );
   QCOMPARE( destination.getElementsArray(), expectedElements );
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::copyLineCopiesTypeAndElements()
 {
   SIG_ProgramLine source;
-  source.setRobotinstruction( LOAD, 3, 4 );
+  source.setRobotInstruction( LOAD, 3, 4 );
   SIG_ProgramLine destination;
-  destination.setRobotinstruction( NOP, 0, 0 );
+  destination.setRobotInstruction( NOP, 0, 0 );
   const QList<int> expectedElements = { 3, 4 };
 
   destination.copyLine( &source, &destination );
   // A change of the source after the copy must not reach the destination.
   source.setElement( 0, 8 );
 
-  QCOMPARE( destination.getRobotinstructionType(), LOAD );
+  QCOMPARE( destination.getRobotInstructionType(), LOAD );
   QCOMPARE( destination.getElementsArray(), expectedElements );
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::assignmentOfAShorterLineRemovesTheElements()
 {
   SIG_ProgramLine source;
-  source.setRobotinstruction( NOP, 0, 0 );
+  source.setRobotInstruction( NOP, 0, 0 );
   SIG_ProgramLine destination;
-  destination.setRobotinstruction( LOAD, 3, 4 );
+  destination.setRobotInstruction( LOAD, 3, 4 );
 
   destination = source;
 
-  QCOMPARE( destination.getRobotinstructionType(), NOP );
+  QCOMPARE( destination.getRobotInstructionType(), NOP );
   QCOMPARE( destination.getNumberOfElements(), 0 );
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::copyLineOfAShorterLineRemovesTheElements()
 {
   SIG_ProgramLine source;
-  source.setRobotinstruction( NOP, 0, 0 );
+  source.setRobotInstruction( NOP, 0, 0 );
   SIG_ProgramLine destination;
-  destination.setRobotinstruction( LOAD, 3, 4 );
+  destination.setRobotInstruction( LOAD, 3, 4 );
 
   destination.copyLine( &source, &destination );
 
-  QCOMPARE( destination.getRobotinstructionType(), NOP );
+  QCOMPARE( destination.getRobotInstructionType(), NOP );
   QCOMPARE( destination.getNumberOfElements(), 0 );
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommand_data()
 {
   QTest::addColumn< QString >( "name" );
-  QTest::addColumn< Robotinstruction >( "instruction" );
+  QTest::addColumn< RobotInstruction >( "instruction" );
 
   QTest::newRow( "MOVE" ) << "MOVE" << MOVE;
   QTest::newRow( "LOAD" ) << "LOAD" << LOAD;
@@ -463,7 +463,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedComman
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommand()
 {
   QFETCH( QString, name );
-  QFETCH( Robotinstruction, instruction );
+  QFETCH( RobotInstruction, instruction );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   QStringList otherNames;
   for ( const SIGEL_Robot::SIG_LanguageParameters::NamedCommand &command : languageParameters.getCommands() )
@@ -478,13 +478,13 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedComman
     {
       SIG_ProgramLine programLine( randomizer, languageParameters, probabilities );
 
-      QCOMPARE( programLine.getRobotinstructionType(), instruction );
+      QCOMPARE( programLine.getRobotInstructionType(), instruction );
     }
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAWeight_data()
 {
-  QTest::addColumn< Robotinstruction >( "instruction" );
+  QTest::addColumn< RobotInstruction >( "instruction" );
 
   QTest::newRow( "MOVE" ) << MOVE;
   QTest::newRow( "LOAD" ) << LOAD;
@@ -505,9 +505,9 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAW
 
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAWeight()
 {
-  QFETCH( Robotinstruction, instruction );
+  QFETCH( RobotInstruction, instruction );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
-  // probabilities has one entry for each instruction, in the order of Robotinstruction.
+  // probabilities has one entry for each instruction, in the order of RobotInstruction.
   QList<int> probabilities( 15, 0 );
   probabilities[instruction] = 5;
   SIGEL_Tools::SIG_Randomizer randomizer( 42 );
@@ -517,7 +517,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAW
       SIG_ProgramLine programLine;
       programLine.generateRandomRobotInstruction( languageParameters, randomizer, probabilities );
 
-      QCOMPARE( programLine.getRobotinstructionType(), instruction );
+      QCOMPARE( programLine.getRobotInstructionType(), instruction );
     }
 }
 
@@ -528,14 +528,14 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomOperandsAreInsideTheRange()
   SIGEL_Tools::SIG_Randomizer randomizer( 42 );
   bool negativeElementSeen = false;
   bool positiveElementSeen = false;
-  // typeSeen has one entry for each instruction, in the order of Robotinstruction.
+  // typeSeen has one entry for each instruction, in the order of RobotInstruction.
   QList<bool> typeSeen( 15, false );
 
   for ( int count = 0; count < 10000; count++ )
     {
       SIG_ProgramLine programLine( randomizer, languageParameters, probabilities );
 
-      typeSeen[programLine.getRobotinstructionType()] = true;
+      typeSeen[programLine.getRobotInstructionType()] = true;
       for ( int element : programLine.getElementsArray() )
         {
           QVERIFY( element >= -31999 );

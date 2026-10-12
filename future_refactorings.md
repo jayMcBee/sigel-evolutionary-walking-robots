@@ -420,15 +420,15 @@ problem; the choice is made before any code is written.
   the others.
 
 - [ ] **163. Draw each operand from 32768 values, not 32000.**
-  `SIG_ProgramLine::randomRobotinstruction` and `SIG_GPOperations::mutation`
+  `SIG_ProgramLine::randomRobotInstruction` and `SIG_GPOperations::mutation`
   call `getRandomInt( 32000 )`. `SIG_Randomizer` makes 0 to 32767 and takes
   it modulo 32000, so the values 0 to 767 are drawn twice as often as the
   others.
 
 - [ ] **168. Consider one description for each robot instruction.** The name
   of an instruction and its number of operands are written out for each
-  instruction in `SIG_ProgramLine` (`setRobotinstruction`, `printToString`,
-  `writeToFile`, `readFromFile`, `randomRobotinstruction`), in the command
+  instruction in `SIG_ProgramLine` (`setRobotInstruction`, `printToString`,
+  `writeToFile`, `readFromFile`, `randomRobotInstruction`), in the command
   list of `SIGEL_MasterGUI::SIG_LanguageParameters`, and by number of
   operands in `MT_Classifier::createDoubleTransIndi` and
   `MT_Substitute::translatedSIGProg`. A new instruction needs an edit in each

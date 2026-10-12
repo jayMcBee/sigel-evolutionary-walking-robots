@@ -83,9 +83,9 @@ namespace SIGEL_Simulation
 #endif
 
 			// An instruction type that is not in robotInstructionNames gets an empty name.
-			const QString commandName = SIGEL_Program::robotInstructionNames.value( programLine.getRobotinstructionType() );
+			const QString commandName = SIGEL_Program::robotInstructionNames.value( programLine.getRobotInstructionType() );
 
-			// A line whose instruction type is not in Robotinstruction is invalid.
+			// A line whose instruction type is not in RobotInstruction is invalid.
 			if ( commandName.isEmpty() )
 				throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, QString( "Program line %1 is invalid." ).arg( programCounter ) );
 
@@ -98,7 +98,7 @@ namespace SIGEL_Simulation
 				continue;
 			}
 
-			switch ( programLine.getRobotinstructionType() )
+			switch ( programLine.getRobotInstructionType() )
 			{
 			case SIGEL_Program::COPY:
 			{

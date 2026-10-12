@@ -38,9 +38,9 @@ namespace SIGEL_Program
 
   private slots:
 
-    void setRobotinstructionSetsTypeAndElements_data();
+    void setRobotInstructionSetsTypeAndElements_data();
 
-    void setRobotinstructionSetsTypeAndElements();
+    void setRobotInstructionSetsTypeAndElements();
 
     void printToStringGivesTheShownText_data();
 
@@ -76,7 +76,7 @@ namespace SIGEL_Program
 
     void clearLineRemovesTheElementsAndKeepsTheType();
 
-    void setRobotinstructionTypeKeepsTheElements();
+    void setRobotInstructionTypeKeepsTheElements();
 
     void assignmentCopiesTypeAndElements();
 

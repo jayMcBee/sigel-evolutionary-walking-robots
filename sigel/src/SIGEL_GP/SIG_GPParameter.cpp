@@ -680,13 +680,13 @@ QList< SIGEL_GP::SIG_GPPVMHost * > &SIGEL_GP::SIG_GPParameter::getHostList()
   return hostList;
 };
 
-void SIGEL_GP::SIG_GPParameter::setProbability( SIGEL_Program::Robotinstruction instruction, int prob )
+void SIGEL_GP::SIG_GPParameter::setProbability( SIGEL_Program::RobotInstruction instruction, int prob )
 {
     int instructionID = static_cast< int >( instruction ); 
     instructionProb[instructionID] = prob;
 }
 
-int  SIGEL_GP::SIG_GPParameter::getProbability( SIGEL_Program::Robotinstruction instruction )
+int  SIGEL_GP::SIG_GPParameter::getProbability( SIGEL_Program::RobotInstruction instruction )
 {
   int instructionID = static_cast< int >( instruction );
   int prob          = instructionProb[instructionID];

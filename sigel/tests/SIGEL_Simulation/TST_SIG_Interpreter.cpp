@@ -164,8 +164,8 @@ void SIGEL_Simulation::TST_SIG_Interpreter::invalidProgramLineThrows()
   setAllDurations( languageParameters, 1.0 );
   SIGEL_Program::SIG_Program program;
   SIGEL_Program::SIG_ProgramLine programLine;
-  // 15 is the first value after the last instruction of Robotinstruction.
-  programLine.setRobotinstructionType( static_cast<SIGEL_Program::Robotinstruction>( 15 ) );
+  // 15 is the first value after the last instruction of RobotInstruction.
+  programLine.setRobotInstructionType( static_cast<SIGEL_Program::RobotInstruction>( 15 ) );
   program.appendLine( programLine );
   appendLine( program, SIGEL_Program::MOVE, 0, 0 );
   TST_RecordingCommandInterface commandInterface;
@@ -192,8 +192,8 @@ void SIGEL_Simulation::TST_SIG_Interpreter::invalidProgramLineThrowsOnlyWhenItIs
   SIGEL_Program::SIG_Program program;
   appendLine( program, SIGEL_Program::MOVE, 0, 0 );
   SIGEL_Program::SIG_ProgramLine programLine;
-  // 15 is the first value after the last instruction of Robotinstruction.
-  programLine.setRobotinstructionType( static_cast<SIGEL_Program::Robotinstruction>( 15 ) );
+  // 15 is the first value after the last instruction of RobotInstruction.
+  programLine.setRobotInstructionType( static_cast<SIGEL_Program::RobotInstruction>( 15 ) );
   program.appendLine( programLine );
   TST_RecordingCommandInterface commandInterface;
   TST_FixedSimulationQueries simulationQueries( 55 );
@@ -734,7 +734,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::nopThatIsNotAllowedIsSkipped()
 
 void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultInTheFirstRegister_data()
 {
-  QTest::addColumn< SIGEL_Program::Robotinstruction >( "instruction" );
+  QTest::addColumn< SIGEL_Program::RobotInstruction >( "instruction" );
   QTest::addColumn< int >( "first" );
   QTest::addColumn< int >( "second" );
   QTest::addColumn< int >( "result" );
@@ -753,7 +753,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultIn
 
 void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultInTheFirstRegister()
 {
-  QFETCH( SIGEL_Program::Robotinstruction, instruction );
+  QFETCH( SIGEL_Program::RobotInstruction, instruction );
   QFETCH( int, first );
   QFETCH( int, second );
   QFETCH( int, result );
@@ -804,7 +804,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::addWithTheSameRegisterTwice()
 
 void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsSkipped_data()
 {
-  QTest::addColumn< SIGEL_Program::Robotinstruction >( "instruction" );
+  QTest::addColumn< SIGEL_Program::RobotInstruction >( "instruction" );
   QTest::addColumn< QString >( "name" );
   QTest::addColumn< int >( "firstRegister" );
   QTest::addColumn< int >( "secondRegister" );
@@ -823,7 +823,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsS
 
 void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsSkipped()
 {
-  QFETCH( SIGEL_Program::Robotinstruction, instruction );
+  QFETCH( SIGEL_Program::RobotInstruction, instruction );
   QFETCH( QString, name );
   QFETCH( int, firstRegister );
   QFETCH( int, secondRegister );
@@ -1174,7 +1174,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::jmpThatIsNotAllowedIsSkipped()
 
 void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLineZero_data()
 {
-  QTest::addColumn< SIGEL_Program::Robotinstruction >( "instruction" );
+  QTest::addColumn< SIGEL_Program::RobotInstruction >( "instruction" );
 
   QTest::newRow( "LOAD" ) << SIGEL_Program::LOAD;
   QTest::newRow( "NOP" ) << SIGEL_Program::NOP;
@@ -1194,7 +1194,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLin
 
 void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLineZero()
 {
-  QFETCH( SIGEL_Program::Robotinstruction, instruction );
+  QFETCH( SIGEL_Program::RobotInstruction, instruction );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   setAllDurations( languageParameters, 1.0 );
   SIGEL_Program::SIG_Program program;
@@ -1211,7 +1211,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::eachInstructionAsLastLineGoesOnAtLin
 
 void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration_data()
 {
-  QTest::addColumn< SIGEL_Program::Robotinstruction >( "instruction" );
+  QTest::addColumn< SIGEL_Program::RobotInstruction >( "instruction" );
   QTest::addColumn< QString >( "name" );
 
   QTest::newRow( "LOAD" ) << SIGEL_Program::LOAD << "LOAD";
@@ -1232,7 +1232,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration_data()
 
 void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDuration()
 {
-  QFETCH( SIGEL_Program::Robotinstruction, instruction );
+  QFETCH( SIGEL_Program::RobotInstruction, instruction );
   QFETCH( QString, name );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   setAllDurations( languageParameters, 1.0 );
@@ -1440,7 +1440,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::remainingLastCommandTimeIsSubtracted
 
 void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDurationAmongDifferentDurations_data()
 {
-  QTest::addColumn< SIGEL_Program::Robotinstruction >( "instruction" );
+  QTest::addColumn< SIGEL_Program::RobotInstruction >( "instruction" );
   QTest::addColumn< double >( "duration" );
 
   // The durations are those of setDifferentDurations.
@@ -1464,7 +1464,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDurationAmongDiffe
 
 void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDurationAmongDifferentDurations()
 {
-  QFETCH( SIGEL_Program::Robotinstruction, instruction );
+  QFETCH( SIGEL_Program::RobotInstruction, instruction );
   QFETCH( double, duration );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   setDifferentDurations( languageParameters );
@@ -1810,7 +1810,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandThatIsNotAllowedTakesNoTimeAm
 
 void SIGEL_Simulation::TST_SIG_Interpreter::exceededTimeOfACommandIsSubtractedFromTheNextCall_data()
 {
-  QTest::addColumn< SIGEL_Program::Robotinstruction >( "instruction" );
+  QTest::addColumn< SIGEL_Program::RobotInstruction >( "instruction" );
   QTest::addColumn< double >( "exceededTime" );
 
   // The durations are those of setDifferentDurations. The exceeded time is the duration - 0.25 s.
@@ -1835,7 +1835,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::exceededTimeOfACommandIsSubtractedFr
 
 void SIGEL_Simulation::TST_SIG_Interpreter::exceededTimeOfACommandIsSubtractedFromTheNextCall()
 {
-  QFETCH( SIGEL_Program::Robotinstruction, instruction );
+  QFETCH( SIGEL_Program::RobotInstruction, instruction );
   QFETCH( double, exceededTime );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   setDifferentDurations( languageParameters );
@@ -2119,9 +2119,9 @@ void SIGEL_Simulation::TST_SIG_Interpreter::setDifferentDurations( SIGEL_Robot::
   languageParameters.getCommand( "NOP" )->setDuration( 4.0 );
 }
 
-void SIGEL_Simulation::TST_SIG_Interpreter::appendLine( SIGEL_Program::SIG_Program &program, SIGEL_Program::Robotinstruction instruction, int operand1, int operand2 )
+void SIGEL_Simulation::TST_SIG_Interpreter::appendLine( SIGEL_Program::SIG_Program &program, SIGEL_Program::RobotInstruction instruction, int operand1, int operand2 )
 {
   SIGEL_Program::SIG_ProgramLine programLine;
-  programLine.setRobotinstruction( instruction, operand1, operand2 );
+  programLine.setRobotInstruction( instruction, operand1, operand2 );
   program.appendLine( programLine );
 }

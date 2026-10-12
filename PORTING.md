@@ -4897,7 +4897,7 @@ reading the declaration would have "fixed" all five.
 **31 mentions of a dead Qt 2 container name remained in comments on 2026-09-05, all 31 the
 port's own historical notes** — "at() was writable on Qt 2's const `QArray`;
 `QList`'s is not", "Qt 2's `QDict` returned the NEWEST binding". The two quoted above stay.
-`SIG_ProgramLine.cpp, randomRobotinstruction`'s `// QList<int> instr;` is commented-out code that
+`SIG_ProgramLine.cpp, randomRobotInstruction`'s `// QList<int> instr;` is commented-out code that
 already names the Qt 6 type.
 
 **No `QList`/`QHash`/`QQueue` mention was left pointing at the wrong container in

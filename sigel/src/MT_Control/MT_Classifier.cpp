@@ -288,7 +288,7 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		(*OperandOne)[i]= programLine.getElement(0);
 		(*OperandTwo)[i]= programLine.getElement(1);
 
-		switch( programLine.getRobotinstructionType() )
+		switch( programLine.getRobotInstructionType() )
 		{
 		case SIGEL_Program::COPY: (*Instruktion)[i]= 1; break;
 		case SIGEL_Program::LOAD: (*Instruktion)[i]= 2; break;
@@ -307,7 +307,7 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		case SIGEL_Program::NOP: (*Instruktion)[i]= 15; break;
 		}
 
-		switch( programLine.getRobotinstructionType() )
+		switch( programLine.getRobotInstructionType() )
 		{
 		case SIGEL_Program::COPY: (*MData)[1] ++ ; break;
 		case SIGEL_Program::LOAD: (*MData)[2] ++; break;
@@ -337,7 +337,7 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		(*OperandOne)[i+SigProgOneSize]= programLine.getElement(0);
 		(*OperandTwo)[i+SigProgOneSize]= programLine.getElement(1);
 
-		switch( programLine.getRobotinstructionType() )
+		switch( programLine.getRobotInstructionType() )
 		{
 		case SIGEL_Program::COPY: (*Instruktion)[i+SigProgOneSize]= 1; break;
 		case SIGEL_Program::LOAD: (*Instruktion)[i+SigProgOneSize]= 2; break;
@@ -356,7 +356,7 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		case SIGEL_Program::NOP: (*Instruktion)[i+SigProgOneSize]= 15; break;
 		}
 	
-		switch( programLine.getRobotinstructionType() )
+		switch( programLine.getRobotInstructionType() )
 		{
 		case SIGEL_Program::COPY: (*MData)[17] ++ ; break;
 		case SIGEL_Program::LOAD: (*MData)[18] ++; break;

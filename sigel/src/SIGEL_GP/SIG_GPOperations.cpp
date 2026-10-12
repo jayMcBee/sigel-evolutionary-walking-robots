@@ -326,7 +326,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	long const maxLength            = gpParameter.getMaxIndLength();
 	int        op1                  = 0;
 	int        op2                  = 0;
-	SIGEL_Program::Robotinstruction instructionType;
+	SIGEL_Program::RobotInstruction instructionType;
 	long int   mutPoint             = 0;
 	long int   numberOfOperands     = 0;
 	int        historyInfo;
@@ -362,7 +362,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 	// Get instruction type of line that is to be mutated:
 
-	instructionType   = newProgram.getLine( mutPoint ).getRobotinstructionType();
+	instructionType   = newProgram.getLine( mutPoint ).getRobotInstructionType();
 
 	// Get number of operands of line that is to be mutated:
 
@@ -422,7 +422,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 			{
 				SIGEL_Program::SIG_ProgramLine mutatedLine;
 				mutatedLine = newProgram.getLine( mutPoint );
-				mutatedLine.randomRobotinstruction( languageParameters,
+				mutatedLine.randomRobotInstruction( languageParameters,
 				                                    randomizer,
 				                                    gpParameter.getInstructionProbabilities() );
 				newProgram.setLine( mutPoint, mutatedLine );
@@ -481,7 +481,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 			{
 				SIGEL_Program::SIG_ProgramLine mutatedLine;
 				mutatedLine = newProgram.getLine( mutPoint );
-				mutatedLine.setRobotinstruction( instructionType,
+				mutatedLine.setRobotInstruction( instructionType,
 				                                 op1,
 				                                 op2 );
 				newProgram.setLine( mutPoint, mutatedLine );
@@ -504,7 +504,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 			                                           languageParameters,
 			                                           gpParameter.getInstructionProbabilities() );
 
-			if( randomLine.getRobotinstructionType() != SIGEL_Program::NOP )
+			if( randomLine.getRobotInstructionType() != SIGEL_Program::NOP )
 			{
 				// The number of operands must eventually be increased for the new line, 
 				// because the new instruction type requires more operands. In this case
@@ -529,7 +529,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 			{
 				SIGEL_Program::SIG_ProgramLine mutatedLine;
 				mutatedLine = newProgram.getLine( mutPoint );
-				mutatedLine.setRobotinstruction( randomLine.getRobotinstructionType(),
+				mutatedLine.setRobotInstruction( randomLine.getRobotInstructionType(),
 				                                 op1,
 				                                 op2 );
 				newProgram.setLine( mutPoint, mutatedLine );

@@ -42,18 +42,10 @@
 namespace SIGEL_Program
 {
 
-	// -----------------------------------------------------------------------
-	// ENUM DEFINITION
-	// -----------------------------------------------------------------------
-
 	/**
-	 * This enumeration defines all supported sorts of robot instructions. IMPORTANT NOTE:
-	 * If a new instruction needs to be added, it is NOT ENOUGH to add the new instruction
-	 * to this enumeration! Some more steps are reuqired to make the GP system know about
-	 * a new supported instruction.
+	 * Add a new instruction at the end only: other code hard-codes these values as indices, so the order must not change.
 	 */
-
-	enum Robotinstruction
+	enum RobotInstruction
 	{
 		COPY,
 		LOAD,
@@ -73,7 +65,7 @@ namespace SIGEL_Program
 	};
 
 	/**
-	 * The names of the robot instructions, in the order of Robotinstruction.
+	 * The names of the robot instructions, in the order of RobotInstruction.
 	 */
 	inline const QStringList robotInstructionNames = { "COPY", "LOAD", "ADD", "SUB", "MUL", "DIV", "MOD", "MIN", "MAX", "CMP", "JMP", "SENSE", "MOVE", "DELAY", "NOP" };
 
@@ -139,7 +131,7 @@ namespace SIGEL_Program
 		 * This function generates randomly a robot instruction. The choice is depended on the
 		 * current language parameters and the given probabilities (prob).
 		 */
-		void randomRobotinstruction( SIGEL_Robot::SIG_LanguageParameters &languageParameters,
+		void randomRobotInstruction( SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 		                             SIGEL_Tools::SIG_Randomizer &randomizer,
 		                             QList< int > &prob );
 
@@ -196,12 +188,12 @@ namespace SIGEL_Program
 		QList< int > getElementsArray() const;
 
 		/**
-		 * This function returns the type of the current robotinstruction.
+		 * This function returns the type of the current robot instruction.
 		 */
-		Robotinstruction getRobotinstructionType() const;
+		RobotInstruction getRobotInstructionType() const;
 
 		/**
-		 * This function returns the element of the current robotinstruction.
+		 * This function returns the element of the current robot instruction.
 		 * The first element, e.g. a register, is to be accessed with index 0.
 		 * In case of an invalid access, e.g. a not defined index, this function returns 0.
 		 * Example 1: LOAD 1,432 -> getInstructionElement(0)=1,getInstructionElement(1)=432;
@@ -237,14 +229,14 @@ namespace SIGEL_Program
 		/**
 		 * Sets the robot instrction type, e.g. SIGEL_Program::COPY, ...
 		 */
-		void setRobotinstructionType( Robotinstruction instr );
+		void setRobotInstructionType( RobotInstruction instr );
 
 		/**
 		 * A robot instruction can be set explicitely by using this function. The robot instruction
 		 * is set to instructionType. The operands are defined by op1 and op2. If an instruction
 		 * only needs one operad (op1) the second operand (op2) will be ignored.
 		 */
-		void setRobotinstruction(SIGEL_Program::Robotinstruction instr, int op1, int op2);
+		void setRobotInstruction(SIGEL_Program::RobotInstruction instr, int op1, int op2);
 
 	protected:
 		/**
@@ -270,7 +262,7 @@ namespace SIGEL_Program
 		/**
 		 *  The type of the current robot inbstruction, e.g. LOAD, COPY, ...
 		 */
-		Robotinstruction instructionType;
+		RobotInstruction instructionType;
 
 		/**
 		 * This array contains the elements of a program line. Elements are coded with values

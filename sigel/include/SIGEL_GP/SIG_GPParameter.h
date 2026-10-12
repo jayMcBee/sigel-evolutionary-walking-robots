@@ -751,10 +751,10 @@ namespace SIGEL_GP
   void setFitnessName(QString name);
 
   public:
-  void setProbability( SIGEL_Program::Robotinstruction instruction, int prob );
+  void setProbability( SIGEL_Program::RobotInstruction instruction, int prob );
 
   public:
-  int  getProbability( SIGEL_Program::Robotinstruction instruction );
+  int  getProbability( SIGEL_Program::RobotInstruction instruction );
 
   public:
   QList< int > &getInstructionProbabilities();

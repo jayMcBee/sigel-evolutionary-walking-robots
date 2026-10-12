@@ -31,7 +31,7 @@
 
 SIGEL_Program::SIG_ProgramLine& SIGEL_Program::SIG_ProgramLine::operator =(SIGEL_Program::SIG_ProgramLine const & prgLine)
 { 
-  setRobotinstructionType( prgLine.getRobotinstructionType() );
+  setRobotInstructionType( prgLine.getRobotInstructionType() );
 
   element.resize( prgLine.getNumberOfElements() );
 
@@ -56,16 +56,16 @@ SIGEL_Program::SIG_ProgramLine::SIG_ProgramLine(SIGEL_Tools::SIG_Randomizer &ran
    generateRandomRobotInstruction(languageParameters, randomizer, prob );
 }
 
-void SIGEL_Program::SIG_ProgramLine::setRobotinstructionType( Robotinstruction instr )
+void SIGEL_Program::SIG_ProgramLine::setRobotInstructionType( RobotInstruction instr )
 {
   instructionType = instr;
 }
 
-void SIGEL_Program::SIG_ProgramLine::setRobotinstruction(SIGEL_Program::Robotinstruction instr, 
+void SIGEL_Program::SIG_ProgramLine::setRobotInstruction(SIGEL_Program::RobotInstruction instr, 
 							 int op1,
 							 int op2)
 {   
-    setRobotinstructionType( instr );     
+    setRobotInstructionType( instr );     
 
     switch( instr )
     {
@@ -155,7 +155,7 @@ void SIGEL_Program::SIG_ProgramLine::setRobotinstruction(SIGEL_Program::Robotins
      }
 }
 
-SIGEL_Program::Robotinstruction SIGEL_Program::SIG_ProgramLine::getRobotinstructionType() const
+SIGEL_Program::RobotInstruction SIGEL_Program::SIG_ProgramLine::getRobotInstructionType() const
 {
      return instructionType;
 }
@@ -247,7 +247,7 @@ void SIGEL_Program::SIG_ProgramLine::printToString(QString &lineStr) const
 
    lineStr="";
 
-   switch( getRobotinstructionType() )
+   switch( getRobotInstructionType() )
      {
      case SIGEL_Program::COPY:
           lineStr = "COPY " + lineStr.number( getElement( 0 ) ) + ","
@@ -419,90 +419,90 @@ bool SIGEL_Program::SIG_ProgramLine::readFromFile(QString &str, SIGEL_Program::S
      if(str.contains(QLatin1String("COPY"), Qt::CaseInsensitive))
 	{
            readTwoRegisters(str,reg1,reg2);
-           line->setRobotinstruction( SIGEL_Program::COPY, reg1, reg2 );
+           line->setRobotInstruction( SIGEL_Program::COPY, reg1, reg2 );
            lineOK = true;
 	}
      if(str.contains(QLatin1String("LOAD"), Qt::CaseInsensitive))
 	{
            readOneRegisterAndIntegerConstant(str,reg1,cnst1);
-           line->setRobotinstruction( SIGEL_Program::LOAD, reg1, cnst1 );
+           line->setRobotInstruction( SIGEL_Program::LOAD, reg1, cnst1 );
 	   lineOK = true;
 	}
      if(str.contains(QLatin1String("ADD"), Qt::CaseInsensitive))
 	{
            readTwoRegisters(str,reg1,reg2);
-           line->setRobotinstruction( SIGEL_Program::ADD, reg1, reg2 );
+           line->setRobotInstruction( SIGEL_Program::ADD, reg1, reg2 );
 	   lineOK = true;
 	}
      if(str.contains(QLatin1String("SUB"), Qt::CaseInsensitive))
 	{ 
            readTwoRegisters(str,reg1,reg2);
-           line->setRobotinstruction( SIGEL_Program::SUB, reg1, reg2 );
+           line->setRobotInstruction( SIGEL_Program::SUB, reg1, reg2 );
 	   lineOK = true;
 	}
      if(str.contains(QLatin1String("MUL"), Qt::CaseInsensitive))
 	{
            readTwoRegisters(str,reg1,reg2);
-           line->setRobotinstruction( SIGEL_Program::MUL, reg1, reg2 );
+           line->setRobotInstruction( SIGEL_Program::MUL, reg1, reg2 );
 	   lineOK = true;
 	}
      if(str.contains(QLatin1String("DIV"), Qt::CaseInsensitive))
 	{
            readTwoRegisters(str,reg1,reg2);
-           line->setRobotinstruction( SIGEL_Program::DIV, reg1, reg2 );
+           line->setRobotInstruction( SIGEL_Program::DIV, reg1, reg2 );
 	   lineOK = true;
 	}
      if(str.contains(QLatin1String("MIN"), Qt::CaseInsensitive))
 	{
            readTwoRegisters(str,reg1,reg2);
-           line->setRobotinstruction( SIGEL_Program::MIN, reg1, reg2 );
+           line->setRobotInstruction( SIGEL_Program::MIN, reg1, reg2 );
 	   lineOK = true;
 	}
      if(str.contains(QLatin1String("MAX"), Qt::CaseInsensitive))
 	{
            readTwoRegisters(str,reg1,reg2);
-           line->setRobotinstruction( SIGEL_Program::MAX, reg1, reg2 );
+           line->setRobotInstruction( SIGEL_Program::MAX, reg1, reg2 );
 	   lineOK = true;
 	}
      if(str.contains(QLatin1String("CMP"), Qt::CaseInsensitive))
 	{
            readTwoRegisters(str,reg1,reg2);
-           line->setRobotinstruction( SIGEL_Program::CMP, reg1, reg2 );
+           line->setRobotInstruction( SIGEL_Program::CMP, reg1, reg2 );
 	   lineOK = true;
 	}
      if(str.contains(QLatin1String("MOVE"), Qt::CaseInsensitive))
 	{
            readOneRegister(str,reg1);
-           line->setRobotinstruction( SIGEL_Program::MOVE, reg1, reg2 );
+           line->setRobotInstruction( SIGEL_Program::MOVE, reg1, reg2 );
 	   lineOK = true;
 	}
      if(str.contains(QLatin1String("SENSE"), Qt::CaseInsensitive))
 	{
            readOneRegister(str,reg1);
-           line->setRobotinstruction( SIGEL_Program::SENSE, reg1, reg2 );
+           line->setRobotInstruction( SIGEL_Program::SENSE, reg1, reg2 );
 	   lineOK = true;
 	}
      if(str.contains(QLatin1String("DELAY"), Qt::CaseInsensitive))
 	{
            readOneRegister(str,reg1);
-           line->setRobotinstruction( SIGEL_Program::DELAY, reg1, reg2 );
+           line->setRobotInstruction( SIGEL_Program::DELAY, reg1, reg2 );
 	   lineOK = true;
 	}
      if(str.contains(QLatin1String("JMP"), Qt::CaseInsensitive))
 	{
            readOneRegister(str,reg1);
-           line->setRobotinstruction( SIGEL_Program::JMP, reg1, reg2 );
+           line->setRobotInstruction( SIGEL_Program::JMP, reg1, reg2 );
 	   lineOK = true;
 	}
      if(str.contains(QLatin1String("MOD"), Qt::CaseInsensitive))
 	{
            readTwoRegisters(str,reg1,reg2);
-           line->setRobotinstruction( SIGEL_Program::MOD, reg1, reg2 );
+           line->setRobotInstruction( SIGEL_Program::MOD, reg1, reg2 );
 	   lineOK = true;
 	}
      if(str.contains(QLatin1String("NOP"), Qt::CaseInsensitive))
 	{
-          line->setRobotinstruction( SIGEL_Program::NOP, reg1, reg2 );
+          line->setRobotInstruction( SIGEL_Program::NOP, reg1, reg2 );
 	  lineOK = true;
 	}
 
@@ -513,7 +513,7 @@ void  SIGEL_Program::SIG_ProgramLine::writeToFile(QTextStream &file) const
 {
    file<<"       ";
 
-   switch( getRobotinstructionType() )
+   switch( getRobotInstructionType() )
    {
       case SIGEL_Program::COPY:
            file << "COPY " 
@@ -601,7 +601,7 @@ void  SIGEL_Program::SIG_ProgramLine::writeToFile(QTextStream &file) const
       }
 }
 
-void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_LanguageParameters &languageParameters,
+void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 							    SIGEL_Tools::SIG_Randomizer &randomizer,
 							    QList< int > &prob   )
 {
@@ -751,35 +751,35 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotinstruction(SIGEL_Robot::SIG_Lan
        
      switch( iType )
        {
-        case 0: setRobotinstruction( SIGEL_Program::COPY, op1, op2 );
+        case 0: setRobotInstruction( SIGEL_Program::COPY, op1, op2 );
                 break;
-        case 1: setRobotinstruction( SIGEL_Program::LOAD, op1, op2 );
+        case 1: setRobotInstruction( SIGEL_Program::LOAD, op1, op2 );
                 break;
-        case 2: setRobotinstruction( SIGEL_Program::ADD, op1, op2 );
+        case 2: setRobotInstruction( SIGEL_Program::ADD, op1, op2 );
                 break;
-        case 3: setRobotinstruction( SIGEL_Program::SUB, op1, op2 );
+        case 3: setRobotInstruction( SIGEL_Program::SUB, op1, op2 );
                 break;
-        case 4: setRobotinstruction( SIGEL_Program::MUL, op1, op2 );
+        case 4: setRobotInstruction( SIGEL_Program::MUL, op1, op2 );
                 break;
-        case 5: setRobotinstruction( SIGEL_Program::DIV, op1, op2 );
+        case 5: setRobotInstruction( SIGEL_Program::DIV, op1, op2 );
                 break;
-        case 6: setRobotinstruction( SIGEL_Program::MOD, op1, op2 );
+        case 6: setRobotInstruction( SIGEL_Program::MOD, op1, op2 );
                 break;
-        case 7: setRobotinstruction( SIGEL_Program::MIN, op1, op2 );
+        case 7: setRobotInstruction( SIGEL_Program::MIN, op1, op2 );
                 break;
-        case 8: setRobotinstruction( SIGEL_Program::MAX, op1, op2 );
+        case 8: setRobotInstruction( SIGEL_Program::MAX, op1, op2 );
                 break;
-        case 9: setRobotinstruction( SIGEL_Program::CMP, op1, op2 );
+        case 9: setRobotInstruction( SIGEL_Program::CMP, op1, op2 );
                 break;
-        case 10:setRobotinstruction( SIGEL_Program::JMP, op1, op2 );
+        case 10:setRobotInstruction( SIGEL_Program::JMP, op1, op2 );
                 break;
-        case 11:setRobotinstruction( SIGEL_Program::SENSE, op1, op2 );
+        case 11:setRobotInstruction( SIGEL_Program::SENSE, op1, op2 );
                 break;
-        case 12:setRobotinstruction( SIGEL_Program::MOVE, op1, op2 );
+        case 12:setRobotInstruction( SIGEL_Program::MOVE, op1, op2 );
                 break;
-        case 13:setRobotinstruction( SIGEL_Program::DELAY, op1, op2 );
+        case 13:setRobotInstruction( SIGEL_Program::DELAY, op1, op2 );
                 break;
-        case 14:setRobotinstruction( SIGEL_Program::NOP, op1, op2 );
+        case 14:setRobotInstruction( SIGEL_Program::NOP, op1, op2 );
                 break;
        }
 }
@@ -788,7 +788,7 @@ void SIGEL_Program::SIG_ProgramLine::generateRandomRobotInstruction(SIGEL_Robot:
 								    SIGEL_Tools::SIG_Randomizer &randomizer,
 								    QList< int > &prob   )
 {
-     randomRobotinstruction(languageParameters, randomizer, prob);
+     randomRobotInstruction(languageParameters, randomizer, prob);
 }
 
 void SIGEL_Program::SIG_ProgramLine::copyLine(SIGEL_Program::SIG_ProgramLine *source,SIGEL_Program::SIG_ProgramLine *destination)

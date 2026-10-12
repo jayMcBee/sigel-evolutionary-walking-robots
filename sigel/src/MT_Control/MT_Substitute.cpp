@@ -72,7 +72,7 @@ MT_TranslatedIndividual * MT_Substitute::translatedSIGProg(SIGEL_Program::SIG_Pr
 		(*OperandOne)[i]= programLine.getElement(0);
 		(*OperandTwo)[i]= programLine.getElement(1);
 
-		switch( programLine.getRobotinstructionType() )
+		switch( programLine.getRobotInstructionType() )
 		{
 		case SIGEL_Program::COPY: (*Instruktion)[i]= 1; (*MData)[1]++; break;
 		case SIGEL_Program::LOAD: (*Instruktion)[i]= 2; (*MData)[2]++; break;
