@@ -159,9 +159,11 @@ void SIGEL_Program::SIG_Program::importProgram( QString& filename )
 
    if( prgFile.open( QIODeviceBase::ReadOnly ) )
      {
-       lines.clear();
+       // The program stays as it was when the read throws.
+       SIG_Program importedProgram;
        QTextStream buffer( &prgFile );
-       readFromFile( buffer );
+       importedProgram.readFromFile( buffer );
+       lines = importedProgram.lines;
        prgFile.close();
      }
    else

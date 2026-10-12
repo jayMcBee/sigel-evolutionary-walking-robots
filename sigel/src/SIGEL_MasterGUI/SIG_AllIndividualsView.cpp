@@ -433,7 +433,14 @@ namespace SIGEL_MasterGUI
 				QString fileName = QFileDialog::getOpenFileName( this, "Import Program", QString(), "Program Files (*.prg);;All Files (*)" );
 				if( !fileName.isEmpty() )
 				{
-					individualListItem->theIndividual->importProgram( fileName );
+					try
+					{
+						individualListItem->theIndividual->importProgram( fileName );
+					}
+					catch ( const SIGEL_Tools::SIG_Exception &e )
+					{
+						QMessageBox::warning( this, "Import Program", e.getMessage() );
+					}
 				}
 				slotSelectionChanged();
 				slotCompleteRefreshList(); // can be done more efficiently!!!
