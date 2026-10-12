@@ -401,11 +401,6 @@ problem; the choice is made before any code is written.
 
 ## 8 · The robot language
 
-- [ ] **159. A program line with a bad operand is read as an instruction with 0.**
-  `SIG_ProgramLine::readFromFile` reads an operand that is missing or is
-  not a number as 0, with no message: `ADD 1,2 # note` becomes `ADD 1,0`.
-  Such a line must give an error.
-
 - [ ] **160. The conditional instructions are `CMP`, `JLE` and `JMP`.**
   Today `JMP n` jumps only when `CMP` has set the compare flag, and no
   instruction jumps always. The set becomes:
@@ -469,9 +464,8 @@ problem; the choice is made before any code is written.
   programs depend on a result that is now fixed. Keep the shipped files as the
   original 1.3 set. Add a second set: each experiment loaded and evolved for
   10 to 25 generations, so that the fitness values come from today's code and
-  such programs are selected away. Do this after the last instruction fix (item
-  159) is in. In the same pass, give the robot models less saturated
-  colours. To decide: the name of the second set and where the two sets live.
+  such programs are selected away. In the same pass, give the robot models
+  less saturated colours. To decide: the name of the second set and where the two sets live.
 
 ---
 
