@@ -185,6 +185,9 @@ touched, because changing one changes behaviour against the reference binary.
 - [ ] **104. Refuse a step size of 0 or less.** The step-size half of item
   89. A step of 0 gives `int(inf)`, undefined behaviour, in Real Speed, and
   loops `SIG_Simulation::start` for ever in the other fitness functions.
+  A negative step reaches `SIG_Interpreter::interprete` as a negative time
+  account: no command runs, and the amount is taken off the time of the
+  next call.
   - **On load:** throw `SIG_UnstreamingError` for a `STEPSIZE` of 0 or less,
     as item 71 does for register widths. File > Open shows it (item 88);
     `sigel -e` and `coredrive` refuse the file.
