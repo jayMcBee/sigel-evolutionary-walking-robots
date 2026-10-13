@@ -407,10 +407,12 @@ problem; the choice is made before any code is written.
   | `JLE n` | Jumps n lines when the compare flag is set. Today's `JMP`. |
   | `JMP n` | Jumps n lines always. |
 
+  Do item 166 first. Item 162 waits for this item.
+
 - [ ] **162. Two buttons for two sets of default instruction probabilities.**
   On the GP parameters page: one sets all probabilities equal, one sets
   the conditional instructions `CMP`, `JLE` and `JMP` (item 160) lower than
-  the others.
+  the others. Do item 160 first.
 
 - [ ] **168. Consider one description for each robot instruction.** The name
   of an instruction and its number of operands are written out for each
@@ -449,6 +451,7 @@ problem; the choice is made before any code is written.
   10 to 25 generations, so that the fitness values come from today's code and
   such programs are selected away. In the same pass, give the robot models
   less saturated colours. To decide: the name of the second set and where the two sets live.
+  Item 160 waits for this item.
 
 ---
 
