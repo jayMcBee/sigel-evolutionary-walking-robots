@@ -147,13 +147,17 @@ touched, because changing one changes behaviour against the reference binary.
   experiments that select `ForceFitnessFunction` are affected; no shipped
   experiment does. No patch to the library touches this method.
 
-- [ ] **61. Decide whether to un-transpose the terrain.**
-  `SIG_Environment::writeTerrain` and DynaMechs'
-  `dmEnvironment::loadTerrainData` disagree on row order, so a floor whose X
-  and Z sizes differ is misread. Physics and drawing agree, and no shipped
-  experiment has such a floor: only `runner.exp` sets `FLOORDIMENSION`, to a
-  square floor. A fix changes physics for asymmetric or
-  non-square floors.
+- [ ] **61. Fix the order of the terrain heights.**
+  `SIG_Environment::writeTerrain` writes the heights for each z, all x.
+  DynaMechs' `dmEnvironment::loadTerrainData` reads them for each x, all z.
+  So a floor that is not flat is not the floor the user asked for: on a
+  square floor, x and z are swapped; on a floor whose X and Z sizes differ,
+  the heights are scrambled. Drawing and physics use the same wrong floor, so
+  they agree with each other. Two kinds of floor are not affected: a flat
+  floor, and a square floor whose function or picture is the same after x and
+  z are swapped. All shipped experiments have a flat floor. The fix changes
+  drawing and physics for every other floor. Fix it together with item 136,
+  where the terrain class states the order.
 
 - [ ] **73. Fix the latent sensor bugs in
   `SIG_DynaMechsSimulationQueries::sense`:** a joint with equal limits, or
