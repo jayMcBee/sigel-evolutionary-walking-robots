@@ -201,7 +201,7 @@ class SIG_GPPopulation
     int getSize();
 
     // The largest pool in which every individual can enter a tournament.
-    static const int maximumSize = 32768;
+    static const int maximumSize = SIGEL_Tools::SIG_Randomizer::fullRandomIntRange;
     
     /**
      * This operation returns the name for the next new individual. The 
