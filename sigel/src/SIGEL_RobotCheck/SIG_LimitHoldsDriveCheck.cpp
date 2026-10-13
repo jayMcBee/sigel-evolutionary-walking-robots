@@ -27,7 +27,7 @@
 
 #include <qstringlist.h>
 
-#include <cmath>
+#include <numbers>
 
 SIGEL_RobotCheck::SIG_LimitHoldsDriveCheck::SIG_LimitHoldsDriveCheck( const SIGEL_Robot::SIG_Robot &robot,
                                                                       const SIGEL_Simulation::SIG_SimulationParameters &simulationParameter )
@@ -66,7 +66,7 @@ QList<SIGEL_RobotCheck::SIG_RobotIssue> SIGEL_RobotCheck::SIG_LimitHoldsDriveChe
         continue;
 
       // The limit spring balances the drive this far past the limit, in degrees.
-      double pastLimit = drive->getMaxForce() / spring * 180 / M_PI;
+      double pastLimit = drive->getMaxForce() / spring * 180 / std::numbers::pi;
       double range = rotationalJoint->getMax() - rotationalJoint->getMin();
 
       if ( pastLimit > range )

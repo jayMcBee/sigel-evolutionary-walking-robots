@@ -29,6 +29,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <numbers>
 
 SIGEL_RobotCheck::SIG_DriveStrengthCheck::SIG_DriveStrengthCheck( const SIGEL_RobotCheck::SIG_RobotStartPose &startPose,
                                                                   const SIGEL_Environment::SIG_Environment &environment )
@@ -72,7 +73,7 @@ QList<SIGEL_RobotCheck::SIG_RobotIssue> SIGEL_RobotCheck::SIG_DriveStrengthCheck
         continue;
 
       // The height one full-force stroke through the joint's range lifts the whole robot.
-      double range = ( rotationalJoint->getMax() - rotationalJoint->getMin() ) * M_PI / 180;
+      double range = ( rotationalJoint->getMax() - rotationalJoint->getMin() ) * std::numbers::pi / 180;
       double strokeHeight = drive->getMaxForce() * range / weight;
 
       if ( strokeHeight > throwHeight )

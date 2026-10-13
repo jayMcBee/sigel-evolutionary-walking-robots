@@ -32,8 +32,8 @@
 #include <newmatap.h>
 
 #include <algorithm>
-#include <cmath>
 #include <limits>
+#include <numbers>
 #include <vector>
 
 SIGEL_RobotCheck::SIG_JointInertia::SIG_JointInertia( const SIGEL_Robot::SIG_Robot &preparedRobot,
@@ -95,10 +95,10 @@ SIGEL_RobotCheck::SIG_JointInertia::SIG_JointInertia( const SIGEL_Robot::SIG_Rob
               static_cast<dmMDHLink *>( jointLinks[j] )->getJointLimits( &minimum, &maximum, &spring, &damper );
 
               // A joint without limits can stand at any angle.
-              if ( maximum - minimum > 2 * M_PI )
+              if ( maximum - minimum > 2 * std::numbers::pi )
                 {
-                  minimum = -M_PI;
-                  maximum = M_PI;
+                  minimum = -std::numbers::pi;
+                  maximum = std::numbers::pi;
                 }
 
               const double largestRandomInt = SIGEL_Tools::SIG_Randomizer::fullRandomIntRange - 1.0;

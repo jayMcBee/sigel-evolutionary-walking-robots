@@ -30,6 +30,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <numbers>
 
 SIGEL_RobotCheck::SIG_UnpoweredRun::SIG_UnpoweredRun( const SIGEL_Robot::SIG_Robot &robot,
                                             const SIGEL_Environment::SIG_Environment &environment,
@@ -132,5 +133,5 @@ double SIGEL_RobotCheck::SIG_UnpoweredRun::turnBetween( SIG_Matrix left, SIG_Mat
         }
     }
 
-  return std::acos( std::clamp( ( trace - 1 ) / 2, -1.0, 1.0 ) ) * 180 / M_PI;
+  return std::acos( std::clamp( ( trace - 1 ) / 2, -1.0, 1.0 ) ) * 180 / std::numbers::pi;
 }
