@@ -419,6 +419,12 @@ problem; the choice is made before any code is written.
   the conditional instructions `CMP`, `JLE` and `JMP` (item 160) lower than
   the others.
 
+- [ ] **171. Declare the number of robot instructions once.**
+  `SIG_ProgramLine::randomRobotInstruction` (`hasCommand.resize( 15 )`) and
+  `SIG_GPParameter` (`instructionProb.resize( 15 )`) hold the number 15. Use
+  one constant, declared once, as `SIG_Randomizer::fullRandomIntRange` is for
+  32768. A new instruction (item 160) changes the number.
+
 - [ ] **168. Consider one description for each robot instruction.** The name
   of an instruction and its number of operands are written out for each
   instruction in `SIG_ProgramLine` (`setRobotInstruction`, `printToString`,
