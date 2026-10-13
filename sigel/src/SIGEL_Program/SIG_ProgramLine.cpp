@@ -621,96 +621,15 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
      if( randomizer.getRandomInt(2) == 1 ) op1 = (-1) * op1;
      if( randomizer.getRandomInt(2) == 1 ) op2 = (-1) * op2;
 
-     if( languageParameters.hasCommand("COPY") )
+     for( int n = 0; n < instructionCount; n++ )
        {
-         maximumValue += prob[0];
-         hasCommand[0] = true;
-       }
-         
-     if( languageParameters.hasCommand("LOAD") )
-       { 
-         maximumValue += prob[1];
-	 hasCommand[1] = true;
+         if( !languageParameters.hasCommand( robotInstructionNames[n] ) )
+           continue;
+
+         maximumValue += prob[n];
+         hasCommand[n] = true;
        }
 
-     if( languageParameters.hasCommand("ADD") ) 
-       {
-	 maximumValue += prob[2];
-	 hasCommand[2] = true;
-       }
-
-     if( languageParameters.hasCommand("SUB") ) 
-       {
-	 maximumValue += prob[3];
-	 hasCommand[3] = true;
-       }
-
-     if( languageParameters.hasCommand("MUL") )
-       {
-	 maximumValue +=  prob[4];
-	 hasCommand[4] = true;
-       }
-
-     if( languageParameters.hasCommand("DIV") )
-       {
-	 maximumValue += prob[5];
-	 hasCommand[5] = true;
-       }
-
-     if( languageParameters.hasCommand("MOD") )
-       {
-	 maximumValue += prob[6];
-	 hasCommand[6] = true;
-       }
-
-     if( languageParameters.hasCommand("MIN") ) 
-       {
-	 maximumValue += prob[7];
-	 hasCommand[7] = true;
-       }
-
-     if( languageParameters.hasCommand("MAX") ) 
-       {
-	 maximumValue +=  prob[8];
-         hasCommand[8] = true;
-       }
-
-     if( languageParameters.hasCommand("CMP") )
-       {
-	 maximumValue +=  prob[9];
-         hasCommand[9] = true;
-       }
-
-     if( languageParameters.hasCommand("JMP") ) 
-       {
-	 maximumValue +=  prob[10];
-         hasCommand[10] = true;
-       }
-
-     if( languageParameters.hasCommand("SENSE") ) 
-       {
-	 maximumValue +=  prob[11];
-	 hasCommand[11] = true;
-       }
-
-     if( languageParameters.hasCommand("MOVE") )
-       {
-	 maximumValue +=  prob[12];
-	 hasCommand[12] = true;
-       }
-
-     if( languageParameters.hasCommand("DELAY") )
-       {
-	 maximumValue +=  prob[13];
-	 hasCommand[13] = true;
-       }
-
-     if( languageParameters.hasCommand("NOP") )
-       {
-	 maximumValue += prob[14];
-         hasCommand[14] = true;
-       }
-        	
      if( maximumValue == 0 )
         SIGEL_Tools::SIG_IO::cerr << "\nERROR: If no instructions are allowed, no instructions can be used !" << Qt::endl;
 
