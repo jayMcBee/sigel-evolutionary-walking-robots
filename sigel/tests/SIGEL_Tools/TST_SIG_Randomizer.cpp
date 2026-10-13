@@ -111,6 +111,7 @@ void SIGEL_Tools::TST_SIG_Randomizer::maximumZeroGivesZero()
   QCOMPARE( randomizer.getRandomInt( 0 ), 0 );
 }
 
+// A change here gives each seed another run.
 void SIGEL_Tools::TST_SIG_Randomizer::maximumZeroMovesTheGeneratorOn()
 {
   SIG_Randomizer reference( 42 );
@@ -123,6 +124,7 @@ void SIGEL_Tools::TST_SIG_Randomizer::maximumZeroMovesTheGeneratorOn()
   QCOMPARE( randomizer.getRandomInt( 1000 ), secondNumber );
 }
 
+// A change here gives each seed another run.
 void SIGEL_Tools::TST_SIG_Randomizer::getRandomLongGivesTheNumberOfGetRandomInt()
 {
   SIG_Randomizer first( 42 );
@@ -138,6 +140,8 @@ void SIGEL_Tools::TST_SIG_Randomizer::getRandomLongWithMaximumZeroGivesZero()
   QCOMPARE( randomizer.getRandomLong( 0 ), 0L );
 }
 
+// Four numbers: the first one alone does not show a small change of the
+// multiplier or the increment. A change here gives each seed another run.
 void SIGEL_Tools::TST_SIG_Randomizer::seedOneGivesKnownNumbers()
 {
   SIG_Randomizer randomizer( 1 );
@@ -148,7 +152,9 @@ void SIGEL_Tools::TST_SIG_Randomizer::seedOneGivesKnownNumbers()
   QCOMPARE( randomizer.getRandomInt( 32768 ), 17515 );
 }
 
-// 1000 is not a power of two.
+// A maximum that is not a power of two: the numbers also depend on the mask
+// and on the remainder of the division by the maximum. A change here gives
+// each seed another run.
 void SIGEL_Tools::TST_SIG_Randomizer::seedFortyTwoGivesKnownNumbersBelowOneThousand()
 {
   SIG_Randomizer randomizer( 42 );

@@ -283,7 +283,7 @@ void SIGEL_GP::TST_SIG_GPPopulation::resetAllFitnessValuesSetsMinusOne()
   SIG_GPPopulation population;
   addIndividuals( population, 2 );
 
-  // A new individual has the fitness -1.
+  // A new individual has the fitness -1 already, so other values are set first.
   population.getIndividualPointer( 0 )->setFitness( 3.5 );
   population.getIndividualPointer( 1 )->setFitness( 7.5 );
 

@@ -67,7 +67,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::setRobotInstructionSetsTypeAndElements(
   QList<int> expectedElements = { element0, element1 };
   expectedElements.resize( numberOfElements );
 
-  // The line starts as a different instruction with three elements.
+  // The line starts as a different instruction with three elements, so that the call must change the type and remove the old elements.
   SIG_ProgramLine programLine;
   if ( instruction == ADD )
     programLine.setRobotInstruction( SUB, 7, 8 );
@@ -224,7 +224,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm()
   QList<int> expectedElements = { element0, element1 };
   expectedElements.resize( numberOfElements );
 
-  // The line starts as a different instruction.
+  // The line starts as a different instruction, so that the read must change it.
   SIG_ProgramLine programLine;
   if ( instruction == NOP )
     programLine.setRobotInstruction( COPY, 1, 1 );
@@ -409,6 +409,8 @@ void SIGEL_Program::TST_SIG_ProgramLine::assignmentCopiesTypeAndElements()
   const QList<int> expectedElements = { 3, 4 };
 
   destination = source;
+
+  // A change of the source after the copy must not reach the destination.
   source.setElement( 0, 8 );
 
   QCOMPARE( destination.getRobotInstructionType(), LOAD );
@@ -424,6 +426,8 @@ void SIGEL_Program::TST_SIG_ProgramLine::copyLineCopiesTypeAndElements()
   const QList<int> expectedElements = { 3, 4 };
 
   destination.copyLine( &source, &destination );
+
+  // A change of the source after the copy must not reach the destination.
   source.setElement( 0, 8 );
 
   QCOMPARE( destination.getRobotInstructionType(), LOAD );
@@ -636,6 +640,8 @@ void SIGEL_Program::TST_SIG_ProgramLine::seedOneGivesKnownInstructions()
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   QList<int> probabilities( 15, 1 );
   SIGEL_Tools::SIG_Randomizer randomizer( 1 );
+
+  // The known lines fix the order in which a random instruction takes its numbers from the randomizer.
   const QStringList expectedShownTexts = { "LOAD -16838,-5758\n", "MOD -5627,23010\n", "DIV 2749,12767\n" };
 
   for ( const QString &expectedShownText : expectedShownTexts )

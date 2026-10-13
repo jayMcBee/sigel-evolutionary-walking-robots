@@ -840,8 +840,12 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultIn
   QTest::newRow( "ADD" ) << SIGEL_Program::ADD << 20 << 6 << 26;
   QTest::newRow( "SUB" ) << SIGEL_Program::SUB << 20 << 6 << 14;
   QTest::newRow( "MUL" ) << SIGEL_Program::MUL << 20 << 6 << 120;
+
+  // 23 / 3 is 7 and 7 % 3 is not 7, so the row fails if the DIV case of the switch runs on into the MOD case.
   QTest::newRow( "DIV" ) << SIGEL_Program::DIV << 23 << 3 << 7;
   QTest::newRow( "MOD" ) << SIGEL_Program::MOD << 20 << 6 << 2;
+
+  // The lesser of 2 and -6 is not 2, so the row fails if the MOD case of the switch runs on into the MIN case.
   QTest::newRow( "MOD second is negative" ) << SIGEL_Program::MOD << 20 << -6 << 2;
   QTest::newRow( "MIN first is greater" ) << SIGEL_Program::MIN << 20 << 6 << 6;
   QTest::newRow( "MIN first is less" ) << SIGEL_Program::MIN << 6 << 20 << 6;
