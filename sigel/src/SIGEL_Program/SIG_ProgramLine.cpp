@@ -607,12 +607,10 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
 {
      int          op1 = 0, 
                   op2 = 0, 
-                  iType = 0,
-                  n = 0;
+                  iType = 0;
      long         maximumValue = 0,
                   randomValue = 0,
                   accuValue = 0;
-     bool         cont = true;
      QList<bool> hasCommand;
 
      hasCommand.resize( instructionCount );
@@ -719,33 +717,16 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
 
      randomValue = randomizer.getRandomLong( maximumValue );
   
-     while( cont )
-       { 
-         if( (hasCommand[0]) && (n == 0) ) accuValue += prob[0];
-         if( (hasCommand[1]) && (n == 1) ) accuValue += prob[1];
-	 if( (hasCommand[2]) && (n == 2) ) accuValue += prob[2];
-	 if( (hasCommand[3]) && (n == 3) ) accuValue += prob[3];
-	 if( (hasCommand[4]) && (n == 4) ) accuValue += prob[4];
-	 if( (hasCommand[5]) && (n == 5) ) accuValue += prob[5];
-	 if( (hasCommand[6]) && (n == 6) ) accuValue += prob[6];
-	 if( (hasCommand[7]) && (n == 7) ) accuValue += prob[7];
-	 if( (hasCommand[8]) && (n == 8) ) accuValue += prob[8];
-	 if( (hasCommand[9]) && (n == 9) ) accuValue += prob[9];
-	 if( (hasCommand[10]) && (n == 10) ) accuValue += prob[10];
-	 if( (hasCommand[11]) && (n == 11) ) accuValue += prob[11];
-	 if( (hasCommand[12]) && (n == 12) ) accuValue += prob[12];
-	 if( (hasCommand[13]) && (n == 13) ) accuValue += prob[13];
-         if( (hasCommand[14]) && (n == 14) ) accuValue += prob[14];
+     for( int n = 0; n < instructionCount; n++ )
+       {
+         if( hasCommand[n] )
+           accuValue += prob[n];
 
-         if( n == instructionCount - 1 ) cont = false;
-         
          if( randomValue < accuValue )
            {
-             cont  = false;
              iType = n;
+             break;
            }
-         
-         n++;
        }
        
      switch( iType )
