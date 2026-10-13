@@ -42,10 +42,10 @@ namespace SIGEL_Simulation
 		  programCounter(0),
 		  compareFlag(false)
 	{
-		int numberOfRegisters = languageParameters.getMemorySize();
+		int numberOfRegisters = std::max( languageParameters.getMemorySize(), 1 );
 		int registerWidth = languageParameters.getRegisterWidth();
-		// Held by value: SIG_Register is two ints with no destructor and no pointers.
-		// It has no default constructor, hence append rather than resize.
+
+		// SIG_Register has no default constructor, so each register is appended.
 		registers.reserve( numberOfRegisters );
 		for( int count = 0; count < numberOfRegisters; count++ )
 		{
@@ -57,7 +57,7 @@ namespace SIGEL_Simulation
 	{
 		long programLength = robotProgram.getProgramLength();
 
-		double maxDelayTime = static_cast<double>( languageParameters.getMaximalDelayTime() ) * 0.001 ;
+		double maxDelayTime = std::max( static_cast<double>( languageParameters.getMaximalDelayTime() ) * 0.001, 0.0 );
 
 		if ( timeAccount <= remainingLastCommandTime )
 		{

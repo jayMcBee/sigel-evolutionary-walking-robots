@@ -523,6 +523,27 @@ void SIGEL_Simulation::TST_SIG_Interpreter::negativeRegisterOperandWithSixRegist
   QCOMPARE( moveRecords[0].registerValues, expectedValues );
 }
 
+void SIGEL_Simulation::TST_SIG_Interpreter::memorySizeOfZeroGivesOneRegister()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.setMemorySize( 0 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 3, 5 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  // With one register, operand 3 of the LOAD and operand 0 of the MOVE both give register 0.
+  interpreter.interprete( 2 );
+
+  const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
+  QCOMPARE( moveRecords.size(), 1 );
+  QCOMPARE( moveRecords[0].driveNumber, 5 );
+  QCOMPARE( moveRecords[0].registerValues, QList<int>( 1, 5 ) );
+}
+
 void SIGEL_Simulation::TST_SIG_Interpreter::senseGivesTheRegisterValueAsSensorNumber()
 {
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
@@ -686,6 +707,27 @@ void SIGEL_Simulation::TST_SIG_Interpreter::delayIsLimitedToTheMaximalDelayTime(
 
   // The LOAD takes 1 s and the DELAY 1 s + 1 s, so 0.5 s is left for one MOVE.
   interpreter.interprete( 3.5 );
+
+  QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::negativeMaximalDelayTimeGivesNoDelayTime()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 1.0 );
+  languageParameters.setRegisterWidth( 16 );
+  languageParameters.setMaximalDelayTime( -1000 );
+  SIGEL_Program::SIG_Program program;
+  appendLine( program, SIGEL_Program::LOAD, 2, 2000 );
+  appendLine( program, SIGEL_Program::DELAY, 2, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  // The LOAD takes 1 s and the DELAY 0 s + 1 s, so 1 s is left for one MOVE.
+  interpreter.interprete( 3 );
 
   QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
 }

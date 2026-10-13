@@ -146,6 +146,8 @@ namespace SIGEL_Simulation
 
     void negativeRegisterOperandWithSixRegisters();
 
+    void memorySizeOfZeroGivesOneRegister();
+
     void senseGivesTheRegisterValueAsSensorNumber();
 
     void senseRegisterOperandWraps();
@@ -159,6 +161,8 @@ namespace SIGEL_Simulation
     void delayOfZeroTakesOnlyTheCommandTime();
 
     void delayIsLimitedToTheMaximalDelayTime();
+
+    void negativeMaximalDelayTimeGivesNoDelayTime();
 
     void delayRegisterOperandWraps();
 
