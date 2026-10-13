@@ -630,39 +630,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
   
      selectedInstructionIndex = selectInstructionByWeight( randomValue, hasCommand, prob );
        
-     switch( selectedInstructionIndex )
-       {
-        case 0: setRobotInstruction( SIGEL_Program::COPY, op1, op2 );
-                break;
-        case 1: setRobotInstruction( SIGEL_Program::LOAD, op1, op2 );
-                break;
-        case 2: setRobotInstruction( SIGEL_Program::ADD, op1, op2 );
-                break;
-        case 3: setRobotInstruction( SIGEL_Program::SUB, op1, op2 );
-                break;
-        case 4: setRobotInstruction( SIGEL_Program::MUL, op1, op2 );
-                break;
-        case 5: setRobotInstruction( SIGEL_Program::DIV, op1, op2 );
-                break;
-        case 6: setRobotInstruction( SIGEL_Program::MOD, op1, op2 );
-                break;
-        case 7: setRobotInstruction( SIGEL_Program::MIN, op1, op2 );
-                break;
-        case 8: setRobotInstruction( SIGEL_Program::MAX, op1, op2 );
-                break;
-        case 9: setRobotInstruction( SIGEL_Program::CMP, op1, op2 );
-                break;
-        case 10:setRobotInstruction( SIGEL_Program::JMP, op1, op2 );
-                break;
-        case 11:setRobotInstruction( SIGEL_Program::SENSE, op1, op2 );
-                break;
-        case 12:setRobotInstruction( SIGEL_Program::MOVE, op1, op2 );
-                break;
-        case 13:setRobotInstruction( SIGEL_Program::DELAY, op1, op2 );
-                break;
-        case 14:setRobotInstruction( SIGEL_Program::NOP, op1, op2 );
-                break;
-       }
+     setRobotInstruction( static_cast<SIGEL_Program::RobotInstruction>( selectedInstructionIndex ), op1, op2 );
 }
 
 long SIGEL_Program::SIG_ProgramLine::totalWeightOfAllowedInstructions( const SIGEL_Robot::SIG_LanguageParameters &languageParameters,
