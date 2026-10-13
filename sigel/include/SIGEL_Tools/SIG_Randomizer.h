@@ -40,6 +40,9 @@ class SIG_Randomizer
 
 public:   
 
+   /** getRandomInt( fullRandomIntRange ) gives a number from 0 to 32767. */
+   static constexpr int fullRandomIntRange = 32768;
+
    /**
     * This randomizer creates random numbers, which are used for the 
     * genetic programming.

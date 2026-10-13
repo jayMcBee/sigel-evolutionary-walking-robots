@@ -50,7 +50,7 @@ void SIGEL_Tools::SIG_Randomizer::setNewSeed(int seed)
 int SIGEL_Tools::SIG_Randomizer::getRandomInt(int maximum)
 {
   next = next*1103515245 + 12345;
-  int randomNumber = static_cast<unsigned int>( next / 65536 ) % 32768;
+  int randomNumber = static_cast<unsigned int>( next / 65536 ) % fullRandomIntRange;
 
   if (maximum == 0)
     return 0;
