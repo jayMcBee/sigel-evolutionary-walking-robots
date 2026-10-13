@@ -19,7 +19,7 @@
   You should have received a copy of the GNU General Public License
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 #include "SIGEL_Robot/IFunctions.h"
 #include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
@@ -33,345 +33,346 @@
 
 using namespace SIGEL_Tools;
 
-namespace SIGEL_Robot {
+namespace SIGEL_Robot
+{
 
-        double tolerantACos( double cosInput )
+	double tolerantACos( double cosInput )
 	{
-	  if (cosInput > 1)
-	    cosInput= 1;
-	  else if (cosInput < -1)
-	    cosInput = -1;
+		if (cosInput > 1)
+			cosInput= 1;
+		else if (cosInput < -1)
+			cosInput = -1;
 
-	  return std::acos( cosInput );
+		return std::acos( cosInput );
 	};
 
-        SIG_Vector orthogonalVector( SIG_Vector input )
+	SIG_Vector orthogonalVector( SIG_Vector input )
 	{
-	  int firstIndex;
+		int firstIndex;
 
-	  for (int i=0; i<3; i++)
-	    if (input.get( i )!=0)
-	      {
-		firstIndex = i;
-		break;
-	      };
+		for (int i=0; i<3; i++)
+			if (input.get( i )!=0)
+			{
+				firstIndex = i;
+				break;
+			};
 
-	  int secondIndex = (firstIndex + 1) % 3;
+		int secondIndex = (firstIndex + 1) % 3;
 
-	  int thirdIndex = (secondIndex + 1) % 3;
+		int thirdIndex = (secondIndex + 1) % 3;
 
-	  SIG_Vector result;
-	  result.set( firstIndex, - input.get( secondIndex ) );
-	  result.set( secondIndex, input.get( firstIndex ) );
-	  result.set( thirdIndex, 0 );
+		SIG_Vector result;
+		result.set( firstIndex, - input.get( secondIndex ) );
+		result.set( secondIndex, input.get( firstIndex ) );
+		result.set( thirdIndex, 0 );
 
-	  result.normalize();
+		result.normalize();
 
-	  return result;
+		return result;
 	};
 
-        SIG_Matrix rotationMatrix(SIG_Vector v, double phi)
+	SIG_Matrix rotationMatrix(SIG_Vector v, double phi)
 	{
-	  double sinPhi = std::sin( phi / 2 );
-	  double cosPhi = std::cos( phi / 2 );
+		double sinPhi = std::sin( phi / 2 );
+		double cosPhi = std::cos( phi / 2 );
 
-	  Quaternion q;
-	  q[0] = v.x * sinPhi;
-	  q[1] = v.y * sinPhi;
-	  q[2] = v.z * sinPhi;
-	  q[3] = cosPhi;
+		Quaternion q;
+		q[0] = v.x * sinPhi;
+		q[1] = v.y * sinPhi;
+		q[2] = v.z * sinPhi;
+		q[3] = cosPhi;
 
-	  normalizeQuat( q );
+		normalizeQuat( q );
 
-	  RotationMatrix result;
+		RotationMatrix result;
 
-	  buildRotMat( q, result );
+		buildRotMat( q, result );
 
-	  return SIG_TypeConverter::toSIG_Matrix( result );
+		return SIG_TypeConverter::toSIG_Matrix( result );
 	}
 
-        NEWMAT::Matrix phatRockingUpStylinVectorBendingAngleSwingingMasterFunction( SIG_Vector pointA,
-										    SIG_Vector pointB,
-										    SIG_Vector pointC,
-										    SIG_Vector otherA,
-										    SIG_Vector otherB,
-										    SIG_Vector otherC )
+	NEWMAT::Matrix phatRockingUpStylinVectorBendingAngleSwingingMasterFunction( SIG_Vector pointA,
+	                                                                            SIG_Vector pointB,
+	                                                                            SIG_Vector pointC,
+	                                                                            SIG_Vector otherA,
+	                                                                            SIG_Vector otherB,
+	                                                                            SIG_Vector otherC )
 	{
-	  SIG_Vector firstTranslationVector = pointA;
-	  firstTranslationVector.minusis( &otherA );
+		SIG_Vector firstTranslationVector = pointA;
+		firstTranslationVector.minusis( &otherA );
 
-	  otherB.plusis( &firstTranslationVector );
-	  otherC.plusis( &firstTranslationVector );
+		otherB.plusis( &firstTranslationVector );
+		otherC.plusis( &firstTranslationVector );
 
-	  pointB.minusis( &pointA );
-	  pointC.minusis( &pointA );
-	  otherB.minusis( &pointA );
-	  otherC.minusis( &pointA );
+		pointB.minusis( &pointA );
+		pointC.minusis( &pointA );
+		otherB.minusis( &pointA );
+		otherC.minusis( &pointA );
 
-	  pointB.normalize();
-	  pointC.normalize();
-	  otherB.normalize();
-	  otherC.normalize();
+		pointB.normalize();
+		pointC.normalize();
+		otherB.normalize();
+		otherC.normalize();
 
 #ifdef SIG_DEBUG
-	  SIGEL_Tools::SIG_IO::cerr << "B:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << pointB.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "B:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << pointB.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
-	  SIGEL_Tools::SIG_IO::cerr << "C:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << pointC.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "C:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << pointC.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
-	  SIGEL_Tools::SIG_IO::cerr << "otherB:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << otherB.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "otherB:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << otherB.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
-	  SIGEL_Tools::SIG_IO::cerr << "otherC:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << otherC.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "otherC:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << otherC.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
-	  SIG_Matrix firstRotation;
+		SIG_Matrix firstRotation;
 
-	  double const minimalAngleMeasure = 0.00001;
+		double const minimalAngleMeasure = 0.00001;
 
-	  double bsAngle = tolerantACos( pointB.inprod( &otherB ) );
+		double bsAngle = tolerantACos( pointB.inprod( &otherB ) );
 
-	  if (bsAngle > minimalAngleMeasure)
-	    {
-	      if (std::abs( std::numbers::pi - bsAngle ) > minimalAngleMeasure)
+		if (bsAngle > minimalAngleMeasure)
 		{
-		  SIG_Vector bsNormal;
+			if (std::abs( std::numbers::pi - bsAngle ) > minimalAngleMeasure)
+			{
+				SIG_Vector bsNormal;
 
-		  otherB.crossprod( &pointB, &bsNormal );
-		  bsNormal.normalize();
+				otherB.crossprod( &pointB, &bsNormal );
+				bsNormal.normalize();
 
-		  firstRotation = rotationMatrix( bsNormal, bsAngle );
+				firstRotation = rotationMatrix( bsNormal, bsAngle );
+			}
+			else
+			{
+				SIG_Vector rotationAxis = orthogonalVector( pointB );
+
+				firstRotation = rotationMatrix( rotationAxis, bsAngle );
+			};
 		}
-	      else
-		{
-		  SIG_Vector rotationAxis = orthogonalVector( pointB );
+		else
+			firstRotation.makeone();
 
-		  firstRotation = rotationMatrix( rotationAxis, bsAngle );
-		};
-	    }
-	  else
-	    firstRotation.makeone();
-
-	  SIG_Vector bufferVector = otherB;
-	  firstRotation.times( &bufferVector, &otherB );
-	  bufferVector = otherC;
-	  firstRotation.times( &bufferVector, &otherC );
+		SIG_Vector bufferVector = otherB;
+		firstRotation.times( &bufferVector, &otherB );
+		bufferVector = otherC;
+		firstRotation.times( &bufferVector, &otherC );
 
 #ifdef SIG_DEBUG
-	  SIGEL_Tools::SIG_IO::cerr << "otherB and otherC have been rotated." << Qt::endl;
-	  SIGEL_Tools::SIG_IO::cerr << "B:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << pointB.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "otherB and otherC have been rotated." << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "B:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << pointB.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
-	  SIGEL_Tools::SIG_IO::cerr << "C:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << pointC.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "C:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << pointC.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
-	  SIGEL_Tools::SIG_IO::cerr << "otherB:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << otherB.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "otherB:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << otherB.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
-	  SIGEL_Tools::SIG_IO::cerr << "otherC:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << otherC.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "otherC:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << otherC.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
-	  SIG_Matrix secondRotation;
+		SIG_Matrix secondRotation;
 
-	  SIG_Vector u = orthogonalVector( pointB );
+		SIG_Vector u = orthogonalVector( pointB );
 
-	  SIG_Vector v;
-	  pointB.crossprod( &u, &v );
-	  v.normalize();
+		SIG_Vector v;
+		pointB.crossprod( &u, &v );
+		v.normalize();
 
-	  SIG_Vector cProjected;
+		SIG_Vector cProjected;
 
-	  SIG_Joint::calculateCut( SIG_Vector(0, 0, 0),
-				   u,
-				   v,
-				   pointC,
-				   pointB,
-				   cProjected );
-	  cProjected.normalize();
+		SIG_Joint::calculateCut( SIG_Vector(0, 0, 0),
+		                         u,
+		                         v,
+		                         pointC,
+		                         pointB,
+		                         cProjected );
+		cProjected.normalize();
 
-	  SIG_Vector otherCProjected;
+		SIG_Vector otherCProjected;
 
-	  SIG_Joint::calculateCut( SIG_Vector(0, 0, 0),
-				   u,
-				   v,
-				   otherC,
-				   pointB,
-				   otherCProjected );
-	  otherCProjected.normalize();
+		SIG_Joint::calculateCut( SIG_Vector(0, 0, 0),
+		                         u,
+		                         v,
+		                         otherC,
+		                         pointB,
+		                         otherCProjected );
+		otherCProjected.normalize();
 
-	  double csAngle = tolerantACos( otherCProjected.inprod( &cProjected ) );
+		double csAngle = tolerantACos( otherCProjected.inprod( &cProjected ) );
 
-          if (csAngle > minimalAngleMeasure)
-	    {
-	      if (std::abs( std::numbers::pi - csAngle ) > minimalAngleMeasure)
+		if (csAngle > minimalAngleMeasure)
 		{
-		  SIG_Vector csNormal;
+			if (std::abs( std::numbers::pi - csAngle ) > minimalAngleMeasure)
+			{
+				SIG_Vector csNormal;
 
-		  otherCProjected.crossprod( &cProjected, &csNormal );
-		  csNormal.normalize();
+				otherCProjected.crossprod( &cProjected, &csNormal );
+				csNormal.normalize();
 
-		  if (pointB.inprod( &csNormal ) < 0)
-		    csAngle = 2 * std::numbers::pi - csAngle;
-		};
+				if (pointB.inprod( &csNormal ) < 0)
+					csAngle = 2 * std::numbers::pi - csAngle;
+			};
 
-	      secondRotation = rotationMatrix( pointB, csAngle );
-	    }
-	  else
-	    secondRotation.makeone();
+			secondRotation = rotationMatrix( pointB, csAngle );
+		}
+		else
+			secondRotation.makeone();
 
 #ifdef SIG_DEBUG
-	  bufferVector = otherB;
-	  secondRotation.times( &bufferVector, &otherB );
-	  bufferVector = otherC;
-	  secondRotation.times( &bufferVector, &otherC );
+		bufferVector = otherB;
+		secondRotation.times( &bufferVector, &otherB );
+		bufferVector = otherC;
+		secondRotation.times( &bufferVector, &otherC );
 
-	  SIGEL_Tools::SIG_IO::cerr << "otherB and otherC have been rotated." << Qt::endl;
-	  SIGEL_Tools::SIG_IO::cerr << "B:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << pointB.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "otherB and otherC have been rotated." << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "B:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << pointB.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
-	  SIGEL_Tools::SIG_IO::cerr << "C:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << pointC.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "C:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << pointC.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
-	  SIGEL_Tools::SIG_IO::cerr << "otherB:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << otherB.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "otherB:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << otherB.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 
-	  SIGEL_Tools::SIG_IO::cerr << "otherC:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << otherC.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "otherC:";
+		for (int i=0; i<3; i++)
+			SIGEL_Tools::SIG_IO::cerr << " " << otherC.get( i );
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
 #endif
 
-	  NEWMAT::Matrix transformation( 4, 4 );
+		NEWMAT::Matrix transformation( 4, 4 );
 
-	  transformation << 1 << 0 << 0 << 0
-			 << 0 << 1 << 0 << 0
-			 << 0 << 0 << 1 << 0
-			 << 0 << 0 << 0 << 1;
+		transformation << 1 << 0 << 0 << 0
+		               << 0 << 1 << 0 << 0
+		               << 0 << 0 << 1 << 0
+		               << 0 << 0 << 0 << 1;
 
-	  NEWMAT::Matrix firstTransformation = transformation;
-	  NEWMAT::Matrix secondTransformation = transformation;
-	  NEWMAT::Matrix thirdTransformation = transformation;
-	  NEWMAT::Matrix fourthTransformation = transformation;
+		NEWMAT::Matrix firstTransformation = transformation;
+		NEWMAT::Matrix secondTransformation = transformation;
+		NEWMAT::Matrix thirdTransformation = transformation;
+		NEWMAT::Matrix fourthTransformation = transformation;
 
-	  firstTransformation.SubMatrix( 1, 3, 4, 4 ) = - SIG_TypeConverter::toColumnVector( otherA );
+		firstTransformation.SubMatrix( 1, 3, 4, 4 ) = - SIG_TypeConverter::toColumnVector( otherA );
 
-	  secondTransformation.SubMatrix( 1, 3, 1, 3 ) = SIG_TypeConverter::toMatrix( firstRotation );
+		secondTransformation.SubMatrix( 1, 3, 1, 3 ) = SIG_TypeConverter::toMatrix( firstRotation );
 
-	  thirdTransformation.SubMatrix( 1, 3, 1, 3 ) = SIG_TypeConverter::toMatrix( secondRotation );
+		thirdTransformation.SubMatrix( 1, 3, 1, 3 ) = SIG_TypeConverter::toMatrix( secondRotation );
 
-	  fourthTransformation.SubMatrix( 1, 3, 4, 4 ) = SIG_TypeConverter::toColumnVector( pointA );
+		fourthTransformation.SubMatrix( 1, 3, 4, 4 ) = SIG_TypeConverter::toColumnVector( pointA );
 
-	  transformation =   fourthTransformation
-                           * thirdTransformation
-                           * secondTransformation
-                           * firstTransformation;
+		transformation =   fourthTransformation
+		                 * thirdTransformation
+		                 * secondTransformation
+		                 * firstTransformation;
 
-	  return transformation;
+		return transformation;
 	};
 
-        void calculateAnyJoint (SIG_Vector pointA, SIG_Vector pointB, SIG_Vector pointC,
-                                SIG_Vector otherA, SIG_Vector otherB, SIG_Vector otherC,
-                                double angleInDegrees, double shift,
-                                SIG_Matrix & orientation, SIG_Vector & translation,
-                                QString debugLabel)
-        {
-                // Make the points coverable.
-                SIG_Vector r, perpendicularDirection;
-                double h1;
-                
-                r.assign (&pointB);
-                r.minusis (&pointA);
-                r.normalize ();
-                pointB.assign (&pointA);
-                pointB.plusis (&r);
+	void calculateAnyJoint (SIG_Vector pointA, SIG_Vector pointB, SIG_Vector pointC,
+	                        SIG_Vector otherA, SIG_Vector otherB, SIG_Vector otherC,
+	                        double angleInDegrees, double shift,
+	                        SIG_Matrix & orientation, SIG_Vector & translation,
+	                        QString debugLabel)
+	{
+		// Make the points coverable.
+		SIG_Vector r, perpendicularDirection;
+		double h1;
 
-                perpendicularDirection.assign (&pointC);
-                perpendicularDirection.minusis (&pointA);
-                h1 = perpendicularDirection.inprod (&r);
-                r.timesis (h1);
-                perpendicularDirection.minusis (&r);
-                perpendicularDirection.normalize ();
-                pointC.assign (&pointA);
-                pointC.plusis (&perpendicularDirection);
-                
-                r.assign (&otherB);
-                r.minusis (&otherA);
-                r.normalize ();
-                otherB.assign (&otherA);
-                otherB.plusis (&r);
+		r.assign (&pointB);
+		r.minusis (&pointA);
+		r.normalize ();
+		pointB.assign (&pointA);
+		pointB.plusis (&r);
 
-                perpendicularDirection.assign (&otherC);
-                perpendicularDirection.minusis (&otherA);
-                h1 = perpendicularDirection.inprod (&r);
-                r.timesis (h1);
-                perpendicularDirection.minusis (&r);
-                perpendicularDirection.normalize ();
-                otherC.assign (&otherA);
-                otherC.plusis (&perpendicularDirection);
-                // End of the covering construction
+		perpendicularDirection.assign (&pointC);
+		perpendicularDirection.minusis (&pointA);
+		h1 = perpendicularDirection.inprod (&r);
+		r.timesis (h1);
+		perpendicularDirection.minusis (&r);
+		perpendicularDirection.normalize ();
+		pointC.assign (&pointA);
+		pointC.plusis (&perpendicularDirection);
+
+		r.assign (&otherB);
+		r.minusis (&otherA);
+		r.normalize ();
+		otherB.assign (&otherA);
+		otherB.plusis (&r);
+
+		perpendicularDirection.assign (&otherC);
+		perpendicularDirection.minusis (&otherA);
+		h1 = perpendicularDirection.inprod (&r);
+		r.timesis (h1);
+		perpendicularDirection.minusis (&r);
+		perpendicularDirection.normalize ();
+		otherC.assign (&otherA);
+		otherC.plusis (&perpendicularDirection);
+		// End of the covering construction
 
 #ifdef SIG_DEBUG
 		SIGEL_Tools::SIG_IO::cerr << "Computing the transformation of "
-					  << debugLabel
-					  << Qt::endl;
+		                          << debugLabel
+		                          << Qt::endl;
 #endif
 
 		NEWMAT::Matrix transformation = phatRockingUpStylinVectorBendingAngleSwingingMasterFunction( pointA,
-													     pointB,
-													     pointC,
-													     otherA,
-													     otherB,
-													     otherC );
+		                                                                                             pointB,
+		                                                                                             pointC,
+		                                                                                             otherA,
+		                                                                                             otherB,
+		                                                                                             otherC );
 
 		orientation = SIG_TypeConverter::toSIG_Matrix( transformation.SubMatrix( 1, 3, 1, 3 ) );
 		translation = SIG_TypeConverter::toSIG_Vector( transformation.SubMatrix( 1, 3, 4, 4 ) );
 
-                SIG_Vector v (&pointB);
-                v.minusis (&pointA);
+		SIG_Vector v (&pointB);
+		v.minusis (&pointA);
 
-                SIG_Vector shiftVector (&v);
-                shiftVector.timesis (shift);
-                translation.plusis (&shiftVector);
+		SIG_Vector shiftVector (&v);
+		shiftVector.timesis (shift);
+		translation.plusis (&shiftVector);
 
-                double phi = (angleInDegrees / 180.0) * std::numbers::pi;
+		double phi = (angleInDegrees / 180.0) * std::numbers::pi;
 
-                SIG_Matrix axisRotation;
+		SIG_Matrix axisRotation;
 
 		axisRotation=rotationMatrix(v,-phi);
-                translation.minusis (&pointA);
-                SIG_Vector translationBuffer;
-                axisRotation.times (&translation, &translationBuffer);
-                translation.assign (&translationBuffer);
-                translation.plusis (&pointA);
+		translation.minusis (&pointA);
+		SIG_Vector translationBuffer;
+		axisRotation.times (&translation, &translationBuffer);
+		translation.assign (&translationBuffer);
+		translation.plusis (&pointA);
 
-                SIG_Matrix orientationBuffer;
-                axisRotation.times (&orientation, &orientationBuffer);
-                orientation.assign (&orientationBuffer);
-        }
+		SIG_Matrix orientationBuffer;
+		axisRotation.times (&orientation, &orientationBuffer);
+		orientation.assign (&orientationBuffer);
+	}
 
 } // namespace
