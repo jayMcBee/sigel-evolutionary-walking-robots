@@ -262,6 +262,11 @@ namespace SIGEL_Program
 		int operandTextToInteger( const QString &operandText, const QString &lineText ) const;
 
 		/**
+		 * The sum of the weights of the instructions that languageParameters allows. Sets the hasCommand entry of each of them to true.
+		 */
+		long totalWeightOfAllowedInstructions( const SIGEL_Robot::SIG_LanguageParameters &languageParameters, const QList<int> &prob, QList<bool> &hasCommand ) const;
+
+		/**
 		 * The index of the allowed instruction in whose range of weights randomValue is, or 0 if it is in none.
 		 */
 		int selectInstructionByWeight( long randomValue, const QList<bool> &hasCommand, const QList<int> &prob ) const;

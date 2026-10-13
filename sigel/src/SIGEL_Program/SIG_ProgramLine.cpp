@@ -608,7 +608,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
      int          op1 = 0, 
                   op2 = 0, 
                   selectedInstructionIndex = 0;
-     long         maximumValue = 0,
+     long         totalWeight = 0,
                   randomValue = 0;
      QList<bool> hasCommand;
 
@@ -621,19 +621,12 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
      if( randomizer.getRandomInt(2) == 1 ) op1 = (-1) * op1;
      if( randomizer.getRandomInt(2) == 1 ) op2 = (-1) * op2;
 
-     for( int n = 0; n < instructionCount; n++ )
-       {
-         if( !languageParameters.hasCommand( robotInstructionNames[n] ) )
-           continue;
+     totalWeight = totalWeightOfAllowedInstructions( languageParameters, prob, hasCommand );
 
-         maximumValue += prob[n];
-         hasCommand[n] = true;
-       }
-
-     if( maximumValue == 0 )
+     if( totalWeight == 0 )
         SIGEL_Tools::SIG_IO::cerr << "\nERROR: If no instructions are allowed, no instructions can be used !" << Qt::endl;
 
-     randomValue = randomizer.getRandomLong( maximumValue );
+     randomValue = randomizer.getRandomLong( totalWeight );
   
      selectedInstructionIndex = selectInstructionByWeight( randomValue, hasCommand, prob );
        
@@ -670,6 +663,24 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
         case 14:setRobotInstruction( SIGEL_Program::NOP, op1, op2 );
                 break;
        }
+}
+
+long SIGEL_Program::SIG_ProgramLine::totalWeightOfAllowedInstructions( const SIGEL_Robot::SIG_LanguageParameters &languageParameters,
+								       const QList<int> &prob,
+								       QList<bool> &hasCommand ) const
+{
+     long totalWeight = 0;
+
+     for( int n = 0; n < instructionCount; n++ )
+       {
+         if( !languageParameters.hasCommand( robotInstructionNames[n] ) )
+           continue;
+
+         totalWeight += prob[n];
+         hasCommand[n] = true;
+       }
+
+     return totalWeight;
 }
 
 int SIGEL_Program::SIG_ProgramLine::selectInstructionByWeight( long randomValue,
