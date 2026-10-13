@@ -42,9 +42,13 @@ namespace SIGEL_Environment
 
     void loadTerrainGivesTheHeightsOfTheFloorFunction();
 
+    void loadTerrainGivesTheHeightsOfThePictureFile();
+
     void loadTerrainGivesTheDimensionsOfTheFloor();
 
     void anotherEnvironmentDoesNotChangeTheTerrain();
+
+    void eachLoadHasATerrainFileOfItsOwnAndLeavesNoneBehind();
 
     void floorFunctionThatCannotBeParsedGivesAFlatFloor();
 
