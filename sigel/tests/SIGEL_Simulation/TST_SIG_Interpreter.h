@@ -126,6 +126,8 @@ namespace SIGEL_Simulation
 
     void loadPutsTheValueInTheRegister();
 
+    void loadPutsANegativeValueInTheRegister();
+
     void loadWrapsTheValueToTheRegisterWidth();
 
     void registerWidthComesFromTheLanguageParameters();
@@ -135,6 +137,8 @@ namespace SIGEL_Simulation
     void moveGivesTheRegisterValueAsDriveNumber();
 
     void moveRegisterOperandWraps();
+
+    void moveTakesItsOwnDurationWithALargeDriveNumber();
 
     void negativeRegisterOperandWithEightRegisters();
 
@@ -178,6 +182,8 @@ namespace SIGEL_Simulation
 
     void jmpJumpsWhenRegistersAreEqual();
 
+    void jmpJumpsWhenFirstRegisterIsNegative();
+
     void jmpDoesNotJumpWhenFirstRegisterIsGreater();
 
     void jmpDoesNotJumpBeforeAnyCmp();
@@ -186,7 +192,21 @@ namespace SIGEL_Simulation
 
     void jmpDoesNotClearTheFlag();
 
+    void jmpThatDoesNotJumpDoesNotSetTheCompareFlag();
+
     void cmpClearsTheFlag();
+
+    void compareFlagIsKeptBetweenCalls();
+
+    void compareFlagIsKeptByACallThatOnlyPaysExceededTime();
+
+    void commandBetweenCmpAndJmpDoesNotClearTheCompareFlag_data();
+
+    void commandBetweenCmpAndJmpDoesNotClearTheCompareFlag();
+
+    void commandBetweenCmpAndJmpDoesNotSetTheCompareFlag_data();
+
+    void commandBetweenCmpAndJmpDoesNotSetTheCompareFlag();
 
     void jmpBackwardsMakesALoop();
 
@@ -194,9 +214,19 @@ namespace SIGEL_Simulation
 
     void jmpBeforeLineZeroWrapsFromTheEnd();
 
+    void jmpWrapsOverSeveralProgramLengths_data();
+
+    void jmpWrapsOverSeveralProgramLengths();
+
+    void jmpToLineZero_data();
+
+    void jmpToLineZero();
+
     void cmpThatIsNotAllowedIsSkipped();
 
     void jmpThatIsNotAllowedIsSkipped();
+
+    void commandThatIsNotAllowedDoesNotClearTheCompareFlag();
 
     void eachInstructionAsLastLineGoesOnAtLineZero_data();
 
