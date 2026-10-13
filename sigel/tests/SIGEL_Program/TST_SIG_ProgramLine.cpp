@@ -614,6 +614,65 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedComman
     }
 }
 
+void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsChosenByTheWeightsOfTheAllowedCommands_data()
+{
+  QTest::addColumn< QString >( "nameOfTheRemovedCommand" );
+  QTest::addColumn< QList<int> >( "probabilities" );
+  QTest::addColumn< int >( "totalWeight" );
+  QTest::addColumn< QList<RobotInstruction> >( "expectedInstructions" );
+
+  // The probabilities have one entry for each instruction, in the order of RobotInstruction.
+  QList<int> probabilitiesWithAllCommandsAllowed( 15, 0 );
+  probabilitiesWithAllCommandsAllowed[COPY] = 1;
+  probabilitiesWithAllCommandsAllowed[LOAD] = 3;
+  probabilitiesWithAllCommandsAllowed[MOVE] = 2;
+  QList<int> probabilitiesWithLoadNotAllowed( 15, 0 );
+  probabilitiesWithLoadNotAllowed[COPY] = 2;
+  probabilitiesWithLoadNotAllowed[LOAD] = 7;
+  probabilitiesWithLoadNotAllowed[ADD] = 1;
+  probabilitiesWithLoadNotAllowed[NOP] = 3;
+
+  // expectedInstructions has one entry for each random value from 0 to totalWeight - 1.
+  QTest::newRow( "all commands allowed" ) << "" << probabilitiesWithAllCommandsAllowed << 6 << QList<RobotInstruction>{ COPY, LOAD, LOAD, LOAD, MOVE, MOVE };
+  QTest::newRow( "LOAD not allowed" ) << "LOAD" << probabilitiesWithLoadNotAllowed << 6 << QList<RobotInstruction>{ COPY, COPY, ADD, NOP, NOP, NOP };
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsChosenByTheWeightsOfTheAllowedCommands()
+{
+  QFETCH( QString, nameOfTheRemovedCommand );
+  QFETCH( QList<int>, probabilities );
+  QFETCH( int, totalWeight );
+  QFETCH( QList<RobotInstruction>, expectedInstructions );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  if ( !nameOfTheRemovedCommand.isEmpty() )
+    languageParameters.removeCommand( nameOfTheRemovedCommand );
+  SIGEL_Tools::SIG_Randomizer randomizer( 42 );
+  SIGEL_Tools::SIG_Randomizer expectedRandomizer( 42 );
+  QList<bool> randomValueSeen( totalWeight, false );
+  const QList<int> probabilitiesBeforeTheCalls = probabilities;
+
+  for ( int count = 0; count < 1000; count++ )
+    {
+      // A random instruction takes five numbers from the randomizer: two operands, two signs and the choice of the instruction.
+      expectedRandomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
+      expectedRandomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
+      expectedRandomizer.getRandomInt( 2 );
+      expectedRandomizer.getRandomInt( 2 );
+      const long randomValue = expectedRandomizer.getRandomLong( totalWeight );
+      randomValueSeen[randomValue] = true;
+      SIG_ProgramLine programLine;
+
+      programLine.randomRobotInstruction( languageParameters, randomizer, probabilities );
+
+      QCOMPARE( programLine.getRobotInstructionType(), expectedInstructions[randomValue] );
+    }
+
+  QCOMPARE( randomValueSeen, QList<bool>( totalWeight, true ) );
+
+  // The caller's list is the one of the GP parameters, so a random instruction must not change it.
+  QCOMPARE( probabilities, probabilitiesBeforeTheCalls );
+}
+
 void SIGEL_Program::TST_SIG_ProgramLine::sameSeedGivesTheSameInstructions()
 {
   SIGEL_Robot::SIG_LanguageParameters languageParameters;

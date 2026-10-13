@@ -98,6 +98,10 @@ namespace SIGEL_Program
 
     void randomInstructionIsTheOnlyAllowedCommandWithOperandsFromTheRandomizer();
 
+    void randomInstructionIsChosenByTheWeightsOfTheAllowedCommands_data();
+
+    void randomInstructionIsChosenByTheWeightsOfTheAllowedCommands();
+
     void sameSeedGivesTheSameInstructions();
 
     void seedOneGivesKnownInstructions();
