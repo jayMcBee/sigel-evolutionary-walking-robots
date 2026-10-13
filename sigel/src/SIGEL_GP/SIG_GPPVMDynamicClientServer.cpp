@@ -122,7 +122,9 @@ bool SIGEL_GP::SIG_GPPVMDynamicClientServer::waitForClient()
 void SIGEL_GP::SIG_GPPVMDynamicClientServer::acceptClient(SIG_GPFitnessTrainer *trainer)
 {
 	int sdRecv;
-	char clientName[256];
+	char registration[512];
+	char clientName[512];
+	int maxSlaves = 0;
 	QString client;
 
 	sdRecv = accept(listenSocket, nullptr, nullptr);
@@ -145,7 +147,7 @@ void SIGEL_GP::SIG_GPPVMDynamicClientServer::acceptClient(SIG_GPFitnessTrainer *
 		return;
 	}
 
-	const ssize_t receivedBytes = recv(sdRecv, clientName, sizeof(clientName), 0);
+	const ssize_t receivedBytes = recv(sdRecv, registration, sizeof(registration), 0);
 
 	if (receivedBytes <= 0)
 	{
@@ -154,9 +156,16 @@ void SIGEL_GP::SIG_GPPVMDynamicClientServer::acceptClient(SIG_GPFitnessTrainer *
 		return;
 	}
 
-	if (memchr(clientName, '\0', receivedBytes) == nullptr)
+	if (memchr(registration, '\0', receivedBytes) == nullptr)
 	{
-		fprintf(stderr, "ERR:   a dynamic client sent a host name with no end; its connection is closed\n");
+		fprintf(stderr, "ERR:   a dynamic client sent a registration with no end; its connection is closed\n");
+		close(sdRecv);
+		return;
+	}
+
+	if (sscanf(registration, "%511s %d", clientName, &maxSlaves) != 2 || maxSlaves < 1)
+	{
+		fprintf(stderr, "ERR:   a dynamic client sent no number of slaves of 1 or more; it is not registered. The client must have the SIGEL version of this master.\n");
 		close(sdRecv);
 		return;
 	}
@@ -168,6 +177,6 @@ void SIGEL_GP::SIG_GPPVMDynamicClientServer::acceptClient(SIG_GPFitnessTrainer *
 	client = clientName;
 
 	// tell the fitnesstrainer there's a fresh host
-	trainer->addDynHost(client);
-	fprintf(stderr, "\t(Servertask registered dyn. client \"%s\")\n", clientName);
+	trainer->addDynHost(client, maxSlaves);
+	fprintf(stderr, "\t(Servertask registered dyn. client \"%s\", number of slaves: %d)\n", clientName, maxSlaves);
 }

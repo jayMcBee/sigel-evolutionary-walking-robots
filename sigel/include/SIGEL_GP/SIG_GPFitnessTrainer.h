@@ -130,18 +130,10 @@ namespace SIGEL_GP
 
 		int getNextHost();
 
-		/** This methods adds a dynamic PVM host, which will used
-		 * for this evaluation only and not saved to the experiment
-		 * file like all other (static) PVM hosts !
-		 */
-		void addDynHost(QString newHost);
+		/** Adds a dynamic PVM host that runs up to maxSlaves slaves at the same time. It is not saved to the experiment file. */
+		void addDynHost(QString newHost, int maxSlaves);
 
-		/**
-		 * True once PVM has reported that it can no longer be reached. checkTask is
-		 * the only place that sees this, because pvm_probe is the only call on the
-		 * run path that touches the daemon. Nothing here acts on it: the environment
-		 * that owns the evolution reads it and decides.
-		 */
+		/** True once PVM can no longer be reached. This class only sets it; SIG_GPManager reads and clears it. */
 		bool pvmLost;
 
 	private:

@@ -127,12 +127,15 @@ The master prints "Server is awaiting requests from dynamic clients on port 6789
 and starts the evolution. From then on a client can join. On the client, in the
 directory "sigelApp":
 
-./sigelDynClient <host name of the master>
+./sigelDynClient <host name of the master> [<number of slaves>]
 
 The script copies "sigel_slave" to "/tmp/_SIGEL_EVOLUTION_TEMP" and gives the host name
-of the client to the master. The master must reach the client by this name; it is the
-name that "hostname" prints on the client. The master then starts its slaves on the
-client, one at a time.
+of the client and the number of slaves to the master. The master must reach the client
+by this name; it is the name that "hostname" prints on the client. The master then
+runs up to that number of slaves on the client at the same time. Without a number,
+it is the number of processors of the client.
+
+The master and the client must have the same version of SIGEL.
 
 For each fitness value the master prints the individual and the host that sent it:
 

@@ -3,7 +3,10 @@
 # This script makes the host running it a dynamic client of a
 # SIGEL master program started with 'sigel -de':
 #
-#    sigelDynClient <MasterHostName>
+#    sigelDynClient <MasterHostName> [<NumberOfSlaves>]
+#
+# The master runs up to <NumberOfSlaves> slaves on this host at the
+# same time. Without it, the number is the number of processors.
 #
 # The master starts sigel_slave from /tmp/_SIGEL_EVOLUTION_TEMP on
 # this host. The script puts a copy of sigel_slave there and
@@ -18,7 +21,7 @@ mkdir /tmp/_SIGEL_EVOLUTION_TEMP
 cp "$SIGEL_ROOT/sigel_slave" /tmp/_SIGEL_EVOLUTION_TEMP
 
 # Registers this host with the master and returns when the master ends.
-"$SIGEL_ROOT/manage_dyn_slave" "$1"
+"$SIGEL_ROOT/manage_dyn_slave" "$1" "${2:-$(nproc)}"
 
 cd "$SIGEL_ROOT"
 rm -rf /tmp/_SIGEL_EVOLUTION_TEMP

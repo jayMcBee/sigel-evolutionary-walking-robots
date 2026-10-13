@@ -110,12 +110,12 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   pvmHosts.clear();
 };
 
-void SIGEL_GP::SIG_GPFitnessTrainer::addDynHost(QString newHost) {
+void SIGEL_GP::SIG_GPFitnessTrainer::addDynHost(QString newHost, int maxSlaves) {
   QString buffer;
 
   // make a new host from scratch using 'newHost' hostname;
-  // 1 slave, enabled, in "/tmp/_SIGEL_EVOLUTION_TEMP"
-  buffer = newHost + " 1 1 \"/tmp/_SIGEL_EVOLUTION_TEMP\"\n";
+  // 'maxSlaves' slaves, enabled, in "/tmp/_SIGEL_EVOLUTION_TEMP"
+  buffer = newHost + " " + QString::number( maxSlaves ) + " 1 \"/tmp/_SIGEL_EVOLUTION_TEMP\"\n";
 
   SIGEL_GP::SIG_GPPVMHost *newPVMHost = new SIGEL_GP::SIG_GPPVMHost( buffer );
 
