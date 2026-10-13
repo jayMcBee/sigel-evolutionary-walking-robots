@@ -452,6 +452,10 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
     // PvmDupHost: the host is still in PVM from an earlier join.
     if (info < 1 && singleInfo != PvmDupHost) {
       SIGEL_Tools::SIG_IO::cerr << "\tPVM cannot add the dynamic host \"" << freshHost->name << "\" (error " << singleInfo << "); it is not used." << Qt::endl;
+
+      if (singleInfo == PvmCantStart)
+        SIGEL_Tools::SIG_IO::cerr << "\tPVM cannot start its daemon on that host. Check the remote shell in PVM_RSH, that \"ssh " << freshHost->name << "\" logs in without a password, and that PVM_ROOT is set on that host." << Qt::endl;
+
       continue;
     }
 

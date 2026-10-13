@@ -79,11 +79,11 @@ The master starts PVM on the other hosts through a remote shell. On the master:
   Host <host>
       User <login name>
 
-- Tell PVM to use ssh, before you start "sigelLauncher":
+- "sigelLauncher" tells PVM to use ssh: it sets PVM_RSH to "/usr/bin/ssh". To use a
+  different remote shell, set PVM_RSH before you start "sigelLauncher":
 
-  export PVM_RSH=/usr/bin/ssh
+  export PVM_RSH=<path of the remote shell>
 
-  Without PVM_RSH, PVM uses rsh.
 - Check the variables of the other host. This must print both paths:
 
   ssh <host> 'echo $SIGEL_ROOT $PVM_ROOT'
