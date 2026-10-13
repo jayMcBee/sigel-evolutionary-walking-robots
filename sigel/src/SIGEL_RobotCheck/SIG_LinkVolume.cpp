@@ -111,10 +111,14 @@ double SIGEL_RobotCheck::SIG_LinkVolume::sharedWith( const SIG_LinkVolume &other
   int insideBoth = 0;
   for ( int sample = 0; sample < samples; sample++ )
     {
-      // SIG_Randomizer gives numbers below 32768.
-      SIG_Vector point( low.x + ( high.x - low.x ) * randomizer.getRandomInt( 32768 ) / 32767.0,
-                        low.y + ( high.y - low.y ) * randomizer.getRandomInt( 32768 ) / 32767.0,
-                        low.z + ( high.z - low.z ) * randomizer.getRandomInt( 32768 ) / 32767.0 );
+      const double largestRandomInt = SIGEL_Tools::SIG_Randomizer::fullRandomIntRange - 1.0;
+      const int randomX = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
+      const int randomY = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
+      const int randomZ = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
+      SIG_Vector point( low.x + ( high.x - low.x ) * randomX / largestRandomInt,
+                        low.y + ( high.y - low.y ) * randomY / largestRandomInt,
+                        low.z + ( high.z - low.z ) * randomZ / largestRandomInt );
+
       if ( contains( point ) && other.contains( point ) )
         insideBoth++;
     }

@@ -101,8 +101,9 @@ SIGEL_RobotCheck::SIG_JointInertia::SIG_JointInertia( const SIGEL_Robot::SIG_Rob
                   maximum = M_PI;
                 }
 
-              // SIG_Randomizer gives numbers below 32768.
-              position[ jointOffsets[j] ] = minimum + ( maximum - minimum ) * randomizer.getRandomInt( 32768 ) / 32767.0;
+              const double largestRandomInt = SIGEL_Tools::SIG_Randomizer::fullRandomIntRange - 1.0;
+              const int randomInt = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
+              position[ jointOffsets[j] ] = minimum + ( maximum - minimum ) * randomInt / largestRandomInt;
             }
         }
 
