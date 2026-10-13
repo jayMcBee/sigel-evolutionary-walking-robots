@@ -607,7 +607,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
 {
      int          op1 = 0, 
                   op2 = 0, 
-                  iType = 0;
+                  selectedInstructionIndex = 0;
      long         maximumValue = 0,
                   randomValue = 0;
      QList<bool> hasCommand;
@@ -716,9 +716,9 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
 
      randomValue = randomizer.getRandomLong( maximumValue );
   
-     iType = selectInstructionByWeight( randomValue, hasCommand, prob );
+     selectedInstructionIndex = selectInstructionByWeight( randomValue, hasCommand, prob );
        
-     switch( iType )
+     switch( selectedInstructionIndex )
        {
         case 0: setRobotInstruction( SIGEL_Program::COPY, op1, op2 );
                 break;
