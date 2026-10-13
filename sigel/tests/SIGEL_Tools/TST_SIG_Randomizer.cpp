@@ -42,7 +42,7 @@ void SIGEL_Tools::TST_SIG_Randomizer::differentSeedsGiveDifferentNumbers()
   SIG_Randomizer first( 1 );
   SIG_Randomizer second( 2 );
 
-  QVERIFY( first.getRandomInt( 32768 ) != second.getRandomInt( 32768 ) );
+  QVERIFY( first.getRandomInt( SIG_Randomizer::fullRandomIntRange ) != second.getRandomInt( SIG_Randomizer::fullRandomIntRange ) );
 }
 
 void SIGEL_Tools::TST_SIG_Randomizer::setNewSeedStartsTheNumbersAgain()
@@ -64,7 +64,7 @@ void SIGEL_Tools::TST_SIG_Randomizer::setNewSeedAfterTheDefaultConstructorGivesT
 
   randomizer.setNewSeed( 1 );
 
-  QCOMPARE( randomizer.getRandomInt( 32768 ), 16838 );
+  QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), 16838 );
 }
 
 void SIGEL_Tools::TST_SIG_Randomizer::defaultConstructorTakesTheSecondsSinceMidnightAsSeed()
@@ -84,8 +84,8 @@ void SIGEL_Tools::TST_SIG_Randomizer::defaultConstructorTakesTheSecondsSinceMidn
         }
 
       SIG_Randomizer expected( secondsBefore );
-      QCOMPARE( randomizer.getRandomInt( 32768 ), expected.getRandomInt( 32768 ) );
-      QCOMPARE( randomizer.getRandomInt( 32768 ), expected.getRandomInt( 32768 ) );
+      QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), expected.getRandomInt( SIG_Randomizer::fullRandomIntRange ) );
+      QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), expected.getRandomInt( SIG_Randomizer::fullRandomIntRange ) );
       return;
     }
 
@@ -146,10 +146,10 @@ void SIGEL_Tools::TST_SIG_Randomizer::seedOneGivesKnownNumbers()
 {
   SIG_Randomizer randomizer( 1 );
 
-  QCOMPARE( randomizer.getRandomInt( 32768 ), 16838 );
-  QCOMPARE( randomizer.getRandomInt( 32768 ), 5758 );
-  QCOMPARE( randomizer.getRandomInt( 32768 ), 10113 );
-  QCOMPARE( randomizer.getRandomInt( 32768 ), 17515 );
+  QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), 16838 );
+  QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), 5758 );
+  QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), 10113 );
+  QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), 17515 );
 }
 
 // A maximum that is not a power of two: the numbers also depend on the mask

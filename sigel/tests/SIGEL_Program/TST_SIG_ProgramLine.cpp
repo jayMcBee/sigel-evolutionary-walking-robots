@@ -596,8 +596,8 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedComman
   for ( int count = 0; count < 1000; count++ )
     {
       // A random instruction takes five numbers from the randomizer: two operands, two signs and the choice of the instruction.
-      int firstOperand = expectedRandomizer.getRandomInt( 32768 );
-      int secondOperand = expectedRandomizer.getRandomInt( 32768 );
+      int firstOperand = expectedRandomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
+      int secondOperand = expectedRandomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
       if ( expectedRandomizer.getRandomInt( 2 ) == 1 )
         firstOperand = -firstOperand;
       if ( expectedRandomizer.getRandomInt( 2 ) == 1 )
