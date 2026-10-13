@@ -24,7 +24,10 @@
 #ifndef SIGEL_ENVIRONMENT_TST_SIG_ENVIRONMENT_H
 #define SIGEL_ENVIRONMENT_TST_SIG_ENVIRONMENT_H
 
+#include <QByteArray>
 #include <QObject>
+
+class dmEnvironment;
 
 namespace SIGEL_Environment
 {
@@ -56,10 +59,38 @@ namespace SIGEL_Environment
 
     void loadTerrainNeedsNoSigelRoot();
 
+    void loadTerrainUsesTheSettingsAtTheCall();
+
+    void readFromFileGivesTheTerrainOfTheFile();
+
+    void loadTerrainGivesHeightsWithSixSignificantDigits();
+
+    void loadTerrainGivesEachHeightOfASymmetricFloorFunction();
+
+    void loadTerrainGivesTheDimensionsOfAFloorThatIsNotSquare();
+
+    void floorFunctionThatCannotBeParsedGivesAFlatFloorThatIsNotSquare();
+
+    void groundElevationIsInterpolatedInTrianglesAndKeepsTheEdgeHeightPastTheFloor();
+
+    void pictureFileWithAnotherMagicKeyGivesAFlatFloor();
+
+    void emptyPictureFileGivesAFlatFloor();
+
+    void commentsInThePictureFileAreSkipped();
+
+    void pictureFileNeedsNoFinalNewline();
+
   private:
 
     /** The height that DynaMechs holds at one grid point after loadTerrain. */
     double loadedHeight( const SIG_Environment &environment, int first, int second ) const;
+
+    /** Loads the terrain of a picture file with this text into target; false if the file cannot be written. The floor settings are 3 by 5. */
+    bool loadPictureTerrain( const QByteArray &picture, dmEnvironment &target ) const;
+
+    /** Fails the test unless the terrain has these dimensions and this height at each grid point. */
+    void verifyFloorOfOneHeight( dmEnvironment &dynaMechsEnvironment, int firstDimension, int secondDimension, double height ) const;
   };
 
 }

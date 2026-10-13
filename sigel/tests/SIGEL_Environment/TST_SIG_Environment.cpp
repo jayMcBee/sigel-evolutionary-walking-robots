@@ -174,6 +174,196 @@ void SIGEL_Environment::TST_SIG_Environment::loadTerrainNeedsNoSigelRoot()
   QCOMPARE( height, 2.0 );
 }
 
+void SIGEL_Environment::TST_SIG_Environment::loadTerrainUsesTheSettingsAtTheCall()
+{
+  SIG_Environment environment;
+  QCOMPARE( loadedHeight( environment, 5, 5 ), 0.0 );
+
+  environment.setFloorFunction( "2" );
+  QCOMPARE( loadedHeight( environment, 5, 5 ), 2.0 );
+}
+
+void SIGEL_Environment::TST_SIG_Environment::readFromFileGivesTheTerrainOfTheFile()
+{
+  QString text = "FLOORDIMENSION\n4\n4\nFLOORFUNCTION\n3\n";
+  QTextStream file( &text, QIODevice::ReadOnly );
+
+  SIG_Environment environment;
+  environment.readFromFile( file );
+
+  // SIG_EnvironmentRenderer draws the terrain that getDMEnvironment gives.
+  int firstDimension = 0;
+  int secondDimension = 0;
+  Float spacing = 0;
+  Float **heights = environment.getDMEnvironment()->getTerrainData( firstDimension, secondDimension, spacing );
+
+  QCOMPARE( firstDimension, 4 );
+  QCOMPARE( secondDimension, 4 );
+  QCOMPARE( heights[ 2 ][ 2 ], 3.0 );
+  QCOMPARE( loadedHeight( environment, 2, 2 ), 3.0 );
+}
+
+void SIGEL_Environment::TST_SIG_Environment::loadTerrainGivesHeightsWithSixSignificantDigits()
+{
+  SIG_Environment environment;
+  environment.setFloorDimensionX( 4 );
+  environment.setFloorDimensionZ( 4 );
+  environment.setFloorFunction( "(x+z)/3" );
+
+  QCOMPARE( loadedHeight( environment, 1, 0 ), 0.333333 );
+  QCOMPARE( loadedHeight( environment, 2, 2 ), 1.33333 );
+
+  // A grey value of 100 of 255 is a height of 1.960784...
+  dmEnvironment dynaMechsEnvironment;
+  QVERIFY( loadPictureTerrain( "P2\n2 2\n255\n0 100\n100 255\n", dynaMechsEnvironment ) );
+
+  int firstDimension = 0;
+  int secondDimension = 0;
+  Float spacing = 0;
+  Float **heights = dynaMechsEnvironment.getTerrainData( firstDimension, secondDimension, spacing );
+
+  QCOMPARE( heights[ 0 ][ 1 ], 1.96078 );
+  QCOMPARE( heights[ 1 ][ 0 ], 1.96078 );
+}
+
+void SIGEL_Environment::TST_SIG_Environment::loadTerrainGivesEachHeightOfASymmetricFloorFunction()
+{
+  SIG_Environment environment;
+  environment.setFloorDimensionX( 4 );
+  environment.setFloorDimensionZ( 4 );
+  environment.setFloorFunction( "x*z+x+z" );
+
+  dmEnvironment dynaMechsEnvironment;
+  environment.loadTerrain( dynaMechsEnvironment );
+
+  int firstDimension = 0;
+  int secondDimension = 0;
+  Float spacing = 0;
+  Float **heights = dynaMechsEnvironment.getTerrainData( firstDimension, secondDimension, spacing );
+
+  QCOMPARE( firstDimension, 4 );
+  QCOMPARE( secondDimension, 4 );
+
+  for (int first = 0; first < 4; ++first)
+    for (int second = 0; second < 4; ++second)
+      QCOMPARE( heights[ first ][ second ], static_cast< double >( first * second + first + second ) );
+}
+
+void SIGEL_Environment::TST_SIG_Environment::loadTerrainGivesTheDimensionsOfAFloorThatIsNotSquare()
+{
+  SIG_Environment environment;
+  environment.setFloorDimensionX( 3 );
+  environment.setFloorDimensionZ( 5 );
+  environment.setFloorFunction( "2" );
+
+  dmEnvironment dynaMechsEnvironment;
+  environment.loadTerrain( dynaMechsEnvironment );
+
+  verifyFloorOfOneHeight( dynaMechsEnvironment, 3, 5, 2.0 );
+}
+
+void SIGEL_Environment::TST_SIG_Environment::floorFunctionThatCannotBeParsedGivesAFlatFloorThatIsNotSquare()
+{
+  SIG_Environment environment;
+  environment.setFloorDimensionX( 3 );
+  environment.setFloorDimensionZ( 5 );
+  environment.setFloorFunction( "sin(x" );
+
+  dmEnvironment dynaMechsEnvironment;
+  environment.loadTerrain( dynaMechsEnvironment );
+
+  verifyFloorOfOneHeight( dynaMechsEnvironment, 3, 5, 0.0 );
+}
+
+void SIGEL_Environment::TST_SIG_Environment::groundElevationIsInterpolatedInTrianglesAndKeepsTheEdgeHeightPastTheFloor()
+{
+  SIG_Environment environment;
+  environment.setFloorDimensionX( 4 );
+  environment.setFloorDimensionZ( 4 );
+  environment.setFloorFunction( "x*z+1" );
+
+  dmEnvironment dynaMechsEnvironment;
+  environment.loadTerrain( dynaMechsEnvironment );
+
+  CartesianVector normal;
+
+  CartesianVector onAGridPoint = { 2, 1, 0 };
+  QCOMPARE( dynaMechsEnvironment.getGroundElevation( onAGridPoint, normal ), 3.0 );
+
+  // In this triangle the floor rises by 2 along each of the two axes, so its normal is (-2, -2, 1), scaled to length 1.
+  QCOMPARE( normal[ 0 ], -2.0 / 3 );
+  QCOMPARE( normal[ 1 ], -2.0 / 3 );
+  QCOMPARE( normal[ 2 ], 1.0 / 3 );
+
+  CartesianVector betweenTwoGridPoints = { 2.5, 1, 0 };
+  QCOMPARE( dynaMechsEnvironment.getGroundElevation( betweenTwoGridPoints, normal ), 3.5 );
+
+  // The function gives 2.875 here; the height in the triangle of the three grid points around it is 3.
+  CartesianVector insideACell = { 1.5, 1.25, 0 };
+  QCOMPARE( dynaMechsEnvironment.getGroundElevation( insideACell, normal ), 3.0 );
+
+  CartesianVector beforeTheFirstCorner = { -4, -4, 0 };
+  QCOMPARE( dynaMechsEnvironment.getGroundElevation( beforeTheFirstCorner, normal ), 1.0 );
+
+  CartesianVector pastTheLastCorner = { 100, 100, 0 };
+  QCOMPARE( dynaMechsEnvironment.getGroundElevation( pastTheLastCorner, normal ), 10.0 );
+
+  CartesianVector pastOneEdge = { 1.5, 100, 0 };
+  QCOMPARE( dynaMechsEnvironment.getGroundElevation( pastOneEdge, normal ), 5.5 );
+}
+
+void SIGEL_Environment::TST_SIG_Environment::pictureFileWithAnotherMagicKeyGivesAFlatFloor()
+{
+  dmEnvironment dynaMechsEnvironment;
+  QVERIFY( loadPictureTerrain( "P5\n2 2\n255\n0 51\n51 255\n", dynaMechsEnvironment ) );
+
+  verifyFloorOfOneHeight( dynaMechsEnvironment, 3, 5, 0.0 );
+}
+
+void SIGEL_Environment::TST_SIG_Environment::emptyPictureFileGivesAFlatFloor()
+{
+  dmEnvironment dynaMechsEnvironment;
+  QVERIFY( loadPictureTerrain( "", dynaMechsEnvironment ) );
+
+  verifyFloorOfOneHeight( dynaMechsEnvironment, 3, 5, 0.0 );
+}
+
+void SIGEL_Environment::TST_SIG_Environment::commentsInThePictureFileAreSkipped()
+{
+  dmEnvironment dynaMechsEnvironment;
+  QVERIFY( loadPictureTerrain( "# before the magic key\nP2\n2\n# between the sizes\n2\n255 #after a value\n0 51\n51 255\n", dynaMechsEnvironment ) );
+
+  int firstDimension = 0;
+  int secondDimension = 0;
+  Float spacing = 0;
+  Float **heights = dynaMechsEnvironment.getTerrainData( firstDimension, secondDimension, spacing );
+
+  QCOMPARE( firstDimension, 2 );
+  QCOMPARE( secondDimension, 2 );
+  QCOMPARE( heights[ 0 ][ 0 ], 0.0 );
+  QCOMPARE( heights[ 0 ][ 1 ], 1.0 );
+  QCOMPARE( heights[ 1 ][ 0 ], 1.0 );
+  QCOMPARE( heights[ 1 ][ 1 ], 5.0 );
+}
+
+void SIGEL_Environment::TST_SIG_Environment::pictureFileNeedsNoFinalNewline()
+{
+  dmEnvironment dynaMechsEnvironment;
+  QVERIFY( loadPictureTerrain( "P2\n2 2\n255\n0 51\n51 255", dynaMechsEnvironment ) );
+
+  int firstDimension = 0;
+  int secondDimension = 0;
+  Float spacing = 0;
+  Float **heights = dynaMechsEnvironment.getTerrainData( firstDimension, secondDimension, spacing );
+
+  QCOMPARE( firstDimension, 2 );
+  QCOMPARE( secondDimension, 2 );
+  QCOMPARE( heights[ 0 ][ 0 ], 0.0 );
+  QCOMPARE( heights[ 0 ][ 1 ], 1.0 );
+  QCOMPARE( heights[ 1 ][ 0 ], 1.0 );
+  QCOMPARE( heights[ 1 ][ 1 ], 5.0 );
+}
+
 double SIGEL_Environment::TST_SIG_Environment::loadedHeight( const SIG_Environment &environment, int first, int second ) const
 {
   dmEnvironment dynaMechsEnvironment;
@@ -185,4 +375,38 @@ double SIGEL_Environment::TST_SIG_Environment::loadedHeight( const SIG_Environme
   Float **heights = dynaMechsEnvironment.getTerrainData( firstDimension, secondDimension, spacing );
 
   return heights[ first ][ second ];
+}
+
+bool SIGEL_Environment::TST_SIG_Environment::loadPictureTerrain( const QByteArray &picture, dmEnvironment &target ) const
+{
+  QTemporaryFile pictureFile;
+
+  if (!pictureFile.open() || pictureFile.write( picture ) != picture.size())
+    return false;
+
+  pictureFile.close();
+
+  SIG_Environment environment;
+  environment.setFloorDimensionX( 3 );
+  environment.setFloorDimensionZ( 5 );
+  environment.setFloorPictureFile( pictureFile.fileName() );
+  environment.setFloorFuncSelected( false );
+  environment.loadTerrain( target );
+
+  return true;
+}
+
+void SIGEL_Environment::TST_SIG_Environment::verifyFloorOfOneHeight( dmEnvironment &dynaMechsEnvironment, int firstDimension, int secondDimension, double height ) const
+{
+  int loadedFirstDimension = 0;
+  int loadedSecondDimension = 0;
+  Float spacing = 0;
+  Float **heights = dynaMechsEnvironment.getTerrainData( loadedFirstDimension, loadedSecondDimension, spacing );
+
+  QCOMPARE( loadedFirstDimension, firstDimension );
+  QCOMPARE( loadedSecondDimension, secondDimension );
+
+  for (int first = 0; first < firstDimension; ++first)
+    for (int second = 0; second < secondDimension; ++second)
+      QCOMPARE( heights[ first ][ second ], height );
 }
