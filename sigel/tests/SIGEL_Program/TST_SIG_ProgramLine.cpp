@@ -540,8 +540,8 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomOperandsAreInsideTheRange()
       typeSeen[programLine.getRobotInstructionType()] = true;
       for ( int element : programLine.getElementsArray() )
         {
-          QVERIFY( element >= -31999 );
-          QVERIFY( element <= 31999 );
+          QVERIFY( element >= -32767 );
+          QVERIFY( element <= 32767 );
           if ( element < 0 )
             negativeElementSeen = true;
           if ( element > 0 )
@@ -596,8 +596,8 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedComman
   for ( int count = 0; count < 1000; count++ )
     {
       // A random instruction takes five numbers from the randomizer: two operands, two signs and the choice of the instruction.
-      int firstOperand = expectedRandomizer.getRandomInt( 32000 );
-      int secondOperand = expectedRandomizer.getRandomInt( 32000 );
+      int firstOperand = expectedRandomizer.getRandomInt( 32768 );
+      int secondOperand = expectedRandomizer.getRandomInt( 32768 );
       if ( expectedRandomizer.getRandomInt( 2 ) == 1 )
         firstOperand = -firstOperand;
       if ( expectedRandomizer.getRandomInt( 2 ) == 1 )

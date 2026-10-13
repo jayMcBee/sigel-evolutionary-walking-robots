@@ -605,7 +605,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
 							    SIGEL_Tools::SIG_Randomizer &randomizer,
 							    QList< int > &prob   )
 {
-     int          maximum = 32000; 
+     int          maximum = 32768; 
      int          op1 = 0, 
                   op2 = 0, 
                   iType = 0,

@@ -445,7 +445,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 				{
 					// Operand 1 will be varied:
 
-					op1 = randomizer.getRandomInt( 32000 );
+					op1 = randomizer.getRandomInt( 32768 );
 					if( randomizer.getRandomInt( 2 ) == 1 ) op1 = (-1) * op1;
 					op2 = newProgram.getLine( mutPoint ).getInstructionElement( 1 );
 				}
@@ -454,7 +454,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 					// Operand 2 will be varied:
 
 					op1 = newProgram.getLine( mutPoint ).getInstructionElement( 0 );
-					op2 = randomizer.getRandomInt( 32000 );
+					op2 = randomizer.getRandomInt( 32768 );
 					if( randomizer.getRandomInt( 2 ) == 1 ) op2 = (-1) * op2;
 				}
 			}
@@ -464,7 +464,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 				{
 					// The current program line has only one operand that can be changed:
 
-					op1 = randomizer.getRandomInt( 32000 );
+					op1 = randomizer.getRandomInt( 32768 );
 					if( randomizer.getRandomInt( 2 ) == 1 ) op1 = (-1) * op1;
 				}
 				else

@@ -2504,7 +2504,7 @@ Do you want to replace it?]
   [savedialog] parentIsTheMainWindow=1
   programs=5  instructionLines=1785
   perProgramLengths=[53,490,670,133,439]
-  sha256(instructions)=1de08c6e34a0d156d5794926bd7dd2d1ffc3c5f0b9d4bbd7c7c45d283a4fecec
+  sha256(instructions)=f415346f8ec2cee375d1946b67f34e5896eb7e691d894ac3471c224f8c86b021
   first 6 of individual 0: LOAD 9988,-22117 / MOVE 19741 / ADD -5659,-9758 / MAX -26233,15212 / NOP / JMP -23212
   RANDOMSEED at line 10 = 0
   RANDOMSEED at line 83 = 12345
