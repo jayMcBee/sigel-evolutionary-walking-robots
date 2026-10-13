@@ -86,15 +86,17 @@ namespace SIGEL_Program
 
     void copyLineOfAShorterLineRemovesTheElements();
 
-    void randomInstructionIsTheOnlyAllowedCommand_data();
-
-    void randomInstructionIsTheOnlyAllowedCommand();
-
     void randomInstructionIsTheOnlyCommandWithAWeight_data();
 
     void randomInstructionIsTheOnlyCommandWithAWeight();
 
+    void randomInstructionIsNeverTheCommandWithoutAWeight();
+
     void randomOperandsAreInsideTheRange();
+
+    void randomInstructionIsTheOnlyAllowedCommandWithOperandsFromTheRandomizer_data();
+
+    void randomInstructionIsTheOnlyAllowedCommandWithOperandsFromTheRandomizer();
 
     void sameSeedGivesTheSameInstructions();
 

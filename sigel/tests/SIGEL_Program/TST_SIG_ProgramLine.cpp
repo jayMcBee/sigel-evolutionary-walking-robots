@@ -66,7 +66,14 @@ void SIGEL_Program::TST_SIG_ProgramLine::setRobotInstructionSetsTypeAndElements(
   QFETCH( int, element1 );
   QList<int> expectedElements = { element0, element1 };
   expectedElements.resize( numberOfElements );
+  // The line starts as a different instruction with three elements, so that the call must change the type and remove the old elements.
   SIG_ProgramLine programLine;
+  if ( instruction == ADD )
+    programLine.setRobotInstruction( SUB, 7, 8 );
+  else
+    programLine.setRobotInstruction( ADD, 7, 8 );
+  programLine.resizeElements( 3 );
+  programLine.setElement( 2, 9 );
 
   programLine.setRobotInstruction( instruction, -12, -34 );
 
@@ -232,23 +239,34 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm()
 void SIGEL_Program::TST_SIG_ProgramLine::readFromFileAllowsExtraWhiteSpace_data()
 {
   QTest::addColumn< QString >( "text" );
+  QTest::addColumn< RobotInstruction >( "instruction" );
+  QTest::addColumn< int >( "numberOfElements" );
+  QTest::addColumn< int >( "element0" );
+  QTest::addColumn< int >( "element1" );
 
-  QTest::newRow( "spaces around the comma" ) << "ADD  1 , 2";
-  QTest::newRow( "space at the end" ) << "ADD 1,2 ";
-  QTest::newRow( "tabs" ) << "\tADD\t1,2";
+  QTest::newRow( "ADD spaces around the comma" ) << "ADD  1 , 2" << ADD << 2 << 1 << 2;
+  QTest::newRow( "ADD space at the end" ) << "ADD 1,2 " << ADD << 2 << 1 << 2;
+  QTest::newRow( "ADD tabs" ) << "\tADD\t1,2" << ADD << 2 << 1 << 2;
+  QTest::newRow( "MOVE tab before the operand" ) << "MOVE\t5" << MOVE << 1 << 5 << 0;
+  QTest::newRow( "LOAD tab before the operands" ) << "LOAD\t1,2" << LOAD << 2 << 1 << 2;
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::readFromFileAllowsExtraWhiteSpace()
 {
   QFETCH( QString, text );
-  const QList<int> expectedElements = { 1, 2 };
+  QFETCH( RobotInstruction, instruction );
+  QFETCH( int, numberOfElements );
+  QFETCH( int, element0 );
+  QFETCH( int, element1 );
+  QList<int> expectedElements = { element0, element1 };
+  expectedElements.resize( numberOfElements );
   SIG_ProgramLine programLine;
   programLine.setRobotInstruction( NOP, 0, 0 );
 
   const bool lineRead = programLine.readFromFile( text, &programLine );
 
   QVERIFY( lineRead );
-  QCOMPARE( programLine.getRobotInstructionType(), ADD );
+  QCOMPARE( programLine.getRobotInstructionType(), instruction );
   QCOMPARE( programLine.getElementsArray(), expectedElements );
 }
 
@@ -438,50 +456,6 @@ void SIGEL_Program::TST_SIG_ProgramLine::copyLineOfAShorterLineRemovesTheElement
   QCOMPARE( destination.getNumberOfElements(), 0 );
 }
 
-void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommand_data()
-{
-  QTest::addColumn< QString >( "name" );
-  QTest::addColumn< RobotInstruction >( "instruction" );
-
-  QTest::newRow( "MOVE" ) << "MOVE" << MOVE;
-  QTest::newRow( "LOAD" ) << "LOAD" << LOAD;
-  QTest::newRow( "NOP" ) << "NOP" << NOP;
-  QTest::newRow( "COPY" ) << "COPY" << COPY;
-  QTest::newRow( "ADD" ) << "ADD" << ADD;
-  QTest::newRow( "SUB" ) << "SUB" << SUB;
-  QTest::newRow( "MUL" ) << "MUL" << MUL;
-  QTest::newRow( "DIV" ) << "DIV" << DIV;
-  QTest::newRow( "MOD" ) << "MOD" << MOD;
-  QTest::newRow( "MIN" ) << "MIN" << MIN;
-  QTest::newRow( "MAX" ) << "MAX" << MAX;
-  QTest::newRow( "CMP" ) << "CMP" << CMP;
-  QTest::newRow( "JMP" ) << "JMP" << JMP;
-  QTest::newRow( "SENSE" ) << "SENSE" << SENSE;
-  QTest::newRow( "DELAY" ) << "DELAY" << DELAY;
-}
-
-void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommand()
-{
-  QFETCH( QString, name );
-  QFETCH( RobotInstruction, instruction );
-  SIGEL_Robot::SIG_LanguageParameters languageParameters;
-  QStringList otherNames;
-  for ( const SIGEL_Robot::SIG_LanguageParameters::NamedCommand &command : languageParameters.getCommands() )
-    if ( command.name != name )
-      otherNames.append( command.name );
-  for ( const QString &otherName : otherNames )
-    languageParameters.removeCommand( otherName );
-  QList<int> probabilities( 15, 1 );
-  SIGEL_Tools::SIG_Randomizer randomizer( 42 );
-
-  for ( int count = 0; count < 100; count++ )
-    {
-      SIG_ProgramLine programLine( randomizer, languageParameters, probabilities );
-
-      QCOMPARE( programLine.getRobotInstructionType(), instruction );
-    }
-}
-
 void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAWeight_data()
 {
   QTest::addColumn< RobotInstruction >( "instruction" );
@@ -521,6 +495,29 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyCommandWithAW
     }
 }
 
+void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsNeverTheCommandWithoutAWeight()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  // probabilities has one entry for each instruction, in the order of RobotInstruction.
+  // COPY has no weight, so no number selects it. Each other instruction has one number that selects it.
+  QList<int> probabilities( 15, 1 );
+  probabilities[COPY] = 0;
+  SIGEL_Tools::SIG_Randomizer randomizer( 42 );
+  // typeSeen has one entry for each instruction, in the order of RobotInstruction.
+  QList<bool> typeSeen( 15, false );
+  QList<bool> expectedTypeSeen( 15, true );
+  expectedTypeSeen[COPY] = false;
+
+  for ( int count = 0; count < 10000; count++ )
+    {
+      SIG_ProgramLine programLine( randomizer, languageParameters, probabilities );
+
+      typeSeen[programLine.getRobotInstructionType()] = true;
+    }
+
+  QCOMPARE( typeSeen, expectedTypeSeen );
+}
+
 void SIGEL_Program::TST_SIG_ProgramLine::randomOperandsAreInsideTheRange()
 {
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
@@ -550,6 +547,66 @@ void SIGEL_Program::TST_SIG_ProgramLine::randomOperandsAreInsideTheRange()
   QVERIFY( negativeElementSeen );
   QVERIFY( positiveElementSeen );
   QCOMPARE( typeSeen, QList<bool>( 15, true ) );
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommandWithOperandsFromTheRandomizer_data()
+{
+  QTest::addColumn< QString >( "name" );
+  QTest::addColumn< RobotInstruction >( "instruction" );
+  QTest::addColumn< int >( "numberOfElements" );
+
+  QTest::newRow( "MOVE" ) << "MOVE" << MOVE << 1;
+  QTest::newRow( "LOAD" ) << "LOAD" << LOAD << 2;
+  QTest::newRow( "NOP" ) << "NOP" << NOP << 0;
+  QTest::newRow( "COPY" ) << "COPY" << COPY << 2;
+  QTest::newRow( "ADD" ) << "ADD" << ADD << 2;
+  QTest::newRow( "SUB" ) << "SUB" << SUB << 2;
+  QTest::newRow( "MUL" ) << "MUL" << MUL << 2;
+  QTest::newRow( "DIV" ) << "DIV" << DIV << 2;
+  QTest::newRow( "MOD" ) << "MOD" << MOD << 2;
+  QTest::newRow( "MIN" ) << "MIN" << MIN << 2;
+  QTest::newRow( "MAX" ) << "MAX" << MAX << 2;
+  QTest::newRow( "CMP" ) << "CMP" << CMP << 2;
+  QTest::newRow( "JMP" ) << "JMP" << JMP << 1;
+  QTest::newRow( "SENSE" ) << "SENSE" << SENSE << 1;
+  QTest::newRow( "DELAY" ) << "DELAY" << DELAY << 1;
+}
+
+void SIGEL_Program::TST_SIG_ProgramLine::randomInstructionIsTheOnlyAllowedCommandWithOperandsFromTheRandomizer()
+{
+  QFETCH( QString, name );
+  QFETCH( RobotInstruction, instruction );
+  QFETCH( int, numberOfElements );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  QStringList otherNames;
+  for ( const SIGEL_Robot::SIG_LanguageParameters::NamedCommand &command : languageParameters.getCommands() )
+    if ( command.name != name )
+      otherNames.append( command.name );
+  for ( const QString &otherName : otherNames )
+    languageParameters.removeCommand( otherName );
+  QList<int> probabilities( 15, 1 );
+  SIGEL_Tools::SIG_Randomizer randomizer( 42 );
+  SIGEL_Tools::SIG_Randomizer expectedRandomizer( 42 );
+
+  for ( int count = 0; count < 1000; count++ )
+    {
+      // A random instruction takes five numbers from the randomizer: two operands, two signs and the choice of the instruction.
+      int firstOperand = expectedRandomizer.getRandomInt( 32000 );
+      int secondOperand = expectedRandomizer.getRandomInt( 32000 );
+      if ( expectedRandomizer.getRandomInt( 2 ) == 1 )
+        firstOperand = -firstOperand;
+      if ( expectedRandomizer.getRandomInt( 2 ) == 1 )
+        secondOperand = -secondOperand;
+      expectedRandomizer.getRandomLong( 1 );
+      QList<int> expectedElements = { firstOperand, secondOperand };
+      expectedElements.resize( numberOfElements );
+      SIG_ProgramLine programLine;
+
+      programLine.randomRobotInstruction( languageParameters, randomizer, probabilities );
+
+      QCOMPARE( programLine.getRobotInstructionType(), instruction );
+      QCOMPARE( programLine.getElementsArray(), expectedElements );
+    }
 }
 
 void SIGEL_Program::TST_SIG_ProgramLine::sameSeedGivesTheSameInstructions()
