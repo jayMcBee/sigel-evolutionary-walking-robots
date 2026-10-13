@@ -164,6 +164,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::invalidProgramLineThrows()
   setAllDurations( languageParameters, 1.0 );
   SIGEL_Program::SIG_Program program;
   SIGEL_Program::SIG_ProgramLine programLine;
+
   // 15 is the first value after the last instruction of RobotInstruction.
   programLine.setRobotInstructionType( static_cast<SIGEL_Program::RobotInstruction>( 15 ) );
   program.appendLine( programLine );
@@ -192,6 +193,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::invalidProgramLineThrowsOnlyWhenItIs
   SIGEL_Program::SIG_Program program;
   appendLine( program, SIGEL_Program::MOVE, 0, 0 );
   SIGEL_Program::SIG_ProgramLine programLine;
+
   // 15 is the first value after the last instruction of RobotInstruction.
   programLine.setRobotInstructionType( static_cast<SIGEL_Program::RobotInstruction>( 15 ) );
   program.appendLine( programLine );
@@ -204,6 +206,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::invalidProgramLineThrowsOnlyWhenItIs
     {
       // The MOVE exceeds the time account by 1 s.
       interpreter.interprete( 1 );
+
       // This call pays the exceeded time exactly, so line 1 is not reached.
       interpreter.interprete( 1 );
     }
@@ -285,6 +288,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::moveThatIsNotAllowedIsSkipped()
   languageParameters.removeCommand( "MOVE" );
   SIGEL_Program::SIG_Program program;
   appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+
   // A skipped line takes no time; the NOP uses up the time so that interprete returns.
   appendLine( program, SIGEL_Program::NOP, 0, 0 );
   TST_RecordingCommandInterface commandInterface;
@@ -393,7 +397,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::loadThatIsNotAllowedIsSkipped()
   TST_FixedSimulationQueries simulationQueries( 55 );
   SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
 
-  // The time is enough for the MOVE only, so its record also shows that the skipped LOAD took no time.
+  // The time is enough for the MOVE only.
   interpreter.interprete( 1 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -457,7 +461,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::moveTakesItsOwnDurationWithALargeDri
   TST_FixedSimulationQueries simulationQueries( 55 );
   SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
 
-  // The time is enough for the LOAD and the two MOVEs only. A MOVE that takes more time with a larger drive number gives one record.
+  // The time is enough for the LOAD and the two MOVEs only.
   interpreter.interprete( 3 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -518,6 +522,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::negativeRegisterOperandWithSixRegist
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
   QCOMPARE( moveRecords.size(), 1 );
+
   // MOVE 0 gives the value of register 0 as drive number.
   QCOMPARE( moveRecords[0].driveNumber, expectedValues[0] );
   QCOMPARE( moveRecords[0].registerValues, expectedValues );
@@ -606,7 +611,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::senseThatIsNotAllowedIsSkipped()
   TST_FixedSimulationQueries simulationQueries( 55 );
   SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
 
-  // The time is enough for the MOVE only, so its record also shows that the skipped SENSE took no time.
+  // The time is enough for the MOVE only.
   interpreter.interprete( 1 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -770,7 +775,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::delayThatIsNotAllowedIsSkipped()
   QList<int> expectedValues( 8, 0 );
   expectedValues[2] = 2000;
 
-  // The time is enough for the LOAD and the MOVE only, so the record also shows that the skipped DELAY took no time.
+  // The time is enough for the LOAD and the MOVE only.
   interpreter.interprete( 2 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -817,7 +822,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::nopThatIsNotAllowedIsSkipped()
   TST_FixedSimulationQueries simulationQueries( 55 );
   SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
 
-  // The time is enough for the MOVE only, so its record shows that the skipped NOP took no time.
+  // The time is enough for the MOVE only.
   interpreter.interprete( 1 );
 
   QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
@@ -835,10 +840,8 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultIn
   QTest::newRow( "ADD" ) << SIGEL_Program::ADD << 20 << 6 << 26;
   QTest::newRow( "SUB" ) << SIGEL_Program::SUB << 20 << 6 << 14;
   QTest::newRow( "MUL" ) << SIGEL_Program::MUL << 20 << 6 << 120;
-  // 23 / 3 is 7 and 7 % 3 is not 7, so the row fails if the DIV case of the switch runs on into the MOD case.
   QTest::newRow( "DIV" ) << SIGEL_Program::DIV << 23 << 3 << 7;
   QTest::newRow( "MOD" ) << SIGEL_Program::MOD << 20 << 6 << 2;
-  // The lesser of 2 and -6 is not 2, so the row fails if the MOD case of the switch runs on into the MIN case.
   QTest::newRow( "MOD second is negative" ) << SIGEL_Program::MOD << 20 << -6 << 2;
   QTest::newRow( "MIN first is greater" ) << SIGEL_Program::MIN << 20 << 6 << 6;
   QTest::newRow( "MIN first is less" ) << SIGEL_Program::MIN << 6 << 20 << 6;
@@ -857,6 +860,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticInstructionPutsTheResultIn
   SIGEL_Program::SIG_Program program;
   appendLine( program, SIGEL_Program::LOAD, 2, first );
   appendLine( program, SIGEL_Program::LOAD, 5, second );
+
   // With 8 registers, the operands 10 and 13 are the registers 2 and 5.
   appendLine( program, instruction, 10, 13 );
   appendLine( program, SIGEL_Program::MOVE, 0, 0 );
@@ -937,7 +941,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::arithmeticCommandThatIsNotAllowedIsS
   expectedValues[2] = 5;
   expectedValues[3] = 3;
 
-  // The time is enough for the two LOADs and the MOVE only, so the record also shows that the skipped line took no time.
+  // The time is enough for the two LOADs and the MOVE only.
   interpreter.interprete( 3 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1111,7 +1115,6 @@ void SIGEL_Simulation::TST_SIG_Interpreter::jmpDoesNotClearTheFlag()
   TST_FixedSimulationQueries simulationQueries( 55 );
   SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
 
-  // The second JMP jumps only if the first JMP has left the compare flag set.
   interpreter.interprete( 4 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1135,7 +1138,6 @@ void SIGEL_Simulation::TST_SIG_Interpreter::jmpThatDoesNotJumpDoesNotSetTheCompa
   QList<int> expectedValues( 8, 0 );
   expectedValues[4] = 99;
 
-  // The second JMP jumps over the LOAD only if the first JMP has set the compare flag.
   interpreter.interprete( 4 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1188,7 +1190,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::compareFlagIsKeptBetweenCalls()
   interpreter.interprete( 1 );
   QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 
-  // The time is enough for the JMP and the MOVE only. Without a jump the LOAD runs and there is no record.
+  // The time is enough for the JMP and the MOVE only.
   interpreter.interprete( 2 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1218,7 +1220,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::compareFlagIsKeptByACallThatOnlyPays
   interpreter.interprete( 1 );
   QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 
-  // The time is enough for the JMP and the MOVE only. Without a jump the LOAD runs and there is no record.
+  // The time is enough for the JMP and the MOVE only.
   interpreter.interprete( 2 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1265,7 +1267,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandBetweenCmpAndJmpDoesNotClearT
   TST_FixedSimulationQueries simulationQueries( 55 );
   SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
 
-  // The time is enough for the CMP, the command, the JMP and the MOVE only. Without a jump the LOAD runs in place of the MOVE.
+  // The time is enough for the CMP, the command, the JMP and the MOVE only.
   interpreter.interprete( 4 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1303,6 +1305,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandBetweenCmpAndJmpDoesNotSetThe
   setAllDurations( languageParameters, 1.0 );
   SIGEL_Program::SIG_Program program;
   appendLine( program, SIGEL_Program::LOAD, 2, 1 );
+
   // Register 2 is 1 and register 3 is 0, so the CMP does not set the compare flag.
   appendLine( program, SIGEL_Program::CMP, 2, 3 );
   appendLine( program, instruction, 3, 2 );
@@ -1313,7 +1316,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandBetweenCmpAndJmpDoesNotSetThe
   TST_FixedSimulationQueries simulationQueries( 55 );
   SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
 
-  // The time is enough for all 6 lines. With a jump the second LOAD does not run before the MOVE.
+  // The time is enough for all 6 lines.
   interpreter.interprete( 6 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1343,7 +1346,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::jmpBackwardsMakesALoop()
   secondExpectedValues[2] = 2;
   secondExpectedValues[3] = 1;
 
-  // The JMP on line 4 goes to the ADD on line 1. The time ends with the second MOVE, so a jump to line 0 gives one record only.
+  // The JMP on line 4 goes to the ADD on line 1. The time ends with the second MOVE.
   interpreter.interprete( 7 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1378,7 +1381,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::jmpPastTheLastLineWrapsToTheStart()
   interpreter.interprete( 1 );
   QCOMPARE( commandInterface.getMoveRecords().size(), 2 );
 
-  // After the MOVE on line 1 come the CMP and the JMP. After the MOVE on line 5 come the LOAD and the MOVE, with one more record.
+  // After the MOVE on line 1 come the CMP and the JMP.
   interpreter.interprete( 2 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1408,7 +1411,6 @@ void SIGEL_Simulation::TST_SIG_Interpreter::jmpBeforeLineZeroWrapsFromTheEnd()
   expectedValues[4] = 11;
 
   // The JMP on line 1 goes to line 1 + 1 - 6 = -4, which is line 3 in a program of 7 lines: the first LOAD.
-  // Without a jump the NOP on line 2 runs, and the time ends before the MOVE.
   interpreter.interprete( 4 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1481,7 +1483,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::jmpToLineZero()
   TST_FixedSimulationQueries simulationQueries( 55 );
   SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
 
-  // The time is enough for the MOVE, the CMP, the JMP and one more command. Only a jump to line 0 gives a second record.
+  // The time is enough for the MOVE, the CMP, the JMP and one more command.
   interpreter.interprete( 4 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1506,7 +1508,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::cmpThatIsNotAllowedIsSkipped()
   QList<int> expectedValues( 8, 0 );
   expectedValues[4] = 99;
 
-  // The time is enough for the JMP, the LOAD and the MOVE only, so the record also shows that the skipped CMP took no time.
+  // The time is enough for the JMP, the LOAD and the MOVE only.
   interpreter.interprete( 3 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1531,7 +1533,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::jmpThatIsNotAllowedIsSkipped()
   QList<int> expectedValues( 8, 0 );
   expectedValues[4] = 99;
 
-  // The time is enough for the CMP, the LOAD and the MOVE only, so the record also shows that the skipped JMP took no time.
+  // The time is enough for the CMP, the LOAD and the MOVE only.
   interpreter.interprete( 3 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1555,7 +1557,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandThatIsNotAllowedDoesNotClearT
   TST_FixedSimulationQueries simulationQueries( 55 );
   SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
 
-  // The time is enough for the CMP, the JMP and the MOVE only. Without a jump the LOAD runs and there is no record.
+  // The time is enough for the CMP, the JMP and the MOVE only.
   interpreter.interprete( 3 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1647,7 +1649,8 @@ void SIGEL_Simulation::TST_SIG_Interpreter::programStartsAgainAfterTheLastLine()
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   setAllDurations( languageParameters, 1.0 );
   SIGEL_Program::SIG_Program program;
-  // The MOVE on line 0 gives a record of its own in each pass, so going on at another line after the last line gives other records.
+
+  // The MOVE on line 0 gives a record of its own in each pass.
   appendLine( program, SIGEL_Program::MOVE, 0, 0 );
   appendLine( program, SIGEL_Program::LOAD, 3, 3 );
   appendLine( program, SIGEL_Program::ADD, 2, 3 );
@@ -1867,11 +1870,10 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandTakesItsOwnDurationAmongDiffe
   TST_FixedSimulationQueries simulationQueries( 55 );
   SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
 
-  // The command uses up the time account exactly. With a smaller duration the MOVE runs in this call.
+  // The command uses up the time account exactly.
   interpreter.interprete( duration );
   QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 
-  // With a larger duration this call only pays exceeded time, because each duration is a multiple of 0.25.
   interpreter.interprete( 0.25 );
 
   QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
@@ -1909,6 +1911,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::cmpThatDoesNotSetTheCompareFlagTakes
   setDifferentDurations( languageParameters );
   SIGEL_Program::SIG_Program program;
   appendLine( program, SIGEL_Program::LOAD, 2, 1 );
+
   // Register 2 is 1 and register 3 is 0, so the CMP does not set the compare flag.
   appendLine( program, SIGEL_Program::CMP, 2, 3 );
   appendLine( program, SIGEL_Program::MOVE, 0, 0 );
@@ -1918,11 +1921,10 @@ void SIGEL_Simulation::TST_SIG_Interpreter::cmpThatDoesNotSetTheCompareFlagTakes
   QList<int> expectedValues( 8, 0 );
   expectedValues[2] = 1;
 
-  // The LOAD takes 0.75 s and the CMP 2.75 s, so the time account is used up exactly. With a smaller duration the MOVE runs in this call.
+  // The LOAD takes 0.75 s and the CMP 2.75 s, so the time account is used up exactly.
   interpreter.interprete( 3.5 );
   QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 
-  // With a larger duration this call only pays exceeded time, because each duration is a multiple of 0.25.
   interpreter.interprete( 0.25 );
 
   const QList<TST_MoveRecord> &moveRecords = commandInterface.getMoveRecords();
@@ -1951,7 +1953,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::jmpThatJumpsTakesItsOwnDuration()
   interpreter.interprete( 5.75 );
   QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 
-  // The JMP goes to the LOAD on line 3, which takes 0.75 s. Without the jump the MOVE on line 2 gives a record here.
+  // The JMP goes to the LOAD on line 3, which takes 0.75 s.
   interpreter.interprete( 0.75 );
   QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 
@@ -1987,8 +1989,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::jmpThatExceedsTheTimeAccountJumps()
   interpreter.interprete( 2.75 );
   QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 
-  // The JMP goes to the LOAD on line 3, which takes 0.75 s. Without the jump the MOVE on line 2 gives a record here.
-  // With less exceeded time the MOVE on line 4 gives a record here or in the call before.
+  // The JMP goes to the LOAD on line 3, which takes 0.75 s.
   interpreter.interprete( 0.75 );
   QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 
@@ -2015,10 +2016,12 @@ void SIGEL_Simulation::TST_SIG_Interpreter::programWithAllCommandsTakesTheSumOfT
   appendLine( program, SIGEL_Program::MIN, 0, 0 );
   appendLine( program, SIGEL_Program::MAX, 0, 0 );
   appendLine( program, SIGEL_Program::CMP, 0, 0 );
+
   // The compare flag is set, and JMP 0 goes to the next line.
   appendLine( program, SIGEL_Program::JMP, 0, 0 );
   appendLine( program, SIGEL_Program::SENSE, 0, 0 );
   appendLine( program, SIGEL_Program::MOVE, 2, 0 );
+
   // Register 2 is 0, so the DELAY has no delay time.
   appendLine( program, SIGEL_Program::DELAY, 2, 0 );
   appendLine( program, SIGEL_Program::NOP, 0, 0 );
@@ -2051,6 +2054,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::differentDurationsAddUpOverSeveralPr
   languageParameters.getCommand( "MOVE" )->setDuration( 1.5 );
   languageParameters.getCommand( "NOP" )->setDuration( 0.25 );
   SIGEL_Program::SIG_Program program;
+
   // Register 2 counts the program passes.
   appendLine( program, SIGEL_Program::LOAD, 3, 1 );
   appendLine( program, SIGEL_Program::ADD, 2, 3 );
@@ -2092,6 +2096,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandWithADurationOfZeroRunsAndTak
   setAllDurations( languageParameters, 0.0 );
   languageParameters.getCommand( "MOVE" )->setDuration( 0.5 );
   SIGEL_Program::SIG_Program program;
+
   // Register 2 counts the program passes.
   appendLine( program, SIGEL_Program::LOAD, 3, 1 );
   appendLine( program, SIGEL_Program::ADD, 2, 3 );
@@ -2160,7 +2165,8 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandThatIsNotAllowedTakesNoTimeAm
   languageParameters.removeCommand( "SUB" );
   languageParameters.removeCommand( "COPY" );
   SIGEL_Program::SIG_Program program;
-  // Register 2 counts the program passes. The SUB would take 1 off again, and the COPY would put 0 in register 2.
+
+  // Register 2 counts the program passes.
   appendLine( program, SIGEL_Program::LOAD, 3, 1 );
   appendLine( program, SIGEL_Program::SUB, 2, 3 );
   appendLine( program, SIGEL_Program::ADD, 2, 3 );
@@ -2208,7 +2214,6 @@ void SIGEL_Simulation::TST_SIG_Interpreter::exceededTimeOfACommandIsSubtractedFr
   // The durations are those of setDifferentDurations. The exceeded time is the duration - 0.25 s.
   // Register 0 is 0, so the DELAY has no delay time.
   // The JMP goes to the next line: no CMP runs before it, and its operand is 0.
-  // The MOVE is in moveTakesItsOwnDurationAmongDifferentDurations.
   QTest::newRow( "COPY" ) << SIGEL_Program::COPY << 0.25;
   QTest::newRow( "LOAD" ) << SIGEL_Program::LOAD << 0.5;
   QTest::newRow( "ADD" ) << SIGEL_Program::ADD << 0.75;
@@ -2242,7 +2247,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::exceededTimeOfACommandIsSubtractedFr
   interpreter.interprete( 0.25 );
   QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 
-  // This call pays the exceeded time exactly. With less exceeded time the MOVE runs in this call.
+  // This call pays the exceeded time exactly.
   interpreter.interprete( exceededTime );
   QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 
@@ -2262,6 +2267,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::exceededTimeIsKeptOverSeveralCallsAn
   TST_RecordingCommandInterface commandInterface;
   TST_FixedSimulationQueries simulationQueries( 55 );
   SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
   // Each of the 10 calls has a time account of 0.75 s. The NOP takes 2 s and the MOVE 0.5 s.
   // A call first pays the exceeded time of the call before. The time that is left is for commands.
   // A command that takes more than the time that is left gives the exceeded time for the next call.
@@ -2356,11 +2362,10 @@ void SIGEL_Simulation::TST_SIG_Interpreter::delayTakesTheLimitedDelayTimeAndItsO
   TST_FixedSimulationQueries simulationQueries( 55 );
   SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
 
-  // The LOAD and the DELAY use up the time account exactly. With a smaller delay time the MOVE runs in this call.
+  // The LOAD and the DELAY use up the time account exactly.
   interpreter.interprete( timeOfLoadAndDelay );
   QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 
-  // With a larger delay time this call only pays exceeded time.
   interpreter.interprete( 0.25 );
 
   QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
@@ -2383,6 +2388,7 @@ void SIGEL_Simulation::TST_SIG_Interpreter::delayTakesTheWholeDelayTimeAtTheLimi
   languageParameters.getCommand( "DELAY" )->setDuration( 0.5 );
   languageParameters.getCommand( "MOVE" )->setDuration( 0.75 );
   languageParameters.setRegisterWidth( 16 );
+
   // The maximal delay time of 40 s is more than each delay time that a register can give.
   languageParameters.setMaximalDelayTime( 40000 );
   SIGEL_Program::SIG_Program program;

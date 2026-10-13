@@ -39,9 +39,11 @@ struct MT_MatingResult
   QStringList parentLinesAfter[2];
   QList<QStringList> childLines;
   QList<int> childGenesis;
+
   // 0 or 1
   QList<int> childParent;
   int maxProgramLength = 0;
+
   // Each offspring place is filled, and both parents are among the offspring.
   bool complete = false;
 };

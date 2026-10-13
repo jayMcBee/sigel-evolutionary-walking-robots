@@ -185,6 +185,7 @@ void SIGEL_GP::TST_SIG_GPPopulation::sameSeedGivesTheSameIndividuals()
 {
   SIG_GPPopulation first;
   SIG_GPPopulation second;
+
   // The history of an individual holds the time when it is made.
   first.setHistory( false );
   second.setHistory( false );
@@ -281,7 +282,8 @@ void SIGEL_GP::TST_SIG_GPPopulation::resetAllFitnessValuesSetsMinusOne()
 {
   SIG_GPPopulation population;
   addIndividuals( population, 2 );
-  // A new individual has the fitness -1 already, so other values are set first.
+
+  // A new individual has the fitness -1.
   population.getIndividualPointer( 0 )->setFitness( 3.5 );
   population.getIndividualPointer( 1 )->setFitness( 7.5 );
 

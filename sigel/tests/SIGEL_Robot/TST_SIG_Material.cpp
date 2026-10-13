@@ -51,7 +51,7 @@ void SIGEL_Robot::TST_SIG_Material::setFrictionValueSetsAndUpdatesBothPartners()
   QCOMPARE( a.getFrictionValue( &c ), 0.5 );
   QCOMPARE( b.getFrictionValue( &a ), 0.75 );
 
-  // The written record gives the number of partners: an update must not add one.
+  // The written record gives the number of partners:
   // "Material a <elasticity> <density> <number of partners> b 0.75 c 0.5 <colour>"
   QString written;
   QTextStream stream( &written );

@@ -111,8 +111,7 @@ void TST_MT_Search::mutationKeepsTheLengthOfTheParent()
         }
     }
 
-  // A mutated element can get its old value again, so one child can be equal
-  // to its parent. If all are equal, the mutation changes nothing.
+  // A mutated element can get its old value again, so one child can be equal to its parent.
   QVERIFY( mutatedChildren > 0 );
 }
 
@@ -190,6 +189,7 @@ QString TST_MT_Search::randomizerText( const int searchOperator[3], const int mu
     stream << mutationPower[i] << "\n";
   for ( int i = 0; i < 3; i++ )
     stream << crossoverPoints[i] << "\n";
+
   // The 18 instruction thresholds of stdConf.mt.
   for ( int i = 0; i < 18; i++ )
     stream << i * 1000 << "\n";
@@ -207,6 +207,7 @@ MT_MatingResult TST_MT_Search::mate( unsigned seed, const int searchOperator[3],
   QString text = randomizerText( searchOperator, mutationPower, crossoverPoints, startLength );
   QTextStream stream( &text );
   MT_Randomizer randomizer( stream );
+
   // MT_Randomizer seeds rand() from the clock in its constructor.
   srand( seed );
 
