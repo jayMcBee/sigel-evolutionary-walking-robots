@@ -69,6 +69,8 @@ namespace SIGEL_Program
 	 */
 	inline const QStringList robotInstructionNames = { "COPY", "LOAD", "ADD", "SUB", "MUL", "DIV", "MOD", "MIN", "MAX", "CMP", "JMP", "SENSE", "MOVE", "DELAY", "NOP" };
 
+	inline const int instructionCount = robotInstructionNames.size();
+
 	/**
 	 * This class represents a program line that contains robot instructions (and more).
 	 * A program line is a set of elements. The meaning of the elements is dependend on

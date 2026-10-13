@@ -615,7 +615,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
      bool         cont = true;
      QList<bool> hasCommand;
 
-     hasCommand.resize( 15 );
+     hasCommand.resize( instructionCount );
      hasCommand.fill( false );
 
      op1 = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
@@ -737,7 +737,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
 	 if( (hasCommand[13]) && (n == 13) ) accuValue += prob[13];
          if( (hasCommand[14]) && (n == 14) ) accuValue += prob[14];
 
-         if( n == 14 ) cont = false;
+         if( n == instructionCount - 1 ) cont = false;
          
          if( randomValue < accuValue )
            {

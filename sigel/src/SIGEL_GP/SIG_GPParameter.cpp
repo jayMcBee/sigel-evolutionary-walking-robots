@@ -48,7 +48,7 @@ SIGEL_GP::SIG_GPParameter::SIG_GPParameter()
 {
   terminationTime=terminationTime.currentDateTime();
   setPriority(veryLow);
-  instructionProb.resize( 15 );
+  instructionProb.resize( SIGEL_Program::instructionCount );
   instructionProb.fill( 1000 );
 };
 
