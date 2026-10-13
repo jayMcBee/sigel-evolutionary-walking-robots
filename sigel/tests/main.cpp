@@ -25,6 +25,7 @@
 #include "SIGEL_GP/TST_SIG_GPIndividual.h"
 #include "SIGEL_GP/TST_SIG_GPPopulation.h"
 #include "SIGEL_Program/TST_SIG_ProgramLine.h"
+#include "SIGEL_Robot/TST_SIG_Drive.h"
 #include "SIGEL_Robot/TST_SIG_LanguageParameters.h"
 #include "SIGEL_Robot/TST_SIG_Link.h"
 #include "SIGEL_Robot/TST_SIG_Material.h"
@@ -49,6 +50,7 @@ int main( int argc, char *argv[] ) {
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPIndividual>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPPopulation>() );
   testClasses.push_back( std::make_unique<SIGEL_Program::TST_SIG_ProgramLine>() );
+  testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Drive>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_LanguageParameters>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Link>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Material>() );

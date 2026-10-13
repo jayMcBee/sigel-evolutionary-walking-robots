@@ -22,7 +22,6 @@
 */
 #include "SIGEL_Robot/SIG_Drive.h"
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
-#include "SIGEL_Tools/SIG_IO.h"
 
 namespace SIGEL_Robot {
 
@@ -56,8 +55,7 @@ namespace SIGEL_Robot {
 			else if (buf == "simpleservo")
 				mode = tServoSimpleMode;
 			else
-			{	SIGEL_Tools::SIG_IO::cerr << "Unsupported Drive Mode <" << buf << "> !!\n" << Qt::endl;
-			}
+				throw SIG_UnstreamingError (__FILE__, __LINE__, "drive mode '" + buf + "' is unknown");
 
 			tx >> name >> number >> minforce >> maxforce >> buf;
 			theJoint = parent->lookupJoint (buf);

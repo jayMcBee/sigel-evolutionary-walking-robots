@@ -195,12 +195,6 @@ touched, because changing one changes behaviour against the reference binary.
   - **Open:** the smallest step and its decimals. The shipped experiments use
     0.01 and 0.002; 0.0001 with 4 decimals would keep both.
 
-- [ ] **52. `SIG_Drive`'s stream constructor can leave `mode` unset.** For
-  an unknown word it is left unset, and `writeToFileTransfer` then writes
-  `invalid_mode`, unless the unset value happens to equal a known one. Only
-  transfer text can bring an unknown word in; the robot
-  compiler rejects it.
-
 - [ ] **152. A geometry file with `DEF` and `USE` aborts SIGEL.** A VRML
   file may give a shape a name with `DEF` and place it again with `USE`.
   `SIG_Body` loads the file with the `cv97` library, and the library stops
