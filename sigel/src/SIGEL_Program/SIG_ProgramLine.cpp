@@ -609,8 +609,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
                   op2 = 0, 
                   iType = 0;
      long         maximumValue = 0,
-                  randomValue = 0,
-                  accuValue = 0;
+                  randomValue = 0;
      QList<bool> hasCommand;
 
      hasCommand.resize( instructionCount );
@@ -717,17 +716,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
 
      randomValue = randomizer.getRandomLong( maximumValue );
   
-     for( int n = 0; n < instructionCount; n++ )
-       {
-         if( hasCommand[n] )
-           accuValue += prob[n];
-
-         if( randomValue < accuValue )
-           {
-             iType = n;
-             break;
-           }
-       }
+     iType = selectInstructionByWeight( randomValue, hasCommand, prob );
        
      switch( iType )
        {
@@ -762,6 +751,24 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
         case 14:setRobotInstruction( SIGEL_Program::NOP, op1, op2 );
                 break;
        }
+}
+
+int SIGEL_Program::SIG_ProgramLine::selectInstructionByWeight( long randomValue,
+							       const QList<bool> &hasCommand,
+							       const QList<int> &prob ) const
+{
+     long cumulativeWeight = 0;
+
+     for( int n = 0; n < instructionCount; n++ )
+       {
+         if( hasCommand[n] )
+           cumulativeWeight += prob[n];
+
+         if( randomValue < cumulativeWeight )
+           return n;
+       }
+
+     return 0;
 }
 
 void SIGEL_Program::SIG_ProgramLine::generateRandomRobotInstruction(SIGEL_Robot::SIG_LanguageParameters &languageParameters,

@@ -262,6 +262,11 @@ namespace SIGEL_Program
 		int operandTextToInteger( const QString &operandText, const QString &lineText ) const;
 
 		/**
+		 * The index of the allowed instruction in whose range of weights randomValue is, or 0 if it is in none.
+		 */
+		int selectInstructionByWeight( long randomValue, const QList<bool> &hasCommand, const QList<int> &prob ) const;
+
+		/**
 		 *  The type of the current robot inbstruction, e.g. LOAD, COPY, ...
 		 */
 		RobotInstruction instructionType;
