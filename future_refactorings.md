@@ -419,12 +419,6 @@ problem; the choice is made before any code is written.
   the conditional instructions `CMP`, `JLE` and `JMP` (item 160) lower than
   the others.
 
-- [ ] **163. Draw each operand from 32768 values, not 32000.**
-  `SIG_ProgramLine::randomRobotInstruction` and `SIG_GPOperations::mutation`
-  call `getRandomInt( 32000 )`. `SIG_Randomizer` makes 0 to 32767 and takes
-  it modulo 32000, so the values 0 to 767 are drawn twice as often as the
-  others.
-
 - [ ] **168. Consider one description for each robot instruction.** The name
   of an instruction and its number of operands are written out for each
   instruction in `SIG_ProgramLine` (`setRobotInstruction`, `printToString`,
