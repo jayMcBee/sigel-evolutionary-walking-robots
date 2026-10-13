@@ -92,7 +92,7 @@ no container, no multiarch, nothing installed on the host.
      program scored 0.0327516 three times out of three under 1 slave. That
      the absurd scores come from a half-read floor is inferred from the
      terrain reader's code (no stream checks), not observed. Fixed in
-     SIGEL 2.0 (temp file + rename).
+     SIGEL 2.0 (each simulation has a terrain file of its own).
 
 5. GUI and 3-D view
    Run in Xephyr started with +iglx (woody's libGL only does indirect GLX);

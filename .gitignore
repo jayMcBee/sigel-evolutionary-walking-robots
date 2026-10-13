@@ -31,7 +31,3 @@ build-asan/
 
 # python bytecode
 __pycache__/
-
-# Written next to Terrain.ter while it is being generated; a killed process
-# leaves one behind.
-Terrain.ter.*

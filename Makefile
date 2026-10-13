@@ -620,18 +620,18 @@ $(B)/manage_dyn_slave: $(SRC)/src/manage_dyn_slave.c
 
 # ---------------------------------------------------------------------------
 # sigelApp/ -- the folder SIGEL is started from, as 1.3's README describes it:
-# the three programs, the three scripts, Terrain.ter, stdConf.mt, pixmaps/,
+# the three programs, the three scripts, stdConf.mt, pixmaps/,
 # textures/ and supportingLibs/pvm3. Start SIGEL there with ./sigelLauncher.
 #
-# The data are copies, not links: SIGEL rewrites Terrain.ter and writes movie/
-# in the folder it runs from, and the tracked files must not change. cp -p keeps
+# The data are copies, not links: SIGEL writes movie/ in the folder it runs
+# from, and the tracked files must not change. cp -p keeps
 # the source's time, so a copy that SIGEL has since rewritten is newer and is
 # left alone. The programs always come from the plain build/ and go through a
 # temporary name, so a running copy is not overwritten in place. `make clean'
 # leaves this folder alone -- what a user saved or generated here stays -- but
 # it removes PVM's build, so run `make' again before starting SIGEL.
 APP      := sigelApp
-APP_DATA := sigelLauncher povrayLauncher sigelDynClient Terrain.ter stdConf.mt \
+APP_DATA := sigelLauncher povrayLauncher sigelDynClient stdConf.mt \
             $(patsubst $(SRC)/%,%,$(wildcard $(SRC)/pixmaps/* $(SRC)/textures/*))
 
 .PHONY: sigelApp

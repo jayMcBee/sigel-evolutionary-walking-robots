@@ -22,6 +22,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "MT_GPSystem/TST_MT_Search.h"
+#include "SIGEL_Environment/TST_SIG_Environment.h"
 #include "SIGEL_GP/TST_SIG_GPIndividual.h"
 #include "SIGEL_GP/TST_SIG_GPPopulation.h"
 #include "SIGEL_Program/TST_SIG_ProgramLine.h"
@@ -47,6 +48,7 @@
 int main( int argc, char *argv[] ) {
   std::vector<std::unique_ptr<QObject>> testClasses;
   testClasses.push_back( std::make_unique<TST_MT_Search>() );
+  testClasses.push_back( std::make_unique<SIGEL_Environment::TST_SIG_Environment>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPIndividual>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPPopulation>() );
   testClasses.push_back( std::make_unique<SIGEL_Program::TST_SIG_ProgramLine>() );

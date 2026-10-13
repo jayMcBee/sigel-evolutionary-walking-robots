@@ -29,17 +29,18 @@ B=${1:-build}
 make -q --no-print-directory -C "$ROOT" B="$B" coredrive >/dev/null 2>&1 || {
 	echo ""$ROOT/$B/coredrive" is out of date -- run 'make B=$B coredrive'" >&2; exit 1; }
 
-# SIGEL rewrites $SIGEL_ROOT/Terrain.ter on every evaluation, so run it in the
-# folder SIGEL is started from, never in the tracked source.
+# Run it in the folder SIGEL is started from, never in the tracked source.
 SIGEL_ROOT=$ROOT/sigelApp
-[ -f "$SIGEL_ROOT/Terrain.ter" ] || { echo "no $SIGEL_ROOT/Terrain.ter -- run 'make'" >&2; exit 1; }
 export SIGEL_ROOT
 # The unit tests, with LeakSanitizer on: every object they make must be
 # freed. The evaluations below cannot run this way, because a simulation does
 # not free all it allocates. A build without a sanitizer ignores ASAN_OPTIONS,
 # so test the program and say when this run is skipped.
+# DynaMechs never frees a terrain it has loaded (dmEnvironment::loadTerrainData),
+# and the tests of SIG_Environment load terrains. Suppress that one function.
 if nm -C "$ROOT/$B/coredrive" 2>/dev/null | grep -q __asan_init; then
-	leaks=$(ASAN_OPTIONS=detect_leaks=1 make -s --no-print-directory -C "$ROOT" B="$B" test 2>&1) || {
+	echo 'leak:dmEnvironment::loadTerrainData' > "$ROOT/$B/lsan.supp"
+	leaks=$(ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=$ROOT/$B/lsan.supp make -s --no-print-directory -C "$ROOT" B="$B" test 2>&1) || {
 		echo "make test FAILED under the sanitizers -- the build, a test or a leak:" >&2
 		echo "$leaks" >&2
 		exit 1

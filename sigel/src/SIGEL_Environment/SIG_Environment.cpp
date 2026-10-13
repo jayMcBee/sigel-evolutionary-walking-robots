@@ -23,12 +23,11 @@
 #include "SIGEL_Environment/SIG_Environment.h"
 #include "fparser.h"
 #include <QByteArray>
-#include <QCoreApplication>
-#include <QSysInfo>
-#include <cstdio>
+#include <QFile>
+#include <QTemporaryFile>
+#include <sstream>
+#include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_IO.h"
-
-#include "stdlib.h"
 
 namespace SIGEL_Environment {
 
@@ -374,20 +373,29 @@ namespace SIGEL_Environment {
   };
 
 	void SIG_Environment::loadDynaMechsEnvironment(){
-		// before loading the DynaMechsEnvironment first generate an actual
-   	generateTerrain();
-	  char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
-
- 	 	QString sigelRootString( sigelRootCString );
-
-  	QString terrainDataFileName = sigelRootString + "/Terrain.ter";
-
-  	const QByteArray terrainDataFileNameQCString = terrainDataFileName.toUtf8();
-	  char const *terrainDataFileNameCString = terrainDataFileNameQCString.constData();
-
-  	dynaMechsEnvironment.loadTerrainData( terrainDataFileNameCString );
+		loadTerrain( dynaMechsEnvironment );
 	};
-	
+
+	void SIG_Environment::loadTerrain( dmEnvironment &target ) const {
+		std::ostringstream terrain;
+
+		if (!writeTerrain( terrain )) {
+			terrain.str( std::string() );
+			terrain.clear();
+			writeFlatTerrain( terrain );
+		}
+
+		// DynaMechs reads a terrain from a file only. Each call has a file of its own, so no process reads the terrain of another.
+		QTemporaryFile terrainFile;
+		const std::string terrainText = terrain.str();
+		const qint64 terrainSize = static_cast< qint64 >( terrainText.size() );
+
+		if (!terrainFile.open() || terrainFile.write( terrainText.data(), terrainSize ) != terrainSize || !terrainFile.flush())
+			throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "Could not write the terrain to a temporary file: " + terrainFile.errorString() );
+
+		target.loadTerrainData( QFile::encodeName( terrainFile.fileName() ).constData() );
+	};
+
 	dmEnvironment *SIG_Environment::getDMEnvironment() const {
 		// dmEnvironment::getTerrainData is not const.
 		return const_cast< dmEnvironment* >( &dynaMechsEnvironment );
@@ -409,35 +417,13 @@ namespace SIGEL_Environment {
 		withTexture = newWithTexture;
   };
 
-	bool SIG_Environment::generateTerrain() {
-  	char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
-	// std::string(nullptr) is undefined behaviour, and SIGEL_ROOT is genuinely
-	// unset in some launches -- pvm_spawn'd tasks inherit pvmd's environment,
-	// not the master's, which is how this bites in practice.
-  	if (sigelRootCString == nullptr) {
-  		SIGEL_Tools::SIG_IO::cerr
-  			<< "Generate terrain: SIGEL_ROOT is not set, cannot locate Terrain.ter."
-  			<< Qt::endl;
-  		return false;
-  	}
-  	std::string terrain(sigelRootCString);
-  	terrain += "/Terrain.ter";
-
-	// Every process writes Terrain.ter and reads it straight back, so a reader
-	// must never see a half-written one. The host belongs in the name as well
-	// as the process id: hosts share SIGEL_ROOT and repeat each other's pids.
-  	std::string partialTerrain(terrain);
-  	partialTerrain += "." + QSysInfo::machineHostName().toStdString();
-  	partialTerrain += "." + std::to_string( QCoreApplication::applicationPid() );
-
-  	std::ofstream partialTerrainFile(partialTerrain.c_str(), std::ios::trunc | std::ios::out);
-  	
+	bool SIG_Environment::writeTerrain( std::ostream &terrain ) const {
   	if (floorFuncSelected) {
   		QString str = floorFunction;
   	
-  		// this is the header of the Terrain.ter file
+  		// this is the header of the terrain
   		// it specifies the dimensions in x and z direction and the dimension of the grid (always 1)
-  		partialTerrainFile << floorDimensionX << " " << floorDimensionZ << " " << 1 << endl;
+  		terrain << floorDimensionX << " " << floorDimensionZ << " " << 1 << endl;
   	
   		const QByteArray funcBytes = str.toUtf8();
 		const char* func = funcBytes.constData();
@@ -445,8 +431,6 @@ namespace SIGEL_Environment {
   		FunctionParser fp;
   		if (fp.Parse(func,"xz") != -1) {
   			SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain function could not be parsed. It must depend on x and z, and contain only valid expressions -- see the documentation in supportingLibs/fparser." << Qt::endl;
-  			partialTerrainFile.close();
-  			std::remove( partialTerrain.c_str() );
   			return false;
   		}
   	
@@ -459,9 +443,9 @@ namespace SIGEL_Environment {
   			{
   				vals[0] = x;
   				vals[1] = z;
-    			partialTerrainFile << fp.Eval(vals) << " ";
+    			terrain << fp.Eval(vals) << " ";
   			}
-  			partialTerrainFile << endl;
+  			terrain << endl;
   		}
   	} // if(floorFuncSelected)
   	
@@ -470,8 +454,6 @@ namespace SIGEL_Environment {
   		std::ifstream pgm(input.toUtf8().constData());
   		if (!pgm) {
   			SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain file does not exist." << Qt::endl;
-  			partialTerrainFile.close();
-  			std::remove( partialTerrain.c_str() );
   			return false;
   		}
   		
@@ -490,19 +472,17 @@ namespace SIGEL_Environment {
     					case 0: // Magic Key
     						if (s.compare("P2")!=0) {
 									SIGEL_Tools::SIG_IO::cerr << "Warning: the specified picture file is not in PGM format." << Qt::endl;
-									partialTerrainFile.close();
-									std::remove( partialTerrain.c_str() );
 									return false;
     						}
 								else ++counter;
 								break;
 							case 1: // x-DIM
-								partialTerrainFile << s << " ";
+								terrain << s << " ";
 								++counter;
 								break;
 							case 2: // y-DIM
-    						partialTerrainFile << s << " ";
-    						partialTerrainFile << 1 << endl;
+    						terrain << s << " ";
+    						terrain << 1 << endl;
 								++counter;
 								break;
 							case 3: // max. grey-value
@@ -512,7 +492,7 @@ namespace SIGEL_Environment {
 							default:
 								str = QString(s.c_str());
 								double greyValue = str.toDouble();
-								partialTerrainFile << greyValue/max*5 << endl;						
+								terrain << greyValue/max*5 << endl;
     				} // switch-tree
     			} // else, no comment has been read
 			} // while-loop
@@ -520,18 +500,18 @@ namespace SIGEL_Environment {
   		pgm.close();
   	} // else, picturefile specified
   	
-  	partialTerrainFile.close();
-
-	// The rename is what makes the file appear whole, so a write that did not
-	// finish must not be renamed. Terrain.ter then keeps what it held.
-  	if (!partialTerrainFile || std::rename( partialTerrain.c_str(), terrain.c_str() ) != 0) {
-  		SIGEL_Tools::SIG_IO::cerr << "Warning: could not write the terrain file "
-  			<< terrain.c_str() << "." << Qt::endl;
-  		std::remove( partialTerrain.c_str() );
-  		return false;
-  	}
-
   	return true;
+	};
+
+	void SIG_Environment::writeFlatTerrain( std::ostream &terrain ) const {
+		terrain << floorDimensionX << " " << floorDimensionZ << " " << 1 << std::endl;
+
+		for (int z = 0; z < floorDimensionZ; ++z) {
+			for (int x = 0; x < floorDimensionX; ++x)
+				terrain << 0 << " ";
+
+			terrain << std::endl;
+		}
 	};
 
 	void SIG_Environment::setAutosave(int newAutosave) {

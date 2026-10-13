@@ -28,6 +28,7 @@
 #include <qtextstream.h>
 #include <qstring.h>
 #include <dmEnvironment.hpp>
+#include <ostream>
 
 /** This namespace just holds the environment for now */
 namespace SIGEL_Environment
@@ -339,28 +340,21 @@ class SIG_Environment {
    */
   double getFrictionCoeff_u_k() const;
 
-  /** Loads the DynaMechsEnvironment; this means that it loads the Terrain.ter file
-	 *
-	 *  @return
-	 *		The loaded DynamechsEnvironment
-  */
+  /** Loads the terrain of this environment into its own DynaMechs environment, which holds the terrain for drawing. */
   void loadDynaMechsEnvironment();
+
+  /**
+   * Loads the terrain of this environment into target. The terrain is the floor function or the picture file, as selected.
+   * If it cannot be made, a warning is printed and the floor is flat at height 0.
+   * Throws a SIG_Exception if the terrain cannot be written to a temporary file.
+   */
+  void loadTerrain( dmEnvironment &target ) const;
 
   /**
   	*  This function returns a reference to the dynaMechsEnvironment. It
   	*  holds the terrain only; a simulation builds an environment of its own.
   	*/
   dmEnvironment *getDMEnvironment() const;
-
- 	/**
- 		*	This function generates a terrain for the DynaMechsEnvironment with
- 		*	the specified function in the environment-tab and writes the parsed
- 		*	output to the file "Terrain.ter" in SIGEL_ROOT.
- 		*
- 		*	@return
- 		*		
- 		*/
-  bool generateTerrain();
 
   /** This is the set method for the variable autosave. */
   void setAutosave(int newAutosave);
@@ -407,6 +401,12 @@ class SIG_Environment {
 
   /** the DynaMechsEnvironment */
   dmEnvironment dynaMechsEnvironment;
+
+  /** Writes the terrain of the floor function or of the picture file in the format that DynaMechs reads. Returns false if it cannot be made. */
+  bool writeTerrain( std::ostream &terrain ) const;
+
+  /** Writes a flat terrain at height 0 with the dimensions of the floor. */
+  void writeFlatTerrain( std::ostream &terrain ) const;
 
  	/**
  		*	This variable specifies the interval (in generations) in which the experiment

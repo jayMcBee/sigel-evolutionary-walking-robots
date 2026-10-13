@@ -109,10 +109,8 @@ cc -I"$PVM/include" "$ROOT/checks/programs/pvm_smoke.c" "$BIN/libpvm3.a" -ltirpc
 cat > "$PVM_TMP/lsan.supp" <<'SUPP'
 leak:dmEnvironment::loadTerrainData
 SUPP
-# SIGEL rewrites $SIGEL_ROOT/Terrain.ter on every evaluation, so run it in the
-# folder SIGEL is started from, never in the tracked source.
+# Run it in the folder SIGEL is started from, never in the tracked source.
 SIGEL_ROOT=$ROOT/sigelApp
-[ -f "$SIGEL_ROOT/Terrain.ter" ] || { echo "no $SIGEL_ROOT/Terrain.ter -- run 'make'" >&2; exit 1; }
 LSAN_OPTIONS=suppressions=$PVM_TMP/lsan.supp
 export SIGEL_ROOT LSAN_OPTIONS
 

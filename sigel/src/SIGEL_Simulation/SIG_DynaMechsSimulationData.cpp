@@ -22,7 +22,6 @@
 */
 #include <cstring>
 #include <cstdlib>
-#include <QByteArray>
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 
 #include "SIGEL_Robot/SIG_Drive.h"
@@ -282,16 +281,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeEnvironment()
 	dynaMechsEnvironment.setFrictionCoeffs( environment.getFrictionCoeff_u_s(),
 	                                        environment.getFrictionCoeff_u_k() );
 
-	char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
-
-	QString sigelRootString( sigelRootCString );
-
-	QString terrainDataFileName = sigelRootString + "/Terrain.ter";
-
-	const QByteArray terrainDataFileNameQCString = terrainDataFileName.toUtf8();
-	char const *terrainDataFileNameCString = terrainDataFileNameQCString.constData();
-
-	dynaMechsEnvironment.loadTerrainData( terrainDataFileNameCString );
+	environment.loadTerrain( dynaMechsEnvironment );
 }
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()

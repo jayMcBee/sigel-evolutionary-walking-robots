@@ -109,11 +109,10 @@ All present in 1.3, none introduced here. Each needs a decision before it is
 touched, because changing one changes behaviour against the reference binary.
 
 - [ ] **136. Keep the terrain in `SIG_Environment` as SIGEL data.**
-  `SIG_Environment` has a `dmEnvironment` member only to load `Terrain.ter`
-  for `SIG_EnvironmentRenderer`. Without it, no class outside
-  `SIGEL_Simulation` uses a DynaMechs environment.
-  `loadDynaMechsEnvironment` also runs `generateTerrain`, which writes the
-  `Terrain.ter` that every simulation reads. That step stays.
+  `SIG_Environment` has a `dmEnvironment` member only to hold the terrain
+  for `SIG_EnvironmentRenderer`, and `loadTerrain` takes a `dmEnvironment`.
+  With the terrain as SIGEL data, only `SIGEL_Simulation` needs a DynaMechs
+  environment.
 
 - [ ] **139. Assess the report that a simple servo drive goes to the mirrored
   angle.** A robot built with `simpleservo` drives was reported to move its
@@ -149,7 +148,7 @@ touched, because changing one changes behaviour against the reference binary.
   experiment does. No patch to the library touches this method.
 
 - [ ] **61. Decide whether to un-transpose the terrain.**
-  `SIG_Environment::generateTerrain` and DynaMechs'
+  `SIG_Environment::writeTerrain` and DynaMechs'
   `dmEnvironment::loadTerrainData` disagree on row order, so a floor whose X
   and Z sizes differ is misread. Physics and drawing agree, and no shipped
   experiment has such a floor: only `runner.exp` sets `FLOORDIMENSION`, to a

@@ -25,7 +25,7 @@ This builds the supporting libraries, PVM and the three executables. Then it fil
 the directory "sigelApp", from which SIGEL is started, with:
 - the executables "sigel", "sigel_slave" and "manage_dyn_slave" (for dynamic clients, see below)
 - the scripts "sigelLauncher", "povrayLauncher", "sigelDynClient" (for dynamic clients, see below)
-- the files "Terrain.ter" and "stdConf.mt"
+- the file "stdConf.mt"
 - the subdirectories pixmaps and textures
 - the subdirectory supportingLibs/pvm3, a link to the PVM that was built
 
