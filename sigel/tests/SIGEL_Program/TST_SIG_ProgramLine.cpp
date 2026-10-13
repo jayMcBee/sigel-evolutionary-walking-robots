@@ -91,7 +91,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::printToStringGivesTheShownText_data()
   QTest::newRow( "ADD" ) << ADD << "ADD -12,-34\n";
   QTest::newRow( "SUB" ) << SUB << "SUB -12,-34\n";
   QTest::newRow( "MUL" ) << MUL << "MUL -12,-34\n";
-  QTest::newRow( "DIV" ) << DIV << "DIV -12, -34\n";
+  QTest::newRow( "DIV" ) << DIV << "DIV -12,-34\n";
   QTest::newRow( "MOD" ) << MOD << "MOD -12,-34\n";
   QTest::newRow( "MIN" ) << MIN << "MIN -12,-34\n";
   QTest::newRow( "MAX" ) << MAX << "MAX -12,-34\n";
@@ -181,7 +181,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::readFromFileReadsEachTextForm_data()
   QTest::newRow( "MUL shown" ) << "MUL -12,-34" << MUL << 2 << -12 << -34;
   QTest::newRow( "MUL lower case" ) << "       mul -12,-34" << MUL << 2 << -12 << -34;
   QTest::newRow( "DIV file" ) << "       DIV -12,-34" << DIV << 2 << -12 << -34;
-  QTest::newRow( "DIV shown" ) << "DIV -12, -34" << DIV << 2 << -12 << -34;
+  QTest::newRow( "DIV space after the comma" ) << "DIV -12, -34" << DIV << 2 << -12 << -34;
   QTest::newRow( "DIV lower case" ) << "       div -12,-34" << DIV << 2 << -12 << -34;
   QTest::newRow( "MOD file" ) << "       MOD -12,-34" << MOD << 2 << -12 << -34;
   QTest::newRow( "MOD shown" ) << "MOD -12,-34" << MOD << 2 << -12 << -34;
@@ -579,7 +579,7 @@ void SIGEL_Program::TST_SIG_ProgramLine::seedOneGivesKnownInstructions()
   QList<int> probabilities( 15, 1 );
   SIGEL_Tools::SIG_Randomizer randomizer( 1 );
   // The known lines fix the order in which a random instruction takes its numbers from the randomizer.
-  const QStringList expectedShownTexts = { "LOAD -16838,-5758\n", "MOD -5627,23010\n", "DIV 2749, 12767\n" };
+  const QStringList expectedShownTexts = { "LOAD -16838,-5758\n", "MOD -5627,23010\n", "DIV 2749,12767\n" };
 
   for ( const QString &expectedShownText : expectedShownTexts )
     {

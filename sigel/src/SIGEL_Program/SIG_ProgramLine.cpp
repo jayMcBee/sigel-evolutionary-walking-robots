@@ -280,7 +280,7 @@ void SIGEL_Program::SIG_ProgramLine::printToString(QString &lineStr) const
           break;
 
      case SIGEL_Program::DIV:
-          lineStr = "DIV " + lineStr.number( getElement( 0 ) ) + ", "
+          lineStr = "DIV " + lineStr.number( getElement( 0 ) ) + ","
                            + lineStr.number( getElement( 1 ) ) + "\n";
 	  ok = true;
           break;
