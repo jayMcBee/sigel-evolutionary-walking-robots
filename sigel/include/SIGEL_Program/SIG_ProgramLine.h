@@ -267,9 +267,9 @@ namespace SIGEL_Program
 		long totalWeightOfAllowedInstructions( const SIGEL_Robot::SIG_LanguageParameters &languageParameters, const QList<int> &prob, QList<bool> &hasCommand ) const;
 
 		/**
-		 * The index of the allowed instruction in whose range of weights randomValue is, or 0 if it is in none.
+		 * The allowed instruction in whose range of weights randomValue is, or COPY if it is in none.
 		 */
-		int selectInstructionByWeight( long randomValue, const QList<bool> &hasCommand, const QList<int> &prob ) const;
+		RobotInstruction selectInstructionByWeight( long randomValue, const QList<bool> &hasCommand, const QList<int> &prob ) const;
 
 		/**
 		 *  The type of the current robot inbstruction, e.g. LOAD, COPY, ...

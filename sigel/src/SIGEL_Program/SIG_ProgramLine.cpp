@@ -606,8 +606,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
 							    QList< int > &prob   )
 {
      int          op1 = 0, 
-                  op2 = 0, 
-                  selectedInstructionIndex = 0;
+                  op2 = 0;
      long         totalWeight = 0,
                   randomValue = 0;
      QList<bool> hasCommand;
@@ -628,9 +627,9 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
 
      randomValue = randomizer.getRandomLong( totalWeight );
   
-     selectedInstructionIndex = selectInstructionByWeight( randomValue, hasCommand, prob );
+     const auto selectedInstruction = selectInstructionByWeight( randomValue, hasCommand, prob );
        
-     setRobotInstruction( static_cast<SIGEL_Program::RobotInstruction>( selectedInstructionIndex ), op1, op2 );
+     setRobotInstruction( selectedInstruction, op1, op2 );
 }
 
 long SIGEL_Program::SIG_ProgramLine::totalWeightOfAllowedInstructions( const SIGEL_Robot::SIG_LanguageParameters &languageParameters,
@@ -651,9 +650,9 @@ long SIGEL_Program::SIG_ProgramLine::totalWeightOfAllowedInstructions( const SIG
      return totalWeight;
 }
 
-int SIGEL_Program::SIG_ProgramLine::selectInstructionByWeight( long randomValue,
-							       const QList<bool> &hasCommand,
-							       const QList<int> &prob ) const
+SIGEL_Program::RobotInstruction SIGEL_Program::SIG_ProgramLine::selectInstructionByWeight( long randomValue,
+											   const QList<bool> &hasCommand,
+											   const QList<int> &prob ) const
 {
      long cumulativeWeight = 0;
 
@@ -663,10 +662,10 @@ int SIGEL_Program::SIG_ProgramLine::selectInstructionByWeight( long randomValue,
            cumulativeWeight += prob[n];
 
          if( randomValue < cumulativeWeight )
-           return n;
+           return static_cast<SIGEL_Program::RobotInstruction>( n );
        }
 
-     return 0;
+     return SIGEL_Program::COPY;
 }
 
 void SIGEL_Program::SIG_ProgramLine::generateRandomRobotInstruction(SIGEL_Robot::SIG_LanguageParameters &languageParameters,
