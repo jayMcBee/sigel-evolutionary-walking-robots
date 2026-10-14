@@ -25,6 +25,7 @@
 
 #include <QString>
 
+#include <cerrno>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -79,21 +80,21 @@ void SIGEL_GP::SIG_GPPVMDynamicClientServer::openPort()
 	listenSocket = socket(PF_INET, SOCK_STREAM, tcpProtocol->p_proto);
 	if (listenSocket < 0)
 	{
-		fprintf(stderr, "ERR:   Can't create socket\n");
+		fprintf(stderr, "ERR:   Can't create socket: %s\n", strerror(errno));
 		exit(1);
 	}
 
 	// let's bind local address & socket
 	if ( bind(listenSocket, reinterpret_cast<struct sockaddr *>(&sad), sizeof(sad)) < 0 )
 	{
-		fprintf(stderr, "ERR:   Bind reported an error\n");
+		fprintf(stderr, "ERR:   Bind to port %d failed: %s\n", kSigelMasterRegPort, strerror(errno));
 		exit(1);
 	}
 
 	// build the queue for incoming requests
 	if ( listen(listenSocket, 32) < 0 )
 	{
-		fprintf(stderr, "ERR:   Listen failed\n");
+		fprintf(stderr, "ERR:   Listen failed: %s\n", strerror(errno));
 		exit(1);
 	}
 
