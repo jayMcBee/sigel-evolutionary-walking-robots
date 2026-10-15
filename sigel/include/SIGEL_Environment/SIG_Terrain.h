@@ -60,7 +60,6 @@ namespace SIGEL_Environment
 
     int getDimensionZ() const;
 
-    /** The height that DynaMechs uses at grid point (x, z). */
     double getHeight( int x, int z ) const;
 
   private:

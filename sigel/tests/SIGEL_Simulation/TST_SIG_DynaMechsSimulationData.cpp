@@ -35,10 +35,10 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadTerrainGivesTheHeigh
   environment.setFloorDimensionZ( 4 );
   environment.setFloorFunction( "0.5*x-10*z" );
 
-  // The function's x counts along the second index, its z along the first.
+  // The function's x counts along the first index, its z along the second.
   QCOMPARE( loadedHeight( environment, 0, 0 ), 0.0 );
-  QCOMPARE( loadedHeight( environment, 0, 3 ), 1.5 );
-  QCOMPARE( loadedHeight( environment, 2, 1 ), -19.5 );
+  QCOMPARE( loadedHeight( environment, 0, 3 ), -30.0 );
+  QCOMPARE( loadedHeight( environment, 2, 1 ), -9.0 );
   QCOMPARE( loadedHeight( environment, 3, 3 ), -28.5 );
 }
 
@@ -66,8 +66,8 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadTerrainGivesTheHeigh
 
   // A grey value of the maximum is a height of 5.
   QCOMPARE( heights[ 0 ][ 0 ], 0.0 );
-  QCOMPARE( heights[ 0 ][ 1 ], 1.0 );
-  QCOMPARE( heights[ 1 ][ 0 ], 5.0 );
+  QCOMPARE( heights[ 0 ][ 1 ], 5.0 );
+  QCOMPARE( heights[ 1 ][ 0 ], 1.0 );
   QCOMPARE( heights[ 2 ][ 1 ], 2.0 );
 }
 

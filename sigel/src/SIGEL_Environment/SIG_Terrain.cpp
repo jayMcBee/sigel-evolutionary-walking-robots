@@ -141,6 +141,5 @@ int SIGEL_Environment::SIG_Terrain::getDimensionZ() const
 
 double SIGEL_Environment::SIG_Terrain::getHeight( int x, int z ) const
 {
-  // dmEnvironment::loadTerrainData reads the heights with x as the outer loop, but they are made with z as the outer loop.
-  return heights[ x * dimensionZ + z ];
+  return heights[ z * dimensionX + x ];
 }
