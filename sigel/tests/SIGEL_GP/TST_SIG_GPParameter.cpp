@@ -34,7 +34,7 @@ void SIGEL_GP::TST_SIG_GPParameter::poolImageFileNameIsInThePoolImageDirectory()
   QDateTime time( QDate( 2026, 10, 15 ), QTime( 8, 49, 4 ) );
 
   QCOMPARE( parameter.getPoolImageFileName( "quadruped.exp", time ),
-            "/data/pool/quadruped.exp_PoolImage_" + time.toString() + ".pol" );
+            QString( "/data/pool/quadruped.exp_PoolImage_" ) + time.toString() + QString( ".pol" ) );
 }
 
 void SIGEL_GP::TST_SIG_GPParameter::poolImageFileNameLeavesOutTheDirectoryOfTheExperiment()
@@ -44,5 +44,5 @@ void SIGEL_GP::TST_SIG_GPParameter::poolImageFileNameLeavesOutTheDirectoryOfTheE
   QDateTime time( QDate( 2026, 10, 15 ), QTime( 8, 49, 4 ) );
 
   QCOMPARE( parameter.getPoolImageFileName( "runs/quadruped.exp", time ),
-            "/data/pool/quadruped.exp_PoolImage_" + time.toString() + ".pol" );
+            QString( "/data/pool/quadruped.exp_PoolImage_" ) + time.toString() + QString( ".pol" ) );
 }
