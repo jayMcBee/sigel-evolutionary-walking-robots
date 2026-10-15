@@ -63,7 +63,7 @@ void SIG_ExperimentView::putIntoExperiment() {
   theExperiment.comment = multilineeditComment->toPlainText();
 
   // autosave slider
-  theExperiment.environment.setAutosave(lcdnumberAutosave->intValue());
+  theExperiment.environment.setAutosaveIntervalGenerations(lcdnumberAutosave->intValue());
   // history checkbox
   theExperiment.population.setHistory(checkboxHistory->isChecked());
 };
@@ -71,7 +71,7 @@ void SIG_ExperimentView::putIntoExperiment() {
 void SIG_ExperimentView::getOutOfExperiment() {
   multilineeditComment->setText( theExperiment.comment );
   // autosave slider
-  lcdnumberAutosave->display(theExperiment.environment.getAutosave());
+  lcdnumberAutosave->display(theExperiment.environment.getAutosaveIntervalGenerations());
   // history checkbox
   checkboxHistory->setChecked(theExperiment.population.getHistory());
 };

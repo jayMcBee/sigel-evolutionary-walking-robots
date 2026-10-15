@@ -110,7 +110,7 @@ void SIGEL_GP::SIG_GPExperiment::saveExperiment(QTextStream & file)
   QString fiveHashesLine("\n#####\n");
 
   if(mtController->IsEnabled()){
-	  mtController->writeToFile(file, experimentName, environment.getAutosave());
+	  mtController->writeToFile(file, experimentName, environment.getAutosaveIntervalGenerations());
   }
 
   simulationParameter.writeToFile(file);

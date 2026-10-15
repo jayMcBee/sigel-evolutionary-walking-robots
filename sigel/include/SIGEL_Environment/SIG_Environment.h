@@ -342,11 +342,11 @@ class SIG_Environment {
   /** Makes the terrain of the selected floor function or picture file, or a flat one if that fails. */
   SIG_Terrain getTerrain() const;
 
-  /** This is the set method for the variable autosave. */
-  void setAutosave(int newAutosave);
+  /** This is the set method for the variable autosaveIntervalGenerations. */
+  void setAutosaveIntervalGenerations(int newAutosaveIntervalGenerations);
 	
-	/** This is the get method for the variable autosave. */
-	int getAutosave();
+	/** This is the get method for the variable autosaveIntervalGenerations. */
+	int getAutosaveIntervalGenerations();
 
  private:
   /** the storage for the gravity vector */
@@ -390,7 +390,7 @@ class SIG_Environment {
  		*	is automatically saved to disk.
  		*	For now the range is from 0 to 100 generations, where 0 disables autosave.
  		*/
- 	int autosave;
+ 	int autosaveIntervalGenerations;
 };
 
 }

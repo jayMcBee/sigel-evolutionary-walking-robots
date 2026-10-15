@@ -40,7 +40,7 @@ namespace SIGEL_Environment {
     groundNormalDamperConstant(50),
     frictionCoeff_u_s(1.5),
     frictionCoeff_u_k(1),
-    autosave(0)
+    autosaveIntervalGenerations(0)
   {
   };
 
@@ -62,7 +62,7 @@ namespace SIGEL_Environment {
       groundNormalDamperConstant(newGroundNormalDamperConstant),
       frictionCoeff_u_s(newFrictionCoeff_u_s),
       frictionCoeff_u_k(newFrictionCoeff_u_k),
-      autosave(0)
+      autosaveIntervalGenerations(0)
   {
   };
 
@@ -133,7 +133,7 @@ namespace SIGEL_Environment {
   		
     	if (s == "AUTOSAVETIME") {
   			s = file.readLine();
-     		autosave = s.toInt();
+     		autosaveIntervalGenerations = s.toInt();
       }
 
       if (s == "GPSconst") {
@@ -206,7 +206,7 @@ namespace SIGEL_Environment {
     file << "FLOORMATERIALNAME\n";
     file << "floor\n";
     file << "AUTOSAVETIME\n";
-    file << autosave << "\n";
+    file << autosaveIntervalGenerations << "\n";
 
     file << "GPSconst\n";
     file << groundPlanarSpringConstant << "\n";
@@ -391,12 +391,12 @@ namespace SIGEL_Environment {
 		withTexture = newWithTexture;
   };
 
-	void SIG_Environment::setAutosave(int newAutosave) {
-		autosave = newAutosave;
+	void SIG_Environment::setAutosaveIntervalGenerations(int newAutosaveIntervalGenerations) {
+		autosaveIntervalGenerations = newAutosaveIntervalGenerations;
 	};
 
-	int SIG_Environment::getAutosave() {
-		return autosave;
+	int SIG_Environment::getAutosaveIntervalGenerations() {
+		return autosaveIntervalGenerations;
 	};
 	
 }

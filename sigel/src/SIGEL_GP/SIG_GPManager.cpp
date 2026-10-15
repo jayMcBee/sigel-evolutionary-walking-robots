@@ -891,9 +891,9 @@ void SIGEL_GP::SIG_GPManager::run()
 
 		// autosave function
 		// checks whether to save the population or not
-		// only save if getAutosave() not zero and the modulo rest is zero
-		if (currentExperiment.environment.getAutosave()!=0
-		    && (currentExperiment.population.poolGeneration%currentExperiment.environment.getAutosave())==0)
+		// only save if getAutosaveIntervalGenerations() not zero and the modulo rest is zero
+		if (currentExperiment.environment.getAutosaveIntervalGenerations()!=0
+		    && (currentExperiment.population.poolGeneration%currentExperiment.environment.getAutosaveIntervalGenerations())==0)
 		{
 			QFile file( currentExperiment.getPath() );
 			if (file.open(QIODeviceBase::WriteOnly))
@@ -1097,9 +1097,9 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 		// autosave function
 		// checks whether to save the population or not
-		// only save if getAutosave() not zero and the modulo rest is zero
-		if (currentExperiment.environment.getAutosave()!=0
-		    && (currentExperiment.population.poolGeneration%currentExperiment.environment.getAutosave())==0)
+		// only save if getAutosaveIntervalGenerations() not zero and the modulo rest is zero
+		if (currentExperiment.environment.getAutosaveIntervalGenerations()!=0
+		    && (currentExperiment.population.poolGeneration%currentExperiment.environment.getAutosaveIntervalGenerations())==0)
 		{
 			QFile file( currentExperiment.getPath() );
 			if (file.open(QIODeviceBase::WriteOnly))
