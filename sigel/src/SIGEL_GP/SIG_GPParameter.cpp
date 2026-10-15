@@ -269,6 +269,11 @@ QDir SIGEL_GP::SIG_GPParameter::getPoolImageDirectory() const
    return poolImageDirectory;
 };
 
+QString SIGEL_GP::SIG_GPParameter::getPoolImageFileName(QString experimentName, QDateTime time) const
+{
+   return poolImageDirectory.path() + "/" + experimentName + "_PoolImage_" + time.toString() + ".pol";
+};
+
 void SIGEL_GP::SIG_GPParameter::setPoolImageGeneration(int gener)
 {
    poolImageGeneration=gener;

@@ -862,14 +862,7 @@ void SIGEL_GP::SIG_GPManager::run()
 		// if the user wants a poolImage and it the generation where it should generate, then he gets it
 		if ( poolImageGeneration && ((runGenerationCounter % poolImageGeneration) == 0) )
 		{
-			QDir poolImageDir = currentExperiment.getGPParameter().getPoolImageDirectory();
-
-			QString poolImageName =   poolImageDir.path()
-			                        + QString( "/" )
-			                        + currentExperiment.experimentName
-			                        + QString( "_PoolImage_" )
-			                        + QDateTime::currentDateTime().toString()
-			                        + ".pol";
+			QString poolImageName = currentExperiment.getGPParameter().getPoolImageFileName( currentExperiment.experimentName, QDateTime::currentDateTime() );
 
 #ifdef SIG_DEBUG
 			SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager saving poolImage, runGenerationCounter: "
@@ -1075,14 +1068,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 		if ( poolImageGeneration && ((runGenerationCounter % poolImageGeneration) == 0) )
 		{
-			QDir poolImageDir = currentExperiment.getGPParameter().getPoolImageDirectory();
-
-			QString poolImageName =   poolImageDir.path()
-			                        + QString( "/" )
-			                        + currentExperiment.experimentName
-			                        + QString( "_PoolImage_" )
-			                        + QDateTime::currentDateTime().toString()
-			                        + ".pol";
+			QString poolImageName = currentExperiment.getGPParameter().getPoolImageFileName( currentExperiment.experimentName, QDateTime::currentDateTime() );
 
 #ifdef SIG_DEBUG
 			SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager saving poolImage, runGenerationCounter: "

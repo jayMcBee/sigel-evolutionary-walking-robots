@@ -690,6 +690,18 @@ namespace SIGEL_GP
   QDir getPoolImageDirectory() const;
 
  /**
+ * Builds the file name of a pool image.
+ * @param experimentName
+ * The name of the experiment. It can include a directory.
+ * @param time
+ * The time that goes into the file name.
+ * @return
+ * The file in the poolimage directory.
+ */
+ public:
+  QString getPoolImageFileName(QString experimentName, QDateTime time) const;
+
+ /**
  * This function sets the number of generations, which have to be played, before a poolimage
  * will be created.
  * @param gener

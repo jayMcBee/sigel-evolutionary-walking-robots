@@ -24,6 +24,7 @@
 #include "MT_GPSystem/TST_MT_Search.h"
 #include "SIGEL_Environment/TST_SIG_Environment.h"
 #include "SIGEL_GP/TST_SIG_GPIndividual.h"
+#include "SIGEL_GP/TST_SIG_GPParameter.h"
 #include "SIGEL_GP/TST_SIG_GPPopulation.h"
 #include "SIGEL_Program/TST_SIG_ProgramLine.h"
 #include "SIGEL_Robot/TST_SIG_Drive.h"
@@ -50,6 +51,7 @@ int main( int argc, char *argv[] ) {
   testClasses.push_back( std::make_unique<TST_MT_Search>() );
   testClasses.push_back( std::make_unique<SIGEL_Environment::TST_SIG_Environment>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPIndividual>() );
+  testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPParameter>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPPopulation>() );
   testClasses.push_back( std::make_unique<SIGEL_Program::TST_SIG_ProgramLine>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Drive>() );
