@@ -21,15 +21,16 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_Environment/TST_SIG_Environment.h"
+#include "SIGEL_Simulation/TST_SIG_DynaMechsSimulationData.h"
 
 #include "SIGEL_Environment/SIG_Environment.h"
+#include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 
 #include <QtTest>
 
-void SIGEL_Environment::TST_SIG_Environment::loadTerrainGivesTheHeightsOfTheFloorFunction()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadTerrainGivesTheHeightsOfTheFloorFunction()
 {
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   environment.setFloorDimensionX( 4 );
   environment.setFloorDimensionZ( 4 );
   environment.setFloorFunction( "0.5*x-10*z" );
@@ -41,19 +42,19 @@ void SIGEL_Environment::TST_SIG_Environment::loadTerrainGivesTheHeightsOfTheFloo
   QCOMPARE( loadedHeight( environment, 3, 3 ), -28.5 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::loadTerrainGivesTheHeightsOfThePictureFile()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadTerrainGivesTheHeightsOfThePictureFile()
 {
   QTemporaryFile pictureFile;
   QVERIFY( pictureFile.open() );
   pictureFile.write( "P2\n# a comment line\n3 2\n255\n0 51 255\n255 0 102\n" );
   pictureFile.close();
 
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   environment.setFloorPictureFile( pictureFile.fileName() );
   environment.setFloorFuncSelected( false );
 
   dmEnvironment dynaMechsEnvironment;
-  environment.loadTerrain( dynaMechsEnvironment );
+  SIG_DynaMechsSimulationData::loadTerrain( environment.getTerrain(), dynaMechsEnvironment );
 
   int firstDimension = 0;
   int secondDimension = 0;
@@ -70,14 +71,14 @@ void SIGEL_Environment::TST_SIG_Environment::loadTerrainGivesTheHeightsOfThePict
   QCOMPARE( heights[ 2 ][ 1 ], 2.0 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::loadTerrainGivesTheDimensionsOfTheFloor()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadTerrainGivesTheDimensionsOfTheFloor()
 {
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   environment.setFloorDimensionX( 7 );
   environment.setFloorDimensionZ( 7 );
 
   dmEnvironment dynaMechsEnvironment;
-  environment.loadTerrain( dynaMechsEnvironment );
+  SIG_DynaMechsSimulationData::loadTerrain( environment.getTerrain(), dynaMechsEnvironment );
 
   int firstDimension = 0;
   int secondDimension = 0;
@@ -89,27 +90,27 @@ void SIGEL_Environment::TST_SIG_Environment::loadTerrainGivesTheDimensionsOfTheF
   QCOMPARE( spacing, 1.0 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::anotherEnvironmentDoesNotChangeTheTerrain()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::anotherEnvironmentDoesNotChangeTheTerrain()
 {
-  SIG_Environment raised;
+  SIGEL_Environment::SIG_Environment raised;
   raised.setFloorFunction( "2" );
 
   // A slave makes a default environment first; its flat floor must not reach the raised one.
-  SIG_Environment flat;
+  SIGEL_Environment::SIG_Environment flat;
   dmEnvironment flatDynaMechsEnvironment;
-  flat.loadTerrain( flatDynaMechsEnvironment );
+  SIG_DynaMechsSimulationData::loadTerrain( flat.getTerrain(), flatDynaMechsEnvironment );
 
   QCOMPARE( loadedHeight( raised, 5, 5 ), 2.0 );
   QCOMPARE( loadedHeight( flat, 5, 5 ), 0.0 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::eachLoadHasATerrainFileOfItsOwnAndLeavesNoneBehind()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::eachLoadHasATerrainFileOfItsOwnAndLeavesNoneBehind()
 {
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   dmEnvironment firstDynaMechsEnvironment;
   dmEnvironment secondDynaMechsEnvironment;
-  environment.loadTerrain( firstDynaMechsEnvironment );
-  environment.loadTerrain( secondDynaMechsEnvironment );
+  SIG_DynaMechsSimulationData::loadTerrain( environment.getTerrain(), firstDynaMechsEnvironment );
+  SIG_DynaMechsSimulationData::loadTerrain( environment.getTerrain(), secondDynaMechsEnvironment );
 
   const QString firstTerrainFile = QFile::decodeName( firstDynaMechsEnvironment.getTerrainFilename() );
   const QString secondTerrainFile = QFile::decodeName( secondDynaMechsEnvironment.getTerrainFilename() );
@@ -119,20 +120,20 @@ void SIGEL_Environment::TST_SIG_Environment::eachLoadHasATerrainFileOfItsOwnAndL
   QVERIFY( !QFile::exists( secondTerrainFile ) );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::floorFunctionThatCannotBeParsedGivesAFlatFloor()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::floorFunctionThatCannotBeParsedGivesAFlatFloor()
 {
-  SIG_Environment raised;
+  SIGEL_Environment::SIG_Environment raised;
   raised.setFloorFunction( "2" );
   dmEnvironment raisedDynaMechsEnvironment;
-  raised.loadTerrain( raisedDynaMechsEnvironment );
+  SIG_DynaMechsSimulationData::loadTerrain( raised.getTerrain(), raisedDynaMechsEnvironment );
 
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   environment.setFloorDimensionX( 4 );
   environment.setFloorDimensionZ( 4 );
   environment.setFloorFunction( "sin(x" );
 
   dmEnvironment dynaMechsEnvironment;
-  environment.loadTerrain( dynaMechsEnvironment );
+  SIG_DynaMechsSimulationData::loadTerrain( environment.getTerrain(), dynaMechsEnvironment );
 
   int firstDimension = 0;
   int secondDimension = 0;
@@ -147,9 +148,9 @@ void SIGEL_Environment::TST_SIG_Environment::floorFunctionThatCannotBeParsedGive
       QCOMPARE( heights[ first ][ second ], 0.0 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::pictureFileThatDoesNotExistGivesAFlatFloor()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::pictureFileThatDoesNotExistGivesAFlatFloor()
 {
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   environment.setFloorDimensionX( 4 );
   environment.setFloorDimensionZ( 4 );
   environment.setFloorPictureFile( "/this/picture/does/not/exist.pgm" );
@@ -158,13 +159,13 @@ void SIGEL_Environment::TST_SIG_Environment::pictureFileThatDoesNotExistGivesAFl
   QCOMPARE( loadedHeight( environment, 3, 3 ), 0.0 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::loadTerrainNeedsNoSigelRoot()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadTerrainNeedsNoSigelRoot()
 {
   const QByteArray sigelRoot = qgetenv( "SIGEL_ROOT" );
   const bool sigelRootWasSet = qEnvironmentVariableIsSet( "SIGEL_ROOT" );
   qunsetenv( "SIGEL_ROOT" );
 
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   environment.setFloorFunction( "2" );
   const double height = loadedHeight( environment, 5, 5 );
 
@@ -174,25 +175,25 @@ void SIGEL_Environment::TST_SIG_Environment::loadTerrainNeedsNoSigelRoot()
   QCOMPARE( height, 2.0 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::loadTerrainUsesTheSettingsAtTheCall()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadTerrainUsesTheSettingsAtTheCall()
 {
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   QCOMPARE( loadedHeight( environment, 5, 5 ), 0.0 );
 
   environment.setFloorFunction( "2" );
   QCOMPARE( loadedHeight( environment, 5, 5 ), 2.0 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::readFromFileGivesTheTerrainOfTheFile()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::readFromFileGivesTheTerrainOfTheFile()
 {
   QString text = "FLOORDIMENSION\n4\n4\nFLOORFUNCTION\n3\n";
   QTextStream file( &text, QIODevice::ReadOnly );
 
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   environment.readFromFile( file );
 
   // SIG_EnvironmentRenderer draws the terrain that getTerrain gives.
-  const SIG_Terrain terrain = environment.getTerrain();
+  const SIGEL_Environment::SIG_Terrain terrain = environment.getTerrain();
 
   QCOMPARE( terrain.getDimensionX(), 4 );
   QCOMPARE( terrain.getDimensionZ(), 4 );
@@ -200,9 +201,9 @@ void SIGEL_Environment::TST_SIG_Environment::readFromFileGivesTheTerrainOfTheFil
   QCOMPARE( loadedHeight( environment, 2, 2 ), 3.0 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::loadTerrainGivesHeightsWithSixSignificantDigits()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadTerrainGivesHeightsWithSixSignificantDigits()
 {
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   environment.setFloorDimensionX( 4 );
   environment.setFloorDimensionZ( 4 );
   environment.setFloorFunction( "(x+z)/3" );
@@ -223,15 +224,15 @@ void SIGEL_Environment::TST_SIG_Environment::loadTerrainGivesHeightsWithSixSigni
   QCOMPARE( heights[ 1 ][ 0 ], 1.96078 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::loadTerrainGivesEachHeightOfASymmetricFloorFunction()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadTerrainGivesEachHeightOfASymmetricFloorFunction()
 {
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   environment.setFloorDimensionX( 4 );
   environment.setFloorDimensionZ( 4 );
   environment.setFloorFunction( "x*z+x+z" );
 
   dmEnvironment dynaMechsEnvironment;
-  environment.loadTerrain( dynaMechsEnvironment );
+  SIG_DynaMechsSimulationData::loadTerrain( environment.getTerrain(), dynaMechsEnvironment );
 
   int firstDimension = 0;
   int secondDimension = 0;
@@ -246,41 +247,41 @@ void SIGEL_Environment::TST_SIG_Environment::loadTerrainGivesEachHeightOfASymmet
       QCOMPARE( heights[ first ][ second ], static_cast< double >( first * second + first + second ) );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::loadTerrainGivesTheDimensionsOfAFloorThatIsNotSquare()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadTerrainGivesTheDimensionsOfAFloorThatIsNotSquare()
 {
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   environment.setFloorDimensionX( 3 );
   environment.setFloorDimensionZ( 5 );
   environment.setFloorFunction( "2" );
 
   dmEnvironment dynaMechsEnvironment;
-  environment.loadTerrain( dynaMechsEnvironment );
+  SIG_DynaMechsSimulationData::loadTerrain( environment.getTerrain(), dynaMechsEnvironment );
 
   verifyFloorOfOneHeight( dynaMechsEnvironment, 3, 5, 2.0 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::floorFunctionThatCannotBeParsedGivesAFlatFloorThatIsNotSquare()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::floorFunctionThatCannotBeParsedGivesAFlatFloorThatIsNotSquare()
 {
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   environment.setFloorDimensionX( 3 );
   environment.setFloorDimensionZ( 5 );
   environment.setFloorFunction( "sin(x" );
 
   dmEnvironment dynaMechsEnvironment;
-  environment.loadTerrain( dynaMechsEnvironment );
+  SIG_DynaMechsSimulationData::loadTerrain( environment.getTerrain(), dynaMechsEnvironment );
 
   verifyFloorOfOneHeight( dynaMechsEnvironment, 3, 5, 0.0 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::groundElevationIsInterpolatedInTrianglesAndKeepsTheEdgeHeightPastTheFloor()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::groundElevationIsInterpolatedInTrianglesAndKeepsTheEdgeHeightPastTheFloor()
 {
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   environment.setFloorDimensionX( 4 );
   environment.setFloorDimensionZ( 4 );
   environment.setFloorFunction( "x*z+1" );
 
   dmEnvironment dynaMechsEnvironment;
-  environment.loadTerrain( dynaMechsEnvironment );
+  SIG_DynaMechsSimulationData::loadTerrain( environment.getTerrain(), dynaMechsEnvironment );
 
   CartesianVector normal;
 
@@ -309,7 +310,7 @@ void SIGEL_Environment::TST_SIG_Environment::groundElevationIsInterpolatedInTria
   QCOMPARE( dynaMechsEnvironment.getGroundElevation( pastOneEdge, normal ), 5.5 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::pictureFileWithAnotherMagicKeyGivesAFlatFloor()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::pictureFileWithAnotherMagicKeyGivesAFlatFloor()
 {
   dmEnvironment dynaMechsEnvironment;
   QVERIFY( loadPictureTerrain( "P5\n2 2\n255\n0 51\n51 255\n", dynaMechsEnvironment ) );
@@ -317,7 +318,7 @@ void SIGEL_Environment::TST_SIG_Environment::pictureFileWithAnotherMagicKeyGives
   verifyFloorOfOneHeight( dynaMechsEnvironment, 3, 5, 0.0 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::emptyPictureFileGivesAFlatFloor()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::emptyPictureFileGivesAFlatFloor()
 {
   dmEnvironment dynaMechsEnvironment;
   QVERIFY( loadPictureTerrain( "", dynaMechsEnvironment ) );
@@ -325,7 +326,7 @@ void SIGEL_Environment::TST_SIG_Environment::emptyPictureFileGivesAFlatFloor()
   verifyFloorOfOneHeight( dynaMechsEnvironment, 3, 5, 0.0 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::commentsInThePictureFileAreSkipped()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::commentsInThePictureFileAreSkipped()
 {
   dmEnvironment dynaMechsEnvironment;
   QVERIFY( loadPictureTerrain( "# before the magic key\nP2\n2\n# between the sizes\n2\n255 #after a value\n0 51\n51 255\n", dynaMechsEnvironment ) );
@@ -343,7 +344,7 @@ void SIGEL_Environment::TST_SIG_Environment::commentsInThePictureFileAreSkipped(
   QCOMPARE( heights[ 1 ][ 1 ], 5.0 );
 }
 
-void SIGEL_Environment::TST_SIG_Environment::pictureFileNeedsNoFinalNewline()
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::pictureFileNeedsNoFinalNewline()
 {
   dmEnvironment dynaMechsEnvironment;
   QVERIFY( loadPictureTerrain( "P2\n2 2\n255\n0 51\n51 255", dynaMechsEnvironment ) );
@@ -361,10 +362,10 @@ void SIGEL_Environment::TST_SIG_Environment::pictureFileNeedsNoFinalNewline()
   QCOMPARE( heights[ 1 ][ 1 ], 5.0 );
 }
 
-double SIGEL_Environment::TST_SIG_Environment::loadedHeight( const SIG_Environment &environment, int first, int second ) const
+double SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadedHeight( const SIGEL_Environment::SIG_Environment &environment, int first, int second ) const
 {
   dmEnvironment dynaMechsEnvironment;
-  environment.loadTerrain( dynaMechsEnvironment );
+  SIG_DynaMechsSimulationData::loadTerrain( environment.getTerrain(), dynaMechsEnvironment );
 
   int firstDimension = 0;
   int secondDimension = 0;
@@ -374,7 +375,7 @@ double SIGEL_Environment::TST_SIG_Environment::loadedHeight( const SIG_Environme
   return heights[ first ][ second ];
 }
 
-bool SIGEL_Environment::TST_SIG_Environment::loadPictureTerrain( const QByteArray &picture, dmEnvironment &target ) const
+bool SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadPictureTerrain( const QByteArray &picture, dmEnvironment &target ) const
 {
   QTemporaryFile pictureFile;
 
@@ -383,17 +384,17 @@ bool SIGEL_Environment::TST_SIG_Environment::loadPictureTerrain( const QByteArra
 
   pictureFile.close();
 
-  SIG_Environment environment;
+  SIGEL_Environment::SIG_Environment environment;
   environment.setFloorDimensionX( 3 );
   environment.setFloorDimensionZ( 5 );
   environment.setFloorPictureFile( pictureFile.fileName() );
   environment.setFloorFuncSelected( false );
-  environment.loadTerrain( target );
+  SIG_DynaMechsSimulationData::loadTerrain( environment.getTerrain(), target );
 
   return true;
 }
 
-void SIGEL_Environment::TST_SIG_Environment::verifyFloorOfOneHeight( dmEnvironment &dynaMechsEnvironment, int firstDimension, int secondDimension, double height ) const
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::verifyFloorOfOneHeight( dmEnvironment &dynaMechsEnvironment, int firstDimension, int secondDimension, double height ) const
 {
   int loadedFirstDimension = 0;
   int loadedSecondDimension = 0;

@@ -22,7 +22,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "MT_GPSystem/TST_MT_Search.h"
-#include "SIGEL_Environment/TST_SIG_Environment.h"
 #include "SIGEL_GP/TST_SIG_GPIndividual.h"
 #include "SIGEL_GP/TST_SIG_GPParameter.h"
 #include "SIGEL_GP/TST_SIG_GPPopulation.h"
@@ -32,6 +31,7 @@
 #include "SIGEL_Robot/TST_SIG_Link.h"
 #include "SIGEL_Robot/TST_SIG_Material.h"
 #include "SIGEL_Robot/TST_SIG_Robot.h"
+#include "SIGEL_Simulation/TST_SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Simulation/TST_SIG_Interpreter.h"
 #include "SIGEL_Simulation/TST_SIG_Register.h"
 #include "SIGEL_Tools/TST_SIG_Randomizer.h"
@@ -49,7 +49,6 @@
 int main( int argc, char *argv[] ) {
   std::vector<std::unique_ptr<QObject>> testClasses;
   testClasses.push_back( std::make_unique<TST_MT_Search>() );
-  testClasses.push_back( std::make_unique<SIGEL_Environment::TST_SIG_Environment>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPIndividual>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPParameter>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPPopulation>() );
@@ -59,6 +58,7 @@ int main( int argc, char *argv[] ) {
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Link>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Material>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Robot>() );
+  testClasses.push_back( std::make_unique<SIGEL_Simulation::TST_SIG_DynaMechsSimulationData>() );
   testClasses.push_back( std::make_unique<SIGEL_Simulation::TST_SIG_Interpreter>() );
   testClasses.push_back( std::make_unique<SIGEL_Simulation::TST_SIG_Register>() );
   testClasses.push_back( std::make_unique<SIGEL_Tools::TST_SIG_Randomizer>() );

@@ -21,8 +21,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_ENVIRONMENT_TST_SIG_ENVIRONMENT_H
-#define SIGEL_ENVIRONMENT_TST_SIG_ENVIRONMENT_H
+#ifndef SIGEL_SIMULATION_TST_SIG_DYNAMECHSSIMULATIONDATA_H
+#define SIGEL_SIMULATION_TST_SIG_DYNAMECHSSIMULATIONDATA_H
 
 #include <QByteArray>
 #include <QObject>
@@ -34,10 +34,15 @@ namespace SIGEL_Environment
 
   class SIG_Environment;
 
+}
+
+namespace SIGEL_Simulation
+{
+
   /**
-   * The unit tests of SIG_Environment.
+   * The unit tests of SIG_DynaMechsSimulationData::loadTerrain, with the terrain of SIG_Environment::getTerrain.
    */
-  class TST_SIG_Environment : public QObject
+  class TST_SIG_DynaMechsSimulationData : public QObject
   {
     Q_OBJECT
 
@@ -84,7 +89,7 @@ namespace SIGEL_Environment
   private:
 
     /** The height that DynaMechs holds at one grid point after loadTerrain. */
-    double loadedHeight( const SIG_Environment &environment, int first, int second ) const;
+    double loadedHeight( const SIGEL_Environment::SIG_Environment &environment, int first, int second ) const;
 
     /** Loads the terrain of a picture file with this text into target; false if the file cannot be written. The floor settings are 3 by 5. */
     bool loadPictureTerrain( const QByteArray &picture, dmEnvironment &target ) const;
@@ -95,4 +100,4 @@ namespace SIGEL_Environment
 
 }
 
-#endif // SIGEL_ENVIRONMENT_TST_SIG_ENVIRONMENT_H
+#endif // SIGEL_SIMULATION_TST_SIG_DYNAMECHSSIMULATIONDATA_H

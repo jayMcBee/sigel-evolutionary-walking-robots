@@ -28,7 +28,6 @@
 #include "SIGEL_Tools/SIG_Vector.h"
 #include <qtextstream.h>
 #include <qstring.h>
-#include <dmEnvironment.hpp>
 
 /** This namespace just holds the environment for now */
 namespace SIGEL_Environment
@@ -340,18 +339,8 @@ class SIG_Environment {
    */
   double getFrictionCoeff_u_k() const;
 
-  /**
-   * Makes the terrain of the floor function or of the picture file, as selected.
-   * If the function cannot be parsed, or the picture file does not exist or is not in P2 format, a warning is printed
-   * and the terrain is flat at height 0, with the dimensions of the floor.
-   */
+  /** Makes the terrain of the selected floor function or picture file, or a flat one if that fails. */
   SIG_Terrain getTerrain() const;
-
-  /**
-   * Loads the terrain that getTerrain makes into target.
-   * Throws a SIG_Exception if the terrain cannot be written to a temporary file.
-   */
-  void loadTerrain( dmEnvironment &target ) const;
 
   /** This is the set method for the variable autosave. */
   void setAutosave(int newAutosave);

@@ -44,9 +44,13 @@
 #include <dmPrismaticLink.hpp>
 #include <dmRevoluteLink.hpp>
 
+#include <QFile>
+#include <QTemporaryFile>
+
 #include <cstdlib>
 #include <cmath>
 #include <limits>
+#include <sstream>
 
 using namespace SIGEL_Tools;
 
@@ -281,7 +285,38 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeEnvironment()
 	dynaMechsEnvironment.setFrictionCoeffs( environment.getFrictionCoeff_u_s(),
 	                                        environment.getFrictionCoeff_u_k() );
 
-	environment.loadTerrain( dynaMechsEnvironment );
+	loadTerrain( environment.getTerrain(), dynaMechsEnvironment );
+}
+
+void SIGEL_Simulation::SIG_DynaMechsSimulationData::loadTerrain( const SIGEL_Environment::SIG_Terrain &terrain, dmEnvironment &target )
+{
+	std::ostringstream text;
+
+	// The header gives the dimensions and the grid spacing, which is always 1.
+	text << terrain.getDimensionX() << " " << terrain.getDimensionZ() << " " << 1 << std::endl;
+
+	// In the order dmEnvironment::loadTerrainData reads them.
+	for ( int x = 0; x < terrain.getDimensionX(); ++x )
+	{
+		for ( int z = 0; z < terrain.getDimensionZ(); ++z )
+			text << terrain.getHeight( x, z ) << " ";
+
+		text << std::endl;
+	}
+
+	// DynaMechs reads a terrain from a file only. Each call has a file of its own, so no process reads the terrain of another.
+	QTemporaryFile terrainFile;
+	if ( !terrainFile.open() )
+		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "Could not open a temporary file for the terrain: " + terrainFile.errorString() );
+
+	const std::string terrainText = text.str();
+	const qint64 terrainSize = static_cast< qint64 >( terrainText.size() );
+	const bool allWritten = terrainFile.write( terrainText.data(), terrainSize ) == terrainSize;
+
+	if ( !allWritten || !terrainFile.flush() )
+		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "Could not write the terrain to a temporary file: " + terrainFile.errorString() );
+
+	target.loadTerrainData( QFile::encodeName( terrainFile.fileName() ).constData() );
 }
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()

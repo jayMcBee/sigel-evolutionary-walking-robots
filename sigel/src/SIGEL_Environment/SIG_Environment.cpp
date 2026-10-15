@@ -21,12 +21,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_Environment/SIG_Environment.h"
-#include <QByteArray>
-#include <QFile>
-#include <QTemporaryFile>
-#include <sstream>
-#include "SIGEL_Tools/SIG_Exception.h"
-#include "SIGEL_Tools/SIG_IO.h"
 
 namespace SIGEL_Environment {
 
@@ -379,32 +373,6 @@ namespace SIGEL_Environment {
 
 		terrain.setFlat( floorDimensionX, floorDimensionZ );
 		return terrain;
-	};
-
-	void SIG_Environment::loadTerrain( dmEnvironment &target ) const {
-		const SIG_Terrain floor = getTerrain();
-		std::ostringstream terrain;
-
-		// The header gives the dimensions and the grid spacing, which is always 1.
-		terrain << floor.getDimensionX() << " " << floor.getDimensionZ() << " " << 1 << std::endl;
-
-		// In the order dmEnvironment::loadTerrainData reads them.
-		for (int x = 0; x < floor.getDimensionX(); ++x) {
-			for (int z = 0; z < floor.getDimensionZ(); ++z)
-				terrain << floor.getHeight( x, z ) << " ";
-
-			terrain << std::endl;
-		}
-
-		// DynaMechs reads a terrain from a file only. Each call has a file of its own, so no process reads the terrain of another.
-		QTemporaryFile terrainFile;
-		const std::string terrainText = terrain.str();
-		const qint64 terrainSize = static_cast< qint64 >( terrainText.size() );
-
-		if (!terrainFile.open() || terrainFile.write( terrainText.data(), terrainSize ) != terrainSize || !terrainFile.flush())
-			throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "Could not write the terrain to a temporary file: " + terrainFile.errorString() );
-
-		target.loadTerrainData( QFile::encodeName( terrainFile.fileName() ).constData() );
 	};
 
 	int SIG_Environment::getTexAlpha() const {

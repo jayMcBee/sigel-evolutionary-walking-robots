@@ -74,6 +74,12 @@ namespace SIGEL_Simulation
 
       void simulationProgress();
 
+      /**
+       * Loads terrain into target.
+       * Throws a SIG_Exception if the terrain cannot be written to a temporary file.
+       */
+      static void loadTerrain( const SIGEL_Environment::SIG_Terrain &terrain, dmEnvironment &target );
+
       dmEnvironment dynaMechsEnvironment;
 
       dmArticulation dynaMechsSystem;
