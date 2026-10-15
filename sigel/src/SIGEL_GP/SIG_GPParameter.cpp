@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_GP/SIG_GPParameter.h"
+#include <QFileInfo>
 
 
 SIGEL_GP::SIG_GPParameter::SIG_GPParameter()
@@ -271,7 +272,7 @@ QDir SIGEL_GP::SIG_GPParameter::getPoolImageDirectory() const
 
 QString SIGEL_GP::SIG_GPParameter::getPoolImageFileName(QString experimentName, QDateTime time) const
 {
-   return poolImageDirectory.path() + "/" + experimentName + "_PoolImage_" + time.toString() + ".pol";
+   return poolImageDirectory.path() + "/" + QFileInfo(experimentName).fileName() + "_PoolImage_" + time.toString() + ".pol";
 };
 
 void SIGEL_GP::SIG_GPParameter::setPoolImageGeneration(int gener)
