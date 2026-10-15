@@ -24,19 +24,16 @@
 #define SIGEL_ENVIRONMENT_SIG_ENVIRONMENT_H
 
 #include "SIGEL_Environment/SIG_Terrain.h"
-// SIG_Vector only.
 #include "SIGEL_Tools/SIG_Vector.h"
 #include <qtextstream.h>
 #include <qstring.h>
 
-/** This namespace just holds the environment for now */
 namespace SIGEL_Environment
 {
 
 /**
  * The SIG_Environment contains the Environment Data
  *
- * Later on, we hope to have some objects here as obstacles.
  * The class can read from File and write to file.
  */
 class SIG_Environment {
