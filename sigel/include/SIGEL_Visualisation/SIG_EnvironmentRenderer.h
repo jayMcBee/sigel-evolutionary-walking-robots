@@ -155,7 +155,7 @@ namespace SIGEL_Visualisation
 			* the option on.
 			*
 			*/
-    void drawInit();
+    void drawInit( const SIGEL_Environment::SIG_Terrain &terrain );
 
   private:
 
@@ -172,16 +172,9 @@ namespace SIGEL_Visualisation
      *
      * @param number The display list number to occupy.
      */
-    void buildPlane(GLuint number);
+    void buildPlane( GLuint number, const SIGEL_Environment::SIG_Terrain &terrain );
 
-    void buildGrid(GLuint number);
-
-    /**
-     * Returns the terrain's depth field and its size. The terrain is drawn
-     * with one unit between points; the spacing DynaMechs returns is not
-     * used.
-     */
-    double **getTerrainDepth( int &x_dim, int &z_dim ) const;
+    void buildGrid( GLuint number, const SIGEL_Environment::SIG_Terrain &terrain );
 
     /**
      * The depth at column x and row z. The robot starts at the terrain's
@@ -190,13 +183,13 @@ namespace SIGEL_Visualisation
      * gives each point the height of the nearest edge, so the ground
      * continues each edge outward; this lookup does the same.
      */
-    static double groundDepth( double **depth, int x_dim, int z_dim, int x, int z );
+    static double groundDepth( const SIGEL_Environment::SIG_Terrain &terrain, int x, int z );
 
     /**
      * Sets v to the terrain vertex at column x and row z.
      */
     static void setTerrainVertex( GLfloat v[3], int x, int z,
-				  double **depth, int x_dim, int z_dim );
+				  const SIGEL_Environment::SIG_Terrain &terrain );
 
     /**
      * Draws the vertex v in column x. The texture repeats every two columns;

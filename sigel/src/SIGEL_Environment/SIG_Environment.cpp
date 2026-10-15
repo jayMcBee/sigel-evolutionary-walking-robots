@@ -48,7 +48,6 @@ namespace SIGEL_Environment {
     frictionCoeff_u_k(1),
     autosave(0)
   {
-		loadDynaMechsEnvironment();
   };
 
   SIG_Environment::SIG_Environment(SIG_Vector newGravity, 
@@ -71,7 +70,6 @@ namespace SIGEL_Environment {
       frictionCoeff_u_k(newFrictionCoeff_u_k),
       autosave(0)
   {
-		loadDynaMechsEnvironment();
   };
 
   void SIG_Environment::readFromFile(QTextStream& file)
@@ -174,7 +172,6 @@ namespace SIGEL_Environment {
       	frictionCoeff_u_k=s.toDouble();
       }
 		}
-    loadDynaMechsEnvironment();
   };
   
   SIG_Environment::SIG_Environment(QTextStream& file)
@@ -371,10 +368,6 @@ namespace SIGEL_Environment {
 		textureFile = newTextureFile;
   };
 
-	void SIG_Environment::loadDynaMechsEnvironment(){
-		loadTerrain( dynaMechsEnvironment );
-	};
-
 	SIG_Terrain SIG_Environment::getTerrain() const {
 		SIG_Terrain terrain;
 
@@ -414,11 +407,6 @@ namespace SIGEL_Environment {
 		target.loadTerrainData( QFile::encodeName( terrainFile.fileName() ).constData() );
 	};
 
-	dmEnvironment *SIG_Environment::getDMEnvironment() const {
-		// dmEnvironment::getTerrainData is not const.
-		return const_cast< dmEnvironment* >( &dynaMechsEnvironment );
-	}
-	
 	int SIG_Environment::getTexAlpha() const {
 		return texAlpha;
 	};

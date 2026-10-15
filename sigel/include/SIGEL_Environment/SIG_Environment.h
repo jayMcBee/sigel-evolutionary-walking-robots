@@ -340,9 +340,6 @@ class SIG_Environment {
    */
   double getFrictionCoeff_u_k() const;
 
-  /** Loads the terrain of this environment into its own DynaMechs environment, which holds the terrain for drawing. */
-  void loadDynaMechsEnvironment();
-
   /**
    * Makes the terrain of the floor function or of the picture file, as selected.
    * If the function cannot be parsed, or the picture file does not exist or is not in P2 format, a warning is printed
@@ -355,12 +352,6 @@ class SIG_Environment {
    * Throws a SIG_Exception if the terrain cannot be written to a temporary file.
    */
   void loadTerrain( dmEnvironment &target ) const;
-
-  /**
-  	*  This function returns a reference to the dynaMechsEnvironment. It
-  	*  holds the terrain only; a simulation builds an environment of its own.
-  	*/
-  dmEnvironment *getDMEnvironment() const;
 
   /** This is the set method for the variable autosave. */
   void setAutosave(int newAutosave);
@@ -404,9 +395,6 @@ class SIG_Environment {
   double frictionCoeff_u_s;
   /** the kinetic friction coefficient */
   double frictionCoeff_u_k;
-
-  /** the DynaMechsEnvironment */
-  dmEnvironment dynaMechsEnvironment;
 
  	/**
  		*	This variable specifies the interval (in generations) in which the experiment

@@ -95,22 +95,16 @@ namespace SIGEL_Visualisation
 					    blue ) );
   };
 
-  double **SIG_EnvironmentRenderer::getTerrainDepth( int &x_dim, int &z_dim ) const
+  double SIG_EnvironmentRenderer::groundDepth( const SIGEL_Environment::SIG_Terrain &terrain, int x, int z )
   {
-    double spacing;
-    return environment.getDMEnvironment()->getTerrainData( x_dim, z_dim, spacing );
-  }
-
-  double SIG_EnvironmentRenderer::groundDepth( double **depth, int x_dim, int z_dim, int x, int z )
-  {
-    return depth[ qBound( 0, x, x_dim - 1 ) ][ qBound( 0, z, z_dim - 1 ) ];
+    return terrain.getHeight( qBound( 0, x, terrain.getDimensionX() - 1 ), qBound( 0, z, terrain.getDimensionZ() - 1 ) );
   }
 
   void SIG_EnvironmentRenderer::setTerrainVertex( GLfloat v[3], int x, int z,
-						  double **depth, int x_dim, int z_dim )
+						  const SIGEL_Environment::SIG_Terrain &terrain )
   {
     v[0] = x;
-    v[1] = -groundDepth( depth, x_dim, z_dim, x, z );
+    v[1] = -groundDepth( terrain, x, z );
     v[2] = z;
   }
 
@@ -123,15 +117,18 @@ namespace SIGEL_Visualisation
 
   void SIG_EnvironmentRenderer::buildDisplayLists()
   {
+    // Made once: getTerrain prints its warning on each call.
+    const SIGEL_Environment::SIG_Terrain terrain = environment.getTerrain();
+
     GLuint planeListIndex = displayListsOffset;
-    buildPlane( planeListIndex );
+    buildPlane( planeListIndex, terrain );
 
     GLuint gridListIndex = displayListsOffset + 1;
 
-    buildGrid( gridListIndex );
+    buildGrid( gridListIndex, terrain );
   };
 
-  void SIG_EnvironmentRenderer::buildPlane(GLuint number)
+  void SIG_EnvironmentRenderer::buildPlane( GLuint number, const SIGEL_Environment::SIG_Terrain &terrain )
   {
     glNewList(number, GL_COMPILE);
 
@@ -141,17 +138,17 @@ namespace SIGEL_Visualisation
 		if (withTexture == true)
     	withTexture = initTexture();
 
-    drawInit();
+    drawInit( terrain );
 
     glEndList();
   };
 
-	void SIG_EnvironmentRenderer::buildGrid(GLuint number)
+	void SIG_EnvironmentRenderer::buildGrid( GLuint number, const SIGEL_Environment::SIG_Terrain &terrain )
   {
    	int x,z;
    	GLfloat vertex[2][3];
-	 	int x_dim, z_dim;
-	 	double **depth = getTerrainDepth( x_dim, z_dim );
+	 	int x_dim = terrain.getDimensionX();
+	 	int z_dim = terrain.getDimensionZ();
 	 	
   	glNewList(number, GL_COMPILE);
     glFrontFace( GL_CCW );
@@ -162,8 +159,8 @@ namespace SIGEL_Visualisation
    	for (z=1-z_dim; z<z_dim-1; ++z) {
       glBegin(GL_LINES);
     	for (x=1-x_dim; x<x_dim-1; ++x) {
-      	setTerrainVertex( vertex[0], x,   z, depth, x_dim, z_dim );
-      	setTerrainVertex( vertex[1], x+1, z, depth, x_dim, z_dim );
+      	setTerrainVertex( vertex[0], x,   z, terrain );
+      	setTerrainVertex( vertex[1], x+1, z, terrain );
 	
       	glVertex3fv(vertex[0]);
       	glVertex3fv(vertex[1]);
@@ -174,8 +171,8 @@ namespace SIGEL_Visualisation
     for (x=1-x_dim; x<x_dim-1; ++x) {
       glBegin(GL_LINES);
       for (z=1-z_dim; z<z_dim-1; ++z) {
-      	setTerrainVertex( vertex[0], x, z,   depth, x_dim, z_dim );
-      	setTerrainVertex( vertex[1], x, z+1, depth, x_dim, z_dim );
+      	setTerrainVertex( vertex[0], x, z,   terrain );
+      	setTerrainVertex( vertex[1], x, z+1, terrain );
         	
       	glVertex3fv(vertex[0]);
       	glVertex3fv(vertex[1]);
@@ -471,11 +468,11 @@ namespace SIGEL_Visualisation
     return true;
   };
 
-  void SIG_EnvironmentRenderer::drawInit() {
+  void SIG_EnvironmentRenderer::drawInit( const SIGEL_Environment::SIG_Terrain &terrain ) {
    int x, z;
 
-	 int x_dim, z_dim;
-	 double **depth = getTerrainDepth( x_dim, z_dim );
+	 int x_dim = terrain.getDimensionX();
+	 int z_dim = terrain.getDimensionZ();
 
 	 if (withTexture) {
    	 glEnable(GL_TEXTURE_2D);
@@ -492,10 +489,10 @@ namespace SIGEL_Visualisation
        glBegin(GL_TRIANGLES);
        for (x=2-x_dim; x<x_dim; ++x) {
             // a is row z+1, b is row z; 0 is column x-1, 1 is column x.
-            setTerrainVertex( a0, x-1, z+1, depth, x_dim, z_dim );
-            setTerrainVertex( b0, x-1, z,   depth, x_dim, z_dim );
-            setTerrainVertex( a1, x,   z+1, depth, x_dim, z_dim );
-            setTerrainVertex( b1, x,   z,   depth, x_dim, z_dim );
+            setTerrainVertex( a0, x-1, z+1, terrain );
+            setTerrainVertex( b0, x-1, z,   terrain );
+            setTerrainVertex( a1, x,   z+1, terrain );
+            setTerrainVertex( b1, x,   z,   terrain );
 
             QVector3D normal = QVector3D::normal( QVector3D( a0[0], a0[1], a0[2] ),
 						  QVector3D( b0[0], b0[1], b0[2] ),

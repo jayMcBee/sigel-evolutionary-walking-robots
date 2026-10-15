@@ -191,15 +191,12 @@ void SIGEL_Environment::TST_SIG_Environment::readFromFileGivesTheTerrainOfTheFil
   SIG_Environment environment;
   environment.readFromFile( file );
 
-  // SIG_EnvironmentRenderer draws the terrain that getDMEnvironment gives.
-  int firstDimension = 0;
-  int secondDimension = 0;
-  Float spacing = 0;
-  Float **heights = environment.getDMEnvironment()->getTerrainData( firstDimension, secondDimension, spacing );
+  // SIG_EnvironmentRenderer draws the terrain that getTerrain gives.
+  const SIG_Terrain terrain = environment.getTerrain();
 
-  QCOMPARE( firstDimension, 4 );
-  QCOMPARE( secondDimension, 4 );
-  QCOMPARE( heights[ 2 ][ 2 ], 3.0 );
+  QCOMPARE( terrain.getDimensionX(), 4 );
+  QCOMPARE( terrain.getDimensionZ(), 4 );
+  QCOMPARE( terrain.getHeight( 2, 2 ), 3.0 );
   QCOMPARE( loadedHeight( environment, 2, 2 ), 3.0 );
 }
 
