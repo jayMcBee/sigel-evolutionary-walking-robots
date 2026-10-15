@@ -351,46 +351,57 @@ class SIG_Environment {
  private:
   /** the storage for the gravity vector */
   SIG_Vector gravity;
+
   /** the storage for the velo-damping */
   double veloDamping;
+
   /** the storage for the start position */
   SIG_Vector startPosition;
-	/** the storage of the x-dimension of the floor */
-	int floorDimensionX;
-	/** the storage of the z-dimension of the floor */
-	int floorDimensionZ;
-	/** the storage of the floor function */
-	QString floorFunction;
-	/** the storage of filename for a floor picture */
-	QString floorPictureFile;
-	/** determines whether a floorFunction or a floorPictureFile is specified */
-	bool floorFuncSelected;
+
+  /** the storage of the x-dimension of the floor */
+  int floorDimensionX;
+
+  /** the storage of the z-dimension of the floor */
+  int floorDimensionZ;
+
+  /** the storage of the floor function */
+  QString floorFunction;
+
+  /** the storage of filename for a floor picture */
+  QString floorPictureFile;
+
+  /** determines whether a floorFunction or a floorPictureFile is specified */
+  bool floorFuncSelected;
+
   /** the storage for the texture pixmap */
   QString textureFile;
+
   /** holds true if the user wants to see the texture else the variable holds false */
   bool withTexture;
+
   /** the storage of the alpha value for the texture */
-	int texAlpha;
-	
+  int texAlpha;
+
   /** the ground planar spring constant */
   double groundPlanarSpringConstant;
+
   /** the ground normal spring constant */
   double groundNormalSpringConstant;
+
   /** the ground planar damper constant */
   double groundPlanarDamperConstant;
+
   /** the ground normal damper constant */
   double groundNormalDamperConstant;
+
   /** the static friction coefficient */
   double frictionCoeff_u_s;
+
   /** the kinetic friction coefficient */
   double frictionCoeff_u_k;
 
- 	/**
- 		*	This variable specifies the interval (in generations) in which the experiment
- 		*	is automatically saved to disk.
- 		*	For now the range is from 0 to 100 generations, where 0 disables autosave.
- 		*/
- 	int autosaveIntervalGenerations;
+  /** 0 disables autosave. */
+  int autosaveIntervalGenerations;
 };
 
 }
