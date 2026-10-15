@@ -22,11 +22,7 @@
    with no -ltirpc and nothing behind them.  Running catches it: without
    -ltirpc the first PVM call dies with SEGV at pc 0 inside enc_xdr_init.
 
-   The three constructor arguments are default-constructed.  SIG_Environment's
-   default constructor loads terrain through vendored DynaMechs and leaks
-   20,400 bytes in 51 allocations -- pre-existing, nothing to do with PVM, and
-   why pvm-check.sh suppresses that one leak by function name rather than
-   turning leak detection off. */
+   The three constructor arguments are default-constructed. */
 
 #include <cstdio>
 #include <pvm3.h>

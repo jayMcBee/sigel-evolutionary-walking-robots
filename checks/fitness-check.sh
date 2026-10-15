@@ -37,7 +37,7 @@ export SIGEL_ROOT
 # not free all it allocates. A build without a sanitizer ignores ASAN_OPTIONS,
 # so test the program and say when this run is skipped.
 # DynaMechs never frees a terrain it has loaded (dmEnvironment::loadTerrainData),
-# and the tests of SIG_Environment load terrains. Suppress that one function.
+# and TST_SIG_DynaMechsSimulationData loads terrains. Suppress that one function.
 if nm -C "$ROOT/$B/coredrive" 2>/dev/null | grep -q __asan_init; then
 	echo 'leak:dmEnvironment::loadTerrainData' > "$ROOT/$B/lsan.supp"
 	leaks=$(ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=$ROOT/$B/lsan.supp make -s --no-print-directory -C "$ROOT" B="$B" test 2>&1) || {

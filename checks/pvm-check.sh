@@ -101,18 +101,9 @@ trap cleanup EXIT INT TERM
 cc -I"$PVM/include" "$ROOT/checks/programs/pvm_smoke.c" "$BIN/libpvm3.a" -ltirpc \
 	-o "$PVM_TMP/pvm_smoke" || exit 1
 
-# pvm_link constructs a SIG_Environment, whose default constructor loads
-# terrain through vendored DynaMechs and leaks 20,400 bytes in 51 allocations
-# (dmEnvironment.cpp:110, via SIG_Environment.cpp, loadDynaMechsEnvironment). Suppress that one
-# function rather than turning leak detection off: a leak on the PVM path is
-# exactly what this check should still catch.
-cat > "$PVM_TMP/lsan.supp" <<'SUPP'
-leak:dmEnvironment::loadTerrainData
-SUPP
 # Run it in the folder SIGEL is started from, never in the tracked source.
 SIGEL_ROOT=$ROOT/sigelApp
-LSAN_OPTIONS=suppressions=$PVM_TMP/lsan.supp
-export SIGEL_ROOT LSAN_OPTIONS
+export SIGEL_ROOT
 
 "$BIN/pvmd3" > "$PVM_TMP/pvmd.out" 2>&1 &
 pvmd_pid=$!
