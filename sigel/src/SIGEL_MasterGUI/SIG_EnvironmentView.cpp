@@ -29,7 +29,6 @@
 #include <qfiledialog.h>
 #include <qslider.h>
 #include <qcheckbox.h>
-#include "fparser.h"
 
 #include "SIGEL_MasterGUI/SIG_EnvironmentView.h"
 

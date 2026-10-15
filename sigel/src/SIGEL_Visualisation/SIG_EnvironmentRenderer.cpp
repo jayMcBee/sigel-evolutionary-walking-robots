@@ -26,7 +26,6 @@
 
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 
-#include "dm.h"
 #include "qmessagebox.h"
 #include "SIGEL_Tools/SIG_DialogParent.h"
 
