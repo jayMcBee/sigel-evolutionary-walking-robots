@@ -108,12 +108,6 @@ Paths are relative to `sigel/`, the source tree.
 All present in 1.3, none introduced here. Each needs a decision before it is
 touched, because changing one changes behaviour against the reference binary.
 
-- [ ] **136. Keep the terrain in `SIG_Environment` as SIGEL data.**
-  `SIG_Environment` has a `dmEnvironment` member only to hold the terrain
-  for `SIG_EnvironmentRenderer`, and `loadTerrain` takes a `dmEnvironment`.
-  With the terrain as SIGEL data, only `SIGEL_Simulation` needs a DynaMechs
-  environment.
-
 - [ ] **139. Assess the report that a simple servo drive goes to the mirrored
   angle.** A robot built with `simpleservo` drives was reported to move its
   joint to minimum + maximum - command instead of to the command. One test
@@ -157,8 +151,7 @@ touched, because changing one changes behaviour against the reference binary.
   they agree with each other. Two kinds of floor are not affected: a flat
   floor, and a square floor whose function or picture is the same after x and
   z are swapped. All shipped experiments have a flat floor. The fix changes
-  drawing and physics for every other floor. Fix it together with item 136,
-  where the terrain class states the order.
+  drawing and physics for every other floor.
 
 - [ ] **73. Fix the latent sensor bugs in
   `SIG_DynaMechsSimulationQueries::sense`:** a joint with equal limits, or
