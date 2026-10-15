@@ -21,7 +21,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_Environment/SIG_Environment.h"
-#include "fparser.h"
 #include <QByteArray>
 #include <QFile>
 #include <QTemporaryFile>
@@ -376,13 +375,32 @@ namespace SIGEL_Environment {
 		loadTerrain( dynaMechsEnvironment );
 	};
 
+	SIG_Terrain SIG_Environment::getTerrain() const {
+		SIG_Terrain terrain;
+
+		if (floorFuncSelected && terrain.setFromFunction( floorFunction, floorDimensionX, floorDimensionZ ))
+			return terrain;
+
+		if (!floorFuncSelected && terrain.setFromPictureFile( floorPictureFile ))
+			return terrain;
+
+		terrain.setFlat( floorDimensionX, floorDimensionZ );
+		return terrain;
+	};
+
 	void SIG_Environment::loadTerrain( dmEnvironment &target ) const {
+		const SIG_Terrain floor = getTerrain();
 		std::ostringstream terrain;
 
-		if (!writeTerrain( terrain )) {
-			terrain.str( std::string() );
-			terrain.clear();
-			writeFlatTerrain( terrain );
+		// The header gives the dimensions and the grid spacing, which is always 1.
+		terrain << floor.getDimensionX() << " " << floor.getDimensionZ() << " " << 1 << std::endl;
+
+		// In the order dmEnvironment::loadTerrainData reads them.
+		for (int x = 0; x < floor.getDimensionX(); ++x) {
+			for (int z = 0; z < floor.getDimensionZ(); ++z)
+				terrain << floor.getHeight( x, z ) << " ";
+
+			terrain << std::endl;
 		}
 
 		// DynaMechs reads a terrain from a file only. Each call has a file of its own, so no process reads the terrain of another.
@@ -416,103 +434,6 @@ namespace SIGEL_Environment {
   void SIG_Environment::setWithTexture(bool newWithTexture) {
 		withTexture = newWithTexture;
   };
-
-	bool SIG_Environment::writeTerrain( std::ostream &terrain ) const {
-  	if (floorFuncSelected) {
-  		QString str = floorFunction;
-  	
-  		// this is the header of the terrain
-  		// it specifies the dimensions in x and z direction and the dimension of the grid (always 1)
-  		terrain << floorDimensionX << " " << floorDimensionZ << " " << 1 << endl;
-  	
-  		const QByteArray funcBytes = str.toUtf8();
-		const char* func = funcBytes.constData();
-
-  		FunctionParser fp;
-  		if (fp.Parse(func,"xz") != -1) {
-  			SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain function could not be parsed. It must depend on x and z, and contain only valid expressions -- see the documentation in supportingLibs/fparser." << Qt::endl;
-  			return false;
-  		}
-  	
-  		double vals[2];
-  	
-  		// calculate the y value for each (x,z) position
-  		for (int z=0;z<floorDimensionZ;++z)
-  		{
-  			for (int x=0;x<floorDimensionX;++x)
-  			{
-  				vals[0] = x;
-  				vals[1] = z;
-    			terrain << fp.Eval(vals) << " ";
-  			}
-  			terrain << endl;
-  		}
-  	} // if(floorFuncSelected)
-  	
-  	else { // a pictureFile is specified
-  		QString input = floorPictureFile;
-  		std::ifstream pgm(input.toUtf8().constData());
-  		if (!pgm) {
-  			SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain file does not exist." << Qt::endl;
-  			return false;
-  		}
-  		
-  		std::string s;
-  		QString str;
-			double max = 0;
-			int counter = 0;
-			while (!pgm.eof()) {
-			    pgm >> s; // read file content till white space
-    			
-    			if (s.find("#",0)!=string::npos) {
-    				pgm.ignore(255, '\n');
-    			}
-    			else {
-    				switch(counter) {
-    					case 0: // Magic Key
-    						if (s.compare("P2")!=0) {
-									SIGEL_Tools::SIG_IO::cerr << "Warning: the specified picture file is not in PGM format." << Qt::endl;
-									return false;
-    						}
-								else ++counter;
-								break;
-							case 1: // x-DIM
-								terrain << s << " ";
-								++counter;
-								break;
-							case 2: // y-DIM
-    						terrain << s << " ";
-    						terrain << 1 << endl;
-								++counter;
-								break;
-							case 3: // max. grey-value
-    						max = QString(s.c_str()).toDouble();
-    						++counter;
-								break;
-							default:
-								str = QString(s.c_str());
-								double greyValue = str.toDouble();
-								terrain << greyValue/max*5 << endl;
-    				} // switch-tree
-    			} // else, no comment has been read
-			} // while-loop
-
-  		pgm.close();
-  	} // else, picturefile specified
-  	
-  	return true;
-	};
-
-	void SIG_Environment::writeFlatTerrain( std::ostream &terrain ) const {
-		terrain << floorDimensionX << " " << floorDimensionZ << " " << 1 << std::endl;
-
-		for (int z = 0; z < floorDimensionZ; ++z) {
-			for (int x = 0; x < floorDimensionX; ++x)
-				terrain << 0 << " ";
-
-			terrain << std::endl;
-		}
-	};
 
 	void SIG_Environment::setAutosave(int newAutosave) {
 		autosave = newAutosave;

@@ -148,8 +148,9 @@ touched, because changing one changes behaviour against the reference binary.
   experiment does. No patch to the library touches this method.
 
 - [ ] **61. Fix the order of the terrain heights.**
-  `SIG_Environment::writeTerrain` writes the heights for each z, all x.
-  DynaMechs' `dmEnvironment::loadTerrainData` reads them for each x, all z.
+  `SIG_Terrain` makes the heights for each z, all x. `SIG_Terrain::getHeight`
+  reads them for each x, all z, as DynaMechs' `dmEnvironment::loadTerrainData`
+  does.
   So a floor that is not flat is not the floor the user asked for: on a
   square floor, x and z are swapped; on a floor whose X and Z sizes differ,
   the heights are scrambled. Drawing and physics use the same wrong floor, so

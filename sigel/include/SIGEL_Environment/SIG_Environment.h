@@ -23,12 +23,12 @@
 #ifndef SIGEL_ENVIRONMENT_SIG_ENVIRONMENT_H
 #define SIGEL_ENVIRONMENT_SIG_ENVIRONMENT_H
 
+#include "SIGEL_Environment/SIG_Terrain.h"
 // SIG_Vector only.
 #include "SIGEL_Tools/SIG_Vector.h"
 #include <qtextstream.h>
 #include <qstring.h>
 #include <dmEnvironment.hpp>
-#include <ostream>
 
 /** This namespace just holds the environment for now */
 namespace SIGEL_Environment
@@ -344,8 +344,14 @@ class SIG_Environment {
   void loadDynaMechsEnvironment();
 
   /**
-   * Loads the terrain of this environment into target. The terrain is the floor function or the picture file, as selected.
-   * If it cannot be made, a warning is printed and the floor is flat at height 0.
+   * Makes the terrain of the floor function or of the picture file, as selected.
+   * If the function cannot be parsed, or the picture file does not exist or is not in P2 format, a warning is printed
+   * and the terrain is flat at height 0, with the dimensions of the floor.
+   */
+  SIG_Terrain getTerrain() const;
+
+  /**
+   * Loads the terrain that getTerrain makes into target.
    * Throws a SIG_Exception if the terrain cannot be written to a temporary file.
    */
   void loadTerrain( dmEnvironment &target ) const;
@@ -401,12 +407,6 @@ class SIG_Environment {
 
   /** the DynaMechsEnvironment */
   dmEnvironment dynaMechsEnvironment;
-
-  /** Writes the terrain of the floor function or of the picture file in the format that DynaMechs reads. Returns false if it cannot be made. */
-  bool writeTerrain( std::ostream &terrain ) const;
-
-  /** Writes a flat terrain at height 0 with the dimensions of the floor. */
-  void writeFlatTerrain( std::ostream &terrain ) const;
 
  	/**
  		*	This variable specifies the interval (in generations) in which the experiment
