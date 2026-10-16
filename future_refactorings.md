@@ -437,6 +437,17 @@ problem; the choice is made before any code is written.
   less saturated colours. To decide: the name of the second set and where the two sets live.
   Item 160 waits for this item.
 
+- [ ] **171. A convenience binary on the GitHub page.** One x86_64 tarball
+  of `sigelApp/`, offered as a GitHub pre-release, so that a visitor can try
+  SIGEL without building it. It is a convenience only, not a supported
+  download: no other architectures, no packages for each distribution, no
+  new tools. Others build from source. Steps: the RemoteZORC fitness
+  function goes behind an `#ifdef`, because it is internal to the
+  university; check that the vendored libraries may ship in a binary; the
+  x86 machine builds stock SIGEL from GitHub on its Debian 12 and packs
+  `sigelApp/`; the release is created and the file uploaded in the GitHub
+  web interface. To decide: the version name, since the code says 1.4.
+
 ---
 
 ## Watch out
