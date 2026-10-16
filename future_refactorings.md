@@ -12,16 +12,6 @@ Paths are relative to `sigel/`, the source tree.
 
 ---
 
-## 1 · Let the compiler hunt bugs
-
-- [ ] **5. Add `override`**, one commit per module. Highest value on this
-  list: a method meant to override with a subtly wrong signature silently
-  becomes a new function. **Read every failure; do not fix mechanically.**
-  Needs tooling rather than an editor, because base headers must parse. The
-  failure shape is a missing `const`, or `int` against `long`.
-
----
-
 ## 2 · Ownership
 
 - [ ] **140. Assess `DynaMechsLinkGuard`.** It is a hand-written struct in
