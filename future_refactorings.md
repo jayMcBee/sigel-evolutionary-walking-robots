@@ -363,6 +363,13 @@ problem; the choice is made before any code is written.
   picture the master cannot read stops the run with an error. The `.exp`
   keeps the path; its format does not change.
 
+- [ ] **170. A dynamic client finds the master also by an IPv6 name.**
+  `manage_dyn_slave` looks up the master's name with `gethostbyname`, which
+  gives IPv4 addresses only. Where the name resolves only to IPv6,
+  `sigelDynClient <master name>` stops with "invalid host", and only the
+  master's IPv4 address works. Look up the name with `getaddrinfo` and try
+  each address it gives.
+
 - [ ] **165. Mutation adds a line also if there is no maximum length.**
   With "Ignore maximum length" the maximum is 0. `SIG_GPOperations::mutation`
   compares the new length with that 0, so it never adds a line. Crossover
