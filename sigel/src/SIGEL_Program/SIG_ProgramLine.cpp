@@ -26,7 +26,6 @@
 #include "SIGEL_Tools/SIG_IO.h"
 
 #include "stdlib.h"
-#include "iostream.h"
 #include <qtextstream.h>
 
 SIGEL_Program::SIG_ProgramLine& SIGEL_Program::SIG_ProgramLine::operator =(SIGEL_Program::SIG_ProgramLine const & prgLine)

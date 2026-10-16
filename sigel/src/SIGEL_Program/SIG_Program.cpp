@@ -28,7 +28,6 @@
 #include "SIGEL_Tools/SIG_Exception.h"
 
 #include "stdlib.h"
-#include "iostream.h" 
 
 
 SIGEL_Program::SIG_Program& SIGEL_Program::SIG_Program::operator =(SIGEL_Program::SIG_Program &prg)
