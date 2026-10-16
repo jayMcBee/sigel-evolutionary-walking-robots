@@ -363,6 +363,14 @@ problem; the choice is made before any code is written.
   vendored libraries, their patches), how the `Makefile` keeps it current,
   and what the master does with a slave that does not match.
 
+- [ ] **169. A slave that cannot read the floor picture stops with an error.**
+  `SIG_Environment::getTerrain` falls back to a flat floor when
+  `SIG_Terrain::setFromPictureFile` fails, and the slave only prints a
+  warning. The master is not told and records the fitness on the flat
+  floor. An absolute picture path that exists on one host only made a run
+  evolve for the wrong floor this way. The slave must report the error to
+  the master and give no fitness.
+
 - [ ] **165. Mutation adds a line also if there is no maximum length.**
   With "Ignore maximum length" the maximum is 0. `SIG_GPOperations::mutation`
   compares the new length with that 0, so it never adds a line. Crossover
