@@ -441,9 +441,8 @@ problem; the choice is made before any code is written.
   of `sigelApp/`, offered as a GitHub pre-release, so that a visitor can try
   SIGEL without building it. It is a convenience only, not a supported
   download: no other architectures, no packages for each distribution, no
-  new tools. Others build from source. Steps: the RemoteZORC fitness
-  function goes behind an `#ifdef`, because it is internal to the
-  university; check that the vendored libraries may ship in a binary; the
+  new tools. Others build from source. Item 83 comes first. Steps: check
+  that the vendored libraries may ship in a binary; the
   x86 machine builds stock SIGEL from GitHub on its Debian 12 and packs
   `sigelApp/`; the release is created and the file uploaded in the GitHub
   web interface. To decide: the version name, since the code says 1.4.
