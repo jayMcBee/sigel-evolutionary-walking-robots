@@ -29,4 +29,4 @@ SIGEL_Simulation::SIG_SimulationData::SIG_SimulationData( SIGEL_Robot::SIG_Robot
     environment( environment ),
     simulationParameter( simulationParameter ),
     actualFrame(0)
-{ };
+{ }

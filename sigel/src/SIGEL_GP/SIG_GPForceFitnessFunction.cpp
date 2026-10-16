@@ -161,4 +161,4 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
   }
 
   return fitness;
-};
+}

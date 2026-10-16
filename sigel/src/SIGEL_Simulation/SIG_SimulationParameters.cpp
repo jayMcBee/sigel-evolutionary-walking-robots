@@ -32,7 +32,7 @@ SIGEL_Simulation::SIG_SimulationParameters::SIG_SimulationParameters()
     jointFrictionU_c(0.35),
     randomSeed(0),
     dynaMechsIntegrator( RungeKutta4 )
-{ };
+{ }
 
 void SIGEL_Simulation::SIG_SimulationParameters::readFromFile(QTextStream& file)
 {
@@ -82,12 +82,12 @@ void SIGEL_Simulation::SIG_SimulationParameters::readFromFile(QTextStream& file)
       jointFrictionU_c=s.toDouble();
 	  }
   }
-};
+}
 
 SIGEL_Simulation::SIG_SimulationParameters::SIG_SimulationParameters(QTextStream& file)
 {
   readFromFile(file);
-};
+}
 
 void SIGEL_Simulation::SIG_SimulationParameters::writeToFile(QTextStream& file)
 {
@@ -129,17 +129,17 @@ void SIGEL_Simulation::SIG_SimulationParameters::writeToFile(QTextStream& file)
   file << jointLimitsB_damper << "\n";
   file << "JOINTFRICTIONU_C\n";
   file << jointFrictionU_c << "\n";
-};
+}
 
 void SIGEL_Simulation::SIG_SimulationParameters::setTimeToSimulate(QTime newTimeToSimulate)
 {
   timeToSimulate = newTimeToSimulate;
-};
+}
 
 QTime SIGEL_Simulation::SIG_SimulationParameters::getTimeToSimulate() const
 {
   return timeToSimulate;
-};
+}
 
 void SIGEL_Simulation::SIG_SimulationParameters::setStepSize(double newStepSize)
 {
@@ -149,62 +149,62 @@ void SIGEL_Simulation::SIG_SimulationParameters::setStepSize(double newStepSize)
 double SIGEL_Simulation::SIG_SimulationParameters::getStepSize() const
 {
   return stepSize;
-};
+}
 
 void SIGEL_Simulation::SIG_SimulationParameters::setJointLimitsK_spring( double newValue )
 {
   jointLimitsK_spring = newValue;
-};
+}
 
 double SIGEL_Simulation::SIG_SimulationParameters::getJointLimitsK_spring() const
 {
   return jointLimitsK_spring;
-};
+}
 
 void SIGEL_Simulation::SIG_SimulationParameters::setJointLimitsB_damper( double newValue )
 {
   jointLimitsB_damper = newValue;
-};
+}
 
 double SIGEL_Simulation::SIG_SimulationParameters::getJointLimitsB_damper() const
 {
   return jointLimitsB_damper;
-};
+}
 
 void SIGEL_Simulation::SIG_SimulationParameters::setJointFrictionU_c( double newValue )
 {
   jointFrictionU_c = newValue;
-};
+}
 
 double SIGEL_Simulation::SIG_SimulationParameters::getJointFrictionU_c() const
 {
   return jointFrictionU_c;
-};
+}
 
 void SIGEL_Simulation::SIG_SimulationParameters::setRandomSeed(int newRandomSeed)
 {
   randomSeed = newRandomSeed;
-};
+}
 
 int SIGEL_Simulation::SIG_SimulationParameters::getRandomSeed() const
 {
   return randomSeed;
-};
+}
 
 void SIGEL_Simulation::SIG_SimulationParameters::setDynaMechsIntegrator( DynaMechsIntegrator newDynaMechsIntegrator )
 {
   dynaMechsIntegrator = newDynaMechsIntegrator;
-};
+}
 
 SIGEL_Simulation::SIG_SimulationParameters::DynaMechsIntegrator SIGEL_Simulation::SIG_SimulationParameters::getDynaMechsIntegrator() const
 {
   return dynaMechsIntegrator;
-};
+}
 
 void SIGEL_Simulation::SIG_SimulationParameters::setNoise(float newNoise) {
 	noise = newNoise;
-};
+}
 
 float SIGEL_Simulation::SIG_SimulationParameters::getNoise() {
     return noise;
-};
+}

@@ -51,239 +51,239 @@ SIGEL_GP::SIG_GPParameter::SIG_GPParameter()
   setPriority(veryLow);
   instructionProb.resize( SIGEL_Program::instructionCount );
   instructionProb.fill( 1000 );
-};
+}
 
 SIGEL_GP::SIG_GPParameter::~SIG_GPParameter()
 {
   // This class owns the hosts in hostList.
   qDeleteAll( hostList );
   hostList.clear();
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setRandomSeed (int seed)
 {
     randomSeed=seed;
-};
+}
 
 int SIGEL_GP::SIG_GPParameter::getRandomSeed() const
 { 
    return randomSeed;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setMinIndLength (int minIndLen)
 {
     minIndLength=minIndLen;
-};
+}
 
 int SIGEL_GP::SIG_GPParameter::getMinIndLength() const
 {
     return minIndLength;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setMaxIndLength (int maxIndLen)
 {
     maxIndLength=maxIndLen;
-};
+}
 
 int SIGEL_GP::SIG_GPParameter::getMaxIndLength() const
 {
    return maxIndLength;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setReproductionProb(int prob)
 {
     reproductionProb=prob;
-};
+}
 
 int SIGEL_GP::SIG_GPParameter::getReproductionProb() const
 {
    return reproductionProb;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setXoverProb(int prob)
 {
    xoverProb=prob;
-};
+}
 
 int SIGEL_GP::SIG_GPParameter::getXoverProb() const
 {
    return xoverProb;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setMutationProb(int prob)
 {
    mutationProb=prob;
-};
+}
 
 int  SIGEL_GP::SIG_GPParameter::getMutationProb() const
 {
    return mutationProb;
-};
+}
 
 void  SIGEL_GP::SIG_GPParameter::setTournamentsPerGeneration(double prob)
 {
    tournamentsPerGeneration=prob;
-};
+}
 
 double  SIGEL_GP::SIG_GPParameter::getTournamentsPerGeneration() const
 {
    return tournamentsPerGeneration;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setMaxAge(long int age)
 {
    maxAge=age;
-};
+}
 
 long int SIGEL_GP::SIG_GPParameter::getMaxAge() const
 {
    return maxAge;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setPassiveTime(unsigned long pTime)
 {
    passiveTime=pTime;
-};
+}
 
 unsigned long SIGEL_GP::SIG_GPParameter::getPassiveTime() const
 {
    return passiveTime;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setMaxTouchsPerLoop(int touchs)
 {
   maxTouchsPerLoop=touchs;
-};
+}
 
 int SIGEL_GP::SIG_GPParameter::getMaxTouchsPerLoop() const
 {
    return maxTouchsPerLoop;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setToDoSweepsPerLoop(int sweeps)
 {
    toDoSweepsPerLoop=sweeps;
-};
+}
 
 int SIGEL_GP::SIG_GPParameter::getToDoSweepsPerLoop() const
 {
    return toDoSweepsPerLoop;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setTerminationTime(QDateTime tTime)
 {
    terminationTime=tTime;
-};
+}
 
 QDateTime SIGEL_GP::SIG_GPParameter::getTerminationTime() const
 {
    return terminationTime;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setTerminationDurationDays( int newValue )
 {
   terminationDurationDays = newValue;
-};
+}
 
 int SIGEL_GP::SIG_GPParameter::getTerminationDurationDays() const
 {
   return terminationDurationDays;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setTerminationDurationHours( int newValue )
 {
   terminationDurationHours = newValue;
-};
+}
 
 int SIGEL_GP::SIG_GPParameter::getTerminationDurationHours() const
 {
   return terminationDurationHours;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setTerminationDurationMinutes( int newValue )
 {
   terminationDurationMinutes = newValue;
-};
+}
 
 int SIGEL_GP::SIG_GPParameter::getTerminationDurationMinutes() const
 {
   return terminationDurationMinutes;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setTerminationDurationSeconds( int newValue )
 {
   terminationDurationSeconds = newValue;
-};
+}
 
 int SIGEL_GP::SIG_GPParameter::getTerminationDurationSeconds() const
 {
   return terminationDurationSeconds;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setTerminationGenerationNo (int tGenNo)
 {
     terminationGenerationNo=tGenNo;
-};
+}
 
 int SIGEL_GP::SIG_GPParameter::getTerminationGenerationNo() const
 {
    return terminationGenerationNo;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setTerminationModel(terminationType termi)
 {
    terminationModel=termi;
-};
+}
 
 SIGEL_GP::SIG_GPParameter::terminationType SIGEL_GP::SIG_GPParameter::getTerminationModel() const
 {
    return terminationModel;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setGraveYardDirectory(QDir directory)
 {
    graveYardDirectory=directory;
-};
+}
 
 QDir SIGEL_GP::SIG_GPParameter::getGraveYardDirectory() const
 {
    return graveYardDirectory;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setLiveUndead(bool grave)
 {
    liveUndead=grave;
-};
+}
 
 bool SIGEL_GP::SIG_GPParameter::getLiveUndead() const
 {
    return liveUndead;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setPoolImageDirectory(QDir PIDir)
 {
    poolImageDirectory=PIDir;
-};
+}
 
 QDir SIGEL_GP::SIG_GPParameter::getPoolImageDirectory() const
 {
    return poolImageDirectory;
-};
+}
 
 QString SIGEL_GP::SIG_GPParameter::getPoolImageFileName(QString experimentName, QDateTime time) const
 {
    return poolImageDirectory.path() + "/" + QFileInfo(experimentName).fileName() + "_PoolImage_" + time.toString() + ".pol";
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setPoolImageGeneration(int gener)
 {
    poolImageGeneration=gener;
-};
+}
 
 int SIGEL_GP::SIG_GPParameter::getPoolImageGeneration() const
 {
    return poolImageGeneration;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setPriority(priorityLevel prio)
 {
@@ -322,22 +322,22 @@ void SIGEL_GP::SIG_GPParameter::setPriority(priorityLevel prio)
 	setToDoSweepsPerLoop(1);
 	break;
       };
-};  
+}  
   
 SIGEL_GP::SIG_GPParameter::priorityLevel SIGEL_GP::SIG_GPParameter::getPriority() const
 {
    return priority;
-};
+}
 
 QString SIGEL_GP::SIG_GPParameter::getFitnessName() const
 {
    return fitnessName;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setFitnessName(QString name)
 {
    fitnessName=name;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::readFromFile(QTextStream & file)
 {
@@ -571,7 +571,7 @@ void SIGEL_GP::SIG_GPParameter::readFromFile(QTextStream & file)
       hostList.append( newHost );
 		}
   }
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::writeToFile(QTextStream & file)
 {
@@ -674,17 +674,17 @@ void SIGEL_GP::SIG_GPParameter::writeToFile(QTextStream & file)
       file << "PVMHOST\n";
       file << actHost->print();
     };
-};
+}
 
 QList< SIGEL_GP::SIG_GPPVMHost * > const &SIGEL_GP::SIG_GPParameter::getHostList() const
 {
   return hostList;
-};
+}
 
 QList< SIGEL_GP::SIG_GPPVMHost * > &SIGEL_GP::SIG_GPParameter::getHostList()
 {
   return hostList;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setProbability( SIGEL_Program::RobotInstruction instruction, int prob )
 {
@@ -708,19 +708,19 @@ QList< int >& SIGEL_GP::SIG_GPParameter::getInstructionProbabilities()
 bool SIGEL_GP::SIG_GPParameter::getTerminationUsesDate() const
 {
   return terminationUsesDate;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setTerminationUsesDate( bool newValue )
 {
   terminationUsesDate = newValue;
-};
+}
 
 int SIGEL_GP::SIG_GPParameter::getTimeOutMinutes()
 {
   return timeOutMinutes;
-};
+}
 
 void SIGEL_GP::SIG_GPParameter::setTimeOutMinutes( int newValue )
 {
   timeOutMinutes = newValue;
-};
+}

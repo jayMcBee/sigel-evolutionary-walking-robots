@@ -102,7 +102,7 @@ namespace SIGEL_SlaveGUI
 
     this->resize( 1098, 900 );
     this->setMinimumSize( 780, 686 );
-  };
+  }
 
   bool SIG_SimulationWindow::event( QEvent *e )
   {
@@ -112,7 +112,7 @@ namespace SIGEL_SlaveGUI
       simulationWidget->visualisationWidget->resumeAfterDialog();
 
     return QMainWindow::event( e );
-  };
+  }
 
   void SIG_SimulationWindow::visualizeThis(SIGEL_Robot::SIG_Robot const &robot,
 					   SIGEL_Environment::SIG_Environment const &environment,
@@ -120,12 +120,12 @@ namespace SIGEL_SlaveGUI
 					   SIGEL_Program::SIG_Program const &program)
   {
     simulationWidget->visualizeThis(robot, environment, simulationParameters, program);
-  };
+  }
 
   void SIG_SimulationWindow::setStaticRunInfo( SIG_MovieStaticRunInfo const &staticRunInfo )
   {
     simulationWidget->visualisationWidget->setStaticRunInfo( staticRunInfo );
-  };
+  }
 
   void SIG_SimulationWindow::slotStopPressed()
   {
@@ -134,6 +134,6 @@ namespace SIGEL_SlaveGUI
 
     // reset the data that has to be resetted in the simulationVisualisationWidget
     simulationWidget->visualisationWidget->resetRecorder();
-  };
+  }
 
 }

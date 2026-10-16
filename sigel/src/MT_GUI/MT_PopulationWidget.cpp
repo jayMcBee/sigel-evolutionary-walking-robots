@@ -101,7 +101,7 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	QObject::connect(loadPopAction, SIGNAL(triggered()), SLOT(slotLoadPop()));
 	QObject::connect(savePopAction, SIGNAL(triggered()), SLOT(slotSavePop()));
 	QObject::connect(this, SIGNAL(numChanged()), SLOT(slotNumChanged()));
-};
+}
 
 /***
  * reads information from the gp-system and displays it

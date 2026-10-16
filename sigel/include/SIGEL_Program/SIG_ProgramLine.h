@@ -284,6 +284,6 @@ namespace SIGEL_Program
 		QList< int > element;
 	};
 
-};
+}
 
 #endif // SIGEL_PROGRAMPACKAGE_SIG_PROGRAMLINE_H

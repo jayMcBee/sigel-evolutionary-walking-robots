@@ -32,6 +32,6 @@ namespace SIGEL_Visualisation
       yPos( yPos ),
       textLabel( textLabel ),
       rendered( false )
-  { };
+  { }
 
 }

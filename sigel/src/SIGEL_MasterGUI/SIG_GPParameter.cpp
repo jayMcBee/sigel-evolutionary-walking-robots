@@ -118,12 +118,12 @@ std::optional<int> SIG_GPParameter::selectedFitnessFunction() const
 void SIG_GPParameter::slotChangeGraveyardDir()
 {
 	lineeditGraveyardDir->setText( QFileDialog::getExistingDirectory( this, "Select Directory", "./" ) );
-};
+}
 
 void SIG_GPParameter::slotChangePoolImageDir()
 {
 	lineeditPoolImageDir->setText( QFileDialog::getExistingDirectory( this, "Select Directory", "./" ) );
-};
+}
 
 void SIG_GPParameter::putIntoExperiment()
 {
@@ -240,7 +240,7 @@ void SIG_GPParameter::putIntoExperiment()
 
 	// set the timeout
 	theExperiment.gpParameter.setTimeOutMinutes( spinboxTimeout->value() );
-};
+}
 
 void SIG_GPParameter::getOutOfExperiment()
 {
@@ -397,7 +397,7 @@ void SIG_GPParameter::getOutOfExperiment()
 
 	// set the timeout
 	spinboxTimeout->setValue( theExperiment.gpParameter.getTimeOutMinutes() );
-};
+}
 
 void SIG_GPParameter::slotAddHost()
 {
@@ -453,12 +453,12 @@ void SIG_GPParameter::slotAddHost()
 		}
 		break;
 	}
-};
+}
 
 void SIG_GPParameter::slotEditHost()
 {
 	slotItemDoubleClicked( listviewHosts->currentItem() );
-};
+}
 
 void SIG_GPParameter::slotDeleteHost()
 {
@@ -514,7 +514,7 @@ void SIG_GPParameter::slotDeleteHost()
 		QTreeWidgetItem *takenItem = listviewHosts->takeTopLevelItem( itemIndex );
 		delete takenItem;
 	}
-};
+}
 
 void SIG_GPParameter::slotEnableAllHosts()
 {
@@ -529,7 +529,7 @@ void SIG_GPParameter::slotEnableAllHosts()
 	{
 		(*listIt)->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/allow.xpm" ) ) );
 	}
-};
+}
 
 void SIG_GPParameter::slotDisableAllHosts()
 {
@@ -544,7 +544,7 @@ void SIG_GPParameter::slotDisableAllHosts()
 	{
 		(*listIt)->setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/disallow.xpm" ) ) );
 	}
-};
+}
 
 void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 {
@@ -687,7 +687,7 @@ void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 		}
 		break;
 	} // end of switch statement
-};
+}
 
 void SIG_GPParameter::slotMutationChanged( int newMutationValue )
 {

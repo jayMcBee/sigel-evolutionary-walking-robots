@@ -44,7 +44,7 @@ using namespace SIGEL_Tools;
 
 SIGEL_Simulation::SIG_DynaMechsSimulationQueries::SIG_DynaMechsSimulationQueries(SIG_DynaMechsSimulationData& theSimulationData)
   : simulationData(theSimulationData)
-{ };
+{ }
 
 void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 							     QList<SIG_Register> & registers) const
@@ -263,7 +263,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 #endif
 
       registers[0].loadValue( registerValue );
-};
+}
 
 QTime SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getCurrentSimulationWholeSeconds() const
 {
@@ -272,12 +272,12 @@ QTime SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getCurrentSimulationWhol
   QTime time = QTime( 0, 0 ).addSecs( secs );
 
   return time;
-};
+}
 
 double SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getCurrentSimulationSeconds() const
 {
   return simulationData.actualFrame * simulationData.simulationParameter.getStepSize();
-};
+}
 
 SIG_Vector SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkPosition(int linkNo) const
 {
@@ -318,7 +318,7 @@ SIG_Vector SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkPosition(int
 
       return position;
     };
-};
+}
 
 SIG_Matrix SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkOrientation(int linkNo) const
 {

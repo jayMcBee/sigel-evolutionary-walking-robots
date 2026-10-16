@@ -74,7 +74,7 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize
 	slotUpdateMovieLength();
 	slotUpdateOverlayLabels();
 	slotUpdatePngCompression();
-};
+}
 
 void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
 {
@@ -94,7 +94,7 @@ void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
   checkboxOverlayStartDistance->setChecked( settings.showOverlayStartDistance );
   checkboxOverlayRobotHeight->setChecked( settings.showOverlayRobotHeight );
   checkboxSaveThumbnails->setChecked( settings.saveThumbnails );
-};
+}
 
 SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
 {
@@ -118,7 +118,7 @@ SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
   settings.showOverlayRobotHeight = checkboxOverlayRobotHeight->isChecked();
   settings.saveThumbnails = checkboxSaveThumbnails->isChecked();
   return settings;
-};
+}
 
 /* 
  * public slot.
@@ -132,20 +132,20 @@ void SIG_MovieSettingsDialog::slotToolButtonClicked()
 				       QFileDialog::ShowDirsOnly );
   if( !newDirectory.isNull() )
     lineeditDirectory->setText( newDirectory );
-};
+}
 
 bool SIG_MovieSettingsDialog::eventFilter( QObject *watched, QEvent *event )
 {
   if ( watched == view && event->type() == QEvent::Resize )
     slotUpdateSizeLabels();
   return SIG_MovieSettingsDialogBase::eventFilter( watched, event );
-};
+}
 
 QSize SIG_MovieSettingsDialog::viewSize() const
 {
   return QSize( qRound( view->width() * view->devicePixelRatioF() ),
 		qRound( view->height() * view->devicePixelRatioF() ) );
-};
+}
 
 /*
  * Shows the view size, and whether a frame of the output size is cut from
@@ -169,7 +169,7 @@ void SIG_MovieSettingsDialog::slotUpdateSizeLabels()
     textlabelFrameFit->setText( "Frames will be letterboxed." );
   else
     textlabelFrameFit->clear();
-};
+}
 
 // Warns when there are fewer simulation steps than frames.
 void SIG_MovieSettingsDialog::slotUpdateFrameTiming()
@@ -183,13 +183,13 @@ void SIG_MovieSettingsDialog::slotUpdateFrameTiming()
 
   // An empty line would leave a gap between the two rows.
   textlabelFrameTiming->setVisible( !textlabelFrameTiming->text().isEmpty() );
-};
+}
 
 void SIG_MovieSettingsDialog::setOutputSize( int width, int height )
 {
   spinboxWidth->setValue( width );
   spinboxHeight->setValue( height );
-};
+}
 
 // Shows how long the movie is at most, played at the frame rate.
 void SIG_MovieSettingsDialog::slotUpdateMovieLength()
@@ -197,13 +197,13 @@ void SIG_MovieSettingsDialog::slotUpdateMovieLength()
   int seconds = qRound( double( spinboxMaxFrames->value() ) / spinboxFrameRate->value() );
 
   textlabelMovieLength->setText( QString( "(Max. length of %1 min %2 s)" ).arg( seconds / 60 ).arg( seconds % 60 ) );
-};
+}
 
 // A POV frame is a scene file, so no label can be drawn into it.
 void SIG_MovieSettingsDialog::slotUpdateOverlayLabels()
 {
   groupboxOverlayLabels->setEnabled( comboboxFormat->currentText() != "POV" );
-};
+}
 
 // Only the PNG writer uses the compression value.
 void SIG_MovieSettingsDialog::slotUpdatePngCompression()
@@ -212,13 +212,13 @@ void SIG_MovieSettingsDialog::slotUpdatePngCompression()
 
   textlabelPngCompression->setVisible( png );
   spinboxPngCompression->setVisible( png );
-};
+}
 
 void SIG_MovieSettingsDialog::slotViewSizeToMovie()
 {
   QSize current = viewSize();
   setOutputSize( current.width(), current.height() );
-};
+}
 
 /*
  * Grows or shrinks the window by the difference between the output size and
@@ -251,6 +251,6 @@ void SIG_MovieSettingsDialog::slotResizeViewToMatch()
 
   window->resize( target );
   window->move( position );
-};
+}
 
 }

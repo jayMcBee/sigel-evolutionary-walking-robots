@@ -102,7 +102,7 @@ void SIG_EnvironmentView::putIntoExperiment()
   theExperiment.environment.setGroundNormalDamperConstant( lineeditNormalDamperConstant->text().toDouble() );
   theExperiment.environment.setFrictionCoeff_u_s( lineeditStaticFrictionCoefficient->text().toDouble() );
   theExperiment.environment.setFrictionCoeff_u_k( lineeditKineticFrictionCoefficient->text().toDouble() );
-};
+}
 
 void SIG_EnvironmentView::getOutOfExperiment()
 {
@@ -138,7 +138,7 @@ void SIG_EnvironmentView::getOutOfExperiment()
   lineeditNormalDamperConstant->setText( QString::number( theExperiment.environment.getGroundNormalDamperConstant() ) );
   lineeditStaticFrictionCoefficient->setText( QString::number( theExperiment.environment.getFrictionCoeff_u_s() ) );
   lineeditKineticFrictionCoefficient->setText( QString::number( theExperiment.environment.getFrictionCoeff_u_k() ) );
-};
+}
 	
 	void SIG_EnvironmentView::slotFloorSelectionChanged() {
 		if (radiobuttonFunction->isChecked()) {
@@ -160,14 +160,14 @@ void SIG_EnvironmentView::getOutOfExperiment()
 			pushbuttonCenterOnTerrain->setDisabled(true);
 			theExperiment.environment.setFloorFuncSelected(false);
 		}
-	};
+	}
 	
 	void SIG_EnvironmentView::slotCenterOnTerrain() {
 		// The floor's grid points are 1 apart and start at 0, so a floor of
 		// X points ends at X - 1.
 		lineeditStartPositionX->setText( QString::number( ( lineeditXDim->text().toInt() - 1 ) / 2.0 ) );
 		lineeditStartPositionZ->setText( QString::number( ( lineeditZDim->text().toInt() - 1 ) / 2.0 ) );
-	};
+	}
 	
 	void SIG_EnvironmentView::slotSelectFile() {
 		QString picFile = QFileDialog::getOpenFileName( this, QString(), theExperiment.environment.getFloorPictureFile(), "Portable Greymap (*.pnm *.pgm)" );
@@ -175,7 +175,7 @@ void SIG_EnvironmentView::getOutOfExperiment()
 			lineeditPictureFile->setText(picFile);
 			this->putIntoExperiment();
 		}
-	};
+	}
 	
   void SIG_EnvironmentView::slotSelectTextureFile() {
   QString texFile = QFileDialog::getOpenFileName( this, QString(), theExperiment.environment.getTextureFile(), "Portable Pixmap (*.pnm *.ppm)" );
@@ -183,11 +183,11 @@ void SIG_EnvironmentView::getOutOfExperiment()
 			lineeditTextureFile->setText(texFile);
 			this->putIntoExperiment();
 		}
-  };
+  }
   	
 	void SIG_EnvironmentView::slotAlpha() {
 		this->putIntoExperiment();
-	};
+	}
 	
 	void SIG_EnvironmentView::slotTextureSelect() {
 		if (checkboxTextureFile->isChecked()) {
@@ -202,6 +202,6 @@ void SIG_EnvironmentView::getOutOfExperiment()
 			sliderAlpha->setDisabled(true);
 			theExperiment.environment.setWithTexture(false);
 		}
-	};
+	}
 
 }

@@ -27,7 +27,7 @@
 bool SIGEL_GP::SIG_GPFitnessFunction::isValid( double value ) const
 {
   return std::isfinite( value );
-};
+}
 
 SIG_Vector SIGEL_GP::SIG_GPFitnessFunction::normalizeRobotPosition( SIG_Vector originalPosition,
 								   SIG_Matrix actualRobotRotation,
@@ -44,4 +44,4 @@ SIG_Vector SIGEL_GP::SIG_GPFitnessFunction::normalizeRobotPosition( SIG_Vector o
   normalizedPosition.plusis( &originalPosition );
 
   return normalizedPosition;
-};
+}

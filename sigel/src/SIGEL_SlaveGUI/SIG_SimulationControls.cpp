@@ -93,7 +93,7 @@ namespace SIGEL_SlaveGUI
 		      SIGNAL(triggered()),
 		      qApp,
 		      SLOT(quit()) );
-  };
+  }
 
   void SIG_SimulationControls::slotPlayPressed()
   {
@@ -106,7 +106,7 @@ namespace SIGEL_SlaveGUI
       playAction->setIcon( pauseIcons );
     else
       playAction->setIcon( playIcons );
-  };
+  }
 
   void SIG_SimulationControls::slotStopPressed()
   {
@@ -116,7 +116,7 @@ namespace SIGEL_SlaveGUI
     fForwardAction->setEnabled( true );
 
     playAction->setIcon( playIcons );
-  };
+  }
 
   void SIG_SimulationControls::slotRecordingAllowed( bool isAllowed )
   {
@@ -124,6 +124,6 @@ namespace SIGEL_SlaveGUI
       alterMovieSettingsAction->setIcon( recordingAllowedIcons );
     else
       alterMovieSettingsAction->setIcon( recordingDisallowedIcons );
-  };
+  }
 
 }

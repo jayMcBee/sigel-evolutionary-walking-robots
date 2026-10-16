@@ -37,7 +37,7 @@ SIGEL_GP::SIG_GPSimpleTournament::SIG_GPSimpleTournament(SIGEL_Tools::SIG_Random
   indis.resize( 2 );
   indis[ 0 ] = new SIG_GPTournamentIndividual( ppos1 );
   indis[ 1 ] = new SIG_GPTournamentIndividual( ppos2 );
-};
+}
 
 bool SIGEL_GP::SIG_GPSimpleTournament::run()
 {      
@@ -107,7 +107,7 @@ bool SIGEL_GP::SIG_GPSimpleTournament::run()
     gpPool.setIndividual(rind, looserPos);
 
     return true; 
- };
+ }
  
 bool SIGEL_GP::SIG_GPSimpleTournament::run(MT_Classifier *MetaClassifier)
 {
@@ -162,7 +162,7 @@ bool SIGEL_GP::SIG_GPSimpleTournament::run(MT_Classifier *MetaClassifier)
     gpPool.setIndividual(rind, looserPos);
 
     return true; 
-};
+}
 
 bool SIGEL_GP::SIG_GPSimpleTournament::classify(MT_Classifier *MetaClassifier)
 {
@@ -213,4 +213,4 @@ bool SIGEL_GP::SIG_GPSimpleTournament::classify(MT_Classifier *MetaClassifier)
     gpPool.setIndividual(rind, looserPos);
 
     return true;
-};
+}

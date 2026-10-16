@@ -24,7 +24,7 @@ namespace SIGEL_GP {
 
 	class SIG_GPExperiment;
 
-};
+}
 
 class MT_Controller : public QObject
 {

@@ -42,7 +42,7 @@
 #include "SIGEL_GP/SIG_GPExperiment.h"
 
 namespace SIGEL_GP
-{ class SIG_GUIGPManager; };
+{ class SIG_GUIGPManager; }
 
 namespace SIGEL_MasterGUI
 {

@@ -213,7 +213,7 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
 		    SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
 		    this,
 		    SLOT( slotCommandDoubleClicked( QTreeWidgetItem *) ) );
-};
+}
 
 void SIG_LanguageParameters::putIntoExperiment()
 {
@@ -222,7 +222,7 @@ void SIG_LanguageParameters::putIntoExperiment()
   theExperiment.robot.getLangParam()->setMemorySize( spinboxNumberOfRegisters->value() );
   theExperiment.robot.getLangParam()->setRegisterWidth( spinboxRegisterWidth->value() );
   theExperiment.robot.getLangParam()->setMaximalDelayTime( spinboxMaximalDelayTime->value() );
-};
+}
 
 void SIG_LanguageParameters::getOutOfExperiment()
 {
@@ -245,12 +245,12 @@ void SIG_LanguageParameters::getOutOfExperiment()
   spinboxNumberOfRegisters->setValue( theExperiment.robot.getLangParam()->getMemorySize() );
   spinboxRegisterWidth->setValue( theExperiment.robot.getLangParam()->getRegisterWidth() );
   spinboxMaximalDelayTime->setValue( theExperiment.robot.getLangParam()->getMaximalDelayTime() );
-};
+}
 
 void SIG_LanguageParameters::slotPushButtonEditClicked()
 {
   slotCommandDoubleClicked( listviewCommands->currentItem() );
-};
+}
 
 void SIG_LanguageParameters::slotPushButtonAllowAllClicked()
 {
@@ -264,7 +264,7 @@ void SIG_LanguageParameters::slotPushButtonAllowAllClicked()
       commandParameters->setDuration( (*it)->text( 2 ).toDouble() );
       (*it)->setIcon( 0, QIcon( allow ) );
     }
-};
+}
 
 void SIG_LanguageParameters::slotPushButtonDisallowAllClicked()
 {
@@ -275,7 +275,7 @@ void SIG_LanguageParameters::slotPushButtonDisallowAllClicked()
       theExperiment.robot.getLangParam()->removeCommand( command );
       (*it)->setIcon( 0, QIcon( disallow ) );
     }
-};
+}
 
 void SIG_LanguageParameters::slotCommandDoubleClicked( QTreeWidgetItem *theItem )
 {
@@ -368,6 +368,6 @@ void SIG_LanguageParameters::slotCommandDoubleClicked( QTreeWidgetItem *theItem 
 	  break;
 	}
     }
-};
+}
 
 }

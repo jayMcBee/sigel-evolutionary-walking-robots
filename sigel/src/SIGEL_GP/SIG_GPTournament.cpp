@@ -34,7 +34,7 @@ SIGEL_GP::SIG_GPTournament::SIG_GPTournament(SIGEL_Tools::SIG_Randomizer& random
   gpPool(actPool),
   gpParameter(gpParameter)
 {   
-};
+}
 
 SIGEL_GP::SIG_GPTournament::~SIG_GPTournament()
 {
@@ -42,16 +42,16 @@ SIGEL_GP::SIG_GPTournament::~SIG_GPTournament()
   // them here.
   qDeleteAll( indis );
   indis.clear();
-};
+}
 
 bool SIGEL_GP::SIG_GPTournament::run()
-{ return true; };
+{ return true; }
 
 bool SIGEL_GP::SIG_GPTournament::run(MT_Classifier *MetaClassifier)
-{ return true; };
+{ return true; }
 
 bool SIGEL_GP::SIG_GPTournament::classify(MT_Classifier *MetaClassifier)
-{ return true; };
+{ return true; }
 
 void SIGEL_GP::SIG_GPTournament::inhume( SIG_GPIndividual &corps )
 {
@@ -86,4 +86,4 @@ void SIGEL_GP::SIG_GPTournament::inhume( SIG_GPIndividual &corps )
 				  << corpsFileName
 				  << "!" << Qt::endl;
     };
-};
+}

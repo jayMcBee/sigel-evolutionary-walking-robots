@@ -50,7 +50,7 @@ namespace SIGEL_Visualisation
     buildDisplayLists();
 
     setPointsVisible( false );
-  };
+  }
 
   void SIG_RobotRenderer::buildDisplayLists()
   {
@@ -154,18 +154,18 @@ namespace SIGEL_Visualisation
 	    nextFloatingIndex++;
 	  };
       };
-  };
+  }
 
   void SIG_RobotRenderer::render()
   {
     renderLinks();
     renderPoints();
-  };
+  }
 
   void SIG_RobotRenderer::renderLinks()
   {
     renderSceneObjects( 0, static_cast<GLuint>(robot.getLinks().size()) );
-  };
+  }
 
   void SIG_RobotRenderer::renderPoints()
   {
@@ -196,12 +196,12 @@ namespace SIGEL_Visualisation
 	else
 	  sceneObjects[i]->getFloatingText()->rendered = false;
       };
-  };
+  }
 
   QString SIG_RobotRenderer::exportToPovray()
   {
     return exportSceneObjectsToPovray();
-  };
+  }
 
   QString SIG_RobotRenderer::createPovrayDeclarations()
   {
@@ -318,12 +318,12 @@ namespace SIGEL_Visualisation
     stream << pointDataString;
 
     return declarationsString;
-  };
+  }
 
   void SIG_RobotRenderer::setPointsVisible( bool visible )
   {
     for (int i = robot.getLinks().size(); i < noOfObjects; i++ )
       sceneObjects[i]->setVisible( visible );
-  };
+  }
 
 }

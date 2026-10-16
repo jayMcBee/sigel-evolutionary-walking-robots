@@ -43,63 +43,63 @@ namespace SIGEL_Visualisation
     updatePositionInternal();
     updateRotationInternal();
     updateColorInternal();
-  };
+  }
 
   void SIG_VisualSceneObject::setPosition(SIG_Vector newPosition)
   {
     position = newPosition;
     updatePositionInternal();
-  };
+  }
 
   void SIG_VisualSceneObject::setRotation(SIG_Matrix newRotation)
   {
     rotation = newRotation;
     updateRotationInternal();
-  };
+  }
 
   void SIG_VisualSceneObject::setColor(SIG_Vector newColor)
   {
     color = newColor;
     updateColorInternal();
-  };
+  }
 
   void SIG_VisualSceneObject::applyTransformation()
   {
     glMultMatrixd(transformationInternal.data());
-  };
+  }
 
   void SIG_VisualSceneObject::applyColor()
   {
     glColor3dv(colorInternal.data());
-  };
+  }
 
   void SIG_VisualSceneObject::updatePositionInternal()
   {
     for (int i=0; i<3; i++)
       transformationInternal[ 12 + i ] = static_cast<GLdouble>(position.get(i));
-  };
+  }
 
   void SIG_VisualSceneObject::updateRotationInternal()
   {
     for (int i=0; i<3; i++)
       for (int j=0; j<3; j++)
 	transformationInternal[ i + (4 * j) ] = static_cast<GLdouble>(rotation.get(i,j));
-  };
+  }
 
   void SIG_VisualSceneObject::updateColorInternal()
   {
     for (int i=0; i<3; i++)
       colorInternal[ i ] = static_cast<GLdouble>(color.get(i));
-  };
+  }
 
   void SIG_VisualSceneObject::setVisible( bool newVisible )
   {
     visible = newVisible;
-  };
+  }
 
   void SIG_VisualSceneObject::setFloatingText( SIG_FloatingText *newFloatingText )
   {
     floatingText = newFloatingText;
-  };
+  }
 
 }

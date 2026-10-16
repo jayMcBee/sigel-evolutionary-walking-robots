@@ -28,6 +28,6 @@ namespace SIGEL_MasterGUI
 
 SIG_IndividualList::SIG_IndividualList( QWidget* parent, const char* name, Qt::WindowFlags fl ) : SIG_IndividualListBase( parent, name, fl )
 {
-};
+}
 
 }

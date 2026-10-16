@@ -275,6 +275,6 @@ class SIG_Program
 		     int &historyInfo );
    };
 
-};
+}
 
 #endif /* SIGEL_PROGRAMPACKAGE_SIG_PROGRAM_H */

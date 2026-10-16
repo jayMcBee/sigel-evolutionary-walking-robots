@@ -30,6 +30,6 @@ namespace SIGEL_Visualisation
       position(0, 0, 0)
   {
     rotation.makeone();
-  };
+  }
 
 }

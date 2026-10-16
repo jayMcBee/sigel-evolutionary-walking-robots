@@ -28,7 +28,7 @@ SIGEL_Simulation::SIG_RecorderNoQueriesSetException::SIG_RecorderNoQueriesSetExc
   : SIGEL_Tools::SIG_Exception(fileName, line, message)
 {
   this->message = "RecorderNoQueriesSetException: " + this->message;
-};
+}
 
 SIGEL_Simulation::SIG_RecorderNoQueriesSetException::SIG_RecorderNoQueriesSetException(QString fileName,
 										       int line,
@@ -37,4 +37,4 @@ SIGEL_Simulation::SIG_RecorderNoQueriesSetException::SIG_RecorderNoQueriesSetExc
   : SIGEL_Tools::SIG_Exception(fileName, line, message, prevException)
 {
   this->message = "RecorderNoQueriesSetException: " + this->message;
-};
+}

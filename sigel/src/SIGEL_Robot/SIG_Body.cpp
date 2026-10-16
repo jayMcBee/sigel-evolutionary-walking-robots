@@ -33,7 +33,7 @@ namespace SIGEL_Robot
                   geometryFile(f),
                   directory (d),
                   geometry(nullptr)
-        { };
+        { }
         
         SIG_Body::SIG_Body(SIG_Robot *par, QTextStream & tx)
                 : parent (par)
@@ -48,12 +48,12 @@ namespace SIGEL_Robot
                 } else {
                         geometry = nullptr;
                 }
-        };
+        }
 
         SIG_Body::~SIG_Body()
         {
                 delete geometry;
-        };
+        }
 
         NEWMAT::Matrix SIG_Body::createRotationMatrix( QList< float > rotation )
         {
@@ -80,7 +80,7 @@ namespace SIGEL_Robot
                 rotationMatrix(4,4) = 1;
                 
                 return rotationMatrix;
-        };
+        }
         
         void SIG_Body::readVRMLNode(Node *node, NEWMAT::Matrix transformation)
         {
@@ -187,7 +187,7 @@ namespace SIGEL_Robot
                                 };
                         };
                 };
-        };
+        }
         
         void SIG_Body::load()
         {
@@ -214,12 +214,12 @@ namespace SIGEL_Robot
         void SIG_Body::setGeometry (SIG_Geometry *geo)
         {
                 geometry = geo;
-        };
+        }
 
         SIG_Geometry const *SIG_Body::getGeometry () const
         {
                 return geometry;
-        };
+        }
 
         QString SIG_Body::getGeometryFile () const
         {
@@ -248,6 +248,6 @@ namespace SIGEL_Robot
                         geometry->writeToFileTransfer (tx);
                 } else
                         tx << "n\n";
-        };
+        }
 
 }

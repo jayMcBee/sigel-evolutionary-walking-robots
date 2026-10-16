@@ -116,7 +116,7 @@ namespace SIGEL_Simulation
 		contactModel.setContactPoints( noOfContactPoints, contactPoints );
 
 		dynaMechsLink->addForce( &contactModel );
-	};
+	}
 
 	void SIG_DynaMechsLink::forwardKinematics( SIG_DynaMechsLink *caller )
 	{
@@ -181,7 +181,7 @@ namespace SIGEL_Simulation
 
 		for (SIG_DynaMechsLink *actSuccessor : successors)
 			actSuccessor->forwardKinematics( this );
-	};
+	}
 
 	NEWMAT::Matrix SIG_DynaMechsLink::buildXRotationMatrix( double angle )
 	{
@@ -207,7 +207,7 @@ namespace SIGEL_Simulation
 #endif
 
 		return transformation;
-	};
+	}
 
 	NEWMAT::Matrix SIG_DynaMechsLink::buildZRotationMatrix( double angle )
 	{
@@ -233,7 +233,7 @@ namespace SIGEL_Simulation
 #endif
 
 		return transformation;
-	};
+	}
 
 	NEWMAT::Matrix SIG_DynaMechsLink::buildTranslationMatrix( double x, double y, double z )
 	{
@@ -256,6 +256,6 @@ namespace SIGEL_Simulation
 #endif
 
 		return transformation;
-	};
+	}
 
 }

@@ -33,7 +33,7 @@ SIGEL_Simulation::SIG_Register::SIG_Register(int size)
     this->size = size;
   else 
     throw SIG_RegisterWrongSizeException(__FILE__,__LINE__,"Size of Register must be between 1 and 16");
-};
+}
 
 void SIGEL_Simulation::SIG_Register::makeValid()
 {
@@ -46,36 +46,36 @@ void SIGEL_Simulation::SIG_Register::makeValid()
 
   if ( value < -max )
     value = max - 1 + ( ( value - ( max - 1) ) % (2*max) );
-};
+}
 
 void SIGEL_Simulation::SIG_Register::copyReg(SIG_Register const& otherRegister)
 { 
   value=otherRegister.getValue();
-};
+}
 
 void SIGEL_Simulation::SIG_Register::addReg(SIG_Register const& otherRegister)
 {
   value=value+otherRegister.getValue();
   makeValid();
-};
+}
 
 void SIGEL_Simulation::SIG_Register::subReg(SIG_Register const& otherRegister)
 { 
   value=value-otherRegister.getValue();
   makeValid();
-};
+}
 
 void SIGEL_Simulation::SIG_Register::loadValue(int newValue)
 {
   value=newValue;
   makeValid();
-};
+}
 
 void SIGEL_Simulation::SIG_Register::mulReg(SIG_Register const& otherRegister)
 {
   value=value*otherRegister.getValue();
   makeValid();
-};
+}
 
 void SIGEL_Simulation::SIG_Register::divReg(SIG_Register const& otherRegister)
 {
@@ -84,19 +84,19 @@ void SIGEL_Simulation::SIG_Register::divReg(SIG_Register const& otherRegister)
   else
     value=value/otherRegister.getValue();
   makeValid();
-};
+}
 
 void SIGEL_Simulation::SIG_Register::minReg(SIG_Register const& otherRegister)
 {
   if (otherRegister.getValue()<value)
     value=otherRegister.getValue();
-};
+}
 
 void SIGEL_Simulation::SIG_Register::maxReg(SIG_Register const& otherRegister)
 {
   if (otherRegister.getValue()>value)
     value=otherRegister.getValue();
-};
+}
 
 void SIGEL_Simulation::SIG_Register::modReg(SIG_Register const& otherRegister)
 {
@@ -117,24 +117,24 @@ void SIGEL_Simulation::SIG_Register::modReg(SIG_Register const& otherRegister)
     }
 
   value = remainder;
-};
+}
 
 int SIGEL_Simulation::SIG_Register::getValue() const
 {
   return value;
-};
+}
 
 int SIGEL_Simulation::SIG_Register::getSize() const
 {
   return size;
-};
+}
 
 int SIGEL_Simulation::SIG_Register::getMaxValue() const
 {
   return static_cast<int>( std::pow(2,size-1) - 1);
-};
+}
 
 int SIGEL_Simulation::SIG_Register::getMinValue() const
 {
   return static_cast<int>( - std::pow(2,size-1));
-};
+}

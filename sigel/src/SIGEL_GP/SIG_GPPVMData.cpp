@@ -45,7 +45,7 @@ SIGEL_GP::SIG_GPPVMData::SIG_GPPVMData(SIGEL_Robot::SIG_Robot& robot,
   individualName(),
   individualFitness(0)
 {
-};
+}
 
 void SIGEL_GP::SIG_GPPVMData::sendQStringToPVM(QString str, int taskId, int messageId)
 {
@@ -61,7 +61,7 @@ void SIGEL_GP::SIG_GPPVMData::sendQStringToPVM(QString str, int taskId, int mess
   char const *cStringBuffer = qCStringBuffer.constData();
   pvm_pkstr( const_cast<char*>( cStringBuffer ) );
   pvm_send(taskId, messageId);
-};
+}
 
 QString SIGEL_GP::SIG_GPPVMData::getQStringFromPVM(int taskId, int messageId) {
   int length;
@@ -76,7 +76,7 @@ QString SIGEL_GP::SIG_GPPVMData::getQStringFromPVM(int taskId, int messageId) {
   QString result( buffer.data() );
 
   return result;
-};
+}
 
 QString SIGEL_GP::SIG_GPPVMData::cutAfterFiveHashes(QTextStream& source)
 {
@@ -88,7 +88,7 @@ QString SIGEL_GP::SIG_GPPVMData::cutAfterFiveHashes(QTextStream& source)
     resultString += ( bufferString + "\n" );
 
   return resultString;
-};
+}
 
 void SIGEL_GP::SIG_GPPVMData::loadPVMDataTransfer(QTextStream & file,
         SIGEL_Program::SIG_Program & program)
@@ -138,7 +138,7 @@ void SIGEL_GP::SIG_GPPVMData::loadPVMDataTransfer(QTextStream & file,
   bufferString = settingsStream.readLine(); // INDIVIDUALFITNESS
   bufferString = settingsStream.readLine();
   individualFitness = bufferString.toDouble();
-};
+}
 
 void SIGEL_GP::SIG_GPPVMData::savePVMDataTransfer(QTextStream & file,
 						  SIGEL_Program::SIG_Program const &program)
@@ -172,54 +172,54 @@ void SIGEL_GP::SIG_GPPVMData::savePVMDataTransfer(QTextStream & file,
   file << "INDIVIDUALFITNESS\n";
   file << individualFitness << "\n";
   file << fiveHashesLine;
-};
+}
 
 void SIGEL_GP::SIG_GPPVMData::setVisualize(bool visu)
 {
   visualize=visu;
-};
+}
 
 bool SIGEL_GP::SIG_GPPVMData::getVisualize()
 {
   return visualize;
-};
+}
 
 QString SIGEL_GP::SIG_GPPVMData::getFitnessFunctionName()
 {
   return fitnessName;
-};
+}
 
 void SIGEL_GP::SIG_GPPVMData::setFitnessFunctionName( QString name )
 {
   fitnessName = name;
-};
+}
 
 QString SIGEL_GP::SIG_GPPVMData::getExperimentName()
 {
   return experimentName;
-};
+}
 
 void SIGEL_GP::SIG_GPPVMData::setExperimentName( QString name )
 {
   experimentName = name;
-};
+}
 
 QString SIGEL_GP::SIG_GPPVMData::getIndividualName()
 {
   return individualName;
-};
+}
 
 void SIGEL_GP::SIG_GPPVMData::setIndividualName( QString name )
 {
   individualName = name;
-};
+}
 
 double SIGEL_GP::SIG_GPPVMData::getIndividualFitness()
 {
   return individualFitness;
-};
+}
 
 void SIGEL_GP::SIG_GPPVMData::setIndividualFitness( double fitness )
 {
   individualFitness = fitness;
-};
+}

@@ -62,13 +62,13 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
 		trainer = new SIG_GPFitnessTrainer(currentExperiment);
 	}
 	// tours owns its tournaments. Each site that drops or replaces one deletes it.
-};
+}
 
 //Returns a reference to the experiment
 SIGEL_GP::SIG_GPExperiment &SIGEL_GP::SIG_GPManager::getCurrentExperiment()
 {
 	return currentExperiment;
-};
+}
 
 void SIGEL_GP::SIG_GPManager::advanceToNextTournament( int tournament )
 {
@@ -263,7 +263,7 @@ void SIGEL_GP::SIG_GPManager::evolutionLoop( MT_Classifier *metaClassifier )
 			};
 		};
 	};
-};
+}
 
 void SIGEL_GP::SIG_GPManager::createTours(int quantity)
 {
@@ -392,7 +392,7 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity)
 		delete tours[ i ];
 		tours[ i ] = actTour;
 	};
-};
+}
 
 namespace
 {
@@ -427,7 +427,7 @@ namespace
 		}
 	};
 
-};
+}
 
 void SIGEL_GP::SIG_GPManager::evalNewIndis()
 {
@@ -565,7 +565,7 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 	};
 
 	fitnessCalculated = true;
-};
+}
 
 void SIGEL_GP::SIG_GPManager::calcInitTourSet()
 {
@@ -632,12 +632,12 @@ void SIGEL_GP::SIG_GPManager::calcInitTourSet()
 			taskCanDoList << i;
 		}
 	};
-};
+}
 
 bool SIGEL_GP::SIG_GPManager::pvmIsLost() const
 {
 	return trainer && trainer->pvmLost;
-};
+}
 
 SIGEL_GP::SIG_GPManager::TournamentProgress SIGEL_GP::SIG_GPManager::tournamentProgress() const
 {
@@ -648,24 +648,24 @@ SIGEL_GP::SIG_GPManager::TournamentProgress SIGEL_GP::SIG_GPManager::tournamentP
 	    []( const SIG_GPTournament *t ) { return t && t->waitCounter > 0; } ) );
 	const int queuedCount = int( taskCanDoList.size() );
 	return { plannedCount - waitingCount - queuedCount, plannedCount };
-};
+}
 
 void SIGEL_GP::SIG_GPManager::processInterfaceEvents()
 {
 	// Empty in the base: a manager with no interface has no events to process.
 	// SIG_GUIGPManager overrides it.
-};
+}
 
 void SIGEL_GP::SIG_GPManager::messageEvolutionStop()
 {
 	// Sets the flag the evolution loop reads. Stops nothing itself; the loop
 	// notices at its next check.
 	stopEvolutionNow = true;
-};
+}
 
 void SIGEL_GP::SIG_GPManager::updateIndividualView( int )
 {
-};
+}
 
 void SIGEL_GP::SIG_GPManager::stopIfNecessary(bool generationBreak)
 {
@@ -677,7 +677,7 @@ void SIGEL_GP::SIG_GPManager::stopIfNecessary(bool generationBreak)
 		// and now eventually stop the Meta-GP-System
 		currentExperiment.mtController->stopEvolution();
 	};
-};
+}
 
 bool SIGEL_GP::SIG_GPManager::checkTerminationConditions(bool generationBreak)
 {
@@ -734,7 +734,7 @@ bool SIGEL_GP::SIG_GPManager::checkTerminationConditions(bool generationBreak)
 		return false;
 		break;
 	}
-};
+}
 
 void SIGEL_GP::SIG_GPManager::start()
 {
@@ -753,7 +753,7 @@ void SIGEL_GP::SIG_GPManager::start()
 	{
 		run();
 	}
-};
+}
 
 void SIGEL_GP::SIG_GPManager::run()
 {
@@ -924,7 +924,7 @@ SIGEL_GP::SIG_GPManager::~SIG_GPManager()
 
 	// tours owns its tournaments.
 	qDeleteAll( tours );
-};
+}
 
 //**************************** META method ************************
 void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
@@ -1241,4 +1241,4 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 	};
 
 	fitnessCalculated = true;
-};
+}

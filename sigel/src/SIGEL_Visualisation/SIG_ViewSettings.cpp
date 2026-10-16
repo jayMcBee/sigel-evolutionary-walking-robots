@@ -32,7 +32,7 @@ namespace SIGEL_Visualisation
       relativeEyePoint(false),
       renderMode(wireFrame),
       aspectRatio(1)
-  { };
+  { }
 
   SIG_Vector SIG_ViewSettings::getAbsoluteEyePoint() const
   {
@@ -42,6 +42,6 @@ namespace SIGEL_Visualisation
     return SIG_Vector( lookPoint.x + eyePoint.x,
 		      lookPoint.y + eyePoint.y,
 		      lookPoint.z + eyePoint.z );
-  };
+  }
 
 }

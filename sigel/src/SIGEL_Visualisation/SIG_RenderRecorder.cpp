@@ -32,19 +32,19 @@ namespace SIGEL_Visualisation
   {
     for (int i=0; i<noOfObjects; i++)
       robotLinks[i] = new SIG_SceneObject(i);
-  };
+  }
 
   SIG_RenderRecorder::~SIG_RenderRecorder()
   {
     qDeleteAll( robotLinks );
     robotLinks.clear();
-  };
+  }
 
   void SIG_RenderRecorder::init()
   {
     SIG_Recorder::init();
     record();
-  };
+  }
 
   void SIG_RenderRecorder::record()
   {
@@ -57,6 +57,6 @@ namespace SIGEL_Visualisation
       };
 
     currentSimulationSeconds = simulationQueries->getCurrentSimulationSeconds();
-  };
+  }
 
 }

@@ -209,7 +209,7 @@ namespace SIGEL_MasterGUI
 		    this,
 		    SLOT( slotEvolutionNotRunning( bool ) ) );
   getAllOutOfExperiment();
-};
+}
 
 SIG_GUIGPExperiment::~SIG_GUIGPExperiment()
 {
@@ -226,12 +226,12 @@ SIG_GUIGPExperiment::~SIG_GUIGPExperiment()
       {
         delete guiGPManager;
       }
-};
+}
 
 QString SIG_GUIGPExperiment::getName() const
 {
   return experimentName;
-};
+}
 
 void SIG_GUIGPExperiment::setName( QString newName )
 {
@@ -240,12 +240,12 @@ void SIG_GUIGPExperiment::setName( QString newName )
 
   experimentName = newName;
   experimentItem->setText( 0, newName );
-};
+}
 
 bool SIG_GUIGPExperiment::isRunning()
 {
   return evolutionRunning;
-};
+}
 
 void SIG_GUIGPExperiment::putAllIntoExperiment()
 {
@@ -261,7 +261,7 @@ void SIG_GUIGPExperiment::putAllIntoExperiment()
   simulationParameter->putIntoExperiment();
   languageParameters->putIntoExperiment();
   environmentView->putIntoExperiment();
-};
+}
 
 void SIG_GUIGPExperiment::getAllOutOfExperiment()
 {
@@ -272,7 +272,7 @@ void SIG_GUIGPExperiment::getAllOutOfExperiment()
   languageParameters->getOutOfExperiment();
   environmentView->getOutOfExperiment();
   allIndividualsView->slotCompleteRefreshList();
-};
+}
 
 QString SIG_GUIGPExperiment::checkEnding( QString fileName, QString ending )
 {
@@ -296,7 +296,7 @@ QString SIG_GUIGPExperiment::checkEnding( QString fileName, QString ending )
     }
   while( QFile::exists( stampedName ) );
   return stampedName;
-};
+}
 
 // Dialogs here take experimentListView as their parent: this widget is never
 // shown, so a dialog parented to it is not tied to the main window.
@@ -311,14 +311,14 @@ void SIG_GUIGPExperiment::slotRightClick( QString option, const QPoint & thePoin
       showMenu->popup( thePoint );
       widgetStack->setCurrentWidget( showWidget );
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotSelectionChanged( QString option )
 {
   // setCurrentWidget() warns on a null widget, so an unknown option is ignored.
   if ( QWidget *showWidget = widgetDict.value( option ) )
     widgetStack->setCurrentWidget( showWidget );
-};
+}
 
 void SIG_GUIGPExperiment::slotEvolutionNotRunning( bool isNotRunning )
 {
@@ -335,7 +335,7 @@ void SIG_GUIGPExperiment::slotEvolutionNotRunning( bool isNotRunning )
   robotView->setEnabled( isNotRunning );
   languageParameters->setEnabled( isNotRunning );
   environmentView->setEnabled( isNotRunning );
-};
+}
 
 void SIG_GUIGPExperiment::slotStartEvolution()
 {
@@ -383,7 +383,7 @@ void SIG_GUIGPExperiment::slotStartEvolution()
     {
       QMessageBox::warning( experimentListView, "Can't Start Evolution", "The evolution cannot be started. There may be several reasons:<ul><li>There is no robot loaded.</li><li>There are fewer than four individuals in the population.</li><li>No fitness function is selected.</li></ul>");
     }
-};
+}
 
 // The termination condition is tested the way SIG_GPManager tests it, against
 // the settings this run was started with. A duration counts from runStartedAt,
@@ -433,7 +433,7 @@ QString SIG_GUIGPExperiment::terminationAlreadyMet() const
 
   return "The evolution ended at once, because " + reason
 	 + " on the GP Parameters page, tab Evolution control.";
-};
+}
 
 void SIG_GUIGPExperiment::slotStopEvolution()
 {
@@ -448,7 +448,7 @@ void SIG_GUIGPExperiment::slotStopEvolution()
   experimentView->pushbuttonStop->setEnabled( false );
 
   guiGPManager->userTerminated = true;
-};
+}
 
 void SIG_GUIGPExperiment::slotSimulationParameterImport()
 {
@@ -469,7 +469,7 @@ void SIG_GUIGPExperiment::slotSimulationParameterImport()
       file.close();
       simulationParameter->getOutOfExperiment();
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotSimulationParameterExport()
 {
@@ -490,7 +490,7 @@ void SIG_GUIGPExperiment::slotSimulationParameterExport()
 	}
       file.close();
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotEnvironmentImport()
 {
@@ -511,7 +511,7 @@ void SIG_GUIGPExperiment::slotEnvironmentImport()
       file.close();
       environmentView->getOutOfExperiment();
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotEnvironmentExport()
 {
@@ -532,7 +532,7 @@ void SIG_GUIGPExperiment::slotEnvironmentExport()
 	}
       file.close();
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotGPParameterImport()
 {
@@ -553,7 +553,7 @@ void SIG_GUIGPExperiment::slotGPParameterImport()
       file.close();
       gpParameter->getOutOfExperiment();
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotGPParameterExport()
 {
@@ -570,7 +570,7 @@ void SIG_GUIGPExperiment::slotGPParameterExport()
 	}
       file.close();
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotLanguageParameterImport()
 {
@@ -599,7 +599,7 @@ void SIG_GUIGPExperiment::slotLanguageParameterImport()
       file.close();
       languageParameters->getOutOfExperiment();
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotLanguageParameterExport()
 {
@@ -616,7 +616,7 @@ void SIG_GUIGPExperiment::slotLanguageParameterExport()
 	}
       file.close();
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotPopulationImport()
 {
@@ -645,7 +645,7 @@ void SIG_GUIGPExperiment::slotPopulationImport()
       allIndividualsView->slotCompleteRefreshList();
       warnIfPoolTooLarge();
     }
-};
+}
 
 void SIG_GUIGPExperiment::warnIfPoolTooLarge()
 {
@@ -655,7 +655,7 @@ void SIG_GUIGPExperiment::warnIfPoolTooLarge()
       QString message = QString( "The pool has %1 individuals; only the first %2 take part in tournaments reliably." ).arg( size ).arg( SIGEL_GP::SIG_GPPopulation::maximumSize );
       QMessageBox::warning( experimentListView, "Large Pool", message );
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotPopulationExport()
 {
@@ -671,7 +671,7 @@ void SIG_GUIGPExperiment::slotPopulationExport()
 	}
       file.close();
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotRobotImport()
 {
@@ -696,7 +696,7 @@ void SIG_GUIGPExperiment::slotRobotImport()
       // perhaps it is enough to update the language parameter screen and the robot view
       this->getAllOutOfExperiment();
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotGNUPlotExport()
 {
@@ -706,7 +706,7 @@ void SIG_GUIGPExperiment::slotGNUPlotExport()
       fileName = checkEnding( fileName, "dat" );
       gpExperiment.exportExperimentHistoryToGNUPlot( fileName );
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotRobotLoad()
 {
@@ -736,7 +736,7 @@ void SIG_GUIGPExperiment::slotRobotLoad()
       // perhaps it is enough to update the language parameter screen and the robot view
       this->getAllOutOfExperiment();
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotRobotSave()
 {
@@ -752,7 +752,7 @@ void SIG_GUIGPExperiment::slotRobotSave()
 	}
       file.close();
     }
-};
+}
 
 void SIG_GUIGPExperiment::slotRobotCheck()
 {
@@ -796,6 +796,6 @@ void SIG_GUIGPExperiment::slotEvolutionStopped()
       QMessageBox::warning( experimentListView, "Evolution Stopped", endedBecause );
       endedBecause = QString();
     }
-};
+}
 
 }

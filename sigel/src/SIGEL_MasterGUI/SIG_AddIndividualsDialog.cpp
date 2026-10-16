@@ -97,6 +97,6 @@ SIG_AddIndividualsDialog::SIG_AddIndividualsDialog( QWidget* parent,  const char
     // signals and slots connections
     connect( pushbuttonOK, SIGNAL( clicked() ), this, SLOT( accept() ) );
     connect( pushbuttonCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
-};
+}
 
 }

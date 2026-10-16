@@ -67,14 +67,14 @@ namespace SIGEL_Visualisation
     sceneObjects[ 1 ] = grid;
 
     buildDisplayLists();
-  };
+  }
 
   SIG_EnvironmentRenderer::~SIG_EnvironmentRenderer()
   {
     // Nothing else frees the path points.
     qDeleteAll( robotPathPoints );
     robotPathPoints.clear();
-  };
+  }
 
   void SIG_EnvironmentRenderer::setPlaneColor( double red,
 					       double green,
@@ -83,7 +83,7 @@ namespace SIGEL_Visualisation
     sceneObjects[ 0 ]->setColor( SIG_Vector( red,
 					    green,
 					    blue ) );
-  };
+  }
 
   void SIG_EnvironmentRenderer::setGridColor( double red,
 					      double green,
@@ -92,7 +92,7 @@ namespace SIGEL_Visualisation
     sceneObjects[ 1 ]->setColor( SIG_Vector( red,
 					    green,
 					    blue ) );
-  };
+  }
 
   double SIG_EnvironmentRenderer::groundDepth( const SIGEL_Environment::SIG_Terrain &terrain, int x, int z )
   {
@@ -125,7 +125,7 @@ namespace SIGEL_Visualisation
     GLuint gridListIndex = displayListsOffset + 1;
 
     buildGrid( gridListIndex, terrain );
-  };
+  }
 
   void SIG_EnvironmentRenderer::buildPlane( GLuint number, const SIGEL_Environment::SIG_Terrain &terrain )
   {
@@ -140,7 +140,7 @@ namespace SIGEL_Visualisation
     drawInit( terrain );
 
     glEndList();
-  };
+  }
 
 	void SIG_EnvironmentRenderer::buildGrid( GLuint number, const SIGEL_Environment::SIG_Terrain &terrain )
   {
@@ -180,7 +180,7 @@ namespace SIGEL_Visualisation
     }	
 
     glEndList();
-  };
+  }
 
   void SIG_EnvironmentRenderer::renderRobotPath()
   {
@@ -201,18 +201,18 @@ namespace SIGEL_Visualisation
 
 	glLineWidth( 1 );
       };
-  };
+  }
 
   void SIG_EnvironmentRenderer::render()
   {
     renderPlane();
     renderGridAndPath();
-  };
+  }
 
   void SIG_EnvironmentRenderer::renderPlane()
   {
     renderSceneObjects( 0, 1 );
-  };
+  }
 
   void SIG_EnvironmentRenderer::renderGridAndPath()
   {
@@ -227,7 +227,7 @@ namespace SIGEL_Visualisation
       renderRobotPath();
 
     glPopAttrib();
-  };
+  }
 
   QString SIG_EnvironmentRenderer::exportToPovray()
   {
@@ -276,7 +276,7 @@ namespace SIGEL_Visualisation
       };
 
     return resultString;
-  };
+  }
 
   QString SIG_EnvironmentRenderer::createPovrayDeclarations()
   {
@@ -347,34 +347,34 @@ namespace SIGEL_Visualisation
 	   << "}\n";
 
     return declarationsString;
-  };
+  }
 
   void SIG_EnvironmentRenderer::setLookPoint( SIG_Vector newPosition )
   {
     lookPoint = newPosition;
-  };
+  }
 
   void SIG_EnvironmentRenderer::setShowPlane( bool newShowPlane )
   {
     sceneObjects[ 0 ]->setVisible( newShowPlane );
-  };
+  }
 
   void SIG_EnvironmentRenderer::setShowGrid( bool newShowGrid )
   {
     sceneObjects[ 1 ]->setVisible( newShowGrid );
-  };
+  }
 
   void SIG_EnvironmentRenderer::setShowRobotPath( bool newShowRobotPath )
   {
     showRobotPath = newShowRobotPath;
-  };
+  }
 
   void SIG_EnvironmentRenderer::addRobotPathPoint( SIG_Vector newPoint )
   {
     SIG_Vector *newPointObject = new SIG_Vector( newPoint );
 
     robotPathPoints.append( newPointObject );
-  };
+  }
 
   bool SIG_EnvironmentRenderer::loadPNMTexture(char *filename) {
 		// the pnmMagic identifies a pnm file with pixmap (RGB) data
@@ -429,7 +429,7 @@ namespace SIGEL_Visualisation
   	
   	fclose (file);
   	return true;
-  };
+  }
 
   bool SIG_EnvironmentRenderer::initTexture() {
     // Load up our textures.
@@ -465,7 +465,7 @@ namespace SIGEL_Visualisation
                  texture.imageData.data());
 
     return true;
-  };
+  }
 
   void SIG_EnvironmentRenderer::drawInit( const SIGEL_Environment::SIG_Terrain &terrain ) {
    int x, z;

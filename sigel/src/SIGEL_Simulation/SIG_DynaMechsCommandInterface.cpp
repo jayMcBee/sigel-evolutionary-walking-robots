@@ -35,7 +35,7 @@
 
 SIGEL_Simulation::SIG_DynaMechsCommandInterface::SIG_DynaMechsCommandInterface(SIG_DynaMechsSimulationData& theSimulationData)
   : simulationData(theSimulationData)
-{ };
+{ }
 
 void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 								QList<SIG_Register> const& registers)

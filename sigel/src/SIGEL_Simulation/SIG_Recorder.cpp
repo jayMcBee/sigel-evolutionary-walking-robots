@@ -27,7 +27,7 @@ SIGEL_Simulation::SIG_Recorder::SIG_Recorder()
   : initialized(false), finished(false)
 {
   simulationQueries = nullptr;
-};
+}
 
 void SIGEL_Simulation::SIG_Recorder::init()
 { 
@@ -36,7 +36,7 @@ void SIGEL_Simulation::SIG_Recorder::init()
   if (initialized)
     throw SIG_RecorderBadRecordingOrderException(__FILE__,__LINE__,"Init called more than once");
   initialized=true;
-};
+}
 
 void SIGEL_Simulation::SIG_Recorder::record()
 {
@@ -46,7 +46,7 @@ void SIGEL_Simulation::SIG_Recorder::record()
     throw SIG_RecorderBadRecordingOrderException(__FILE__,__LINE__,"Record called before Init");
   if (finished)
     throw SIG_RecorderBadRecordingOrderException(__FILE__,__LINE__,"Record called after Finish");
-};
+}
 
 void SIGEL_Simulation::SIG_Recorder::finish()
 {
@@ -57,9 +57,9 @@ void SIGEL_Simulation::SIG_Recorder::finish()
   if (finished)
     throw SIG_RecorderBadRecordingOrderException(__FILE__,__LINE__,"Finish called more than once");
   finished = true;
-};
+}
 
 void SIGEL_Simulation::SIG_Recorder::setSimulationQueries(SIG_SimulationQueries const &newSimulationQueries)
 {
   simulationQueries=&newSimulationQueries;
-};
+}

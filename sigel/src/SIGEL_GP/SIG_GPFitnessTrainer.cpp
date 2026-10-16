@@ -82,7 +82,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment&
       hostCounter++;
     };
   };
-};
+}
 
 SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   // This class owns its dynamic host list.
@@ -108,7 +108,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   // The loop above only tells PVM to drop each host. The objects are freed here.
   qDeleteAll( pvmHosts );
   pvmHosts.clear();
-};
+}
 
 void SIGEL_GP::SIG_GPFitnessTrainer::addDynHost(QString newHost, int maxSlaves) {
   QString buffer;
@@ -240,7 +240,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
   nextFreeNumber++;
 
   return actId;
-};
+}
 
 double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 {
@@ -330,7 +330,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 #endif
 
   return result;
-};
+}
 
 void SIGEL_GP::SIG_GPFitnessTrainer::stopTrainersSlaves()
 {
@@ -347,7 +347,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::stopTrainersSlaves()
 	      break;
 	  };
     };
-};
+}
 
 void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 {
@@ -429,7 +429,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
       else
 	toSpawnIndex++;
     };
-};
+}
 
 int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
   int result = -1;
@@ -495,4 +495,4 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
 #endif
 
   return result;
-};
+}

@@ -127,6 +127,6 @@ SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent,  const char* name
   cLocale.setNumberOptions( QLocale::RejectGroupSeparator );
   for ( QValidator *v : findChildren<QValidator *>() )
     v->setLocale( cLocale );
-};
+}
 
 }

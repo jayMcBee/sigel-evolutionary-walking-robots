@@ -35,6 +35,6 @@ namespace SIGEL_GP
       pvmTaskId( pvmTaskId ),
       indPosition( indPosition ),
       spawnTime( spawnTime )
-  { };
+  { }
 
 }

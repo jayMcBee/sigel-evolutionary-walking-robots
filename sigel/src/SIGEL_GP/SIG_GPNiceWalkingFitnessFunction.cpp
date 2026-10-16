@@ -111,6 +111,6 @@ namespace SIGEL_GP
       };
 
     return fitness;
-  };
+  }
 
 }

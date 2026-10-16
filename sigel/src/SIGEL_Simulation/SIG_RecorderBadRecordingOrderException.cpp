@@ -28,7 +28,7 @@ SIGEL_Simulation::SIG_RecorderBadRecordingOrderException::SIG_RecorderBadRecordi
   : SIGEL_Tools::SIG_Exception(fileName, line, message)
 {
   this->message = "RecorderBadRecordingOrderException: " + this->message;
-};
+}
 
 SIGEL_Simulation::SIG_RecorderBadRecordingOrderException::SIG_RecorderBadRecordingOrderException(QString fileName,
 												 int line,
@@ -37,4 +37,4 @@ SIGEL_Simulation::SIG_RecorderBadRecordingOrderException::SIG_RecorderBadRecordi
   : SIGEL_Tools::SIG_Exception(fileName, line, message, prevException)
 {
   this->message = "RecorderBadRecordingOrderException: " + this->message;
-};
+}

@@ -31,11 +31,11 @@ namespace SIGEL_CommonGUI
   {
     if ( name )
       setObjectName( QString::fromUtf8( name ) );
-  };
+  }
 
   void SIG_FloatingTextLabel::mousePressEvent( QMouseEvent *e )
   {
     lower();
-  };
+  }
 
 }

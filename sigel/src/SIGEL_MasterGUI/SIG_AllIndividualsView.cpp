@@ -105,7 +105,7 @@ namespace SIGEL_MasterGUI
 		valList += 5;
 		valList += 6;
 		setSizes( valList );
-	};
+	}
 
 	int SIG_AllIndividualsView::numberOfSelectedItems()
 	{
@@ -121,7 +121,7 @@ namespace SIGEL_MasterGUI
 			}
 		}
 		return numberOfSelectedItems;
-	};
+	}
 
 	void SIG_AllIndividualsView::slotCompleteRefreshList()
 	{
@@ -153,7 +153,7 @@ namespace SIGEL_MasterGUI
 		}
 		individualList->listviewIndividuals->setSortingEnabled( true );
 		individualList->lcdnumberNumberOfIndividuals->display(theExperiment.population.getSize() );
-	};
+	}
 
 	void SIG_AllIndividualsView::slotAddIndividuals()
 	{
@@ -186,7 +186,7 @@ namespace SIGEL_MasterGUI
 			break;
 		}
 		individualList->lcdnumberNumberOfIndividuals->display( theExperiment.population.getSize() );
-	};
+	}
 
 	void SIG_AllIndividualsView::slotDeleteIndividuals()
 	{
@@ -247,18 +247,18 @@ namespace SIGEL_MasterGUI
 					individualView->clear();
 			}
 		} // if( numbeOfSelectedItems != 0 )
-	};
+	}
 
 	void SIG_AllIndividualsView::slotResetAllFitnessValues()
 	{
 		theExperiment.population.resetAllFitnessValues();
 		slotCompleteRefreshList();
-	};
+	}
 
 	void SIG_AllIndividualsView::slotStatsClicked()
 	{
 		SIGEL_Tools::SIG_IO::cerr << "Pool Size:" << theExperiment.population.getSize() << Qt::endl;
-	};
+	}
 
 	void SIG_AllIndividualsView::slotRightButtonClicked( const QPoint &pos )
 	{
@@ -274,7 +274,7 @@ namespace SIGEL_MasterGUI
 		{
 			individualMenu->popup( thePoint );
 		}
-	};
+	}
 
 	void SIG_AllIndividualsView::slotDoubleClicked( QTreeWidgetItem *theItem )
 	{
@@ -287,7 +287,7 @@ namespace SIGEL_MasterGUI
 			theView->setAttribute( Qt::WA_DeleteOnClose );
 			theView->show();
 		}
-	};
+	}
 
 	void SIG_AllIndividualsView::slotVisualize()
 	{
@@ -362,7 +362,7 @@ namespace SIGEL_MasterGUI
 				};
 			} // if-statement
 		} //for-loop
-	};
+	}
 
 	void SIG_AllIndividualsView::slotSelectionChanged()
 	{
@@ -382,7 +382,7 @@ namespace SIGEL_MasterGUI
 			QString history = theGPIndividual->getHistory().join( "\n" );
 			individualView->multilineeditHistory->setText( history );
 		}
-	};
+	}
 
 	void SIG_AllIndividualsView::slotEvolutionNotRunning( bool isNotRunning )
 	{
@@ -420,7 +420,7 @@ namespace SIGEL_MasterGUI
 			                  this,
 			                  SLOT( slotSelectionChanged() ) );
 		}
-	};
+	}
 
 	void SIG_AllIndividualsView::slotImportProgram()
 	{
@@ -450,7 +450,7 @@ namespace SIGEL_MasterGUI
 		} // if( currentitem )
 		else
 			QMessageBox::information( this, "No Individual Selected", "There is no individual selected." );
-	};
+	}
 
 	void SIG_AllIndividualsView::slotExportProgram()
 	{
@@ -474,7 +474,7 @@ namespace SIGEL_MasterGUI
 		}
 		else
 			QMessageBox::information( this, "No Individual Selected", "There is no individual selected." );
-	};
+	}
 
 	void SIG_AllIndividualsView::slotImportIndividual()
 	{
@@ -495,7 +495,7 @@ namespace SIGEL_MasterGUI
 			}
 		}
 		slotCompleteRefreshList(); // can be done more efficiently!!!
-	};
+	}
 
 	void SIG_AllIndividualsView::slotExportIndividual()
 	{
@@ -519,6 +519,6 @@ namespace SIGEL_MasterGUI
 		}
 		else
 			QMessageBox::information( this, "No Individual Selected", "There is no individual selected." );
-	};
+	}
 
 }

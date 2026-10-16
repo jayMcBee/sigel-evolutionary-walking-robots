@@ -42,7 +42,7 @@ namespace SIGEL_Environment {
     frictionCoeff_u_k(1),
     autosaveIntervalGenerations(0)
   {
-  };
+  }
 
   SIG_Environment::SIG_Environment(SIG_Vector newGravity, 
 				   double newVeloDamping, SIG_Vector newStartPosition, 
@@ -64,7 +64,7 @@ namespace SIGEL_Environment {
       frictionCoeff_u_k(newFrictionCoeff_u_k),
       autosaveIntervalGenerations(0)
   {
-  };
+  }
 
   void SIG_Environment::readFromFile(QTextStream& file)
   {
@@ -166,12 +166,12 @@ namespace SIGEL_Environment {
       	frictionCoeff_u_k=s.toDouble();
       }
 		}
-  };
+  }
   
   SIG_Environment::SIG_Environment(QTextStream& file)
   {
     readFromFile(file);
-  };
+  }
 
   void SIG_Environment::writeToFile(QTextStream& file)
   {
@@ -220,147 +220,147 @@ namespace SIGEL_Environment {
     file << frictionCoeff_u_s << "\n";
     file << "UKFcoeff\n";
     file << frictionCoeff_u_k << "\n";
-  };
+  }
 
   void SIG_Environment::setGravity(SIG_Vector newGravity)
   {
     gravity=newGravity;
-  };
+  }
 
   SIG_Vector SIG_Environment::getGravity() const
   {
     return gravity;
-  };
+  }
 
   void SIG_Environment::setVeloDamping(double newVeloDamping)
   {
     veloDamping=newVeloDamping;
-  };
+  }
 
   double SIG_Environment::getVeloDamping() const
   {
     return veloDamping;
-  };
+  }
 
   void SIG_Environment::setStartPosition(SIG_Vector newStartPosition)
   {
     startPosition=newStartPosition;
-  };
+  }
 
   SIG_Vector SIG_Environment::getStartPosition() const
   {
     return startPosition;
-  };
+  }
 
   void SIG_Environment::setFloorDimensionX(int newFloorDimensionX) {
 		floorDimensionX = newFloorDimensionX;
-  };
+  }
 
   int SIG_Environment::getFloorDimensionX() const {
 		return floorDimensionX;
-  };
+  }
 
   void SIG_Environment::setFloorDimensionZ(int newFloorDimensionZ) {
 		floorDimensionZ = newFloorDimensionZ;
-  };
+  }
 
   int SIG_Environment::getFloorDimensionZ() const {
 		return floorDimensionZ;
-  };
+  }
 
   void SIG_Environment::setFloorFunction(QString newFloorFunction)
   {
     floorFunction=newFloorFunction;
-  };
+  }
 
   QString SIG_Environment::getFloorFunction() const
   {
     return floorFunction;
-  };
+  }
 
   void SIG_Environment::setGroundPlanarSpringConstant(double newGroundPlanarSpringConstant) 
   {
     groundPlanarSpringConstant=newGroundPlanarSpringConstant;
-  };
+  }
 
   double SIG_Environment::getGroundPlanarSpringConstant() const 
   {
     return groundPlanarSpringConstant;
-  };
+  }
 
   void SIG_Environment::setGroundNormalSpringConstant(double newGroundNormalSpringConstant) 
   {
     groundNormalSpringConstant=newGroundNormalSpringConstant;
-  };
+  }
 
   double SIG_Environment::getGroundNormalSpringConstant() const 
   {
     return groundNormalSpringConstant;
-  };
+  }
 
   void SIG_Environment::setGroundPlanarDamperConstant(double newGroundPlanarDamperConstant) 
   {
     groundPlanarDamperConstant=newGroundPlanarDamperConstant;
-  };
+  }
 
   double SIG_Environment::getGroundPlanarDamperConstant() const 
   {
     return groundPlanarDamperConstant;
-  };
+  }
 
   void SIG_Environment::setGroundNormalDamperConstant(double newGroundNormalDamperConstant) 
   {
     groundNormalDamperConstant=newGroundNormalDamperConstant;
-  };
+  }
 
   double SIG_Environment::getGroundNormalDamperConstant() const 
   {
     return groundNormalDamperConstant;
-  };
+  }
 
   void SIG_Environment::setFrictionCoeff_u_s(double newFrictionCoeff_u_s) 
   {
     frictionCoeff_u_s=newFrictionCoeff_u_s;
-  };
+  }
 
   double SIG_Environment::getFrictionCoeff_u_s() const 
   {
     return frictionCoeff_u_s;
-  };
+  }
 
   void SIG_Environment::setFrictionCoeff_u_k(double newFrictionCoeff_u_k) 
   {
     frictionCoeff_u_k=newFrictionCoeff_u_k;
-  };
+  }
 
   double SIG_Environment::getFrictionCoeff_u_k() const 
   {
     return frictionCoeff_u_k;
-  };
+  }
 
 	void SIG_Environment::setFloorFuncSelected(bool newFloorFuncSelected) {
 		floorFuncSelected = newFloorFuncSelected;
-	};
+	}
 	
   bool SIG_Environment::getFloorFuncSelected() {
 		return floorFuncSelected;
-  };
+  }
 
   void SIG_Environment::setFloorPictureFile(QString newFloorPictureFile) {
 		floorPictureFile = newFloorPictureFile;
-  };
+  }
 
  	QString SIG_Environment::getFloorPictureFile() const {
  		return floorPictureFile;
- 	};
+ 	}
  	
  	QString SIG_Environment::getTextureFile() const {
  		return textureFile;
- 	};
+ 	}
 
   void SIG_Environment::setTextureFile(QString newTextureFile) {
 		textureFile = newTextureFile;
-  };
+  }
 
 	SIG_Terrain SIG_Environment::getTerrain() const {
 		SIG_Terrain terrain;
@@ -373,30 +373,30 @@ namespace SIGEL_Environment {
 
 		terrain.setFlat( floorDimensionX, floorDimensionZ );
 		return terrain;
-	};
+	}
 
 	int SIG_Environment::getTexAlpha() const {
 		return texAlpha;
-	};
+	}
 
   void SIG_Environment::setTexAlpha(int newTexAlpha) {
 		texAlpha = newTexAlpha;
-  };
+  }
 
   bool SIG_Environment::getWithTexture() const {
 		return withTexture;
-  };
+  }
 
   void SIG_Environment::setWithTexture(bool newWithTexture) {
 		withTexture = newWithTexture;
-  };
+  }
 
 	void SIG_Environment::setAutosaveIntervalGenerations(int newAutosaveIntervalGenerations) {
 		autosaveIntervalGenerations = newAutosaveIntervalGenerations;
-	};
+	}
 
 	int SIG_Environment::getAutosaveIntervalGenerations() {
 		return autosaveIntervalGenerations;
-	};
+	}
 	
 }

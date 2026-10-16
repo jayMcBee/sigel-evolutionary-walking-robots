@@ -74,7 +74,7 @@
     SIGEL_SlaveGUI::SIG_MovieSettings movieSettings;
     movieSettings.directory = temp + "movie/";
     movieRecorder.setSettings( movieSettings );
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::setShowAncorPoints( int state )
   {
@@ -90,7 +90,7 @@
 
 	SIG_VisualisationWidget::setShowAncorPoints( state );
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::choosePlaneColor()
   {
@@ -110,7 +110,7 @@
 	      update();
 	  };
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::chooseGridColor()
   {
@@ -130,7 +130,7 @@
 	      update();
 	  };
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::setShowPlane( int state )
   {
@@ -152,7 +152,7 @@
 	if (automaticRefresh)
 	  update();
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::setShowGrid( int state )
   {
@@ -174,7 +174,7 @@
 	if (automaticRefresh)
 	  update();
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::setShowRobotPath( int state )
   {
@@ -196,7 +196,7 @@
 	if (automaticRefresh)
 	  update();
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::setShowShadows( bool show )
   {
@@ -207,7 +207,7 @@
 	if (automaticRefresh)
 	  update();
       };
-  };
+  }
 
 	void SIG_SimulationVisualisationWidget::makeTimeSteps( int noOfSteps )
 	{
@@ -241,7 +241,7 @@
 			if ( movieRecorder.needsToRecordFrameAt( seconds ) )
 				recordFrame( simulationVisualisation, seconds );
 		}
-	};
+	}
 
 	void SIG_SimulationVisualisationWidget::moveLookPointTowardsRobot( SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation, double elapsedSeconds )
 	{
@@ -254,7 +254,7 @@
 			double const fraction = 1 - std::exp( -elapsedSeconds / followTime );
 			lookPoint.set( k, lookPoint.get(k) + (robotCentre.get(k) - lookPoint.get(k)) * fraction );
 		}
-	};
+	}
 
 	void SIG_SimulationVisualisationWidget::recordFrame( SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation, double seconds )
 	{
@@ -285,7 +285,7 @@
 			emit signalRecordingAllowed( false );
 			reportAndEncodeRecording();
 		}
-	};
+	}
 
   void SIG_SimulationVisualisationWidget::visualizeThis(SIGEL_Robot::SIG_Robot const &rrobot,
 							SIGEL_Environment::SIG_Environment const &eenvironment,
@@ -325,12 +325,12 @@
     slotSetTraceRobot( true );
     slotNavigateCenter();
     update();
-  };
+  }
 
 void SIG_SimulationVisualisationWidget::setStaticRunInfo( SIGEL_SlaveGUI::SIG_MovieStaticRunInfo const &staticRunInfo )
 {
   movieRecorder.setStaticRunInfo( staticRunInfo );
-};
+}
 
 void SIG_SimulationVisualisationWidget::resetRecorder()
 {
@@ -338,12 +338,12 @@ void SIG_SimulationVisualisationWidget::resetRecorder()
     reportAndEncodeRecording();
 
   movieRecorder.reset();
-};
+}
 
 void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 {
   movieEncoder.encode( movieRecorder.getSettings(), movieRecorder.getFramesRecorded() );
-};
+}
 
   void SIG_SimulationVisualisationWidget::slotStartSimulation()
   {
@@ -358,7 +358,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	frameShown = true;
 	simulationTimer->start( qMax( frameDelay, 1 ) );
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::pauseForDialog()
   {
@@ -367,7 +367,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	simulationTimer->stop();
 	pausedForDialog = true;
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::resumeAfterDialog()
   {
@@ -376,7 +376,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	pausedForDialog = false;
 	simulationTimer->start( qMax( frameDelay, 1 ) );
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotStopSimulation()
   {
@@ -389,7 +389,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 		   *environment,
 		   *simulationParameters,
 		   *program );
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotStepSimulation()
   {
@@ -398,7 +398,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	makeTimeSteps(1);
 	update();
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotFForwardSimulation()
   {
@@ -407,7 +407,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	makeTimeSteps( noOfFFSteps );
 	update();
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotSetFrameDelay(int fframeDelay)
   {
@@ -415,7 +415,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 
     if (simulationTimer->isActive())
       simulationTimer->setInterval( qMax( frameDelay, 1 ) );
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotSimulationProgress()
   {
@@ -427,12 +427,12 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
     frameShown = false;
     makeTimeSteps(1);
     update();
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotFrameShown()
   {
     frameShown = true;
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotSetTraceRobot( bool newValue )
   {
@@ -440,7 +440,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 
     if (traceRobot)
       slotNavigateCenter();
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotNavigateForward()
   {
@@ -467,7 +467,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	if (automaticRefresh)
 	  update();
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotNavigateBackward()
   {
@@ -489,7 +489,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	if (automaticRefresh)
 	  update();
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotNavigateRight()
   {
@@ -516,7 +516,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	if (automaticRefresh)
 	  update();
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotNavigateLeft()
   {
@@ -542,7 +542,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	if (automaticRefresh)
 	  update();
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotNavigateDown()
   {
@@ -557,7 +557,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	if (automaticRefresh)
 	  update();
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotNavigateUp()
   {
@@ -572,13 +572,13 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	if (automaticRefresh)
 	  update();
       };
-  };
+  }
 
   bool SIG_SimulationVisualisationWidget::canShowShadows() const
   {
     return visualisation
       && static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation const* >( visualisation )->canShowShadows();
-  };
+  }
 
   double SIG_SimulationVisualisationWidget::getFittingDistance() const
   {
@@ -597,7 +597,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
       halfAngle = std::atan( std::tan( halfHeightAngle ) * aspectRatio );
 
     return simulationVisualisation->getRobotRadius() / std::sin( halfAngle );
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotNavigateCenter()
   {
@@ -612,7 +612,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	if (automaticRefresh)
 	  update();
       };
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::slotAlterMovieSettingsClicked()
   {
@@ -657,7 +657,7 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	emit signalRecordingAllowed( movieRecorder.isRecording() );
 	break;
       }
-  };
+  }
 
   void SIG_SimulationVisualisationWidget::paintGL()
   {
@@ -671,4 +671,4 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 	else
 	  emit signalPosition( visualisation->viewSettings.lookPoint );
       };
-  };
+  }

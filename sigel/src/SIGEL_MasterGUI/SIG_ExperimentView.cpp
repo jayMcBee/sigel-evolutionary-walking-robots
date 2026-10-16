@@ -66,7 +66,7 @@ void SIG_ExperimentView::putIntoExperiment() {
   theExperiment.environment.setAutosaveIntervalGenerations(lcdnumberAutosave->intValue());
   // history checkbox
   theExperiment.population.setHistory(checkboxHistory->isChecked());
-};
+}
 
 void SIG_ExperimentView::getOutOfExperiment() {
   multilineeditComment->setText( theExperiment.comment );
@@ -74,7 +74,7 @@ void SIG_ExperimentView::getOutOfExperiment() {
   lcdnumberAutosave->display(theExperiment.environment.getAutosaveIntervalGenerations());
   // history checkbox
   checkboxHistory->setChecked(theExperiment.population.getHistory());
-};
+}
 
 void SIG_ExperimentView::streamToGnuPlot( QTextStream &stream ) {
   stream << "set data style lines\n"
@@ -113,7 +113,7 @@ void SIG_ExperimentView::streamToGnuPlot( QTextStream &stream ) {
     }
 
   stream << "e\n";
-};
+}
 
 void SIG_ExperimentView::slotExportPostScript() {
   if (theExperiment.experimentHistory.isEmpty())
@@ -150,7 +150,7 @@ void SIG_ExperimentView::slotExportPostScript() {
   pipeFile.close();
 
   pclose( gnuPlotStdInPipe );
-};
+}
 
 void SIG_ExperimentView::slotShowFitnesscurve() {
   if (theExperiment.experimentHistory.isEmpty())
@@ -178,11 +178,11 @@ void SIG_ExperimentView::slotShowFitnesscurve() {
   pipeFile.close();
 
   pclose( gnuPlotStdInPipe );
-};
+}
 
 void SIG_ExperimentView::slotHistory(bool selected) {
   putIntoExperiment();
-};
+}
 
 void SIG_ExperimentView::slotAutosaveChanged(int value) {
   if (theExperiment.getPath()!="new") {
@@ -195,6 +195,6 @@ void SIG_ExperimentView::slotAutosaveChanged(int value) {
     sliderAutosave->setValue(0);
     QMessageBox::warning( this, "Error", "You have to save the experiment first.");
   }
-};
+}
 
 }

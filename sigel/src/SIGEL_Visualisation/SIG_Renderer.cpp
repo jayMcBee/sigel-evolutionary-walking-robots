@@ -37,7 +37,7 @@ namespace SIGEL_Visualisation
 
     glListBase(0);
     displayListsOffset = glGenLists( this->noOfObjects ); // ToDo: throw allocation error
-  };
+  }
 
   SIG_Renderer::~SIG_Renderer()
   {
@@ -48,7 +48,7 @@ namespace SIGEL_Visualisation
     floatingTexts.clear();
 
     glDeleteLists( displayListsOffset, static_cast<GLsizei>(noOfObjects) );
-  };
+  }
 
   void SIG_Renderer::renderSceneObjects( GLuint first, GLuint end )
   {
@@ -62,7 +62,7 @@ namespace SIGEL_Visualisation
 	    glCallList( displayListsOffset + i );
 	    glPopMatrix();
 	  };
-  };
+  }
 
   QString SIG_Renderer::exportSceneObjectsToPovray()
   {
@@ -102,7 +102,7 @@ namespace SIGEL_Visualisation
 	};
 
     return resultString;
-  };
+  }
 
   QString SIG_Renderer::vectorToPovray( NEWMAT::ColumnVector input )
   {
@@ -114,6 +114,6 @@ namespace SIGEL_Visualisation
     resultStream << "<" << input( 1 ) << ", " << input( 2 ) << ", " << input( 3 ) << ">";
 
     return resultString;
-  };
+  }
 
 }

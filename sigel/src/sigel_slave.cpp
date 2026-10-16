@@ -88,8 +88,8 @@ extern "C"
     pvm_exit();
 
     exit( result );
-  };
-};
+  }
+}
 
 bool guiEnabled = false;
 

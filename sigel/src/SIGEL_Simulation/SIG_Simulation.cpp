@@ -47,7 +47,7 @@ SIGEL_Simulation::SIG_Simulation::SIG_Simulation(SIGEL_Robot::SIG_Robot const & 
 	                                                   robotProgram,
 	                                                   *commandInterface,
 	                                                   *simulationQueries );
-};
+}
 
 SIGEL_Simulation::SIG_Simulation::~SIG_Simulation() = default;
 
@@ -89,7 +89,7 @@ void SIGEL_Simulation::SIG_Simulation::start()
 		// function silently scoring a partial run.
 		std::terminate();
 	}
-};
+}
 
 // The boundary below is deliberate. Every caller is a fitness function that
 // catches SIG_Exception, so an escaping one becomes a wrong fitness, not a crash.
@@ -121,4 +121,4 @@ void SIGEL_Simulation::SIG_Simulation::makeTimeSteps(int numTimeSteps)
 		// function silently scoring a partial run.
 		std::terminate();
 	}
-};
+}

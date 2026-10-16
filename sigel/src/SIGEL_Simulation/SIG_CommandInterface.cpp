@@ -26,4 +26,4 @@
 #include <cmath>
 
 SIGEL_Simulation::SIG_CommandInterface::SIG_CommandInterface()
-{ };
+{ }

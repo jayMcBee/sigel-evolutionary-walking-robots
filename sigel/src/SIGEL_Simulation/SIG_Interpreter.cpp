@@ -51,7 +51,7 @@ namespace SIGEL_Simulation
 		{
 			registers.append( SIGEL_Simulation::SIG_Register(registerWidth) );
 		}
-	};
+	}
 
 	void SIG_Interpreter::interprete(double timeAccount)
 	{
@@ -249,7 +249,7 @@ namespace SIGEL_Simulation
 #ifdef SIG_DEBUG
 		SIGEL_Tools::SIG_IO::cerr << "Remaining Last Command Time: " << remainingLastCommandTime << Qt::endl; // debug! delete!
 #endif
-	};
+	}
 
 	void SIG_Interpreter::debugPrintInterpreterState( double timeAccount, SIGEL_Program::SIG_ProgramLine const &programLine ) const
 	{

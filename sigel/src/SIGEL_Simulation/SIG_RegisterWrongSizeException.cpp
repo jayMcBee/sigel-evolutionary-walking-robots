@@ -28,7 +28,7 @@ SIGEL_Simulation::SIG_RegisterWrongSizeException::SIG_RegisterWrongSizeException
   : SIGEL_Tools::SIG_Exception(fileName, line, message)
 {
   this->message = "RegisterWrongSizeException: " + this->message;
-};
+}
 
 SIGEL_Simulation::SIG_RegisterWrongSizeException::SIG_RegisterWrongSizeException(QString fileName,
 											 int line,
@@ -37,4 +37,4 @@ SIGEL_Simulation::SIG_RegisterWrongSizeException::SIG_RegisterWrongSizeException
   : SIGEL_Tools::SIG_Exception(fileName, line, message, prevException)
 {
   this->message = "RegisterWrongSizeException: " + this->message;
-};
+}

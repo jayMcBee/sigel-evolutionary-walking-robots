@@ -51,7 +51,7 @@
     QSurfaceFormat surfaceFormat = format();
     surfaceFormat.setSamples( multisamplingSamples );
     setFormat( surfaceFormat );
-  };
+  }
 
   SIG_VisualisationWidget::~SIG_VisualisationWidget()
   {
@@ -61,7 +61,7 @@
     // QWidget base destructor, so each unparents itself first -- not a double free.
     qDeleteAll( floatingTextWidgets );
     floatingTextWidgets.clear();
-  };
+  }
 
   void SIG_VisualisationWidget::setRenderMode( const QString & string )
   {
@@ -80,7 +80,7 @@
 	if (automaticRefresh)
 	  update();
       };
-  };
+  }
 
   void SIG_VisualisationWidget::setAmbientLighting( int newValue )
   {
@@ -98,7 +98,7 @@
 	if (automaticRefresh)
 	  update();
       };
-  };
+  }
 
   void SIG_VisualisationWidget::setShowAncorPoints( int state )
   {
@@ -113,25 +113,25 @@
     showAncorPointsState = state;
 
     update();
-  };
+  }
 
   void SIG_VisualisationWidget::setYaw( double yyaw )
   {
     yaw = yyaw;
     updateEyePoint();
-  };
+  }
 
   void SIG_VisualisationWidget::setPitch( double ppitch )
   {
     pitch = ppitch;
     updateEyePoint();
-  };
+  }
 
   void SIG_VisualisationWidget::setDistance( double ddistance )
   {
     distance = ddistance;
     updateEyePoint();
-  };
+  }
 
   void SIG_VisualisationWidget::updateEyePoint()
   {
@@ -177,7 +177,7 @@
 	if (automaticRefresh)
 	  update();
       };
-  };
+  }
 
   void SIG_VisualisationWidget::initFloatingTextWidgets()
   {
@@ -196,13 +196,13 @@
 	    newLabel->raise();
 	  };
       };
-  };
+  }
 
   void SIG_VisualisationWidget::mousePressEvent( QMouseEvent *event )
   {
     mouseXPos = event->position().toPoint().x();
     mouseYPos = event->position().toPoint().y();
-  };
+  }
 
   void SIG_VisualisationWidget::mouseMoveEvent( QMouseEvent *event )
   {
@@ -218,12 +218,12 @@
 
     mouseXPos = mousePosition.x();
     mouseYPos = mousePosition.y();
-  };
+  }
 
   void SIG_VisualisationWidget::initializeGL()
   {
     glClearColor( 1, 1, 1, 1 );
-  };
+  }
 
   void SIG_VisualisationWidget::resizeGL(int width, int height)
   {
@@ -237,7 +237,7 @@
       visualisation->viewSettings.aspectRatio = static_cast<double>(width) / static_cast<double>(height);
       visualisation->updateAspectRatio();
     };
-  };
+  }
 
   void SIG_VisualisationWidget::paintGL()
     {
@@ -280,4 +280,4 @@
 	}
       else
 	glClear(GL_COLOR_BUFFER_BIT);
-    };
+    }

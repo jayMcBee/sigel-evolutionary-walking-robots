@@ -47,29 +47,29 @@ namespace SIGEL_SlaveGUI
       lastFileName(),
       staticRunInfo()
   {
-  };
+  }
 
   void SIG_MovieRecorder::setSettings( SIG_MovieSettings const &newSettings )
   {
     settings = newSettings;
-  };
+  }
 
   void SIG_MovieRecorder::setStaticRunInfo( SIG_MovieStaticRunInfo const &newStaticRunInfo )
   {
     staticRunInfo = newStaticRunInfo;
-  };
+  }
 
   void SIG_MovieRecorder::startRecordingAt( double simulationSeconds )
   {
     recording = true;
     recordingStartSeconds = simulationSeconds;
     nextFrame = 0;
-  };
+  }
 
   void SIG_MovieRecorder::stopRecording()
   {
     recording = false;
-  };
+  }
 
   bool SIG_MovieRecorder::needsToRecordFrameAt( double simulationSeconds ) const
   {
@@ -77,7 +77,7 @@ namespace SIGEL_SlaveGUI
       return false;
 
     return framePosition( simulationSeconds ) >= nextFrame;
-  };
+  }
 
   bool SIG_MovieRecorder::writeImage( QImage const &view, double simulationSeconds, double startDistance, double robotCentreHeight )
   {
@@ -95,7 +95,7 @@ namespace SIGEL_SlaveGUI
 
     // Qt's quality value runs the other way: 100 does not compress.
     return frame.save( lastFileName, settings.format.toUpper().toUtf8().constData(), 100 - settings.pngCompression );
-  };
+  }
 
   QImage SIG_MovieRecorder::frameWithView( QImage const &view ) const
   {
@@ -110,7 +110,7 @@ namespace SIGEL_SlaveGUI
     painter.drawImage( (settings.width - image.width()) / 2, (settings.height - image.height()) / 2, image );
 
     return frame;
-  };
+  }
 
   bool SIG_MovieRecorder::saveThumbnailOncePerSecond( QImage const &frame )
   {
@@ -127,7 +127,7 @@ namespace SIGEL_SlaveGUI
 
     lastFileName = thumbnailName;
     return false;
-  };
+  }
 
   void SIG_MovieRecorder::paintOverlayLabels( QImage &frame, double simulationSeconds, double startDistance, double robotCentreHeight ) const
   {
@@ -171,7 +171,7 @@ namespace SIGEL_SlaveGUI
     QPen outlinePen( outlineColor, 2.0 * fontSize * outlineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin );
     painter.strokePath( path, outlinePen );
     painter.fillPath( path, textColor );
-  };
+  }
 
   SIG_MovieRecorder::OverlayLines SIG_MovieRecorder::assembleOverlayLines( double simulationSeconds, double startDistance, double robotCentreHeight ) const
   {
@@ -218,7 +218,7 @@ namespace SIGEL_SlaveGUI
       }
 
     return { labels, values };
-  };
+  }
 
   QFont SIG_MovieRecorder::overlayFont( double pixelSize ) const
   {
@@ -235,7 +235,7 @@ namespace SIGEL_SlaveGUI
     font.setPixelSize( qMax( 1, qRound( pixelSize ) ) );
 
     return font;
-  };
+  }
 
   bool SIG_MovieRecorder::writePovray( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation, double simulationSeconds )
   {
@@ -243,7 +243,7 @@ namespace SIGEL_SlaveGUI
 
     return visualisation.exportToPovray( settings.filePrefix + ".inc",
 					 lastFileName );
-  };
+  }
 
   bool SIG_MovieRecorder::createPovrayIncludeFile( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation )
   {
@@ -253,13 +253,13 @@ namespace SIGEL_SlaveGUI
     double aspectRatio = double( settings.width ) / double( settings.height );
 
     return visualisation.createPovrayIncludeFile( lastFileName, aspectRatio );
-  };
+  }
 
   void SIG_MovieRecorder::reset()
   {
     recording = false;
     framesRecorded = 0;
-  };
+  }
 
   QString SIG_MovieRecorder::nextFrameFileName() const
   {
@@ -269,7 +269,7 @@ namespace SIGEL_SlaveGUI
       number = number.rightJustified( QString::number( settings.maxFrames ).length(), '0' );
 
     return settings.directory + settings.filePrefix + number + "." + settings.format;
-  };
+  }
 
   QString SIG_MovieRecorder::thumbnailFileName() const
   {
@@ -278,7 +278,7 @@ namespace SIGEL_SlaveGUI
     // "_thumb_" keeps the name out of the frame pattern that ffmpeg reads.
     return settings.directory + settings.filePrefix + "_thumb_"
       + QString::number( seconds ).rightJustified( 3, '0' ) + "s.png";
-  };
+  }
 
   void SIG_MovieRecorder::startFrame( double simulationSeconds )
   {
@@ -290,20 +290,20 @@ namespace SIGEL_SlaveGUI
     SIGEL_Tools::SIG_IO::cerr << "Writing " << lastFileName << " in format " << settings.width << " x " << settings.height << " with PNG compression " << settings.pngCompression << "." << Qt::endl;
 #endif
     makeDirectory();
-  };
+  }
 
   double SIG_MovieRecorder::framePosition( double simulationSeconds ) const
   {
     // A step exactly on a frame time can come out a hair below it; the small
     // addition keeps that frame on this step.
     return ( simulationSeconds - recordingStartSeconds ) * settings.frameRate + 1e-6;
-  };
+  }
 
   void SIG_MovieRecorder::makeDirectory() const
   {
     QDir movieDir( settings.directory );
     if ( !movieDir.exists() )
       movieDir.mkdir( settings.directory );
-  };
+  }
 
 }

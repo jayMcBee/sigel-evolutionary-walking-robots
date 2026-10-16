@@ -28,13 +28,13 @@ SIGEL_Tools::SIG_Randomizer::SIG_Randomizer()
   : next( 0 )
 {
   setNewSeed( 0 );
-};
+}
 
 SIGEL_Tools::SIG_Randomizer::SIG_Randomizer(int seed)
   : next( 0 )
 {
   setNewSeed( seed );
-};
+}
 
 void SIGEL_Tools::SIG_Randomizer::setNewSeed(int seed)
 {

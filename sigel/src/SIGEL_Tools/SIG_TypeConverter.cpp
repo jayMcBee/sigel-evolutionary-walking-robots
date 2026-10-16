@@ -33,7 +33,7 @@ namespace SIGEL_Tools
       result.set( i, input( i+1 ) );
 
     return result;
-  };
+  }
 
   SIG_Vector SIG_TypeConverter::toSIG_Vector( CartesianVector const input )
   {
@@ -43,7 +43,7 @@ namespace SIGEL_Tools
       result.set( i, input[i] );
 
     return result;
-  };
+  }
 
   NEWMAT::ColumnVector SIG_TypeConverter::toColumnVector( SIG_Vector input )
   {
@@ -53,7 +53,7 @@ namespace SIGEL_Tools
       result( i+1 ) = input.get( i );
 
     return result;
-  };
+  }
 
   NEWMAT::ColumnVector SIG_TypeConverter::toColumnVector( CartesianVector const input )
   {
@@ -63,19 +63,19 @@ namespace SIGEL_Tools
       result( i+1 ) = input[i];
 
     return result;
-  };
+  }
 
   void SIG_TypeConverter::toCartesianVector( SIG_Vector input, CartesianVector result )
   {
     for (int i=0; i<3; i++)
       result[i] = input.get( i );
-  };
+  }
 
   void SIG_TypeConverter::toCartesianVector( NEWMAT::ColumnVector input, CartesianVector result )
   {
     for (int i=0; i<3; i++)
       result[i] = input( i+1 );
-  };
+  }
 
   SIG_Matrix SIG_TypeConverter::toSIG_Matrix( NEWMAT::Matrix input )
   {
@@ -86,7 +86,7 @@ namespace SIGEL_Tools
 	result.set( i, j, input( i+1, j+1 ) );
 
     return result;
-  };
+  }
 
   SIG_Matrix SIG_TypeConverter::toSIG_Matrix( RotationMatrix const input )
   {
@@ -97,7 +97,7 @@ namespace SIGEL_Tools
 	result.set( i, j, input[j][i] );
 
     return result;
-  };
+  }
 
   NEWMAT::Matrix SIG_TypeConverter::toMatrix( SIG_Matrix input )
   {
@@ -108,7 +108,7 @@ namespace SIGEL_Tools
 	result( i+1, j+1 ) = input.get( i, j );
 
     return result;
-  };
+  }
 
   NEWMAT::Matrix SIG_TypeConverter::toMatrix( RotationMatrix const input )
   {
@@ -119,21 +119,21 @@ namespace SIGEL_Tools
 	result( i+1, j+1 ) = input[j][i];
 
     return result;
-  };
+  }
 
   void SIG_TypeConverter::toRotationMatrix( NEWMAT::Matrix input, RotationMatrix result )
   {
     for (int i=0; i<3; i++)
       for (int j=0; j<3; j++)
 	result[j][i] = input( i+1, j+1 );
-  };
+  }
 
   void SIG_TypeConverter::toRotationMatrix( SIG_Matrix input, RotationMatrix result )
   {
     for (int i=0; i<3; i++)
       for (int j=0; j<3; j++)
 	result[j][i] = input.get( i, j );
-  };
+  }
 
   NEWMAT::Matrix SIG_TypeConverter::sigelToDynaMechs()
   {
@@ -144,7 +144,7 @@ namespace SIGEL_Tools
 		   << 0 << 1 << 0;
 
     return transformation;
-  };
+  }
 
   NEWMAT::Matrix SIG_TypeConverter::dynaMechsToSigel()
   {
@@ -155,7 +155,7 @@ namespace SIGEL_Tools
 		   << 0 << -1 << 0;
 
     return transformation; 
-  };
+  }
 
   NEWMAT::Matrix SIG_TypeConverter::sigelToPovray()
   {
@@ -166,6 +166,6 @@ namespace SIGEL_Tools
 		   << 0 << 0 << -1;
 
     return transformation; 
-  };
+  }
 
 }

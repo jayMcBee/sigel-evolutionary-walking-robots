@@ -33,7 +33,7 @@ MT_ExperimentWidget::MT_ExperimentWidget(QWidget* parent, const char* name, Qt::
 	// before showing the window for the first time select the first item
 	// in the list
 	setCurrentItem(topLevelItem(0));
-};
+}
 
 void MT_ExperimentWidget::slotCurrentChanged(QTreeWidgetItem *newSelection)
 {
@@ -43,7 +43,7 @@ void MT_ExperimentWidget::slotCurrentChanged(QTreeWidgetItem *newSelection)
 	prevSelectedItems.enqueue(static_cast<MT_ExperimentItem*>(newSelection));
 	if(prevSelectedItems.count() > 2)
 		prevSelectedItems.dequeue();
-};
+}
 
 void MT_ExperimentWidget::lastSelected()
 {

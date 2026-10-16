@@ -44,7 +44,7 @@ namespace SIGEL_Robot
 			cosInput = -1;
 
 		return std::acos( cosInput );
-	};
+	}
 
 	SIG_Vector orthogonalVector( SIG_Vector input )
 	{
@@ -69,7 +69,7 @@ namespace SIGEL_Robot
 		result.normalize();
 
 		return result;
-	};
+	}
 
 	SIG_Matrix rotationMatrix(SIG_Vector v, double phi)
 	{
@@ -293,7 +293,7 @@ namespace SIGEL_Robot
 		                 * firstTransformation;
 
 		return transformation;
-	};
+	}
 
 	void calculateAnyJoint (SIG_Vector pointA, SIG_Vector pointB, SIG_Vector pointC,
 	                        SIG_Vector otherA, SIG_Vector otherB, SIG_Vector otherC,

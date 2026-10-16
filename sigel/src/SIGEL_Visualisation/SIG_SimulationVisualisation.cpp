@@ -179,7 +179,7 @@ namespace SIGEL_Visualisation
 		updateRobotPoints();
 
 		initShadowMapping();
-	};
+	}
 
 	SIG_SimulationVisualisation::~SIG_SimulationVisualisation()
 	{
@@ -191,7 +191,7 @@ namespace SIGEL_Visualisation
 			glDeleteTextures( 1, &shadowTexture );
 		};
 		delete shadowProgram;
-	};
+	}
 
 	void SIG_SimulationVisualisation::initShadowMapping()
 	{
@@ -266,7 +266,7 @@ namespace SIGEL_Visualisation
 		program->release();
 
 		shadowProgram = program;
-	};
+	}
 
 	QMatrix4x4 SIG_SimulationVisualisation::renderShadowMap()
 	{
@@ -320,7 +320,7 @@ namespace SIGEL_Visualisation
 		glPopAttrib();
 
 		return lightProjection * lightView;
-	};
+	}
 
 	void SIG_SimulationVisualisation::renderShadowedScene( QMatrix4x4 const &lightMatrix )
 	{
@@ -355,12 +355,12 @@ namespace SIGEL_Visualisation
 
 		environmentRenderer.renderGridAndPath();
 		robotRenderer.renderPoints();
-	};
+	}
 
 	void SIG_SimulationVisualisation::setPointsVisible( bool visible )
 	{
 		robotRenderer.setPointsVisible( visible );
-	};
+	}
 
 	void SIG_SimulationVisualisation::setPlaneColor( QColor newColor )
 	{
@@ -371,34 +371,34 @@ namespace SIGEL_Visualisation
 		environmentRenderer.setPlaneColor( red,
 		                                   green,
 		                                   blue );
-	};
+	}
 
 	void SIG_SimulationVisualisation::setGridColor( QColor newColor )
 	{
 		environmentRenderer.setGridColor( newColor.redF(),
 		                                  newColor.greenF(),
 		                                  newColor.blueF() );
-	};
+	}
 
 	void SIG_SimulationVisualisation::setShowPlane( bool newShowPlane )
 	{
 		environmentRenderer.setShowPlane( newShowPlane );
-	};
+	}
 
 	void SIG_SimulationVisualisation::setShowGrid( bool newShowGrid )
 	{
 		environmentRenderer.setShowGrid( newShowGrid );
-	};
+	}
 
 	void SIG_SimulationVisualisation::setShowRobotPath( bool newShowRobotPath )
 	{
 		environmentRenderer.setShowRobotPath( newShowRobotPath );
-	};
+	}
 
 	void SIG_SimulationVisualisation::setShowShadows( bool newShowShadows )
 	{
 		showShadows = newShowShadows;
-	};
+	}
 
 	void SIG_SimulationVisualisation::visualize()
 	{
@@ -464,7 +464,7 @@ namespace SIGEL_Visualisation
 
 		if (hidden)
 			glDepthFunc( GL_LESS );
-	};
+	}
 
 	void SIG_SimulationVisualisation::makeTimeSteps(int noOfTimeSteps)
 	{
@@ -495,7 +495,7 @@ namespace SIGEL_Visualisation
 
 		updateRobotLinks();
 		updateRobotPoints();
-	};
+	}
 
 	void SIG_SimulationVisualisation::updateRobotLinks()
 	{
@@ -505,7 +505,7 @@ namespace SIGEL_Visualisation
 			robotRenderer.sceneObjects[i]->setPosition( renderRecorder.robotLinks[i]->position );
 			robotRenderer.sceneObjects[i]->setRotation( renderRecorder.robotLinks[i]->rotation );
 		};
-	};
+	}
 
 	void SIG_SimulationVisualisation::updateRobotPoints()
 	{
@@ -516,21 +516,21 @@ namespace SIGEL_Visualisation
 			robotRenderer.sceneObjects[i]->setPosition( renderRecorder.robotLinks[ linkNumber ]->position );
 			robotRenderer.sceneObjects[i]->setRotation( renderRecorder.robotLinks[ linkNumber ]->rotation );
 		};
-	};
+	}
 
 	SIG_Vector SIG_SimulationVisualisation::getRobotPosition() const
 	{
 		int rootLinkNumber = robot.getRootLink()->getNumber();
 
 		return renderRecorder.robotLinks[ rootLinkNumber ]->position;
-	};
+	}
 
 	SIG_Matrix SIG_SimulationVisualisation::getRobotRotation() const
 	{
 		int rootLinkNumber = robot.getRootLink()->getNumber();
 
 		return renderRecorder.robotLinks[ rootLinkNumber ]->rotation;
-	};
+	}
 
 	SIG_Vector SIG_SimulationVisualisation::getRobotCentre() const
 	{
@@ -542,7 +542,7 @@ namespace SIGEL_Visualisation
 		centre.plusis( &position );
 
 		return centre;
-	};
+	}
 
 	bool SIG_SimulationVisualisation::exportToPovray( QString includeFilename,
 	                                                  QString fileName )
@@ -591,7 +591,7 @@ namespace SIGEL_Visualisation
 		file.close();
 
 		return true;
-	};
+	}
 
 	bool SIG_SimulationVisualisation::createPovrayIncludeFile( QString fileName,
 	                                                           double aspectRatio )
@@ -639,6 +639,6 @@ namespace SIGEL_Visualisation
 		file.close();
 
 		return true;
-	};
+	}
 
 }

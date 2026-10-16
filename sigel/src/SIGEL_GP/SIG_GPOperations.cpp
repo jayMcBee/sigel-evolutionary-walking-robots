@@ -306,7 +306,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	crossedInds[ 1 ] = crossoverInd2;
 
 	return crossedInds;
-};
+}
 
 /*------------------------------------------Mutation-----------------------------------------*/
 
@@ -607,7 +607,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	mutatedInd->addMutationInfo( winner.getName(), actTime, mutPoint, winnerFitness );
 
 	return  *mutatedInd;
-};
+}
 
 /*------------------------------------------Reproduction-----------------------------------------*/
 
@@ -661,4 +661,4 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::reproduction( SIGEL_GP::
 	// The reproduced individual is returned
 
 	return *reproducedInd;
-};
+}

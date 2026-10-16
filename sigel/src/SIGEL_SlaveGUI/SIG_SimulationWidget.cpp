@@ -196,22 +196,22 @@ namespace SIGEL_SlaveGUI
 
     QObject::connect( showShadowsCheckBox, &QCheckBox::toggled,
 		      visualisationWidget, &SIG_SimulationVisualisationWidget::setShowShadows );
-  };
+  }
 
   void SIG_SimulationWidget::slotSetYaw( int yaw )
   {
     visualisationWidget->setYaw( 360 - yaw );
-  };
+  }
 
   void SIG_SimulationWidget::slotSetPitch( int pitch )
   {
     visualisationWidget->setPitch( pitch - 90 );
-  };
+  }
 
   void SIG_SimulationWidget::slotSetDistance( int distance )
   {
     visualisationWidget->setDistance( static_cast<double>(distance) / 10 );
-  };
+  }
 
   void SIG_SimulationWidget::slotMouseRotation( int deltaX, int deltaY )
   {
@@ -221,14 +221,14 @@ namespace SIGEL_SlaveGUI
 
     yawSlider->setValue( newFittedYawValue );
     pitchSlider->setValue( newPitchValue );
-  };
+  }
 
   void SIG_SimulationWidget::slotMouseZoom( int deltaY )
   {
     int newDistanceValue = distanceSlider->value() + deltaY;
 
     distanceSlider->setValue( newDistanceValue );
-  };
+  }
 
   void SIG_SimulationWidget::slotSetSimulationTime( double simulationSeconds )
   {
@@ -239,7 +239,7 @@ namespace SIGEL_SlaveGUI
 				      .arg( tenths / 600 )
 				      .arg( tenths % 600 / 10 )
 				      .arg( tenths % 10 ) );
-  };
+  }
 
   void SIG_SimulationWidget::visualizeThis(SIGEL_Robot::SIG_Robot const &robot,
 					   SIGEL_Environment::SIG_Environment const &environment,
@@ -264,7 +264,7 @@ namespace SIGEL_SlaveGUI
     QString programCode;
     program.printToString( programCode );
     robotProgramView->setText( programCode );
-  };
+  }
 
   void SIG_SimulationWidget::slotSetTraceRobot( bool newValue )
   {
@@ -277,7 +277,7 @@ namespace SIGEL_SlaveGUI
     backwardPushButton->setEnabled( manualNavigation );
     forwardPushButton->setEnabled( manualNavigation );
     centerPushButton->setEnabled( manualNavigation );
-  };
+  }
 
   void SIG_SimulationWidget::slotSetPosition( SIG_Vector position )
   {
@@ -288,7 +288,7 @@ namespace SIGEL_SlaveGUI
     xPosTextLabel->setText( xPosString );
     yPosTextLabel->setText( yPosString );
     zPosTextLabel->setText( zPosString );
-  };
+  }
 
   void SIG_SimulationWidget::slotStopSimulation()
   {
@@ -323,6 +323,6 @@ namespace SIGEL_SlaveGUI
       };
 
     visualisationWidget->setShowAncorPoints( showAnchorPointsState );
-  };
+  }
 
 }

@@ -66,6 +66,6 @@ class SIG_TypeConverter
     static NEWMAT::Matrix sigelToPovray();
   };
 
-};
+}
 
 #endif // SIGEL_TOOLS_SIG_TYPECONVERTER_H

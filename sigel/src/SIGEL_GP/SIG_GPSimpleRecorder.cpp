@@ -30,7 +30,7 @@ SIGEL_GP::SIG_GPSimpleRecorder::SIG_GPSimpleRecorder()
 		    start(0,0,0),
 		    end(0,0,0)
 {
-};
+}
 
 void SIGEL_GP::SIG_GPSimpleRecorder::init()
 {
@@ -48,10 +48,10 @@ void SIGEL_GP::SIG_GPSimpleRecorder::init()
   catch (SIGEL_Simulation::SIG_RecorderNoQueriesSetException &) { throw; }
   catch (SIGEL_Simulation::SIG_RecorderBadRecordingOrderException &) { throw; }
   catch (...) { std::terminate(); }
-};
+}
 
 void SIGEL_GP::SIG_GPSimpleRecorder::record()
-{ };
+{ }
 
 void SIGEL_GP::SIG_GPSimpleRecorder::finish()
 {
@@ -61,4 +61,4 @@ void SIGEL_GP::SIG_GPSimpleRecorder::finish()
 
   end = simulationQueries->getLinkPosition( rootLinkNumber );
   endRotation = simulationQueries->getLinkOrientation( rootLinkNumber );
-};
+}

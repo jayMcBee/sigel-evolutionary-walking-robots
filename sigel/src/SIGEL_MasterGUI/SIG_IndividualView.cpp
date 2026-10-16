@@ -60,6 +60,6 @@ void SIG_IndividualView::clear()
   textlabelShowFitness->setText( QString() );
   multilineeditProgramCode->clear();
   multilineeditHistory->clear();
-};
+}
 
 }

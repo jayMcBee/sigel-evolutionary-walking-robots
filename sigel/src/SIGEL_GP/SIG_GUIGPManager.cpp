@@ -50,7 +50,7 @@ namespace SIGEL_GP
 	  individualItems[ actItem->poolPosition ] = actItem;
 	++listIter;
       };
-  };
+  }
 
   void SIG_GUIGPManager::processInterfaceEvents()
   {
@@ -58,7 +58,7 @@ namespace SIGEL_GP
     // `passive time' caps that in ms; it is not a pause between generations.
     qApp->processEvents( QEventLoop::AllEvents,
                          currentExperiment.gpParameter.getPassiveTime() );
-  };
+  }
 
   void SIG_GUIGPManager::messageEvolutionStop()
   {
@@ -66,7 +66,7 @@ namespace SIGEL_GP
     // slotEvolutionStopped() after start() returns; calling it here too would
     // announce the run finished while it still runs.
     stopEvolutionNow = true;
-  };
+  }
 
   void SIG_GUIGPManager::updateIndividualView( int poolPos )
   {
@@ -82,6 +82,6 @@ namespace SIGEL_GP
 
     // update generations display (this line looks cool, doesn't it ?!)
     guiExperiment.experimentView->lcdnumberGenerations->display(currentExperiment.population.getPoolGeneration());
-  };
+  }
 
 }

@@ -76,4 +76,4 @@ SIGEL_MasterGUI::SIG_ExperimentItem::SIG_ExperimentItem( QTreeWidget * parent, Q
   newItem->setIcon( 0, QIcon( QPixmap( sigelRootString + "/pixmaps/individualSmall.xpm" ) ) );
 
   this->setExpanded( true );
-};
+}

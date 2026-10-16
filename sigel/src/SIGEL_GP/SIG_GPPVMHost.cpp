@@ -32,7 +32,7 @@ namespace SIGEL_GP
       maxSlaves( 1 ),
       enabled( false ),
       executableDir()
-  { };
+  { }
 
   SIG_GPPVMHost::SIG_GPPVMHost( QString name,
 				int maxSlaves,
@@ -42,7 +42,7 @@ namespace SIGEL_GP
       maxSlaves( maxSlaves ),
       enabled( enabled ),
       executableDir( executableDir )
-  { };
+  { }
 
   // Skipping whitespace on every read drops spaces inside a quoted path
   // (/tmp/with space -> /tmp/withspace). A preserved defect, not an oversight.
@@ -76,7 +76,7 @@ namespace SIGEL_GP
 
     enabled = enabledInt;
     executableDir.setPath( dirString );
-  };
+  }
 
   QString SIG_GPPVMHost::print() const
   {
@@ -96,6 +96,6 @@ namespace SIGEL_GP
 		 << "\n";
 
     return result;
-  };
+  }
 
 }

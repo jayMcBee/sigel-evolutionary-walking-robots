@@ -37,7 +37,7 @@ namespace SIGEL_GP
     if (recordingFrequency <= 0) {
       this->recordingFrequency = 1;
     }
-  };
+  }
 
   // This class owns positions and rotations.
   SIG_GPFullDataRecorder::~SIG_GPFullDataRecorder()
@@ -47,7 +47,7 @@ namespace SIGEL_GP
     // listForces is not freed here: the force vectors belong to
     // SIG_GPForceFitnessFunction, which frees them at the end of its evaluation.
     listForces.clear();
-  };
+  }
 
   void SIG_GPFullDataRecorder::init()
   {
@@ -61,7 +61,7 @@ namespace SIGEL_GP
     catch (SIGEL_Simulation::SIG_RecorderNoQueriesSetException &) { throw; }
     catch (SIGEL_Simulation::SIG_RecorderBadRecordingOrderException &) { throw; }
     catch (...) { std::terminate(); }
-  };
+  }
 
   void SIG_GPFullDataRecorder::record()
   {
@@ -96,6 +96,6 @@ void SIG_GPFullDataRecorder::finish()
 
   endPosition = simulationQueries->getLinkPosition( rootLinkNumber );
   endRotation = simulationQueries->getLinkOrientation( rootLinkNumber );
-};
+}
 
 }

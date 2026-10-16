@@ -29,4 +29,4 @@
 #include "SIGEL_Tools/SIG_IO.h"
 
 SIGEL_Simulation::SIG_SimulationQueries::SIG_SimulationQueries()
-{ };
+{ }

@@ -105,6 +105,6 @@ namespace SIGEL_GP
     fitness = totalDistance / simulatedSeconds;
 
     return fitness;
-  };
+  }
 
 }

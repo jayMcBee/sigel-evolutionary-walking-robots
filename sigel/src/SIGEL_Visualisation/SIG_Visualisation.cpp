@@ -70,7 +70,7 @@ namespace SIGEL_Visualisation
     glFogi( GL_FOG_MODE, GL_LINEAR );
 
     updateAspectRatio();
-  };
+  }
 
   void SIG_Visualisation::visualize()
   {
@@ -133,7 +133,7 @@ namespace SIGEL_Visualisation
        	glEnable( GL_CULL_FACE );
        	break;
       };
-  };
+  }
 
 	void SIG_Visualisation::drawSky() const
 	{
@@ -169,7 +169,7 @@ namespace SIGEL_Visualisation
 		glMatrixMode( GL_MODELVIEW );
 
 		glPopAttrib();
-	};
+	}
 
 	void SIG_Visualisation::setFog( SIG_Vector const &eyePoint ) const
 	{
@@ -192,7 +192,7 @@ namespace SIGEL_Visualisation
 		                             + (skyTopColor - skyBottomColor) * static_cast<float>( (horizonHeight + 1) / 2 );
 		GLfloat const fogColor[4] = { horizonColor.x(), horizonColor.y(), horizonColor.z(), 1 };
 		glFogfv( GL_FOG_COLOR, fogColor );
-	};
+	}
 
   void SIG_Visualisation::setAmbientSceneColor( double red,
 						double green,
@@ -210,7 +210,7 @@ namespace SIGEL_Visualisation
     lightModelAmbientColor[3] = 1;
 
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, lightModelAmbientColor.data() );
-  };
+  }
 
   void SIG_Visualisation::updateAspectRatio()
   {
@@ -222,6 +222,6 @@ namespace SIGEL_Visualisation
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective( fovy, aspectRatio, nearPlane, farPlane );
-  };
+  }
 
 }

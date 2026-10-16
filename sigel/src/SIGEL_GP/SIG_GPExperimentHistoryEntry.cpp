@@ -37,7 +37,7 @@ namespace SIGEL_GP
       maxFitness( maxFitness ),
       minFitness( minFitness ),
       averageFitness( averageFitness )
-  { };
+  { }
 
   SIG_GPExperimentHistoryEntry::SIG_GPExperimentHistoryEntry( QString entryString )
   {
@@ -67,22 +67,22 @@ namespace SIGEL_GP
 
     breakTime.setDate( date );
     breakTime.setTime( time );
-  };
+  }
 
   int SIG_GPExperimentHistoryEntry::getGenerationNo() const
   {
     return generationNo;
-  };
+  }
 
   QDateTime SIG_GPExperimentHistoryEntry::getBreakTime() const
   {
     return breakTime;
-  };
+  }
 
   double SIG_GPExperimentHistoryEntry::getMaxFitness() const
   {
     return maxFitness;
-  };
+  }
 
   QString SIG_GPExperimentHistoryEntry::print() const
   {
@@ -111,16 +111,16 @@ namespace SIGEL_GP
 		 << "\n";
 
     return result;
-  };
+  }
 
   double SIG_GPExperimentHistoryEntry::getMinFitness() const
   {
     return minFitness;
-  };
+  }
 
   double SIG_GPExperimentHistoryEntry::getAverageFitness() const
   {
     return averageFitness;
-  };
+  }
 
 }

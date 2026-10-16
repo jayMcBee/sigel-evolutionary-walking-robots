@@ -28,6 +28,6 @@ namespace SIGEL_GP
   SIG_GPActivePVMHost::SIG_GPActivePVMHost( SIG_GPPVMHost const &origin )
     : SIG_GPPVMHost( origin ),
       noOfSlaves( 0 )
-  { };
+  { }
 
 }

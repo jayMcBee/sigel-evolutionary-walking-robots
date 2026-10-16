@@ -726,14 +726,14 @@ SIG_MainWindow::SIG_MainWindow( QWidget * parent, const char * name, Qt::WindowF
 		    this,
 		    SLOT( slotEnableEvolutionRunningActions( bool ) ) );
   statusBar()->showMessage( "Ready.", 5000 );
-};
+}
 
 void SIG_MainWindow::slotAbout()
 {
   SIG_InfoBox theInfoBox( this, "InfoBox", true );
   theInfoBox.resize( 600, -1 );
   theInfoBox.exec();
-};
+}
 
 void SIG_MainWindow::slotShowEmpty( bool isNotEmpty )
 {
@@ -741,21 +741,21 @@ void SIG_MainWindow::slotShowEmpty( bool isNotEmpty )
     {
       widgetStack->setCurrentWidget( widgetBase );
     }
-};
+}
 
 bool SIG_MainWindow::askBeforeQuitting()
 {
   return QMessageBox::warning( this, "Quit SIGEL",
 			       "Do you really want to quit?\nThere may be unsaved experiments.",
 			       QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes ) == QMessageBox::Yes;
-};
+}
 
 void SIG_MainWindow::slotAboutToQuit()
 {
   // closeEvent asks the user. Asking here and then calling quit() would ask
   // twice, because quit() closes every window.
   close();
-};
+}
 
 void SIG_MainWindow::slotUseBigPixmaps()
 {
@@ -764,7 +764,7 @@ void SIG_MainWindow::slotUseBigPixmaps()
   bool usesBigPixmaps = iconSize().width() < 48;
   bigPixmapAction->setChecked( usesBigPixmaps );
   setIconSize( usesBigPixmaps ? QSize( 48, 48 ) : QSize( 25, 25 ) );
-};
+}
 
 void SIG_MainWindow::slotUseTextLabels()
 {
@@ -772,7 +772,7 @@ void SIG_MainWindow::slotUseTextLabels()
   textLabelsAction->setChecked( usesTextLabels );
   setToolButtonStyle( usesTextLabels ? Qt::ToolButtonTextUnderIcon
                                      : Qt::ToolButtonIconOnly );
-};
+}
 
 void SIG_MainWindow::slotChangeFont()
 {
@@ -780,7 +780,7 @@ void SIG_MainWindow::slotChangeFont()
   QFont newFont = QFontDialog::getFont( &ok, QApplication::font(), this );
   if( ok )
     qApp->setFont( newFont );
-};
+}
 
 /********************************
  * MetaGP slots
@@ -800,7 +800,7 @@ void SIG_MainWindow::slotMTUseMT(bool state)
 		mtConfigureAction->setEnabled(state);
 		mtChoiceTypeActionGroup->setEnabled(state);
 	}
-};
+}
 
 // show the configuration window for the metaGP-System
 // used by the actual experiment
@@ -813,7 +813,7 @@ void SIG_MainWindow::slotMTConfigureSystem()
 	if(currentExperiment){
 		currentExperiment->gpExperiment.mtController->configureSystem( this );
 	};
-};
+}
 
 // switch the actual experiment to the other metaGP system
 void SIG_MainWindow::slotMTSwitchSystem(QAction *selSystem)
@@ -840,7 +840,7 @@ void SIG_MainWindow::slotMTSwitchSystem(QAction *selSystem)
 	// so this records what is actually checked.
 	mtSelectedSystem = mtChoiceClassifierAction->isChecked()
 	                   ? mtChoiceClassifierAction : mtChoiceEvaluatorAction;
-};
+}
 
 void SIG_MainWindow::slotCurrentExperimentChanged()
 {
@@ -870,7 +870,7 @@ void SIG_MainWindow::slotCurrentExperimentChanged()
 			mtUseAction->setChecked(false);
 		}
 	}
-};
+}
 
 void SIG_MainWindow::slotEnableNoExperimentActions( bool enable )
 {
@@ -882,13 +882,13 @@ void SIG_MainWindow::slotEnableNoExperimentActions( bool enable )
   // two lists cannot drift apart.
   if ( enable && experimentListView->isRunning() )
     slotEnableEvolutionRunningActions( false );
-};
+}
 
 void SIG_MainWindow::slotEnableEvolutionRunningActions( bool enable )
 {
   for ( QAction *a : evolutionRunningActions )
     a->setEnabled( enable );
-};
+}
 
 void SIG_MainWindow::closeEvent( QCloseEvent *event )
 {
@@ -908,6 +908,6 @@ void SIG_MainWindow::closeEvent( QCloseEvent *event )
     qApp->quit();
   else
     event->ignore();
-};
+}
 
 }

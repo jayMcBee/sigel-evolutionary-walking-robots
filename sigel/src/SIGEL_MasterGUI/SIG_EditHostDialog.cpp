@@ -44,6 +44,6 @@ SIG_EditHostDialog::SIG_EditHostDialog( QWidget* parent,  const char* name, bool
 void SIG_EditHostDialog::slotToolbuttonSlaveDirectoryClicked()
 {
   lineeditSlaveDirectory->setText( QFileDialog::getExistingDirectory( this, "Select Directory", "./" ) );
-};
+}
 
 }

@@ -39,7 +39,7 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation()
 	  poolGeneration(0)
 {
 	history = true;
-};
+}
 
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size)
 	: randomizer( nullptr )   // the guard below reads it
@@ -64,7 +64,7 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size)
 		pool[ x ] = new SIGEL_GP::SIG_GPIndividual( *getRandomizerPointer() );
 		getIndividualPointer( x )->setPoolPos( x );
 	}
-};
+}
 
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(QString data)
 	: randomizer( nullptr )   // the guard below reads it
@@ -86,7 +86,7 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(QString data)
 	SIGEL_Tools::SIG_IO::cerr << "\n\nREADING FINISHED.\n" << Qt::endl;
 
 #endif
-};
+}
 
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
                                              SIGEL_Tools::SIG_Randomizer &newRandomizer,
@@ -146,7 +146,7 @@ SIGEL_GP::SIG_GPPopulation::~SIG_GPPopulation()
 	qDeleteAll( pool );
 	pool.clear();
 	delete randomizer;
-};
+}
 
 SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPPopulation::getIndividual(int poolpos)
 {
@@ -160,7 +160,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPPopulation::getIndividual(int poolpo
 		SIGEL_Tools::SIG_IO::cerr << "Wrong Position requested from Population!" << Qt::endl;
 		exit( 1 );
 	}
-};
+}
 
 void SIGEL_GP::SIG_GPPopulation::setIndividual(SIG_GPIndividual& indi,
                                                int poolpos)
@@ -169,7 +169,7 @@ void SIGEL_GP::SIG_GPPopulation::setIndividual(SIG_GPIndividual& indi,
 	// takes over the one the caller allocated.
 	delete pool[ poolpos ];
 	pool[ poolpos ] = &indi;
-};
+}
 
 int SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
                                                       SIGEL_GP::SIG_GPParameter& gpParameter,
@@ -219,12 +219,12 @@ int SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
 	}
 
 	return quantity;
-};
+}
 
 int SIGEL_GP::SIG_GPPopulation::getSize()
 {
 	return int( pool.size() );
-};
+}
 
 QString SIGEL_GP::SIG_GPPopulation::getNextIdentifier()
 {
@@ -235,17 +235,17 @@ QString SIGEL_GP::SIG_GPPopulation::getNextIdentifier()
 	nextIdentifier = QString::number( nextIdentifierNumber );
 
 	return releasedIdentifier;
-};
+}
 
 void SIGEL_GP::SIG_GPPopulation::setNextIdentifier(QString identifier)
 {
 	nextIdentifier = identifier;
-};
+}
 
 int SIGEL_GP::SIG_GPPopulation::getPoolGeneration()
 {
 	return poolGeneration;
-};
+}
 
 void SIGEL_GP::SIG_GPPopulation::setPoolGeneration(int pGen)
 {
@@ -255,12 +255,12 @@ void SIGEL_GP::SIG_GPPopulation::setPoolGeneration(int pGen)
 void SIGEL_GP::SIG_GPPopulation::loadPool(QTextStream & pool)
 {
 	readFromFile( pool );
-};
+}
 
 void SIGEL_GP::SIG_GPPopulation::savePool(QTextStream & pool)
 {
 	writeToFile( pool );
-};
+}
 
 SIGEL_GP::SIG_GPIndividual *SIGEL_GP::SIG_GPPopulation::getIndividualPointer(int poolpos)
 {
@@ -508,7 +508,7 @@ void SIGEL_GP::SIG_GPPopulation::resetAllFitnessValues()
 {
 	for(unsigned int counter = 0; counter < pool.size(); counter++ )
 		pool[ counter ]->setFitness( -1 );
-};
+}
 
 double SIGEL_GP::SIG_GPPopulation::getWorstFitness()
 {
@@ -546,9 +546,9 @@ QList<double> SIGEL_GP::SIG_GPPopulation::getFitnessValuesOfSimulatedIndividuals
 void SIGEL_GP::SIG_GPPopulation::setHistory(bool newHistory)
 {
 	history = newHistory;
-};
+}
 
 bool SIGEL_GP::SIG_GPPopulation::getHistory()
 {
 	return history;
-};
+}

@@ -35,7 +35,7 @@ namespace SIGEL_SlaveGUI
 	SIG_MovieEncoder::SIG_MovieEncoder( QWidget *messageParent )
 		: messageParent( messageParent )
 	{
-	};
+	}
 
 	void SIG_MovieEncoder::encode( SIG_MovieSettings const &settings, int frameCount )
 	{
@@ -75,7 +75,7 @@ namespace SIGEL_SlaveGUI
 
 		runFfmpegWithProgressDialog( ffmpeg, settings, frameCount );
 		reportFinished();
-	};
+	}
 
 	void SIG_MovieEncoder::runFfmpegWithProgressDialog( QString const &ffmpeg, SIG_MovieSettings const &settings, int frameCount )
 	{
@@ -99,7 +99,7 @@ namespace SIGEL_SlaveGUI
 		}
 
 		progress.close();
-	};
+	}
 
 	QStringList SIG_MovieEncoder::arguments( SIG_MovieSettings const &settings, int frameCount ) const
 	{
@@ -122,7 +122,7 @@ namespace SIGEL_SlaveGUI
 			"-vf", "crop=trunc(iw/2)*2:trunc(ih/2)*2,scale=out_color_matrix=bt709,setparams=colorspace=bt709:color_primaries=bt709:color_trc=bt709",
 			"-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p",
 			"-movflags", "+faststart", unfinishedFileName };
-	};
+	}
 
 	void SIG_MovieEncoder::reportFinished()
 	{
@@ -151,6 +151,6 @@ namespace SIGEL_SlaveGUI
 			message += "\n\nThe unfinished file was deleted.";
 
 		QMessageBox::warning( messageParent, "Movie Error", message );
-	};
+	}
 
 }

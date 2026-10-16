@@ -28,7 +28,7 @@ SIGEL_Tools::SIG_Exception::SIG_Exception(QString fileName,
 {
   this->message += message + "\n";
   this->message += "File: " + fileName + " Line: " + QString().setNum(line) + "\n";
-};
+}
 
 SIGEL_Tools::SIG_Exception::SIG_Exception(QString fileName,
 					       int line,
@@ -39,9 +39,9 @@ SIGEL_Tools::SIG_Exception::SIG_Exception(QString fileName,
   this->message += "File: " + fileName + " Line: " + QString().setNum(line) + "\n";
   this->message += "thrown by:\n";
   this->message += prevException.getMessage();
-};
+}
 
 QString SIGEL_Tools::SIG_Exception::getMessage() const
 {
   return message;
-};
+}

@@ -43,7 +43,7 @@ SIGEL_GP::SIG_GPCrossOverTournament::SIG_GPCrossOverTournament(SIGEL_Tools::SIG_
   indis[ 1 ] = new SIG_GPTournamentIndividual( indPos2 );
   indis[ 2 ] = new SIG_GPTournamentIndividual( indPos3 );
   indis[ 3 ] = new SIG_GPTournamentIndividual( indPos4 );
-};
+}
 
 bool SIGEL_GP::SIG_GPCrossOverTournament::run()
 {
@@ -144,7 +144,7 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run()
    gpPool.setIndividual(*cinds[1],looserPos2);
    
    return true;
-};
+}
 
 bool SIGEL_GP::SIG_GPCrossOverTournament::run(MT_Classifier *MetaClassifier)
 {
@@ -226,7 +226,7 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run(MT_Classifier *MetaClassifier)
    gpPool.setIndividual(*cinds[1],looserPos2);
    
    return true;
-};
+}
 
 bool  SIGEL_GP::SIG_GPCrossOverTournament::classify(MT_Classifier *MetaClassifier)
 {
@@ -302,4 +302,4 @@ bool  SIGEL_GP::SIG_GPCrossOverTournament::classify(MT_Classifier *MetaClassifie
    gpPool.setIndividual(*cinds[1],looserPos2);
    
    return true;
-};
+}

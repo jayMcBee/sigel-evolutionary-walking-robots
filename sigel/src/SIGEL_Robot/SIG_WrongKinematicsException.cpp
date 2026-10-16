@@ -31,7 +31,7 @@ namespace SIGEL_Robot
 	: SIGEL_Tools::SIG_Exception( fileName, line, message )
       {
 	this->message = "WrongKinematicsException: " + this->message;
-      };
+      }
 
       SIG_WrongKinematicsException::SIG_WrongKinematicsException( QString fileName,
 								  int line,
@@ -40,6 +40,6 @@ namespace SIGEL_Robot
 	: SIGEL_Tools::SIG_Exception(fileName, line, message, prevException)
       {
 	this->message = "WrongKinematicsException: " + this->message;
-      };
+      }
 
 }

@@ -678,4 +678,4 @@ void SIGEL_Program::SIG_ProgramLine::generateRandomRobotInstruction(SIGEL_Robot:
 void SIGEL_Program::SIG_ProgramLine::copyLine(SIGEL_Program::SIG_ProgramLine *source,SIGEL_Program::SIG_ProgramLine *destination)
 {
    *destination=*source;
-};
+}

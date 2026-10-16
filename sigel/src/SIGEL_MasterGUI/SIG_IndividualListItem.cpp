@@ -35,7 +35,7 @@ SIG_IndividualListItem::SIG_IndividualListItem( QTreeWidget *parent )
   parent->insertTopLevelItem( 0, this );
   QString sigelRoot( std::getenv( "SIGEL_ROOT" ) );
   setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/individualSmall.xpm" ) ) );
-};
+}
 
 SIG_IndividualListItem::SIG_IndividualListItem( QTreeWidget *parent, int poolPosition, SIGEL_GP::SIG_GPIndividual *theIndividual )
   : QTreeWidgetItem(), poolPosition( poolPosition), theIndividual( theIndividual ) 
@@ -47,7 +47,7 @@ SIG_IndividualListItem::SIG_IndividualListItem( QTreeWidget *parent, int poolPos
       setIcon( 0, QIcon( QPixmap( sigelRoot + "/pixmaps/individualSmall.xpm" ) ) );
       setTo( theIndividual );
     }
-};
+}
 
 QString SIG_IndividualListItem::key(int column, bool ascending) const {
   int const zeros = 999;
@@ -87,7 +87,7 @@ QString SIG_IndividualListItem::key(int column, bool ascending) const {
       break;
   }
   return QString();
-};
+}
 
 bool SIG_IndividualListItem::operator<( const QTreeWidgetItem &other ) const
 {
@@ -100,7 +100,7 @@ bool SIG_IndividualListItem::operator<( const QTreeWidgetItem &other ) const
   if( !o )
     return QTreeWidgetItem::operator<( other );
   return key( column, true ) < o->key( column, true );
-};
+}
 
 void SIG_IndividualListItem::setTo( SIGEL_GP::SIG_GPIndividual *theIndividual )
 {
@@ -116,6 +116,6 @@ void SIG_IndividualListItem::setTo( SIGEL_GP::SIG_GPIndividual *theIndividual )
       this->theIndividual = theIndividual;
       this->poolPosition = theIndividual->getPoolPos();
     }
-};
+}
 
 }

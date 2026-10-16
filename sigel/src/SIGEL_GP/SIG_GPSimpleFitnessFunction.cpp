@@ -69,4 +69,4 @@ double SIGEL_GP::SIG_GPSimpleFitnessFunction::evalFitness( SIGEL_Program::SIG_Pr
     fitness = 0;
 
   return fitness;
-};
+}

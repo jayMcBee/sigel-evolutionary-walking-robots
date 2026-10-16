@@ -151,12 +151,12 @@ namespace SIGEL_Robot {
 	double SIG_Joint::getMechsMinPos() const
 	{
 		return mechsMinPos;
-	};
+	}
 
 	double SIG_Joint::getMechsMaxPos() const
 	{
 		return mechsMaxPos;
-	};
+	}
 
 	void SIG_Joint::transformToDynaMechs( SIG_Link *predecessor,
 	                                      double screwD,
@@ -219,7 +219,7 @@ namespace SIGEL_Robot {
 		SIG_Link *successor = ( predecessor == leftLink ) ? rightLink : leftLink;
 
 		return ( !((mdh_predecessor_is_left==0) || (mdh_predecessor_is_left==1)) && !successor->isMDHVisited());
-	};
+	}
 
 	void SIG_Joint::calculateMDH( SIG_Link *caller )
 	{
@@ -744,7 +744,7 @@ namespace SIGEL_Robot {
 
 		for (SIG_Joint *actJoint : joints)
 			actJoint->calculateMDH( successor );
-	};
+	}
 
 	void SIG_Joint::calculateCut( SIG_Vector a,
 	                              SIG_Vector u,
@@ -767,7 +767,7 @@ namespace SIGEL_Robot {
 		cut = w;
 		cut.timesis( solution( 3 ) );
 		cut.plusis( &b );
-	};
+	}
 
 	double SIG_Joint::normalizeRadAngle( double input )
 	{
@@ -777,6 +777,6 @@ namespace SIGEL_Robot {
 			return input - (2 * std::numbers::pi);
 
 		return input;
-	};
+	}
 
 }
