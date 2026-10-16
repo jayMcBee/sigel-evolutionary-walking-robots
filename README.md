@@ -8,6 +8,30 @@ tests each program in a physics simulator.
 
 To build and run it, see [Getting started](sigel/GETTING_STARTED).
 
+## Screenshots
+
+The experiment `joventinoQuadruped_bumpy`: a four-legged robot on an uneven floor.
+
+The population, with the best individual's program:
+
+![Population](sigel/doc/screenshot-population.png)
+
+The genetic programming parameters:
+
+![GP parameters](sigel/doc/screenshot-gp-parameters.png)
+
+The environment, with the floor as a function of x and z:
+
+![Environment](sigel/doc/screenshot-environment.png)
+
+The commands of the robot language:
+
+![Language parameters](sigel/doc/screenshot-language-parameters.png)
+
+The best individual in the 3-D view of the simulation:
+
+![3-D view](sigel/doc/screenshot-3d-view.png)
+
 ## Origin
 
 - **SIGEL 1.0 (2001):** written by project group PG 368 at the University of
