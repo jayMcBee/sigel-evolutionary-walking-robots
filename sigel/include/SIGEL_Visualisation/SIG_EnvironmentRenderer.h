@@ -86,7 +86,7 @@ namespace SIGEL_Visualisation
      *
      * @pre The display lists are builded.
      */
-    void render();
+    void render() override;
 
     /**
      * Calls the display list of the plane only.
@@ -108,9 +108,9 @@ namespace SIGEL_Visualisation
      */
     bool getWithTexture() const { return withTexture; }
 
-    QString exportToPovray();
+    QString exportToPovray() override;
 
-    QString createPovrayDeclarations();
+    QString createPovrayDeclarations() override;
 
     void setLookPoint( SIG_Vector newPosition );
 
@@ -164,7 +164,7 @@ namespace SIGEL_Visualisation
      * its properties like geometry of objects to
      * build display lists.
      */
-    void buildDisplayLists();
+    void buildDisplayLists() override;
 
     /**
      * Builds the display list to render the plane that

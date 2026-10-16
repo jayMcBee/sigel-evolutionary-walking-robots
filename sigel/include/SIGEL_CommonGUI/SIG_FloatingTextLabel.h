@@ -35,7 +35,7 @@ namespace SIGEL_CommonGUI
 			     const char * name=nullptr );
 
     private:
-      void mousePressEvent( QMouseEvent *e );
+      void mousePressEvent( QMouseEvent *e ) override;
     };
 
 }

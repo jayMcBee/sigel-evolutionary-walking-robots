@@ -117,7 +117,7 @@
 
     public slots:
 
-      void setShowAncorPoints( int state );
+      void setShowAncorPoints( int state ) override;
 
       void choosePlaneColor();
 
@@ -229,7 +229,7 @@
 
       SIGEL_SlaveGUI::SIG_MovieEncoder movieEncoder;
 
-      void paintGL();
+      void paintGL() override;
 
       /**
        * Let the simulation progress about the supplied

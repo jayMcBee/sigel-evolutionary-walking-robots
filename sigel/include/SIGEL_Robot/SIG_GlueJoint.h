@@ -44,19 +44,19 @@ namespace SIGEL_Robot
     SIG_GlueJoint (SIG_Robot *par, QString n, int nr = -1);
     SIG_GlueJoint (SIG_Robot *par, QTextStream & tx);
 
-    virtual JointType getJointType () const;
+    JointType getJointType () const override;
 
     void setPlaneA (SIG_Vector p1, SIG_Vector p2, SIG_Vector p3);
     void setPlaneB (SIG_Vector p1, SIG_Vector p2, SIG_Vector p3);
     void getPlaneA (SIG_Vector &p1, SIG_Vector &p2, SIG_Vector &p3);
     void getPlaneB (SIG_Vector &p1, SIG_Vector &p2, SIG_Vector &p3);
 
-    virtual void transformPoints (SIG_Link *side,
-                                  SIG_Vector mov, SIG_Matrix rot);
-    virtual void getGeomRelation
-      (SIG_Vector &t, SIG_Matrix &o, SIG_Link *origin);
+    void transformPoints (SIG_Link *side,
+                          SIG_Vector mov, SIG_Matrix rot) override;
+    void getGeomRelation
+      (SIG_Vector &t, SIG_Matrix &o, SIG_Link *origin) override;
 
-    virtual void writeToFileTransfer (QTextStream & tx);
+    void writeToFileTransfer (QTextStream & tx) override;
   };
 
 }

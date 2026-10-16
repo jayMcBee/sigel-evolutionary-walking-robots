@@ -50,11 +50,11 @@ public:
 double evalFitness( SIGEL_Program::SIG_Program &program,
                     SIGEL_Robot::SIG_Robot &rob,
                     SIGEL_Environment::SIG_Environment &environment,
-                    SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const;
+                    SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const override;
 
-QString serializedId() const { return "ForceFitnessFunction"; }
-QString name() const { return "Force"; }
-QString description() const { return "Average speed from start to end, divided by how unevenly the joints share the load; 0 as soon as the body is more than 0.5 above or below its start height."; }
+QString serializedId() const override { return "ForceFitnessFunction"; }
+QString name() const override { return "Force"; }
+QString description() const override { return "Average speed from start to end, divided by how unevenly the joints share the load; 0 as soon as the body is more than 0.5 above or below its start height."; }
 };
 
 }

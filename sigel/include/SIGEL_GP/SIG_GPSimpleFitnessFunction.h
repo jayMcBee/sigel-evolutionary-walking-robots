@@ -50,11 +50,11 @@ public:
 double evalFitness( SIGEL_Program::SIG_Program &program,
                     SIGEL_Robot::SIG_Robot &rob,
                     SIGEL_Environment::SIG_Environment &environment,
-                    SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const;
+                    SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const override;
 
-QString serializedId() const { return "SimpleFitnessFunction"; }
-QString name() const { return "Simple"; }
-QString description() const { return "Average speed: the straight-line distance from start to end, divided by the simulated time."; }
+QString serializedId() const override { return "SimpleFitnessFunction"; }
+QString name() const override { return "Simple"; }
+QString description() const override { return "Average speed: the straight-line distance from start to end, divided by the simulated time."; }
 };
 
 }

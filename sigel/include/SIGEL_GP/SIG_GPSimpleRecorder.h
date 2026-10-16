@@ -50,7 +50,7 @@ namespace SIGEL_GP
        * First it calls the method init of the superclass
        * SIGEL_Simulation::SIG_Recorder.
        */
-      void init();
+      void init() override;
 
       /**
        * Records the forces of all robot drives.
@@ -58,7 +58,7 @@ namespace SIGEL_GP
        * First it calls the method finish of the superclass
        * SIGEL_Simulation::SIG_Recorder.
        */
-      void record();
+      void record() override;
 
       /**
        * Reads the end position of the torso element
@@ -66,7 +66,7 @@ namespace SIGEL_GP
        * First it calls the method finish of the superclass
        * SIGEL_Simulation::SIG_Recorder.
        */
-      void finish();
+      void finish() override;
 	       
     private:
 

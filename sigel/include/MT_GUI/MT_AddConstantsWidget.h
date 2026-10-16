@@ -25,7 +25,7 @@ private:
 
 public slots:
 	void slotClicked(int id);
-	void accept();
+	void accept() override;
 };
 
 #endif

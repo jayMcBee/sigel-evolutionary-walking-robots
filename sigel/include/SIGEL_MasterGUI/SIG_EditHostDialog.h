@@ -45,7 +45,7 @@ public:
      * This slot is used to popup a file dialog whenever a user clicks
      * on the ToolButton associated with the slave directory lineedit.
      */
-    void slotToolbuttonSlaveDirectoryClicked();
+    void slotToolbuttonSlaveDirectoryClicked() override;
 };
 
 }

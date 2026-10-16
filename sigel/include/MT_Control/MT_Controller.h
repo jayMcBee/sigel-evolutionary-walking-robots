@@ -34,7 +34,7 @@ class MT_Controller : public QObject
 
 public:
 	MT_Controller(SIGEL_GP::SIG_GPExperiment &exp);
-	~MT_Controller();
+	~MT_Controller() override;
 
 public:
 	bool startWOSigel;

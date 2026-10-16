@@ -40,12 +40,12 @@ namespace SIGEL_GP
       double evalFitness( SIGEL_Program::SIG_Program &program,
                           SIGEL_Robot::SIG_Robot &rob,
                           SIGEL_Environment::SIG_Environment &environment,
-                          SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const;
+                          SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const override;
 
       // Experiment files store this ID for Adaptive Walking.
-      QString serializedId() const { return "ZorcWalkingFitnessFunction"; }
-      QString name() const { return "Adaptive Walking"; }
-      QString description() const { return "Average speed from start to end, weighted by how high the body stays compared with its start height."; }
+      QString serializedId() const override { return "ZorcWalkingFitnessFunction"; }
+      QString name() const override { return "Adaptive Walking"; }
+      QString description() const override { return "Average speed from start to end, weighted by how high the body stays compared with its start height."; }
     };
 
 }

@@ -64,31 +64,31 @@ public:
 
 		/** this slot is called whenever a radiobutton in the general tab has been changed
 			*/
-		virtual void slotFloorSelectionChanged();
+		void slotFloorSelectionChanged() override;
 		
 		/** this slot is called when the user wants to select a picture-file for the
 			* dynamechs floor
 			*/
-		virtual void slotSelectFile();
+		void slotSelectFile() override;
 		
     /**
   		*	This slot will be envoked when the user wants to select texture file
   		*/
-  	virtual void slotSelectTextureFile();
+  	void slotSelectTextureFile() override;
   	
   	/**
   		*	This slot will be envoked when the user moves the alpha slider
   		*/
-  	virtual void slotAlpha();
+  	void slotAlpha() override;
   	
   	/**
   		*	This slot will be envoked when the user check or uncheck the Texture checkbox
   		*/
-		virtual	void slotTextureSelect();
+		void slotTextureSelect() override;
   	/**
   		*	Sets the start position's X and Z to the middle of the floor.
   		*/
-		virtual void slotCenterOnTerrain();
+		void slotCenterOnTerrain() override;
 			
  private:
 

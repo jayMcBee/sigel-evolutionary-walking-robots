@@ -59,7 +59,7 @@ class SIG_ExperimentListView : public QTreeWidget
    *
    * Will be erased if not needed.
    */
-  ~SIG_ExperimentListView();
+  ~SIG_ExperimentListView() override;
 
   /**
    * Returns the experiment object of the experiment called name.

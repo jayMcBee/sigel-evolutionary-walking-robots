@@ -57,11 +57,11 @@ namespace SIGEL_GP
       double   evalFitness( SIGEL_Program::SIG_Program &program,
                             SIGEL_Robot::SIG_Robot &rob,
                             SIGEL_Environment::SIG_Environment &environment,
-                            SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const;
+                            SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const override;
 
-      QString  serializedId() const { return "RemoteZORCFitnessFunction"; }
-      QString  name() const { return "Remote ZORC"; }
-      QString  description() const { return "Runs the program on the real ZORC robot; the user enters the distance it travels, which is divided by the simulated time."; }
+      QString  serializedId() const override { return "RemoteZORCFitnessFunction"; }
+      QString  name() const override { return "Remote ZORC"; }
+      QString  description() const override { return "Runs the program on the real ZORC robot; the user enters the distance it travels, which is divided by the simulated time."; }
 
     /**
       * This method sends all data contained in the QString object over the

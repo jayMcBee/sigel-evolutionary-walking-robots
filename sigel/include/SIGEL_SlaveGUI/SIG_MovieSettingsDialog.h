@@ -40,7 +40,7 @@ public:
     SIG_MovieSettings settings() const;
 
 public slots:
-    void slotToolButtonClicked();
+    void slotToolButtonClicked() override;
 
 protected:
     bool eventFilter( QObject *watched, QEvent *event ) override;

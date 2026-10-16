@@ -17,10 +17,10 @@ private:
 	bool	acceptChange;
 
 protected:
-	void focusOutEvent(QFocusEvent *event);
-	void mousePressEvent(QMouseEvent *event);
-	void hideEvent(QHideEvent *event);
-	void keyPressEvent(QKeyEvent *event);
+	void focusOutEvent(QFocusEvent *event) override;
+	void mousePressEvent(QMouseEvent *event) override;
+	void hideEvent(QHideEvent *event) override;
+	void keyPressEvent(QKeyEvent *event) override;
 
 signals:
 	void newText(const QString &);

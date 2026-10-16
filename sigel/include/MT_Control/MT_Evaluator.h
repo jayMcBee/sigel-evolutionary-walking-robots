@@ -13,15 +13,15 @@ public:
 
 	// administrative method 
 	MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File);
-	virtual ~MT_Evaluator() = default;
-	void loadSetup(QTextStream & File);
-   void writeToFile(QTextStream & File);
-	void writeToFileSetup(QTextStream & File);
+	~MT_Evaluator() override = default;
+	void loadSetup(QTextStream & File) override;
+   void writeToFile(QTextStream & File) override;
+	void writeToFileSetup(QTextStream & File) override;
 
 	// see also SIGEL_GP::SIG_GPFitnessTrainer
-	virtual int spawnTask(SIGEL_GP::SIG_GPIndividual const& ind);
+	int spawnTask(SIGEL_GP::SIG_GPIndividual const& ind) override;
 	// see also SIGEL_GP::SIG_GPFitnessTrainer
-	virtual double checkTask(int task);
+	double checkTask(int task) override;
 	
 private:
 	

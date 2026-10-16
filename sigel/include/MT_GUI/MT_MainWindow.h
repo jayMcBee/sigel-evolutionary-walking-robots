@@ -31,7 +31,7 @@ class MT_MainWindow : public QMainWindow
 
 public:
 	MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, MT_EstimationState *estimationState, QWidget * parent = nullptr, const char * name = nullptr, Qt::WindowFlags f = Qt::Dialog );
-	~MT_MainWindow();
+	~MT_MainWindow() override;
 
 	MT_GPManager* getManager();
 	void enforceUpdate(bool GUI);
@@ -86,6 +86,6 @@ private:
 	void raiseWidget(int pos);
 
 protected:
-	virtual void closeEvent(QCloseEvent *e);
-	virtual void showEvent(QShowEvent *e);
+	void closeEvent(QCloseEvent *e) override;
+	void showEvent(QShowEvent *e) override;
 };

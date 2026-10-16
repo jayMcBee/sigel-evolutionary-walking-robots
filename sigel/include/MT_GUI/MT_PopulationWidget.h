@@ -19,8 +19,8 @@ class MT_PopulationWidget : public MT_PopulationWidgetBase, public MT_WidgetBase
 	Q_OBJECT
 
 public:
-	virtual bool onHide(MT_GPManager *manager, MT_EstimationState *estimationState);
-	virtual void onShow(MT_GPManager *manager, MT_EstimationState *estimationState);
+	bool onHide(MT_GPManager *manager, MT_EstimationState *estimationState) override;
+	void onShow(MT_GPManager *manager, MT_EstimationState *estimationState) override;
 	MT_PopulationWidget(QMainWindow* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 
 private:

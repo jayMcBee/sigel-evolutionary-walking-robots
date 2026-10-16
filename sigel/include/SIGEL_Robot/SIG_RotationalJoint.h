@@ -47,7 +47,7 @@ namespace SIGEL_Robot {
   public:
     SIG_RotationalJoint (SIG_Robot *par, QString n, int nr = -1);
     SIG_RotationalJoint (SIG_Robot *par, QTextStream & tx);
-    virtual JointType getJointType () const;
+    JointType getJointType () const override;
     void setLeftPoints (SIG_Vector base, SIG_Vector dir, SIG_Vector hand);
     void setRightPoints (SIG_Vector base, SIG_Vector dir, SIG_Vector hand);
     void setRange (double mn, double mx, double ii);
@@ -61,15 +61,15 @@ namespace SIGEL_Robot {
     double getMax () const;
     double getIni () const;
 
-    virtual void transformPoints (SIG_Link *side,
-                                  SIG_Vector mov, SIG_Matrix rot);
-    virtual void getGeomRelation
-      (SIG_Vector &t, SIG_Matrix &o, SIG_Link *origin);
-    virtual void getMDH (SIG_Link * & predecessor,
-			 double & a, double & alpha,
-			 double & d, double & theta,
-			 double & screwD, double & screwTheta);
-    virtual void writeToFileTransfer (QTextStream & tx);
+    void transformPoints (SIG_Link *side,
+                          SIG_Vector mov, SIG_Matrix rot) override;
+    void getGeomRelation
+      (SIG_Vector &t, SIG_Matrix &o, SIG_Link *origin) override;
+    void getMDH (SIG_Link * & predecessor,
+		 double & a, double & alpha,
+		 double & d, double & theta,
+		 double & screwD, double & screwTheta) override;
+    void writeToFileTransfer (QTextStream & tx) override;
   };
 
 }

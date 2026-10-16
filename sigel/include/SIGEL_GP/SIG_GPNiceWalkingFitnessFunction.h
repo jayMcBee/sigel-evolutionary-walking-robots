@@ -35,11 +35,11 @@ namespace SIGEL_GP
       double evalFitness( SIGEL_Program::SIG_Program &program,
                           SIGEL_Robot::SIG_Robot &rob,
                           SIGEL_Environment::SIG_Environment &environment,
-                          SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const;
+                          SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const override;
 
-      QString serializedId() const { return "NiceWalkingFitnessFunction"; }
-      QString name() const { return "Nice Walking"; }
-      QString description() const { return "Average speed from start to end; 0 as soon as the body is more than 0.5 above or below its start height."; }
+      QString serializedId() const override { return "NiceWalkingFitnessFunction"; }
+      QString name() const override { return "Nice Walking"; }
+      QString description() const override { return "Average speed from start to end; 0 as soon as the body is more than 0.5 above or below its start height."; }
     };
 
 }

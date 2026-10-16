@@ -53,7 +53,7 @@ namespace SIGEL_Visualisation
       /**
        * The destructor. It frees the scene objects in robotLinks.
        */
-      ~SIG_RenderRecorder();
+      ~SIG_RenderRecorder() override;
       // This class owns raw pointers in a QList and frees them in its
       // destructor, so a copy would free them twice.
       SIG_RenderRecorder( const SIG_RenderRecorder & ) = delete;
@@ -67,7 +67,7 @@ namespace SIGEL_Visualisation
        * First it calls the method init of the superclass
        * SIGEL_Simulation::SIG_Recorder.
        */
-      void init();
+      void init() override;
 
       /**
        * Updates the positions and rotations of the robotLinks
@@ -77,7 +77,7 @@ namespace SIGEL_Visualisation
        * First it calls the method record of the superclass
        * SIGEL_Simulation::SIG_Recorder.
        */
-      void record();
+      void record() override;
 
     private:
 

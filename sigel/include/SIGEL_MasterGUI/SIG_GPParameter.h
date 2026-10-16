@@ -71,7 +71,7 @@ public slots:
        *
        * A file dialog pops up in which the user can select a directory.
        */
-     void slotChangeGraveyardDir();
+     void slotChangeGraveyardDir() override;
 
 /**
  * This slot is called when the user clicks on the tool button to
@@ -79,25 +79,25 @@ public slots:
  *
  * A file dialog pops up in which the user can select a directory.
  */
- void slotChangePoolImageDir();
+ void slotChangePoolImageDir() override;
 
- void slotAddHost();
+ void slotAddHost() override;
 
- void slotEditHost();
+ void slotEditHost() override;
 
- void slotDeleteHost();
+ void slotDeleteHost() override;
 
- void slotEnableAllHosts();
+ void slotEnableAllHosts() override;
 
- void slotDisableAllHosts();
+ void slotDisableAllHosts() override;
 
  void slotItemDoubleClicked( QTreeWidgetItem * );
 
- void slotMutationChanged( int );
+ void slotMutationChanged( int ) override;
 
- void slotCrossoverChanged( int );
+ void slotCrossoverChanged( int ) override;
 
- void slotTourPerGenChanged( int );
+ void slotTourPerGenChanged( int ) override;
 
  protected:
 

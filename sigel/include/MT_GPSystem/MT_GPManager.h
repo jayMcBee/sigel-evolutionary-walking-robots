@@ -35,7 +35,7 @@ public:
 	MT_GPManager(); // not used 
 	MT_GPManager (MT_Substitute * Substitue); // not used
 	
-	virtual ~MT_GPManager();	
+	~MT_GPManager() override;	
 
 	void loadSetup(QTextStream &File);
 	

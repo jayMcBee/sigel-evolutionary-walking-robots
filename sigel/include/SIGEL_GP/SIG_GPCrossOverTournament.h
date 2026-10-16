@@ -85,7 +85,7 @@ class SIG_GPCrossOverTournament : public SIGEL_GP::SIG_GPTournament
 * The boolean for successful launching the function.
 */
  public:
-virtual bool run();
+bool run() override;
 
 /*
 * see above run(); 
@@ -94,7 +94,7 @@ virtual bool run();
 * @pre: there is a Meta Classifier Syste
 */
 public:
-virtual bool run(MT_Classifier *MetaClassifier);
+bool run(MT_Classifier *MetaClassifier) override;
 
 /**
 * equal run(), but the tournament outcome will decide by the MT_Classifer;
@@ -103,7 +103,7 @@ virtual bool run(MT_Classifier *MetaClassifier);
 *   
 */
 public:
-virtual bool classify(MT_Classifier *MetaClassifier);
+bool classify(MT_Classifier *MetaClassifier) override;
 };
 
 }

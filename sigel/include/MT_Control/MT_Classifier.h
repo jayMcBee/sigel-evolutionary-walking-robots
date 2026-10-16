@@ -20,10 +20,10 @@ public:
 
 	// administrative method 
 	MT_Classifier(QTextStream &File);
-	virtual ~MT_Classifier() = default;
-	void writeToFileSetup(QTextStream &File);
-	void writeToFile(QTextStream &File);
-	void loadSetup(QTextStream &File);
+	~MT_Classifier() override = default;
+	void writeToFileSetup(QTextStream &File) override;
+	void writeToFile(QTextStream &File) override;
+	void loadSetup(QTextStream &File) override;
 
 	/* execute the first Tournaments by the MT_Classifier 
 	*/

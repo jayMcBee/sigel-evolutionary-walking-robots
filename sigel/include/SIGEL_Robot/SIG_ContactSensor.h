@@ -46,7 +46,7 @@ namespace SIGEL_Robot {
     SIG_ContactSensor (SIG_Robot *par, QString n, int nr = -1);
     SIG_ContactSensor (SIG_Robot *par, QTextStream & tx);
 
-    virtual SensorType getSensorType () const;
+    SensorType getSensorType () const override;
 
 	/**
 	* Set link associated with this sensor.
@@ -58,7 +58,7 @@ namespace SIGEL_Robot {
 	*/
 	SIG_Link const *getLink () const;
 
-    virtual void writeToFileTransfer (QTextStream & tx);
+    void writeToFileTransfer (QTextStream & tx) override;
   };
 
 }

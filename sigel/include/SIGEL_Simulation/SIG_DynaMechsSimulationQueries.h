@@ -66,12 +66,12 @@ namespace SIGEL_Simulation
   SIG_DynaMechsSimulationQueries(SIG_DynaMechsSimulationData& theSimulationData);
 
   /** Interprets the SENSE command and writes the results into the registers */
-  void sense(int sensorNo,QList<SIG_Register> & registers) const;
+  void sense(int sensorNo,QList<SIG_Register> & registers) const override;
 
   /** The current simulated time, frame*stepsize, cut to whole seconds. */
-  QTime getCurrentSimulationWholeSeconds() const;
+  QTime getCurrentSimulationWholeSeconds() const override;
 
-  double getCurrentSimulationSeconds() const;
+  double getCurrentSimulationSeconds() const override;
 
   /** gets the position of link linkNo
    * @pre
@@ -84,7 +84,7 @@ namespace SIGEL_Simulation
    * @return
    *  the position of the center of mass of link linkNo
    */
-  SIG_Vector getLinkPosition(int linkNo) const;
+  SIG_Vector getLinkPosition(int linkNo) const override;
 
   /** gets the orientation of link linkNo
    * @pre
@@ -97,7 +97,7 @@ namespace SIGEL_Simulation
    * @return
    *  the orientation of the link relativ to the original orientation
    */
-  SIG_Matrix getLinkOrientation(int linkNo) const;
+  SIG_Matrix getLinkOrientation(int linkNo) const override;
 
   /** gets the number of the torso link
    * @pre
@@ -107,7 +107,7 @@ namespace SIGEL_Simulation
    * @return
    *  the number of the torso link
    */
-  int getRootNumber() const;
+  int getRootNumber() const override;
 
   /** gets the forces of each link enacted this timeframe
    * @pre
@@ -121,7 +121,7 @@ namespace SIGEL_Simulation
    *  The double* is the pointer to this array.
    *  for each link the array is stored in the vector. For example: to query the force for link3, you have to write vector[2].
    */
-  std::vector<double*>* getUsedForces() const;
+  std::vector<double*>* getUsedForces() const override;
 
   /** gets the number of links
    * @pre
@@ -131,9 +131,9 @@ namespace SIGEL_Simulation
    * @return
    *  the number of links
    */
-  int getLinkCount() const;
+  int getLinkCount() const override;
 
-  void checkDynas() const;
+  void checkDynas() const override;
 };
 
 }

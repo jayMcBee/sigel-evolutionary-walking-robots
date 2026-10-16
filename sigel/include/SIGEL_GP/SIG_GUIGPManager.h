@@ -40,11 +40,11 @@ namespace SIGEL_GP
 
       SIGEL_MasterGUI::SIG_GUIGPExperiment &guiExperiment;
 
-      void processInterfaceEvents();
+      void processInterfaceEvents() override;
 
-      void messageEvolutionStop();
+      void messageEvolutionStop() override;
 
-      void updateIndividualView( int poolPos );
+      void updateIndividualView( int poolPos ) override;
     };
 
 }

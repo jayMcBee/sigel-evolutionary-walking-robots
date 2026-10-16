@@ -40,94 +40,94 @@ namespace SIGEL_RobotIO {
                                           SIG_Robot *tg,
                                           QString homepath);
 
-                virtual SIG_Material *materialFind (QString name);
-                virtual void materialDensity (SIG_Material *material,
-                                              double density);
-                virtual void materialFriction (SIG_Material *material,
-                                               QString otherSide,
-                                               double frictionconst);
-                virtual void materialElasticity (SIG_Material *material,
-                                                 double elasconst);
-                virtual void materialColour (SIG_Material *material,
-                                             double red,
-                                             double green,
-                                             double blue);
-                virtual void materialFinish (SIG_Material *material);
+                SIG_Material *materialFind (QString name) override;
+                void materialDensity (SIG_Material *material,
+                                      double density) override;
+                void materialFriction (SIG_Material *material,
+                                       QString otherSide,
+                                       double frictionconst) override;
+                void materialElasticity (SIG_Material *material,
+                                         double elasconst) override;
+                void materialColour (SIG_Material *material,
+                                     double red,
+                                     double green,
+                                     double blue) override;
+                void materialFinish (SIG_Material *material) override;
 
-                virtual SIG_Link *linkFind (QString name);
-                virtual void linkIsTorso (SIG_Link *link);
-                virtual void linkGeometryFile (SIG_Link *link,
-                                               QString geometryfile);
-                virtual void linkMaterial (SIG_Link *link,
-                                           QString material);
-                virtual void linkPoint (SIG_Link *link,
-                                        QString pointname,
-                                        double x,
-                                        double y,
-                                        double z);
-                virtual void linkNoCollide (SIG_Link *link,
-                                            QString nocollide);
-                virtual void linkFinish (SIG_Link *link);
+                SIG_Link *linkFind (QString name) override;
+                void linkIsTorso (SIG_Link *link) override;
+                void linkGeometryFile (SIG_Link *link,
+                                       QString geometryfile) override;
+                void linkMaterial (SIG_Link *link,
+                                   QString material) override;
+                void linkPoint (SIG_Link *link,
+                                QString pointname,
+                                double x,
+                                double y,
+                                double z) override;
+                void linkNoCollide (SIG_Link *link,
+                                    QString nocollide) override;
+                void linkFinish (SIG_Link *link) override;
 
-                virtual SIG_RotationalJoint *rjointFind (QString name);
-                virtual void rjointLinking (SIG_RotationalJoint *rj,
-                                            QString Alink, QString AB, QString AD, QString AH,
-                                            QString Blink, QString BB, QString BD, QString BH);
-                virtual void rjointExtents (SIG_RotationalJoint *rj,
-                                            double mn, double mx, double ii);
-                virtual void rjointFinish (SIG_RotationalJoint *rj);
+                SIG_RotationalJoint *rjointFind (QString name) override;
+                void rjointLinking (SIG_RotationalJoint *rj,
+                                    QString Alink, QString AB, QString AD, QString AH,
+                                    QString Blink, QString BB, QString BD, QString BH) override;
+                void rjointExtents (SIG_RotationalJoint *rj,
+                                    double mn, double mx, double ii) override;
+                void rjointFinish (SIG_RotationalJoint *rj) override;
 
-                virtual SIG_TranslationalJoint *tjointFind (QString name);
-                virtual void tjointLinking (SIG_TranslationalJoint *tj,
-                                            QString Alink, QString AB, QString AD, QString AF,
-                                            QString Blink, QString BB, QString BD, QString BF);
-                virtual void tjointExtents (SIG_TranslationalJoint *tj,
-                                            double mn, double mx, double ii);
-                virtual void tjointFinish (SIG_TranslationalJoint *tj);
+                SIG_TranslationalJoint *tjointFind (QString name) override;
+                void tjointLinking (SIG_TranslationalJoint *tj,
+                                    QString Alink, QString AB, QString AD, QString AF,
+                                    QString Blink, QString BB, QString BD, QString BF) override;
+                void tjointExtents (SIG_TranslationalJoint *tj,
+                                    double mn, double mx, double ii) override;
+                void tjointFinish (SIG_TranslationalJoint *tj) override;
 
-                virtual SIG_CylindricalJoint *cjointFind (QString name);
-                virtual void cjointLinking (SIG_CylindricalJoint *cj,
-                                            QString Alink, QString AB, QString AD, QString AH,
-                                            QString Blink, QString BB, QString BD, QString BH);
-                virtual void cjointRotExtents (SIG_CylindricalJoint *cj,
-                                               double mn, double mx, double ii);
-                virtual void cjointTraExtents (SIG_CylindricalJoint *cj,
-                                               double mn, double mx, double ii);
-                virtual void cjointFinish (SIG_CylindricalJoint *cj);
+                SIG_CylindricalJoint *cjointFind (QString name) override;
+                void cjointLinking (SIG_CylindricalJoint *cj,
+                                    QString Alink, QString AB, QString AD, QString AH,
+                                    QString Blink, QString BB, QString BD, QString BH) override;
+                void cjointRotExtents (SIG_CylindricalJoint *cj,
+                                       double mn, double mx, double ii) override;
+                void cjointTraExtents (SIG_CylindricalJoint *cj,
+                                       double mn, double mx, double ii) override;
+                void cjointFinish (SIG_CylindricalJoint *cj) override;
 
-                virtual SIG_GlueJoint *glueFind (QString name);
-                virtual void glueLinking (SIG_GlueJoint *glue,
-                                          QString Alink, QString AA, QString AB, QString AC,
-                                          QString Blink, QString BP, QString BQ, QString BR);
-                virtual void glueFinish (SIG_GlueJoint *glue);
+                SIG_GlueJoint *glueFind (QString name) override;
+                void glueLinking (SIG_GlueJoint *glue,
+                                  QString Alink, QString AA, QString AB, QString AC,
+                                  QString Blink, QString BP, QString BQ, QString BR) override;
+                void glueFinish (SIG_GlueJoint *glue) override;
 
-                virtual SIG_Drive *driveFind (QString name);
-                virtual void driveMode (SIG_Drive *d, QString mode);
-                virtual void driveJoint (SIG_Drive *d, QString jointname);
-                virtual void driveMinMaxForce (SIG_Drive *d, double minf, double maxf);
-                virtual void driveFinish (SIG_Drive *d);
+                SIG_Drive *driveFind (QString name) override;
+                void driveMode (SIG_Drive *d, QString mode) override;
+                void driveJoint (SIG_Drive *d, QString jointname) override;
+                void driveMinMaxForce (SIG_Drive *d, double minf, double maxf) override;
+                void driveFinish (SIG_Drive *d) override;
 
-                virtual SIG_JointSensor *jointSensorFind (QString name);
-                virtual void jointSensorJoint (SIG_JointSensor *js, QString jointname);
-                virtual void jointSensorFinish (SIG_JointSensor *js);
+                SIG_JointSensor *jointSensorFind (QString name) override;
+                void jointSensorJoint (SIG_JointSensor *js, QString jointname) override;
+                void jointSensorFinish (SIG_JointSensor *js) override;
 
-                virtual SIG_PitchRollSensor *pitchRollSensorFind (QString name);
-                virtual void pitchRollSensorLink (SIG_PitchRollSensor *prs, QString linkname);
-                virtual void pitchRollSensorFinish (SIG_PitchRollSensor *prs);
+                SIG_PitchRollSensor *pitchRollSensorFind (QString name) override;
+                void pitchRollSensorLink (SIG_PitchRollSensor *prs, QString linkname) override;
+                void pitchRollSensorFinish (SIG_PitchRollSensor *prs) override;
 
-				virtual SIG_ContactSensor *contactSensorFind (QString name);
-				virtual void contactSensorLink(SIG_ContactSensor *cs, QString linkname);
-		        virtual void contactSensorFinish (SIG_ContactSensor *cs);
+				SIG_ContactSensor *contactSensorFind (QString name) override;
+				void contactSensorLink(SIG_ContactSensor *cs, QString linkname) override;
+		        void contactSensorFinish (SIG_ContactSensor *cs) override;
 
-                virtual SIG_Geometry *surfaceFind (QString name);
-                virtual SIG_Polygon *surfaceNewPoly (SIG_Geometry *g);
-                virtual void surfaceNewPoint (SIG_Polygon *p,
-                                              double x,
-                                              double y,
-                                              double z);
-                virtual void surfaceFinish (SIG_Geometry *g, QString name);
+                SIG_Geometry *surfaceFind (QString name) override;
+                SIG_Polygon *surfaceNewPoly (SIG_Geometry *g) override;
+                void surfaceNewPoint (SIG_Polygon *p,
+                                      double x,
+                                      double y,
+                                      double z) override;
+                void surfaceFinish (SIG_Geometry *g, QString name) override;
 
-                virtual void modifierScaleall (double scalingFactor);
+                void modifierScaleall (double scalingFactor) override;
         };
 
 }

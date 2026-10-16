@@ -74,7 +74,7 @@ namespace SIGEL_Simulation
    *  Other types of drives currently don't work with DynaMechs.
    */
   void moveDrive(int driveNo,
-		 QList<SIG_Register> const& registers);
+		 QList<SIG_Register> const& registers) override;
 };
 
 }

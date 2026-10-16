@@ -42,13 +42,13 @@ namespace SIGEL_GP
 
       /** This recorder owns its positions and rotations. */
 
-      ~SIG_GPFullDataRecorder();
+      ~SIG_GPFullDataRecorder() override;
 
-      void init();
+      void init() override;
 
-      void record();
+      void record() override;
 
-      void finish();
+      void finish() override;
 
       QList< SIG_Vector * > positions;
       QList< SIG_Matrix * > rotations;

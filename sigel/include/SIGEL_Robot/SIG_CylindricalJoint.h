@@ -50,7 +50,7 @@ namespace SIGEL_Robot
   public:
     SIG_CylindricalJoint (SIG_Robot *par, QString n, int nr = -1);
     SIG_CylindricalJoint (SIG_Robot *par, QTextStream & tx);
-    virtual JointType getJointType () const;
+    JointType getJointType () const override;
 
     void setLeftPoints (SIG_Vector base, SIG_Vector dir, SIG_Vector hand);
     void setRightPoints (SIG_Vector base, SIG_Vector dir, SIG_Vector hand);
@@ -70,11 +70,11 @@ namespace SIGEL_Robot
     double getMaxTrans () const;
     double getIniTrans () const;
 
-    virtual void transformPoints (SIG_Link *side,
-                                  SIG_Vector mov, SIG_Matrix rot);
-    virtual void getGeomRelation
-      (SIG_Vector &t, SIG_Matrix &o, SIG_Link *origin);
-    virtual void writeToFileTransfer (QTextStream & tx);
+    void transformPoints (SIG_Link *side,
+                          SIG_Vector mov, SIG_Matrix rot) override;
+    void getGeomRelation
+      (SIG_Vector &t, SIG_Matrix &o, SIG_Link *origin) override;
+    void writeToFileTransfer (QTextStream & tx) override;
   };
 
 }

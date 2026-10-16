@@ -75,7 +75,7 @@ namespace SIGEL_MasterGUI
        *
        * Will be erased if not needed.
        */
-      ~SIG_GUIGPExperiment();
+      ~SIG_GUIGPExperiment() override;
   
       /**
        * This function return the name of the experiment.

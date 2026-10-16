@@ -52,7 +52,7 @@ namespace SIGEL_Visualisation
      *
      * @pre The display lists are builded.
      */
-    void render();
+    void render() override;
 
     /**
      * Calls the display lists of the robot's links only.
@@ -70,9 +70,9 @@ namespace SIGEL_Visualisation
      */
     void renderPoints();
 
-    QString exportToPovray();
+    QString exportToPovray() override;
 
-    QString createPovrayDeclarations();
+    QString createPovrayDeclarations() override;
 
     void setPointsVisible( bool visible );
 
@@ -83,7 +83,7 @@ namespace SIGEL_Visualisation
      * its properties like geometry of objects to
      * build display lists.
      */
-    void buildDisplayLists();    
+    void buildDisplayLists() override;    
 
     /**
      * The SIG_Robot object that should be rendered

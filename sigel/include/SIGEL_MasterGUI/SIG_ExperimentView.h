@@ -61,19 +61,19 @@ public:
 
   public slots:
 
-      void slotShowFitnesscurve();
+      void slotShowFitnesscurve() override;
 
-      void slotExportPostScript();
+      void slotExportPostScript() override;
 
       /**
       	*	This slot will be envoked when the user clicks on the history checkbox.
       	*/
-      void slotHistory(bool selected);
+      void slotHistory(bool selected) override;
 
       /**
       	*	This slot will be envoked when the user moves the autosave slider.
       	*/
-      void slotAutosaveChanged(int value);
+      void slotAutosaveChanged(int value) override;
 
  private:
     

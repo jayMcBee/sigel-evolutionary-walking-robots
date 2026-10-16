@@ -70,9 +70,9 @@ namespace SIGEL_Simulation
        * Frees the links in dynaMechsLinks, which this class owns, and takes
        * dynaMechsEnvironment out of DynaMechs.
        */
-      ~SIG_DynaMechsSimulationData();
+      ~SIG_DynaMechsSimulationData() override;
 
-      void simulationProgress();
+      void simulationProgress() override;
 
       /**
        * Loads terrain into target.

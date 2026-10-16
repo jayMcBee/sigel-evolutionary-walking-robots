@@ -83,7 +83,7 @@ namespace SIGEL_Visualisation
 		 *
 		 * Cleans up the OpenGL stuff and deletes the simulation and the renderRecorder.
 		 */
-		~SIG_SimulationVisualisation();
+		~SIG_SimulationVisualisation() override;
 
 		void setPointsVisible( bool visible );
 
@@ -114,7 +114,7 @@ namespace SIGEL_Visualisation
 		 * current state of the simulation and the
 		 * attribute viewSettings.
 		 */
-		void visualize();
+		void visualize() override;
 
 		/**
 		 * This method lets the simulation progress

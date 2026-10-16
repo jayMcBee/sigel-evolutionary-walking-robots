@@ -45,10 +45,10 @@ namespace SIGEL_Robot {
     SIG_JointSensor (SIG_Robot *par, QString n, int nr = -1);
     SIG_JointSensor (SIG_Robot *par, QTextStream & tx);
 
-    virtual SensorType getSensorType () const;
+    SensorType getSensorType () const override;
     void setJoint (SIG_Joint *j);
     SIG_Joint const *getJoint () const;
-    virtual void writeToFileTransfer (QTextStream & tx);
+    void writeToFileTransfer (QTextStream & tx) override;
   };
 
 }

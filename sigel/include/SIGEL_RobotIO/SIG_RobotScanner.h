@@ -49,7 +49,7 @@ namespace SIGEL_RobotIO {
         class SIG_RobotScanner : public SIG_Scanner {
         public:
                 SIG_RobotScanner (QString sourceText);
-                virtual void nextSymbol ();
+                void nextSymbol () override;
         };
 
 }

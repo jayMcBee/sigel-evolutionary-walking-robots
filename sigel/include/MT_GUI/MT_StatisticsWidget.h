@@ -19,8 +19,8 @@ class MT_StatisticsWidget : public MT_StatisticsWidgetBase, public MT_WidgetBase
 public:
 	MT_StatisticsWidget(QMainWindow* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 
-	void onShow(MT_GPManager *manager, MT_EstimationState *estimationState);
-	bool onHide(MT_GPManager *manager, MT_EstimationState *estimationState);
+	void onShow(MT_GPManager *manager, MT_EstimationState *estimationState) override;
+	bool onHide(MT_GPManager *manager, MT_EstimationState *estimationState) override;
 	void evolutionRunning(bool running);
 
 private:

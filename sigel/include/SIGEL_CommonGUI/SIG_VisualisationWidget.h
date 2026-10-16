@@ -70,7 +70,7 @@ using namespace SIGEL_CommonGUI;
       /**
        * The destructor of the SIG_VisualisationWidget.
        */
-      ~SIG_VisualisationWidget();
+      ~SIG_VisualisationWidget() override;
 
     public slots:
 
@@ -153,7 +153,7 @@ using namespace SIGEL_CommonGUI;
        * there's not much to do here. At the moment just the
        * glClearColor is set to white.
        */
-      virtual void initializeGL();
+      void initializeGL() override;
 
       /**
        * Resizes the contents of this widget.
@@ -167,7 +167,7 @@ using namespace SIGEL_CommonGUI;
        * @parameter width The widget's new width in pixels.
        * @parameter height The widget's new height in pixels.
        */
-      virtual void resizeGL(int width, int height);
+      void resizeGL(int width, int height) override;
 
       /**
        * Refreshes the contents of this widget by initiating
@@ -180,7 +180,7 @@ using namespace SIGEL_CommonGUI;
        * being true). This is only done indirectly by calling
        * the method update.
        */
-      virtual void paintGL();
+      void paintGL() override;
 
       /**
        * Calculates the actual eyepoint from the attributes
@@ -199,7 +199,7 @@ using namespace SIGEL_CommonGUI;
        * When the user presses a mousebutton the actual
        * mouse position is stored in mouseXPos and mouseYPos.
        */
-      virtual void mousePressEvent( QMouseEvent *event );
+      void mousePressEvent( QMouseEvent *event ) override;
 
       /**
        * This method is inherited from the QWidget.
@@ -207,7 +207,7 @@ using namespace SIGEL_CommonGUI;
        * When the user moves the mouse,
        * this method emits the appropriate signals.
        */
-      virtual void mouseMoveEvent( QMouseEvent *event );
+      void mouseMoveEvent( QMouseEvent *event ) override;
 
       /**
        * The pointer to the SIG_Visualisation object that is

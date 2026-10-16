@@ -64,11 +64,11 @@ public:
 
     public slots:
 
-    void slotPushButtonEditClicked();
+    void slotPushButtonEditClicked() override;
 
-    void slotPushButtonAllowAllClicked();
+    void slotPushButtonAllowAllClicked() override;
 
-    void slotPushButtonDisallowAllClicked();
+    void slotPushButtonDisallowAllClicked() override;
 
     void slotCommandDoubleClicked( QTreeWidgetItem *theItem );
 

@@ -35,11 +35,11 @@ namespace SIGEL_GP
       double evalFitness( SIGEL_Program::SIG_Program &program,
                           SIGEL_Robot::SIG_Robot &rob,
                           SIGEL_Environment::SIG_Environment &environment,
-                          SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const;
+                          SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const override;
 
-      QString serializedId() const { return "RealSpeedFitnessFunction"; }
-      QString name() const { return "Real Speed"; }
-      QString description() const { return "Average speed along the path the robot actually travels, rather than the straight line from start to end."; }
+      QString serializedId() const override { return "RealSpeedFitnessFunction"; }
+      QString name() const override { return "Real Speed"; }
+      QString description() const override { return "Average speed along the path the robot actually travels, rather than the straight line from start to end."; }
     };
 
 }
