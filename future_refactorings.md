@@ -352,17 +352,6 @@ problem; the choice is made before any code is written.
   normalised positions, or methods in `SIG_GPFitnessFunction`. The fitness
   values must stay identical.
 
-- [ ] **155. The master refuses a `sigel_slave` built from other source.**
-  Nothing checks that the master and a slave are the same SIGEL. A slave of
-  another state can read a job differently or simulate differently, and the
-  master gets a wrong fitness with no sign of it. This holds for a dynamic
-  client and for a host from the experiment file. Decided: no version
-  number kept by hand; the build computes a hash over the source and
-  compiles it into `sigel` and `sigel_slave`, and the two compare it when
-  the slave starts. To design: what the hash covers (SIGEL's source, the
-  vendored libraries, their patches), how the `Makefile` keeps it current,
-  and what the master does with a slave that does not match.
-
 - [ ] **169. The master sends the floor picture to the slave.**
   The job carries only the path of the floor picture, and each slave opens
   that path on its own host. `SIG_Environment::getTerrain` falls back to a
