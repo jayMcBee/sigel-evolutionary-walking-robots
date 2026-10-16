@@ -414,14 +414,16 @@ problem; the choice is made before any code is written.
 
 - [ ] **83. Put ZORC support behind a compile-time switch, off by default.**
   Decided. ZORC is a real robot driven over a serial line; the simulation does
-  not need it. One global `#define` removes `SIG_GPRemoteZORCFitnessFunction`, its
-  branches in `sigel_slave.cpp`, and its entry in
-  `SIG_GPFitnessFunctionRegistry::fitnessFunctions`, from which the fitness
-  function list in the interface is filled. Not ZORC:
-  `SIG_GPAdaptiveWalkingFitnessFunction`, stored as
-  "ZorcWalkingFitnessFunction"; it stays. To decide: where the switch lives
-  (the `Makefile` or a header), and what an experiment file naming
-  "RemoteZORCFitnessFunction" does when the switch is off.
+  not need it. The ZORC code is two fitness functions:
+  `SIG_GPRemoteZORCFitnessFunction` and `SIG_GPAdaptiveWalkingFitnessFunction`,
+  stored as "ZorcWalkingFitnessFunction". One global `#define` removes both,
+  their entries in `SIG_GPFitnessFunctionRegistry::fitnessFunctions`, from
+  which the fitness function list in the interface is filled, and the
+  remote ZORC branches in `sigel_slave.cpp`. With the switch off, the fitness
+  list in `guibehaviour-baseline.txt` loses "Adaptive Walking" and "Remote
+  ZORC". To decide: where the switch lives (the `Makefile` or a header), and
+  what an experiment file naming "RemoteZORCFitnessFunction" or
+  "ZorcWalkingFitnessFunction" does when the switch is off.
 
 ---
 
