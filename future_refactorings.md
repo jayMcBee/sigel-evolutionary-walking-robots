@@ -367,8 +367,10 @@ problem; the choice is made before any code is written.
   `manage_dyn_slave` looks up the master's name with `gethostbyname`, which
   gives IPv4 addresses only. Where the name resolves only to IPv6,
   `sigelDynClient <master name>` stops with "invalid host", and only the
-  master's IPv4 address works. Look up the name with `getaddrinfo` and try
-  each address it gives.
+  master's IPv4 address works. The master's registration socket in
+  `SIG_GPPVMDynamicClientServer` also takes IPv4 only. Both sides need IPv6:
+  the master listens on both address families, and the client looks up the
+  name with `getaddrinfo` and tries each address it gives.
 
 - [ ] **165. Mutation adds a line also if there is no maximum length.**
   With "Ignore maximum length" the maximum is 0. `SIG_GPOperations::mutation`
