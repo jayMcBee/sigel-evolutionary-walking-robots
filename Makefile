@@ -270,7 +270,18 @@ SIGSAN := -fsanitize=address,undefined -fno-omit-frame-pointer
 else
 SIGSAN :=
 endif
-SIGINC := -Ishim -I$(SRC)/include -I$(B)/ui -isystem $(QTINC) \
+# The source hash: an MD5 over SIGEL's own code, compiled into sigel and
+# sigel_slave through SIG_GPPVMData::sourceHash. The master refuses a fitness
+# from a slave with another hash. It is computed each time make reads this
+# file, and the header is written only when the hash changes, so an unchanged
+# tree stays up to date for `make -q'.
+SOURCE_HASH := $(shell find $(SRC)/src $(SRC)/include -type f -print0 | LC_ALL=C sort -z \
+                 | xargs -0 md5sum | md5sum | cut -c1-32)
+SOURCE_HASH_HDR := $(B)/gen/SIG_SourceHash.h
+$(shell mkdir -p $(B)/gen; grep -qs '"$(SOURCE_HASH)"' $(SOURCE_HASH_HDR) \
+  || echo '#define SIG_SOURCE_HASH "$(SOURCE_HASH)"' > $(SOURCE_HASH_HDR))
+
+SIGINC := -Ishim -I$(SRC)/include -I$(B)/ui -I$(B)/gen -isystem $(QTINC) \
           $(addprefix -isystem $(QTINC)/,QtCore QtGui QtWidgets \
                                         QtOpenGL QtOpenGLWidgets) \
           $(addprefix -isystem $(SL)/,newmat09 dynamechs/dm \

@@ -54,8 +54,11 @@ extern "C"
   int masterTaskId = 0;
 
   void sendFitnessToMaster( double fitnessValue ) {
+    QByteArray hash = SIGEL_GP::SIG_GPPVMData::sourceHash();
+
     pvm_initsend( PvmDataDefault );
     pvm_pkdouble( &fitnessValue, 1, 1 );
+    pvm_pkbyte( hash.data(), hash.size(), 1 );
     pvm_send( masterTaskId, 5 );
   }
 

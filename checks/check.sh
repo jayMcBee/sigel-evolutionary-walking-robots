@@ -52,7 +52,7 @@ FORMS_FAILED=
 FORMSB=${TMPDIR:-/tmp}/forms.$$
 rm -rf "$FORMSB"
 if make -s -C "$ROOT" B="$FORMSB" forms >/tmp/mkforms.$$ 2>&1; then
-    INCS="$INCS -I$FORMSB/ui"
+    INCS="$INCS -I$FORMSB/ui -I$FORMSB/gen"
 else
     FORMS_FAILED=1
     echo "  make forms FAILED -- every GUI module check below is unreliable:"

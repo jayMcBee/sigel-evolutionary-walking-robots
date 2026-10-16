@@ -51,6 +51,9 @@ namespace SIGEL_GP
    /** Waits for message messageId from the PVM task taskId and returns its string. */
     QString getQStringFromPVM(int taskId, int messageId);
 
+   /** The MD5 over SIGEL's source that this program was built from. A slave sends it with its fitness. */
+    static QByteArray sourceHash();
+
    /** Reads the lines up to the next "#####" line, which ends a block of the message. */
     QString cutAfterFiveHashes(QTextStream& source);
 

@@ -137,6 +137,9 @@ namespace SIGEL_GP
 		bool pvmLost;
 
 	private:
+		/** Reads the slave's source hash from the received result and compares it with this program's. A mismatch prints an error line. */
+		bool slaveBuiltFromSameSource(SIG_GPPVMTask const &pvmTask, QString const &indName) const;
+
 		/**
 		 * A refernce to the actual experiment datas.
 		 */

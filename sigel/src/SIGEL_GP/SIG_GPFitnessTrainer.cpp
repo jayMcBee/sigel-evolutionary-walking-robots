@@ -262,6 +262,16 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 	  	pvm_recv(pvmTask->pvmTaskId, 5);
 	  	pvm_upkdouble(&result,1,1);
 
+	  	if (!slaveBuiltFromSameSource( *pvmTask, indName ))
+	  	{
+	  		pvmTask->host.noOfSlaves--;
+	  		toSpawnList.append( SIG_GPTaskToSpawn{ taskId, pvmTask->indPosition } );
+
+	  		delete pvmTasks[ taskId ];
+	  		pvmTasks[ taskId ] = nullptr;
+	  		return -1;
+	  	}
+
 	  	// No fitness is negative. A slave's -1 would also read as this
 	  	// method's "no result yet" and leave the caller polling a task
 	  	// deleted below.
@@ -330,6 +340,24 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 #endif
 
   return result;
+}
+
+bool SIGEL_GP::SIG_GPFitnessTrainer::slaveBuiltFromSameSource(SIG_GPPVMTask const &pvmTask, QString const &indName) const
+{
+  // A slave built from other source may compute another fitness. A slave
+  // built before the hash existed sends none.
+  const QByteArray ownHash = SIG_GPPVMData::sourceHash();
+  QByteArray slaveHash( ownHash.size(), '\0' );
+  if (pvm_upkbyte( slaveHash.data(), slaveHash.size(), 1 ) < 0)
+    slaveHash = "none";
+
+  if (slaveHash == ownHash)
+    return true;
+
+  SIGEL_Tools::SIG_IO::cerr << "Individual \"" << indName << "\": the sigel_slave on host \"" << pvmTask.host.name
+			    << "\" was built from other source. Its source hash is " << slaveHash << ", this sigel's is " << ownHash
+			    << ". Its fitness is refused." << Qt::endl;
+  return false;
 }
 
 void SIGEL_GP::SIG_GPFitnessTrainer::stopTrainersSlaves()

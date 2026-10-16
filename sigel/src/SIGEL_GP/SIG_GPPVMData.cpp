@@ -28,6 +28,7 @@
 #include <pvm3.h>
 
 #include "SIGEL_Tools/SIG_IO.h"
+#include "SIG_SourceHash.h"
 
 SIGEL_GP::SIG_GPPVMData::SIG_GPPVMData(SIGEL_Robot::SIG_Robot& robot,
        SIGEL_Environment::SIG_Environment& environment,
@@ -76,6 +77,11 @@ QString SIGEL_GP::SIG_GPPVMData::getQStringFromPVM(int taskId, int messageId) {
   QString result( buffer.data() );
 
   return result;
+}
+
+QByteArray SIGEL_GP::SIG_GPPVMData::sourceHash()
+{
+  return SIG_SOURCE_HASH;
 }
 
 QString SIGEL_GP::SIG_GPPVMData::cutAfterFiveHashes(QTextStream& source)
