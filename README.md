@@ -14,23 +14,23 @@ The experiment `joventinoQuadruped_bumpy`: a four-legged robot on an uneven floo
 
 The population, with the best individual's program:
 
-![Population](sigel/doc/screenshot-population.png)
+<img src="sigel/doc/screenshot-population.png" width="320" alt="Population">
 
 The genetic programming parameters:
 
-![GP parameters](sigel/doc/screenshot-gp-parameters.png)
+<img src="sigel/doc/screenshot-gp-parameters.png" width="320" alt="GP parameters">
 
 The environment, with the floor as a function of x and z:
 
-![Environment](sigel/doc/screenshot-environment.png)
+<img src="sigel/doc/screenshot-environment.png" width="320" alt="Environment">
 
 The commands of the robot language:
 
-![Language parameters](sigel/doc/screenshot-language-parameters.png)
+<img src="sigel/doc/screenshot-language-parameters.png" width="320" alt="Language parameters">
 
 The best individual in the 3-D view of the simulation:
 
-![3-D view](sigel/doc/screenshot-3d-view.png)
+<img src="sigel/doc/screenshot-3d-view.png" width="275" alt="3-D view">
 
 ## Origin
 
