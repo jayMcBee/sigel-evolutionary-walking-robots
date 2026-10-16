@@ -8024,8 +8024,10 @@ carried; other items and this file cite them, so they do not change.
   `SIG_GPIndividual.cpp`, `MT_GPManager.cpp`, `MT_Randomizer.cpp`,
   `SIG_RobotScanner.cpp`, `SIG_SimulationQueries.h` and
   `SIG_DynaMechsSimulationQueries.h`; three lines in `MT_Randomizer` write
-  `std::cerr` and `std::endl`. SIGEL's own code includes nothing from `shim/`
-  any more; the vendored libraries still do, so `shim/` stays. The two
+  `std::cerr` and `std::endl`. The search covered only the `<...>` form, so
+  `#include "iostream.h"` in `SIG_Program.cpp` and `SIG_ProgramLine.cpp` stayed
+  until 2026-10-16. Since then SIGEL's own code includes nothing from `shim/`;
+  the vendored libraries still do, so `shim/` stays. The two
   headers still get `using namespace std` through Dynamo's headers.
 
 - [x] **3. Loop-variable scope leaks in `MT_GPSystem`** — done 2026-08-19 by
