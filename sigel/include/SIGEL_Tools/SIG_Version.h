@@ -8,7 +8,7 @@ namespace SIGEL_Tools
   class SIG_Version
   {
   public:
-    static constexpr const char *number = "1.4";
+    static constexpr const char *number = "1.5";
   };
 
 }

@@ -257,7 +257,7 @@
 == SCENARIO gate ==
 
 == STEP 1: fresh start, no experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
@@ -265,7 +265,7 @@
   [filedialog] title=[Open Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
@@ -335,7 +335,7 @@
     TB:viewToolBar/&Simulation Parameters                      ENABLED
 
 == STEP 3: after View > Population ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
@@ -481,7 +481,7 @@ we do with the system?]
 == SCENARIO pages ==
 
 == STEP 1: fresh start, no experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
@@ -489,7 +489,7 @@ we do with the system?]
   [filedialog] title=[Open Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
@@ -559,7 +559,7 @@ we do with the system?]
     TB:viewToolBar/&Simulation Parameters                      ENABLED
 
 == STEP 3: after View > Population ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
@@ -901,7 +901,7 @@ we do with the system?]
 == SCENARIO exportall ==
 
 == STEP 1: fresh start, no experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
@@ -909,7 +909,7 @@ we do with the system?]
   [filedialog] title=[Open Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
@@ -979,7 +979,7 @@ we do with the system?]
     TB:viewToolBar/&Simulation Parameters                      ENABLED
 
 == STEP 3: after View > Population ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
@@ -1109,7 +1109,7 @@ selected=17013
 == SCENARIO overwrite ==
 
 == STEP 1: fresh start, no experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
@@ -1117,7 +1117,7 @@ selected=17013
   [filedialog] title=[Open Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
@@ -1187,7 +1187,7 @@ selected=17013
     TB:viewToolBar/&Simulation Parameters                      ENABLED
 
 == STEP 3: after View > Population ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
@@ -1232,7 +1232,7 @@ Do you want to replace it?]
 == SCENARIO dialogs ==
 
 == STEP 1: fresh start, no experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
@@ -1240,7 +1240,7 @@ Do you want to replace it?]
   [filedialog] title=[Open Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
@@ -1310,7 +1310,7 @@ Do you want to replace it?]
     TB:viewToolBar/&Simulation Parameters                      ENABLED
 
 == STEP 3: after View > Population ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
@@ -1395,7 +1395,7 @@ Do you want to replace it?]
     parent [SIGEL_MasterGUI::SIG_MainWindow] tiedToMainWindow=1
     label pixmap=1 size=256x256
     text lines=25 vScrollPolicy=1
-    | SIGEL v1.4
+    | SIGEL v1.5
     | SIGEL 1.0 (2001) by PG 368:
     | Christian "Krasstexta" Aue
     | Abdeladim "Silent Ad" Benkacem
@@ -1444,7 +1444,7 @@ Do you want to replace it?]
 == SCENARIO metagui ==
 
 == STEP 1: fresh start, no experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
@@ -1452,7 +1452,7 @@ Do you want to replace it?]
   [filedialog] title=[Open Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
@@ -1522,7 +1522,7 @@ Do you want to replace it?]
     TB:viewToolBar/&Simulation Parameters                      ENABLED
 
 == STEP 3: after View > Population ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
@@ -1796,7 +1796,7 @@ Do you want to replace it?]
 == SCENARIO roundtrip ==
 
 == STEP 1: fresh start, no experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
@@ -1804,7 +1804,7 @@ Do you want to replace it?]
   [filedialog] title=[Open Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
@@ -1874,7 +1874,7 @@ Do you want to replace it?]
     TB:viewToolBar/&Simulation Parameters                      ENABLED
 
 == STEP 3: after View > Population ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
@@ -1976,7 +1976,7 @@ Do you want to replace it?]
 == SCENARIO metadrive ==
 
 == STEP 1: fresh start, no experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
@@ -1984,7 +1984,7 @@ Do you want to replace it?]
   [filedialog] title=[Open Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
@@ -2054,7 +2054,7 @@ Do you want to replace it?]
     TB:viewToolBar/&Simulation Parameters                      ENABLED
 
 == STEP 3: after View > Population ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
@@ -2207,7 +2207,7 @@ Do you want to replace it?]
 == SCENARIO runlock ==
 
 == STEP 1: fresh start, no experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
@@ -2215,7 +2215,7 @@ Do you want to replace it?]
   [filedialog] title=[Open Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
@@ -2285,7 +2285,7 @@ Do you want to replace it?]
     TB:viewToolBar/&Simulation Parameters                      ENABLED
 
 == STEP 3: after View > Population ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
@@ -2386,7 +2386,7 @@ Do you want to replace it?]
 == SCENARIO rngseed ==
 
 == STEP 1: fresh start, no experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
@@ -2394,7 +2394,7 @@ Do you want to replace it?]
   [filedialog] title=[Open Experiments] mode=3 nameFilters=[Experiment Files (*.exp) ;; All Files (*)] labelAccept=[&Open]
 
 == STEP 2: after File > Open Experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
@@ -2464,7 +2464,7 @@ Do you want to replace it?]
     TB:viewToolBar/&Simulation Parameters                      ENABLED
 
 == STEP 3: after View > Population ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=0 exp=1 cur=0 selectable=1
         Individuals              sel=1 exp=0 cur=1 selectable=1
@@ -2509,7 +2509,7 @@ Do you want to replace it?]
 == SCENARIO openfocus ==
 
 == STEP 1: fresh start, no experiment ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=0
   [page] count=1 current=QLabel objectName=[baseWidget]
   [action changes] none
@@ -2519,7 +2519,7 @@ Do you want to replace it?]
   [focus] pokedInsideTheWindow=yes currentItemChanged total=1 orphan=0
 
 == STEP 2: after File > Open Experiment with the tree taking focus ==
-  [title] SIGEL 1.4 (built <DATE>)
+  [title] SIGEL 1.5 (built <DATE>)
   [tree] header=[Experiments] topLevel=1
       twoBases.exp             sel=1 exp=1 cur=1 selectable=1
         Individuals              sel=0 exp=0 cur=0 selectable=1
