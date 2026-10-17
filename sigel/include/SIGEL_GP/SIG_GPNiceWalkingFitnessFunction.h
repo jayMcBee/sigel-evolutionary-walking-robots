@@ -39,7 +39,7 @@ namespace SIGEL_GP
 
       QString serializedId() const override { return "NiceWalkingFitnessFunction"; }
       QString name() const override { return "Nice Walking"; }
-      QString description() const override { return "Average speed from start to end; 0 as soon as the body is more than 0.5 above or below its start height."; }
+      QString description() const override { return "Average speed from start to end; 0 once the body leaves a fixed band of ±0.5 units around its start height."; }
     };
 
 }

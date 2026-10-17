@@ -54,7 +54,7 @@ double evalFitness( SIGEL_Program::SIG_Program &program,
 
 QString serializedId() const override { return "ForceFitnessFunction"; }
 QString name() const override { return "Force"; }
-QString description() const override { return "Average speed from start to end, divided by how unevenly the joints share the load; 0 as soon as the body is more than 0.5 above or below its start height."; }
+QString description() const override { return "Average speed from start to end, divided by how unevenly the joints share the load; 0 once the body leaves a fixed band of ±0.5 units around its start height."; }
 };
 
 }
