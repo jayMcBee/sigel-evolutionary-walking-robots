@@ -410,23 +410,6 @@ problem; the choice is made before any code is written.
 
 ---
 
-## 9 · Removals
-
-- [ ] **83. Put ZORC support behind a compile-time switch, off by default.**
-  Decided. ZORC is a real robot driven over a serial line; the simulation does
-  not need it. The ZORC code is two fitness functions:
-  `SIG_GPRemoteZORCFitnessFunction` and `SIG_GPAdaptiveWalkingFitnessFunction`,
-  stored as "ZorcWalkingFitnessFunction". One global `#define` removes both,
-  their entries in `SIG_GPFitnessFunctionRegistry::fitnessFunctions`, from
-  which the fitness function list in the interface is filled, and the
-  remote ZORC branches in `sigel_slave.cpp`. With the switch off, the fitness
-  list in `guibehaviour-baseline.txt` loses "Adaptive Walking" and "Remote
-  ZORC". To decide: where the switch lives (the `Makefile` or a header), and
-  what an experiment file naming "RemoteZORCFitnessFunction" or
-  "ZorcWalkingFitnessFunction" does when the switch is off.
-
----
-
 ## 10 · Experiments and robot models
 
 - [ ] **166. Ship a second set of experiments that fits today's instructions.**
@@ -439,15 +422,15 @@ problem; the choice is made before any code is written.
   less saturated colours. To decide: the name of the second set and where the two sets live.
   Item 160 waits for this item.
 
-- [ ] **171. A convenience binary on the GitHub page.** One x86_64 tarball
-  of `sigelApp/`, offered as a GitHub pre-release, so that a visitor can try
+- [ ] **171. A convenience binary on the GitHub page.** One x86_64 tarball of
+  `sigelApp/`, offered as a GitHub pre-release, so that a visitor can try
   SIGEL without building it. It is a convenience only, not a supported
-  download: no other architectures, no packages for each distribution, no
-  new tools. Others build from source. Item 83 comes first. Steps: check
-  that the vendored libraries may ship in a binary; the
-  x86 machine builds stock SIGEL from GitHub on its Debian 12 and packs
-  `sigelApp/`; the release is created and the file uploaded in the GitHub
-  web interface. To decide: the version name, since the code says 1.4.
+  download: no other architectures, no packages for each distribution, no new
+  tools. Others build from source. Steps: check that the vendored libraries
+  may ship in a binary; the x86 machine builds stock SIGEL from GitHub on its
+  Debian 12 and packs `sigelApp/`; the release is created and the file
+  uploaded in the GitHub web interface. To decide: the version name, since the
+  code says 1.4.
 
 ---
 
