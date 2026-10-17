@@ -221,14 +221,6 @@
       static constexpr double horizontalFollowTime = 0.75;
       static constexpr double verticalFollowTime = 2.5;
 
-      /**
-       * The robot centre at the last look point update, and the robot's velocity smoothed
-       * over the follow time. The look point aims ahead by the follow lag (about velocity x follow time), which
-       * cancels the follow lag while the robot moves steadily, so fast robots stay centred.
-       */
-      SIG_Vector lastRobotCentre;
-      SIG_Vector smoothedVelocity;
-
       QColor planeColor;
 
       QColor gridColor;
@@ -279,6 +271,13 @@
        * The robot centre at the start of the simulation.
        */
       SIG_Vector startRobotCentre;
+
+      /**
+       * The robot centre at the last look point update, and the robot's smoothed velocity.
+       * The look point aims ahead by the follow lag, so a steadily moving robot stays centred.
+       */
+      SIG_Vector lastRobotCentre;
+      SIG_Vector smoothedVelocity;
 
     private slots:
 
