@@ -36,11 +36,14 @@ namespace SIGEL_GP
   std::optional<int> SIG_GPFitnessFunctionRegistry::indexOf( const QString &serializedId )
   {
     const QList<const SIG_GPFitnessFunction *> &functions = fitnessFunctions();
+
     const auto found = std::find_if( functions.begin(), functions.end(),
                                      [&serializedId]( const SIG_GPFitnessFunction *function )
                                      { return function->serializedId() == serializedId; } );
+
     if( found == functions.end() )
       return std::nullopt;
+
     return int( std::distance( functions.begin(), found ) );
   }
 
