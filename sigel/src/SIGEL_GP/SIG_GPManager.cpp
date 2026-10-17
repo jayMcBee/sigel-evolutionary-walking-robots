@@ -49,6 +49,9 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
 	  fitnessCalculated( false ),
 	  runGenerationCounter(0)
 {
+	if (currentExperiment.gpParameter.getTimeOutMinutes() <= 0)
+		SIGEL_Tools::SIG_IO::cerr << "Warning: no slave time-out is set (TIMEOUTMINUTES 0). If a host is lost, the evolution stops until it is back." << Qt::endl;
+
 	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == EVALUATOR_SUBST)
 	{
 		trainer = dynamic_cast<SIG_GPFitnessTrainer*>(currentExperiment.mtController->getFitnessTrainer());
