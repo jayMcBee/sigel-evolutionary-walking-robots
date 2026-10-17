@@ -325,7 +325,7 @@ $(B)/coredrive: checks/programs/coredrive.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CO
 	@want=`$(call ctor_size,$(CLEAN_OBJ))`; got=`$(call ctor_size,$@)`; \
 	 test -n "$$want" && test "$$got" = "$$want" || { \
 	   echo "coredrive linked the WRONG SIG_GPExperiment: constructor is $$got," \
-	        "Clean's is $$want -- see PORTING.md section 9." >&2; exit 1; }
+	        "Clean's is $$want." >&2; exit 1; }
 
 # The unit tests, with Qt Test, linked like coredrive. Each test class has a
 # Q_OBJECT header. main.cpp names the classes by hand, so `make test' stops if
@@ -403,8 +403,7 @@ $(B)/sigel: $(SRC)/src/sigel.cpp $(MOC_OBJS) $(QRC_OBJS) $(GUI_LIBS) $(CORE_LIBS
 	@want=`$(call ctor_size,$(MASTER_OBJ))`; got=`$(call ctor_size,$@)`; \
 	 test -n "$$want" && test "$$got" = "$$want" || { \
 	   echo "sigel linked the WRONG SIG_GPExperiment: constructor is $$got," \
-	        "the master's is $$want. Clean leaves mtController uninitialised" \
-	        "-- see PORTING.md section 9." >&2; exit 1; }
+	        "the master's is $$want. Clean leaves mtController uninitialised." >&2; exit 1; }
 
 $(B)/sigel_slave: $(SRC)/src/sigel_slave.cpp $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(CLEAN_OBJ) \
                   $(GUI_SLAVE_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) $(PVM_LIB)
@@ -413,7 +412,7 @@ $(B)/sigel_slave: $(SRC)/src/sigel_slave.cpp $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(CL
 	@want=`$(call ctor_size,$(CLEAN_OBJ))`; got=`$(call ctor_size,$@)`; \
 	 test -n "$$want" && test "$$got" = "$$want" || { \
 	   echo "sigel_slave linked the WRONG SIG_GPExperiment: constructor is $$got," \
-	        "Clean's is $$want -- see PORTING.md section 9." >&2; exit 1; }
+	        "Clean's is $$want." >&2; exit 1; }
 
 # manage_dyn_slave is C and needs only the C library. -std=gnu17, not c17: the
 # strict modes hide gethostname() and the member h_addr of struct hostent.
@@ -461,6 +460,6 @@ $(B)/guidrive: checks/programs/guidrive.cpp $(MOC_OBJS) $(QRC_OBJS) $(GUI_LIBS) 
 	@want=`$(call ctor_size,$(MASTER_OBJ))`; got=`$(call ctor_size,$@)`; \
 	 test -n "$$want" && test "$$got" = "$$want" || { \
 	   echo "guidrive linked the WRONG SIG_GPExperiment: constructor is $$got," \
-	        "the master's is $$want -- see PORTING.md section 9." >&2; exit 1; }
+	        "the master's is $$want." >&2; exit 1; }
 
 -include $(shell find $(OBJ) -name '*.d' 2>/dev/null)
