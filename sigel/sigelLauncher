@@ -3,6 +3,11 @@
 # Just modify the next line.
 SIGEL_ROOT=$PWD
 
+if [ ! -x "$SIGEL_ROOT/sigel" ]; then
+  echo "sigelLauncher: start it from the SIGEL folder: cd sigelApp && ./sigelLauncher" >&2
+  exit 1
+fi
+
 # Don't change the following lines.
 export SIGEL_ROOT
 PVM_ROOT=$SIGEL_ROOT/supportingLibs/pvm3
