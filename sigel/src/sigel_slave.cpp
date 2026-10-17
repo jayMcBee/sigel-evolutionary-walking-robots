@@ -338,7 +338,7 @@ int runPVMJob( int argc, char *argv[] )
 		return returnValue;
 	}
 
-	// launched to compute !! Just evaluate fitness, no window-stuff.
+	// Not visualising: compute the fitness and send it to the master.
 #ifdef SIG_DEBUG
 	SIGEL_Tools::SIG_IO::cerr << "Slave is used to calculate a fitness!" << Qt::endl;
 #endif
