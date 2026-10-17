@@ -46,6 +46,13 @@ Start SIGEL in the directory "sigelApp" with the script "sigelLauncher":
 On one machine nothing else is needed. Sections 2.1 and 2.2 are for an evolution on
 several hosts.
 
+All SIGELs of one user share one PVM daemon, and each SIGEL stops it when it ends.
+So if you close SIGEL's windows while an evolution without windows runs, that
+evolution stops too. To look at results during such a run, give the windows a
+daemon of their own:
+
+PVM_VMID=view ./sigelLauncher
+
 2.1 Evolving on several hosts
 
 The master is the host on which you start SIGEL. Through PVM it starts the program
