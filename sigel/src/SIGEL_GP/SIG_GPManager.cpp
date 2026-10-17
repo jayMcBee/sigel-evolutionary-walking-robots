@@ -415,7 +415,7 @@ namespace
 
 
 	/* Deletes the tasks left in fitTaskList on every exit from evalNewIndis and
-	 * evalNeededIndis, including the early returns on a stop. */
+	 * evaluateIndividualsForMetaClassifier, including the early returns on a stop. */
 	struct FitTaskListGuard
 	{
 		QList< QList<int> * > *tasks;
@@ -933,7 +933,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 		1) createTours
 		2) MT_Classifier.preEvolution  --->classifies the SIGEL tournament; may shrink tours(!)
 		3) calcInitTourSet()
-		4) evalNeededIndis(): compute fitness only for those SIGEL individuals
+		4) evaluateIndividualsForMetaClassifier(): compute fitness only for those SIGEL individuals
 		which still appear in tours!
 		5) evolutionLoop(MetaClassifier): compute fitness only for those SIGEL individuals
 		which still appear in tours! Use MT_Classifier for tournaments!
@@ -995,7 +995,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 		calcInitTourSet();
 
-		evalNeededIndis();
+		evaluateIndividualsForMetaClassifier();
 
 		evolutionLoop(MetaClassifier);
 
@@ -1106,7 +1106,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 	}
 }
 
-void SIGEL_GP::SIG_GPManager::evalNeededIndis()
+void SIGEL_GP::SIG_GPManager::evaluateIndividualsForMetaClassifier()
 {
 	QList< QList<int> * > fitTaskList;
 	FitTaskListGuard fitTaskListGuard{ &fitTaskList };

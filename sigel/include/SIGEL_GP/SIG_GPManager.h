@@ -206,7 +206,7 @@ namespace SIGEL_GP
 		 * difference: only for this Individual i, which is a participant
 		 * on a tournament in this generation
 		 */
-		void evalNeededIndis();
+		void evaluateIndividualsForMetaClassifier();
 
 		/**
 		 * This functions calculates the order in which the tournaments have to be
