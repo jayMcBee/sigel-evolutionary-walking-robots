@@ -271,7 +271,6 @@ namespace SIGEL_GP
    bool SIG_GPRemoteZORCFitnessFunction::timedSerialWait(int serIF, int timeOutSecs) const
    {  fd_set rfds;
       struct timeval tv;
-      int retval;
 
       // Watch the device file associated with the serial interface
       FD_ZERO(&rfds);
@@ -281,15 +280,8 @@ namespace SIGEL_GP
       tv.tv_sec  = timeOutSecs;
       tv.tv_usec = 0;
 
-      retval = select(serIF+1, &rfds, nullptr, nullptr, &tv);
-
-      // retval tells us if data is available !
-      if (retval)
-      {  return true;
-      }
-      else
-      {  return false;
-      }
+      const int selectResult = select(serIF+1, &rfds, nullptr, nullptr, &tv);
+      return selectResult > 0;
    }
 
 	/**
