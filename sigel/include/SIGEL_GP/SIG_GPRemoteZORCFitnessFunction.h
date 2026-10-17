@@ -38,6 +38,9 @@ namespace SIGEL_GP
 	 * the machine via serial interface.
 	 *
 	 * Normally one wouldn't use this fitness function in ordinary experiments.
+	 *
+	 * Requires the physical ZORC robot prototype, a biped built at the Department
+	 * of Computer Science, University of Dortmund.
 	 */
 	class SIG_GPRemoteZORCFitnessFunction : public SIG_GPFitnessFunction
 	{

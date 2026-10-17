@@ -32,6 +32,9 @@ namespace SIGEL_GP
  * The 'SIG_GPAdaptiveWalkingFitnessFunction' calculates the fitness by averaging
  * the height of the torso joint throughout the evolution and using the average
  * height to weight the raw fitness-value (distance travelled).
+ *
+ * Requires the physical ZORC robot prototype, a biped built at the Department
+ * of Computer Science, University of Dortmund.
  */
   class SIG_GPAdaptiveWalkingFitnessFunction : public SIG_GPFitnessFunction
     {

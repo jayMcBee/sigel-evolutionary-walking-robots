@@ -30,7 +30,9 @@
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 #include "SIGEL_GP/SIG_GPFitnessFunctionRegistry.h"
+#ifdef SIG_INCLUDE_ZORC_SUPPORT
 #include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
+#endif
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
 #include "SIGEL_RobotCheck/SIG_RobotChecker.h"
 #include "SIGEL_Robot/SIG_Joint.h"
@@ -233,11 +235,16 @@ int main(int argc, char *argv[])
   SIGEL_GP::SIG_GPIndividual &individual = experiment.population.getIndividual(index);
   const QString name = experiment.gpParameter.getFitnessName();
 
-  // Remote ZORC needs a serial line and a QApplication, which this program does not have.
   const std::optional<int> fitnessIndex =
       SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf(name);
+  bool cannotEvaluate = !fitnessIndex;
+#ifdef SIG_INCLUDE_ZORC_SUPPORT
+  // Remote ZORC needs a serial line and a QApplication, which this program does not have.
   const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
-  if (!fitnessIndex || name == remoteZORC.serializedId()) {
+  if (name == remoteZORC.serializedId())
+    cannotEvaluate = true;
+#endif
+  if (cannotEvaluate) {
     fprintf(stderr, "%s names %s, which this program cannot evaluate\n",
             argv[1], qPrintable(name));
     return 1;

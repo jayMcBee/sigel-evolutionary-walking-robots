@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#ifdef SIG_INCLUDE_ZORC_SUPPORT
 #include "SIGEL_GP/SIG_GPAdaptiveWalkingFitnessFunction.h"
 
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
@@ -142,3 +143,4 @@ namespace SIGEL_GP
   }
 
 }
+#endif // SIG_INCLUDE_ZORC_SUPPORT

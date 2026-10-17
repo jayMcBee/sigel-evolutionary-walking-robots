@@ -21,8 +21,9 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+#ifdef SIG_INCLUDE_ZORC_SUPPORT
 #include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
-#include <QInputDialog>   // widget used in this file only
+#include <QInputDialog>
 #include "SIGEL_Tools/SIG_DialogParent.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
@@ -306,3 +307,4 @@ namespace SIGEL_GP
 	}
 
 }
+#endif // SIG_INCLUDE_ZORC_SUPPORT
