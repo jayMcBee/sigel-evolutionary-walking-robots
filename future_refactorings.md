@@ -364,6 +364,14 @@ problem; the choice is made before any code is written.
   the master listens on both address families, and the client looks up the
   name with `getaddrinfo` and tries each address it gives.
 
+- [ ] **172. The master is found on a host whose name maps to 127.0.1.1.**
+  Debian and Ubuntu map the host's own name to 127.0.1.1 in `/etc/hosts`.
+  PVM on the master then gives the other hosts 127.0.1.1 as the master's
+  address, and they cannot reach it. Today GETTING_STARTED section 2.2 tells
+  the user to edit `/etc/hosts`, which needs root and changes the system for
+  every program. The x86 machine got around it without root by giving PVM the
+  master's network address in a host file (`PVMHOSTFILE` with `ip=`).
+
 - [ ] **165. Mutation adds a line also if there is no maximum length.**
   With "Ignore maximum length" the maximum is 0. `SIG_GPOperations::mutation`
   compares the new length with that 0, so it never adds a line. Crossover
