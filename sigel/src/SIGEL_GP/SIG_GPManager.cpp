@@ -859,7 +859,7 @@ void SIGEL_GP::SIG_GPManager::run()
 		}
 
 		// if the user wants a poolImage and it the generation where it should generate, then he gets it
-		if ( poolImageGeneration && ((runGenerationCounter % poolImageGeneration) == 0) )
+		if ( poolImageGeneration && ((currentExperiment.population.poolGeneration % poolImageGeneration) == 0) )
 		{
 			QString poolImageName = currentExperiment.getGPParameter().getPoolImageFileName( currentExperiment.experimentName, QDateTime::currentDateTime() );
 
@@ -1056,7 +1056,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 		currentExperiment.experimentHistory.append( newExpHistEntry );
 
-		if ( poolImageGeneration && ((runGenerationCounter % poolImageGeneration) == 0) )
+		if ( poolImageGeneration && ((currentExperiment.population.poolGeneration % poolImageGeneration) == 0) )
 		{
 			QString poolImageName = currentExperiment.getGPParameter().getPoolImageFileName( currentExperiment.experimentName, QDateTime::currentDateTime() );
 
