@@ -19,6 +19,10 @@
 # make B=build-asan ...   the same with AddressSanitizer and
 # UndefinedBehaviorSanitizer, in its own directory. Only the checks use it.
 #
+# make CPPFLAGS=... ...   SIGEL's own code with the flags in CPPFLAGS, such as
+# -DSIG_DEBUG or -DSIG_INCLUDE_ZORC_SUPPORT; see the README. make does not
+# notice a change of flags, so run `make clean' first.
+#
 # The vendored tree is not tracked (it comes out of
 # vendor/supportingLibs.tar.gz), so our edits to it live in vendor/patches/ and
 # are applied here against a stamp file inside that tree. tar does not delete
@@ -291,7 +295,7 @@ SIGINC := -Ishim -I$(SRC)/include -I$(B)/ui -I$(B)/gen -isystem $(QTINC) \
 # relocations for Qt data such as QCoreApplication::self, and QApplication's
 # constructor crashes in QGuiApplication::screenAdded.
 SIGCXX := g++ -std=c++20 -O1 -g -fPIC -Wall -Wextra -Wold-style-cast \
-              -Wnon-virtual-dtor $(SIGSAN)
+              -Wnon-virtual-dtor $(SIGSAN) $(CPPFLAGS)
 
 CORE := SIGEL_Tools SIGEL_Environment MT_GPSystem SIGEL_Robot SIGEL_Program \
         SIGEL_RobotIO SIGEL_Simulation MT_Control SIGEL_GP SIGEL_RobotCheck

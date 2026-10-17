@@ -3,9 +3,12 @@
 #include "SIGEL_GP/SIG_GPSimpleFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPRealSpeedFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPNiceWalkingFitnessFunction.h"
+#include "SIGEL_GP/SIG_GPForceFitnessFunction.h"
+
+#ifdef SIG_INCLUDE_ZORC_SUPPORT
 #include "SIGEL_GP/SIG_GPAdaptiveWalkingFitnessFunction.h"
 #include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
-#include "SIGEL_GP/SIG_GPForceFitnessFunction.h"
+#endif
 
 #include <algorithm>
 #include <iterator>
@@ -18,17 +21,23 @@ namespace SIGEL_GP
     static const SIG_GPSimpleFitnessFunction simple;
     static const SIG_GPRealSpeedFitnessFunction realSpeed;
     static const SIG_GPNiceWalkingFitnessFunction niceWalking;
-    static const SIG_GPAdaptiveWalkingFitnessFunction adaptiveWalking;
     static const SIG_GPForceFitnessFunction force;
+
+#ifdef SIG_INCLUDE_ZORC_SUPPORT
+    static const SIG_GPAdaptiveWalkingFitnessFunction adaptiveZorcWalking;
     static const SIG_GPRemoteZORCFitnessFunction remoteZORC;
+#endif
 
     static const QList<const SIG_GPFitnessFunction *> functions = {
       &simple,
       &realSpeed,
       &niceWalking,
-      &adaptiveWalking,
       &force,
+
+#ifdef SIG_INCLUDE_ZORC_SUPPORT
+      &adaptiveZorcWalking,
       &remoteZORC
+#endif
     };
     return functions;
   }
