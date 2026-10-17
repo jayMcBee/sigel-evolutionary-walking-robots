@@ -53,7 +53,9 @@
       environment(nullptr),
       simulationParameters(nullptr),
       program(nullptr),
-      startRobotCentre( 0.0, 0.0, 0.0 )
+      startRobotCentre( 0.0, 0.0, 0.0 ),
+      lastRobotCentre( 0.0, 0.0, 0.0 ),
+      smoothedVelocity( 0.0, 0.0, 0.0 )
   {
     simulationTimer = new QTimer( this );
     simulationTimer->setObjectName( "simulationTimer" );
@@ -248,12 +250,20 @@
 		SIG_Vector robotCentre = simulationVisualisation.getRobotCentre();
 		SIG_Vector &lookPoint = simulationVisualisation.viewSettings.lookPoint;
 
+		if (elapsedSeconds <= 0)
+			return;
+
 		for (int k=0; k<3; k++)
 		{
 			double const followTime = (k == 1) ? verticalFollowTime : horizontalFollowTime;
 			double const fraction = 1 - std::exp( -elapsedSeconds / followTime );
-			lookPoint.set( k, lookPoint.get(k) + (robotCentre.get(k) - lookPoint.get(k)) * fraction );
+			double const velocity = (robotCentre.get(k) - lastRobotCentre.get(k)) / elapsedSeconds;
+			smoothedVelocity.set( k, smoothedVelocity.get(k) + (velocity - smoothedVelocity.get(k)) * fraction );
+			double const target = robotCentre.get(k) + smoothedVelocity.get(k) * followTime;
+			lookPoint.set( k, lookPoint.get(k) + (target - lookPoint.get(k)) * fraction );
 		}
+
+		lastRobotCentre.assign( &robotCentre );
 	}
 
 	void SIG_SimulationVisualisationWidget::recordFrame( SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation, double seconds )
@@ -608,6 +618,8 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 
 	SIG_Vector robotCentre = simulationVisualisation->getRobotCentre();
 	simulationVisualisation->viewSettings.lookPoint.assign( &robotCentre );
+	lastRobotCentre.assign( &robotCentre );
+	smoothedVelocity = SIG_Vector( 0.0, 0.0, 0.0 );
 
 	if (automaticRefresh)
 	  update();
