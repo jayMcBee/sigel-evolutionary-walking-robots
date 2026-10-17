@@ -21,7 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include <QApplication>   // qApp and QProgressDialog need QtWidgets
-#include <QProgressDialog>   // widget used in this file only
+#include <QProgressDialog>
 #include <algorithm>
 #include <memory>
 #include "SIGEL_Tools/SIG_DialogParent.h"
