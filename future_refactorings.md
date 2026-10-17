@@ -422,15 +422,6 @@ problem; the choice is made before any code is written.
   less saturated colours. To decide: the name of the second set and where the two sets live.
   Item 160 waits for this item.
 
-- [ ] **171. A convenience binary on the GitHub page.** Two tarballs of
-  `sigelApp/`, offered as a GitHub pre-release, so that a visitor can try
-  SIGEL without building it: x86_64 built on the x86 machine, aarch64 built on
-  this VM, each with what that machine has. They run where they run; others
-  build from source. Steps: check that the vendored libraries may ship in a
-  binary; `sigelLauncher` finds its own directory instead of using `$PWD`;
-  pack with the PVM symlink followed; the release is created and the files
-  uploaded in the GitHub web interface. The version is 1.4, as the code says.
-
 ---
 
 ## Watch out
