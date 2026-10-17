@@ -259,7 +259,8 @@
 			double const fraction = 1 - std::exp( -elapsedSeconds / followTime );
 			double const velocity = (robotCentre.get(k) - lastRobotCentre.get(k)) / elapsedSeconds;
 			smoothedVelocity.set( k, smoothedVelocity.get(k) + (velocity - smoothedVelocity.get(k)) * fraction );
-			double const target = robotCentre.get(k) + smoothedVelocity.get(k) * followTime;
+			// the steady lag of this step-wise follow, v * dt * (1 - f) / f: v * followTime for small steps, 0 for large ones
+			double const target = robotCentre.get(k) + smoothedVelocity.get(k) * elapsedSeconds * (1 - fraction) / fraction;
 			lookPoint.set( k, lookPoint.get(k) + (target - lookPoint.get(k)) * fraction );
 		}
 

@@ -223,7 +223,7 @@
 
       /**
        * The robot centre at the last look point update, and the robot's velocity smoothed
-       * over the follow time. The look point aims ahead by velocity x follow time, which
+       * over the follow time. The look point aims ahead by the follow lag (about velocity x follow time), which
        * cancels the follow lag while the robot moves steadily, so fast robots stay centred.
        */
       SIG_Vector lastRobotCentre;
