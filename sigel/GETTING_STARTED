@@ -17,7 +17,14 @@ as baking pancake. SIGEL runs on Linux.
 1. Building SIGEL
 
 To build SIGEL you need g++ with C++20, Qt 6, OpenGL with GLU, and libtirpc.
-In the top directory of the repository run
+In the top directory of the repository, first unpack the supporting libraries
+once:
+
+mkdir -p downloads
+tar xzf vendor/supportingLibs.tar.gz -C downloads
+tar xzf vendor/pvm3.4.6.tgz -C downloads/supportingLibs --strip-components=1 ./pvm3
+
+Then run
 
 make
 
