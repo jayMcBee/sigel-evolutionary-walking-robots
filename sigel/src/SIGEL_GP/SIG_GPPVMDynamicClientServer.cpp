@@ -84,6 +84,14 @@ void SIGEL_GP::SIG_GPPVMDynamicClientServer::openPort()
 		exit(1);
 	}
 
+	// Without it, a master restarted while the old connections are in TIME-WAIT cannot bind the port.
+	int const reuseAddress = 1;
+	if ( setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, &reuseAddress, sizeof(reuseAddress)) < 0 )
+	{
+		fprintf(stderr, "ERR:   Can't set SO_REUSEADDR on port %d: %s\n", kSigelMasterRegPort, strerror(errno));
+		exit(1);
+	}
+
 	// let's bind local address & socket
 	if ( bind(listenSocket, reinterpret_cast<struct sockaddr *>(&sad), sizeof(sad)) < 0 )
 	{
