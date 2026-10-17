@@ -58,7 +58,7 @@ namespace SIGEL_GP
 		 * @post
 		 * A gp-manager was created and the data from the experiment is set to
 		 * the values of the GPManager.
-		 * @param exp
+		 * @param experiment
 		 * A reference of the experiment to work with.
 		 */
 		SIG_GPManager(SIG_GPExperiment &experiment);
@@ -214,10 +214,9 @@ namespace SIGEL_GP
 		 * tournament dependencies, caused by the steady state paradigm.
 		 * @pre
 		 * There is a set of tournaments created and placed in the QList tours.
-		 * @return
-		 * The returned QList of integer contains the indices of the tournaments
-		 * in the QList tours. This tournaments can be played without blocking
-		 * dependicies to other tournaments.
+		 * @post
+		 * taskCanDoList holds the indices of the tournaments in tours that can be
+		 * played without waiting for another tournament.
 		 */
 		void calcInitTourSet();
 

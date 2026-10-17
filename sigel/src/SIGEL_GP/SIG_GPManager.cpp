@@ -280,7 +280,6 @@ void SIGEL_GP::SIG_GPManager::createTours(int quantity)
 	SIG_GPPopulation &pop = currentExperiment.population;
 
 	//The tournament set size is fixed
-	// clear(): setAutoDelete made this delete every tournament. Real free.
 	qDeleteAll( tours );
 	tours.clear();
 	// resize() fills the new slots with null.
@@ -533,7 +532,6 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 				pop.getIndividual( (*actFitTask)[1] ).setFitness( actFitness );
 				updateIndividualView( (*actFitTask)[1] );
 
-				// remove(): setAutoDelete(true) made this the free.
 				delete fitTaskList.takeAt( fitCur );
 				// Past the end: step back to the last task. That is prevFitTask, so the pass ends.
 				if (fitCur >= fitTaskList.size())
@@ -553,7 +551,6 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 #endif
 
 				prevFitTask = actFitTask;
-				// next(): a dead cursor stays dead and does NOT advance.
 				if (fitCur < 0 || ++fitCur >= fitTaskList.size())
 				{
 					fitCur = -1;
@@ -795,7 +792,6 @@ void SIGEL_GP::SIG_GPManager::run()
 
 		// Every "resetGeneration" generations all fitness values are set to -1 so that evalNewIndis()
 		// recomputes them. If the fitness function supports it, this allows a different target every "resetGeneration" generations
-		// Apply the fitness criterion.
 		// Do not divide by zero
 		if ( currentExperiment.gpParameter.getResetEveryGeneration() != 0
 		     && (currentExperiment.population.getPoolGeneration() % currentExperiment.gpParameter.getResetEveryGeneration()) == 0)
@@ -929,16 +925,15 @@ SIGEL_GP::SIG_GPManager::~SIG_GPManager()
 	qDeleteAll( tours );
 }
 
-//**************************** META method ************************
 void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 {
 	/*
-		Meta ordering / changes
+		Meta ordering
 		0) as for SIGEL ...
 		1) createTours
 		2) MT_Classifier.preEvolution  --->classifies the SIGEL tournament; may shrink tours(!)
 		3) calcInitTourSet()
-		4) evalNeededIndis() --> new method: compute fitness only for those SIGEL individuals
+		4) evalNeededIndis(): compute fitness only for those SIGEL individuals
 		which still appear in tours!
 		5) evolutionLoop(MetaClassifier): compute fitness only for those SIGEL individuals
 		which still appear in tours! Use MT_Classifier for tournaments!
@@ -946,19 +941,11 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 		7) determine average fitness only from exactly computed SIGEL individuals
 	 */
 
-	/***************************************
-	 *  tell the Meta-System to start the evolution
-	 ****/
-
 	// start the MT_GP-System only if the SIGEL-GP-System would start
 	if(toursAreEmpty( tours ) && currentExperiment.getPopulation().getSize() > 3)
 	{
 		currentExperiment.mtController->startEvolution();
 	}
-
-	/***************************************
-	 *  end of Meta-System specific part
-	 ****/
 
 	if (!toursAreEmpty( tours ))
 	{
@@ -1130,7 +1117,6 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 	//The population size is determined
 	int poolSize=pop.getSize();
 
-	// ********************* META change
 	QList<int> ToursParticipant;
 	ToursParticipant.resize(poolSize); // Position i = number of tournaments individual i takes part in
 	for(int l=0; l<poolSize;l++)
@@ -1154,7 +1140,6 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 			}
 		}
 	}
-	// ********************* End of the meta adaptation
 
 	for (int i=0;i<poolSize;i++)
 	{
@@ -1171,9 +1156,7 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 
 		bool upToDate = actInd.upToDate();
 
-		//Update the fitness values for individuals that are up to date
-
-		// ********************* META change - only if the individual appears in the tournament schedule
+		// Only an individual that is not up to date and takes part in a tournament is evaluated.
 		if((!upToDate)&&(ToursParticipant[i]!=0))
 		{
 			QList<int> *actFitTask = new QList<int>(2);
@@ -1213,7 +1196,6 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 				pop.getIndividual( (*actFitTask)[1] ).setFitness( actFitness );
 				updateIndividualView( (*actFitTask)[1] );
 
-				// remove(): setAutoDelete(true) made this the free.
 				delete fitTaskList.takeAt( fitCur );
 				// Past the end: step back to the last task. That is prevFitTask, so the pass ends.
 				if (fitCur >= fitTaskList.size())
@@ -1229,7 +1211,6 @@ void SIGEL_GP::SIG_GPManager::evalNeededIndis()
 			else
 			{
 				prevFitTask = actFitTask;
-				// next(): a dead cursor stays dead and does NOT advance.
 				if (fitCur < 0 || ++fitCur >= fitTaskList.size())
 				{
 					fitCur = -1;
