@@ -421,8 +421,7 @@ problem; the choice is made before any code is written.
   build from source. Steps: check that the vendored libraries may ship in a
   binary; `sigelLauncher` finds its own directory instead of using `$PWD`;
   pack with the PVM symlink followed; the release is created and the files
-  uploaded in the GitHub web interface. To decide: the version name, since the
-  code says 1.4.
+  uploaded in the GitHub web interface. The version is 1.4, as the code says.
 
 ---
 
