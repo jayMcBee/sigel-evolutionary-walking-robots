@@ -436,7 +436,15 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
       return;
 
     frameShown = false;
-    makeTimeSteps(1);
+
+    // While recording, only recorded frames need drawing; drawing every step is wasted work.
+    int const framesBefore = movieRecorder.getFramesRecorded();
+    do
+      {
+	makeTimeSteps(1);
+      }
+    while (movieRecorder.isRecording() && movieRecorder.getFramesRecorded() == framesBefore);
+
     update();
   }
 
