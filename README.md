@@ -8,6 +8,20 @@ tests each program in a physics simulator.
 
 To build and run it, see [Getting started](sigel/GETTING_STARTED).
 
+## Build options
+
+Two flags add code that a normal build leaves out:
+
+- `SIG_DEBUG`: extra diagnostic output on the console.
+- `SIG_INCLUDE_ZORC_SUPPORT`: the two fitness functions for the ZORC robot,
+  Adaptive Walking and Remote ZORC. Remote ZORC needs the robot on a serial line.
+
+Pass them in `CPPFLAGS`. make does not notice a change of flags, so run
+`make clean` first:
+
+    make clean
+    make CPPFLAGS="-DSIG_DEBUG -DSIG_INCLUDE_ZORC_SUPPORT"
+
 ## Screenshots
 
 The experiment `joventinoQuadruped_bumpy`: a four-legged robot on an uneven floor.
