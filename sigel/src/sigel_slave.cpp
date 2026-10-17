@@ -42,7 +42,10 @@
 #include "SIGEL_Tools/SIG_Exception.h"
 
 #include "SIGEL_GP/SIG_GPFitnessFunctionRegistry.h"
+
+#ifdef SIG_INCLUDE_ZORC_SUPPORT
 #include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
+#endif
 
 #include <pvm3.h>
 
@@ -191,6 +194,22 @@ int showFirstIndividualOfExperimentFile( int argc, char *argv[], QString const &
   return showSimulation( modifiedRobot, experiment.environment, experiment.simulationParameter, program, staticRunInfo );
 }
 
+#ifdef SIG_INCLUDE_ZORC_SUPPORT
+// Remote ZORC runs the program on the physical ZORC robot prototype and asks the user in a
+// dialog for the distance it walked, so it needs a QApplication; nullptr for every other fitness function.
+std::unique_ptr< QApplication > applicationForFitnessFunction( int argc, char *argv[], QString const &serializedId ) {
+  const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
+
+  if (serializedId != remoteZORC.serializedId())
+    return nullptr;
+
+  std::unique_ptr< QApplication > app = std::make_unique< QApplication >(argc, argv);
+  app->setStyle( QStyleFactory::create( "Fusion" ) );
+
+  return app;
+}
+#endif
+
 double computeFitness( int argc, char *argv[],
                        QString const &serializedId,
                        SIGEL_Program::SIG_Program &program,
@@ -203,13 +222,9 @@ double computeFitness( int argc, char *argv[],
     return 0;
   }
 
-  // Remote ZORC needs a QApplication for its dialog
-  const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
-  std::unique_ptr< QApplication > app;
-  if (serializedId == remoteZORC.serializedId()) {
-    app = std::make_unique< QApplication >(argc, argv);
-    app->setStyle( QStyleFactory::create( "Fusion" ) );
-  }
+#ifdef SIG_INCLUDE_ZORC_SUPPORT
+  const std::unique_ptr< QApplication > app = applicationForFitnessFunction( argc, argv, serializedId );
+#endif
 
   const QList<const SIGEL_GP::SIG_GPFitnessFunction *> &fitnessFunctions = SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions();
   const SIGEL_GP::SIG_GPFitnessFunction *fitnessFunction = fitnessFunctions[*fitnessIndex];
@@ -242,10 +257,13 @@ int showIndividualFromPVM( int argc, char *argv[],
   staticRunInfo.individualProgramLength = program.getProgramLength();
   staticRunInfo.fitnessFunctionName = nameOfFitnessFunction( pvmData.getFitnessFunctionName() );
 
+#ifdef SIG_INCLUDE_ZORC_SUPPORT
   // if we use the RemoteZORC-Fitnessfunction: run evaluation to transmit the program !
   const SIGEL_GP::SIG_GPRemoteZORCFitnessFunction remoteZORC;
+
   if (pvmData.getFitnessFunctionName() == remoteZORC.serializedId())
     remoteZORC.evalFitness( program, robot, environment, simulationParameters );
+#endif
 
   return showSimulation( robot, environment, simulationParameters, program, staticRunInfo );
 }
