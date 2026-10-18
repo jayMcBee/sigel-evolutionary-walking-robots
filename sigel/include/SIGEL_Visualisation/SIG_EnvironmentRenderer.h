@@ -35,43 +35,36 @@ namespace SIGEL_Visualisation
 {
 
   /**
-  	*	This struct defines a TGA-file to support Textures
-  	*/
+   * The floor texture: 256 × 256 RGBA pixels, read from a PNM file.
+   */
   typedef struct {
-		// GLubyte will work for images up to 32-bits.
 		std::vector< GLubyte > imageData;
 
-		// Stores the color depth of the image in bits
-		// per pixel.
+		// Always 24: the file holds 8-bit RGB.
 		GLuint   bpp;
 
 		GLuint   width;
 		GLuint   height;
 
-		GLuint   texID;     // For texture objects; more later.
+		GLuint   texID;     // The OpenGL texture name.
 	} Texture;
 	
   /**
-   * This classes task is the rendering of SIG_Environment objects.
+   * Draws an environment: the plane, the grid and the robot path.
    */
   class SIG_EnvironmentRenderer : public SIG_Renderer
   {
   public:
 
     /**
-     * The constructor of the SIG_EnvironmentRenderer.
+     * Creates the plane and the grid, which is hidden, and builds their display lists.
      *
-     * It reads the supplied SIG_Environment, fills the inherited
-     * QList sceneObjects and calls the method buildDisplayLists.
-     *
-     * @param environment The environment that should be rendered.
+     * @pre An OpenGL context is current.
      */
     SIG_EnvironmentRenderer(SIGEL_Environment::SIG_Environment const &environment);
 
     /**
-     * The destructor of the SIG_EnvironmentRenderer.
-     *
-     * It cleans up the OpenGL stuff like the display lists.
+     * Deletes the robot path points.
      */
     ~SIG_EnvironmentRenderer();
     // This class owns raw pointers in a QList and frees them in its
@@ -80,18 +73,16 @@ namespace SIGEL_Visualisation
     SIG_EnvironmentRenderer &operator=( const SIG_EnvironmentRenderer & ) = delete;
 
     /**
-     * Calls the inherited method renderSceneObjects and
-     * does additional rendering like drawing the main plane
-     * which is the main component of every SIG_Environment.
+     * Draws the plane, then the grid and the robot path, each if it is shown.
      *
-     * @pre The display lists are builded.
+     * @pre buildDisplayLists has run.
      */
     void render() override;
 
     /**
      * Calls the display list of the plane only.
      *
-     * @pre The display lists are builded.
+     * @pre buildDisplayLists has run.
      */
     void renderPlane();
 
@@ -99,7 +90,7 @@ namespace SIGEL_Visualisation
      * Calls the display list of the grid and draws the robot path,
      * each if it is shown.
      *
-     * @pre The display lists are builded.
+     * @pre buildDisplayLists has run.
      */
     void renderGridAndPath();
 
@@ -131,38 +122,29 @@ namespace SIGEL_Visualisation
     void addRobotPathPoint( SIG_Vector newPoint );
 
     /**
-    	*	This functions loads the specified file and writes all the relevant data
-    	*	into the texture struct. For now the pnm format only supports RGB data. Thus
-    	*	the RGBA information generates the function itself. The user specifies the magnitude
-    	*	of the A information
-    	*
-    	*	@param *filename
-    	*		This is the path of the texture file. The file format must be pnm.
-    	*
-    	*/
+     * Reads a binary PNM file (P6) of 256 × 256 pixels into texture, and gives each pixel
+     * the environment's texture alpha. The size is fixed, and the header after "P6" must be
+     * exactly 58 bytes. Shows a warning and returns false if the file does not open, is not
+     * P6 or is shorter than the header.
+     */
     bool loadPNMTexture(char *filename);
 
     /**
-    	* This function loads and initialize the texture. It does all the opengl stuff
-    	*	to initialize texture mapping.
-    	*
-    	*/
+     * Loads the environment's texture file and gives it to OpenGL. Shows a warning and
+     * returns false if no file name is set or the file cannot be read.
+     */
     bool initTexture();
 		
-		/**
-			*	This function generates the display list. It specifies the ground and
-			*	the texture coordinates. The texture is only generated if the user turns
-			* the option on.
-			*
-			*/
+    /**
+     * Draws the terrain, textured if withTexture is set. buildPlane calls it inside the
+     * plane's display list.
+     */
     void drawInit( const SIGEL_Environment::SIG_Terrain &terrain );
 
   private:
 
     /**
-     * Reads the environment attribute and uses
-     * its properties like geometry of objects to
-     * build display lists.
+     * Builds the display lists of the plane and the grid.
      */
     void buildDisplayLists() override;
 
@@ -199,10 +181,6 @@ namespace SIGEL_Visualisation
 
     void renderRobotPath();
 
-    /**
-     * The SIG_Environment object that should be rendered
-     * by this SIG_EnvironmentRenderer.
-     */
     SIGEL_Environment::SIG_Environment const &environment;
 
     GLint const gridSpacing;
@@ -215,9 +193,6 @@ namespace SIGEL_Visualisation
 
     QList< SIG_Vector * > robotPathPoints;
 
-    /**
-    	*	This variable holds a texture
-    	*/
     Texture texture;
   };
 
