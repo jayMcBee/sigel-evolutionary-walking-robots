@@ -2357,7 +2357,7 @@ here.
   `SIG_GPOperations::crossOver` (the minimum length).
 - **Part 4, the other SIGEL modules:** merged in
   `SIG_MainWindow::slotMTUseMT`, `SIG_Program::checkLength` (2 places),
-  `SIG_Body::readVRMLNode` and `SIG_EnvironmentRenderer::exportToPovray`.
+  `SIG_Body::readVRMLNode` and `SIG_PovrayExporter::environmentObjects`.
   `SIG_AllIndividualsView::slotImportIndividual` stays nested.
 - **Baselines:** unchanged.
 - **Review:** no defects, over all four parts.

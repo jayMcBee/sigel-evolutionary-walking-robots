@@ -105,7 +105,7 @@ namespace SIGEL_Visualisation
 	   << includeFileName
 	   << "\"\n"
 	   << "\n"
-	   << visualisation.getEnvironmentRenderer().exportToPovray()
+	   << environmentObjects()
 	   << visualisation.getRobotRenderer().exportToPovray()
 	   << "object {\n"
 	   << "  headLight\n"
@@ -327,6 +327,65 @@ namespace SIGEL_Visualisation
     stream << pointDataString;
 
     return declarationsString;
+  }
+
+  QString SIG_PovrayExporter::environmentObjects() const
+  {
+    SIG_EnvironmentRenderer const &environmentRenderer = visualisation.getEnvironmentRenderer();
+
+    SIG_Vector const &lookPoint = environmentRenderer.getLookPoint();
+
+    int const gridSpacing = environmentRenderer.getGridSpacing();
+
+    bool const showRobotPath = environmentRenderer.getShowRobotPath();
+
+    QList< SIG_Vector * > const &robotPathPoints = environmentRenderer.getRobotPathPoints();
+
+    QString resultString;
+    QTextStream stream( &resultString, QIODevice::WriteOnly );
+
+    int xPos = static_cast< int >( std::floor( lookPoint.x / gridSpacing ) * gridSpacing );
+    int zPos = - static_cast< int >( std::floor( lookPoint.z / gridSpacing ) * gridSpacing );
+
+    stream << "union {\n"
+	   << environmentRenderer.exportSceneObjectsToPovray()
+	   << "translate <"
+	   << xPos
+	   << ",0,"
+	   << zPos
+	   << ">\n"
+	   << "}\n"
+	   << "\n";
+
+    if (showRobotPath && robotPathPoints.count() >= 2)
+      {
+	// One cylinder from each point to the next.
+	for ( qsizetype i = 1; i < robotPathPoints.size(); i++ )
+	  {
+	    SIG_Vector *prevPoint = robotPathPoints.at( i - 1 );
+	    SIG_Vector *actPoint  = robotPathPoints.at( i );
+	    NEWMAT::ColumnVector base =   SIG_TypeConverter::sigelToPovray()
+					* SIG_TypeConverter::toColumnVector( *prevPoint );
+	    NEWMAT::ColumnVector cap =   SIG_TypeConverter::sigelToPovray()
+				       * SIG_TypeConverter::toColumnVector( *actPoint );
+
+	    stream << "cylinder {\n"
+		   << "  "
+		   << SIG_Renderer::vectorToPovray( base )
+		   << ", "
+		   << SIG_Renderer::vectorToPovray( cap )
+		   << ", 0.02\n"
+		   << "  open\n"
+		   << "  pigment { rgb <1,1,0> }\n"
+		   << "  finish { ambient rgb <1,1,0>\n"
+		   << "           diffuse 1 }\n"
+		   << "}\n";
+	  };
+
+	stream << "\n";
+      };
+
+    return resultString;
   }
 
 }

@@ -110,7 +110,11 @@ namespace SIGEL_Visualisation
 
     int getGridSpacing() const { return gridSpacing; }
 
-    QString exportToPovray() const;
+    SIG_Vector const &getLookPoint() const { return lookPoint; }
+
+    bool getShowRobotPath() const { return showRobotPath; }
+
+    QList< SIG_Vector * > const &getRobotPathPoints() const { return robotPathPoints; }
 
     void setLookPoint( SIG_Vector newPosition );
 

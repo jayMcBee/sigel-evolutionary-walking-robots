@@ -20,16 +20,12 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include <QIODevice>
 #include <QVector3D>
 #include "SIGEL_Visualisation/SIG_EnvironmentRenderer.h"
-
-#include "SIGEL_Tools/SIG_TypeConverter.h"
 
 #include "qmessagebox.h"
 #include "SIGEL_Tools/SIG_DialogParent.h"
 
-#include <cmath>
 #include <stdlib.h>
 
 using namespace SIGEL_Tools;
@@ -227,55 +223,6 @@ namespace SIGEL_Visualisation
       renderRobotPath();
 
     glPopAttrib();
-  }
-
-  QString SIG_EnvironmentRenderer::exportToPovray() const
-  {
-    QString resultString;
-    QTextStream stream( &resultString, QIODevice::WriteOnly );
-
-    int xPos = static_cast< int >( std::floor( lookPoint.x / gridSpacing ) * gridSpacing );
-    int zPos = - static_cast< int >( std::floor( lookPoint.z / gridSpacing ) * gridSpacing );
-
-    stream << "union {\n"
-	   << exportSceneObjectsToPovray()
-	   << "translate <"
-	   << xPos
-	   << ",0,"
-	   << zPos
-	   << ">\n"
-	   << "}\n"
-	   << "\n";
-
-    if (showRobotPath && robotPathPoints.count() >= 2)
-      {
-	// One cylinder from each point to the next.
-	for ( qsizetype i = 1; i < robotPathPoints.size(); i++ )
-	  {
-	    SIG_Vector *prevPoint = robotPathPoints.at( i - 1 );
-	    SIG_Vector *actPoint  = robotPathPoints.at( i );
-	    NEWMAT::ColumnVector base =   SIG_TypeConverter::sigelToPovray()
-					* SIG_TypeConverter::toColumnVector( *prevPoint );
-	    NEWMAT::ColumnVector cap =   SIG_TypeConverter::sigelToPovray()
-				       * SIG_TypeConverter::toColumnVector( *actPoint );
-
-	    stream << "cylinder {\n"
-		   << "  "
-		   << vectorToPovray( base )
-		   << ", "
-		   << vectorToPovray( cap )
-		   << ", 0.02\n"
-		   << "  open\n"
-		   << "  pigment { rgb <1,1,0> }\n"
-		   << "  finish { ambient rgb <1,1,0>\n"
-		   << "           diffuse 1 }\n"
-		   << "}\n";
-	  };
-
-	stream << "\n";
-      };
-
-    return resultString;
   }
 
   void SIG_EnvironmentRenderer::setLookPoint( SIG_Vector newPosition )

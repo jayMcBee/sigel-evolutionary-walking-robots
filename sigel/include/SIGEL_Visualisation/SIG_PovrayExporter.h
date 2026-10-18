@@ -60,6 +60,8 @@ namespace SIGEL_Visualisation
 
     QString robotDeclarations() const;
 
+    QString environmentObjects() const;
+
     SIG_SimulationVisualisation const &visualisation;
   };
 
