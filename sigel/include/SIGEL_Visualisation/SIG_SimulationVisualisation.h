@@ -45,33 +45,17 @@ namespace SIGEL_Visualisation
 {
 
 	/**
-	 * This class is used to visualize simulations.
-	 *
-	 * Like classes inherited from SIG_GPFitnessFunction, the
-	 * SIG_SimulationVisualisation contains a SIG_Simulation object
-	 * and uses a class inherited from the SIG_Recorder class
-	 * (the SIG_RenderRecorder) to retrieve information from
-	 * the simulation.
-	 * Besides the inherited method visualize there is a method
-	 * makeTimeSteps that effects the progress of the
-	 * contained simulation and visualisation data structures.
+	 * Shows a running simulation. It runs its own SIG_Simulation, reads the links' positions
+	 * through a SIG_RenderRecorder, and draws the environment and the robot.
 	 */
 	class SIG_SimulationVisualisation : public SIG_Visualisation
 	{
 	public:
 
 		/**
-		 * The constructor of the SIG_SimulationVisualisation.
+		 * Creates the simulation, the renderers and the shadow mapping.
 		 *
-		 * It initializes the references that are used to acces the elements
-		 * that take part in the simulation/visualisation.
-		 * It creates the SIG_Simulation and SIG_RenderRecorder objects.
-		 * It initializes the OpenGL stuff.
-		 *
-		 * @param robot The robot used for the simulation.
-		 * @param environment The environment used for the simulation.
-		 * @param simulationParameter The simulation parameters used for the simulation.
-		 * @param program The robot control program used for the simulation.
+		 * @pre An OpenGL context is current.
 		 */
 		SIG_SimulationVisualisation(SIGEL_Robot::SIG_Robot const &robot,
 		                            SIGEL_Environment::SIG_Environment const &environment,
@@ -79,9 +63,10 @@ namespace SIGEL_Visualisation
 		                            SIGEL_Program::SIG_Program const &program);
 
 		/**
-		 * The destructor of the SIG_SimulationVisualisation.
+		 * Frees the shadow mapping objects.
 		 *
-		 * Cleans up the OpenGL stuff and deletes the simulation and the renderRecorder.
+		 * @pre The constructor's OpenGL context is current. If it is not, the shadow map and
+		 *      the display lists stay until that context goes.
 		 */
 		~SIG_SimulationVisualisation() override;
 
@@ -106,22 +91,13 @@ namespace SIGEL_Visualisation
 		bool canShowShadows() const { return shadowProgram != nullptr; }
 
 		/**
-		 * This method finally initiates the calling
-		 * of certain OpenGL rendering commands.
-		 *
-		 * They refresh the active framebuffer of the
-		 * current OpenGL context according to the
-		 * current state of the simulation and the
-		 * attribute viewSettings.
+		 * Draws the simulation as it is now, with the camera and render mode in viewSettings.
 		 */
 		void visualize() override;
 
 		/**
-		 * This method lets the simulation progress
-		 * and updates internal data structures
-		 * (for example position and rotation of objects).
-		 *
-		 * @param noOfTimeSteps The number of timeSteps the simulation should progress about.
+		 * Runs the simulation noOfTimeSteps steps on, adds robot path points every 0.5
+		 * simulated seconds, and moves the drawn robot to its new place.
 		 */
 		void makeTimeSteps(int noOfTimeSteps);
 
@@ -131,11 +107,7 @@ namespace SIGEL_Visualisation
 
 		SIG_Matrix getRobotRotation() const;
 
-		/**
-		 * Returns the centre of the box around the robot, where the
-		 * robot is now. The box is measured at time 0 and moves with
-		 * the root link.
-		 */
+		/** The centre of the robot's box at time 0, carried along with the root link. */
 		SIG_Vector getRobotCentre() const;
 
 		/**
@@ -149,11 +121,7 @@ namespace SIGEL_Visualisation
 
 	private:
 
-		/**
-		 * The direction from the scene towards the sun, in world
-		 * coordinates, not normalised. The sun is a directional light
-		 * fixed to the world; only its light is shadowed.
-		 */
+		/** Towards the sun, in world coordinates, not normalised; the only light that casts shadows. */
 		static constexpr QVector3D sunDirection = QVector3D( -0.6f, 1.0f, 0.4f );
 
 		/**
@@ -235,36 +203,10 @@ namespace SIGEL_Visualisation
 
 		bool showShadows;
 
-		/**
-		 * The SIG_EnvironmentRenderer object that is
-		 * responsible for the rendering of the environment.
-		 *
-		 * While this SIG_SimulationVisualisation object
-		 * takes care of all OpenGL related things to be done
-		 * (framebuffer initialization and setting of
-		 * OpenGL state variables for example),
-		 * the final rendering of the environment
-		 * is done by the environmentRenderer.
-		 */
 		SIG_EnvironmentRenderer environmentRenderer;
 
-		/**
-		 * The SIG_RobotRenderer object that is
-		 * responsible for the rendering of the robot.
-		 *
-		 * While this SIG_SimulationVisualisation object
-		 * takes care of all OpenGL related things to be done
-		 * (framebuffer initialization and setting of
-		 * OpenGL state variables for example),
-		 * the final rendering of the robot
-		 * is done by the robotRenderer.
-		 */
 		SIG_RobotRenderer robotRenderer;
 
-		/**
-		 * The SIG_Robot object that should take part
-		 * in the simulation.
-		 */
 		SIGEL_Robot::SIG_Robot const &robot;
 
 		/**
@@ -295,21 +237,13 @@ namespace SIGEL_Visualisation
 		double robotRadius;
 
 		/**
-		 * Reads the actual positions and rotations of the
-		 * robot's links from the renderRecorder and writes them in the
-		 * appropriate elements of the attribute sceneObjects of the robotRenderer.
-		 *
-		 * Is called by the constructor for setting up the initial robot.
-		 * Is called in makeTimeSteps.
+		 * Copies each link's position and rotation from renderRecorder to its scene object in
+		 * robotRenderer.
 		 */
 		void updateRobotLinks();
 
 		/**
-		 * Reads the actual positions and rotations of the robot's links
-		 * and sets the according values of the appropriate robot points.
-		 *
-		 * Is called by the constructor for setting up the initial robot.
-		 * Is called in makeTimeSteps.
+		 * Moves the robot's anchor points with their links.
 		 */
 		void updateRobotPoints();
 	};
