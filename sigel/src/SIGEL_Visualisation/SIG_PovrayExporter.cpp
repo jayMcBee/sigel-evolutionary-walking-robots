@@ -127,11 +127,22 @@ namespace SIGEL_Visualisation
 
     NEWMAT::ColumnVector lookPointColumnVector = SIG_TypeConverter::toColumnVector( viewSettings.lookPoint );
 
+    // The radiosity samples densely with a low error bound, so that the indirect light
+    // changes little from frame to frame.
     stream << "#version 3.7;\n"
 	   << "\n"
-	   << "global_settings { assumed_gamma 1.0 ambient_light srgb "
-	   << vectorToPovray( visualisation.getAmbientSceneColor() )
-	   << " }\n"
+	   << "global_settings {\n"
+	   << "  assumed_gamma 1.0\n"
+	   << "  radiosity {\n"
+	   << "    pretrace_start 0.08\n"
+	   << "    pretrace_end 0.01\n"
+	   << "    count 300\n"
+	   << "    nearest_count 15\n"
+	   << "    error_bound 0.35\n"
+	   << "    recursion_limit 2\n"
+	   << "    always_sample off\n"
+	   << "  }\n"
+	   << "}\n"
 	   << "\n"
 	   << "#include "
 	   << "\""
@@ -172,10 +183,7 @@ namespace SIGEL_Visualisation
 	   << "                     pigment { srgb "
 	   << vectorToPovray( planeColorVector )
 	   << " }\n"
-	   << "                     finish { ambient srgb "
-	   << vectorToPovray( planeColorVector )
-	   << "\n"
-	   << "                              diffuse 1 }\n"
+	   << "                     finish { ambient 0 diffuse 1 }\n"
 	   << "                   }\n"
 	   << "                 }\n"
 	   << "\n";
@@ -225,8 +233,7 @@ namespace SIGEL_Visualisation
 
     stream << "\n"
 	   << "  pigment { srgb " << vectorToPovray( gridColorVector ) << " }\n"
-	   << "  finish { ambient srgb " << vectorToPovray( gridColorVector ) << "\n"
-	   << "           diffuse 1 }\n"
+	   << "  finish { ambient 0 diffuse 1 }\n"
 	   << "}\n";
 
     return declarationsString;
@@ -250,10 +257,7 @@ namespace SIGEL_Visualisation
 	       << "  pigment { srgb "
 	       << vectorToPovray( SIG_TypeConverter::toColumnVector( actMaterial.getColour() ) )
 	       << " }\n"
-	       << "  finish { ambient srgb "
-	       << vectorToPovray( SIG_TypeConverter::toColumnVector( actMaterial.getColour() ) )
-	       << "\n"
-	       << "           diffuse 1 }\n"
+	       << "  finish { ambient 0 diffuse 1 }\n"
 	       << "}\n"
 	       << "\n";
       };
@@ -399,8 +403,7 @@ namespace SIGEL_Visualisation
 		   << ", 0.02\n"
 		   << "  open\n"
 		   << "  pigment { srgb <1,1,0> }\n"
-		   << "  finish { ambient srgb <1,1,0>\n"
-		   << "           diffuse 1 }\n"
+		   << "  finish { ambient 0 diffuse 1 }\n"
 		   << "}\n";
 	  };
 

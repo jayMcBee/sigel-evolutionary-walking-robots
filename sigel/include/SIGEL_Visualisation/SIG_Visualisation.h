@@ -29,8 +29,6 @@
 #include <QList>
 #include <QVector3D>
 
-#include <newmat.h>
-
 /**
  * Draws robots, environments and simulations with OpenGL and writes them as POV-Ray
  * scenes. The windows that show them are in other modules.
@@ -64,8 +62,6 @@ namespace SIGEL_Visualisation
 
       virtual void setAmbientSceneColor( double red, double green, double blue );
 
-      NEWMAT::ColumnVector getAmbientSceneColor() const { return ambientSceneColor; }
-
       /**
        * Sets the projection matrix for viewSettings.aspectRatio. The widget calls it when its
        * size changes.
@@ -83,9 +79,6 @@ namespace SIGEL_Visualisation
       SIG_ViewSettings viewSettings;
 
       QList< SIG_FloatingText * > floatingTexts;
-
-    protected:
-      NEWMAT::ColumnVector ambientSceneColor;
 
     private:
 

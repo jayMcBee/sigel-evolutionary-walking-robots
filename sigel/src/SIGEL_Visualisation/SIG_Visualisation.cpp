@@ -35,11 +35,8 @@ namespace SIGEL_Visualisation
 
   SIG_Visualisation::SIG_Visualisation()
     : viewSettings(),
-      floatingTexts(),
-      ambientSceneColor( 3 )
+      floatingTexts()
   {
-    ambientSceneColor( 1 ) = ambientSceneColor( 2 ) = ambientSceneColor( 3 ) = 1;
-
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_NORMALIZE);
 
@@ -196,10 +193,6 @@ namespace SIGEL_Visualisation
 
   void SIG_Visualisation::setAmbientSceneColor( double red, double green, double blue )
   {
-    ambientSceneColor( 1 ) = red;
-    ambientSceneColor( 2 ) = green;
-    ambientSceneColor( 3 ) = blue;
-
     QList< GLfloat > lightModelAmbientColor( 4 );
 
     lightModelAmbientColor[0] = red;
