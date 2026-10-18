@@ -29,17 +29,14 @@ namespace SIGEL_Visualisation
 {
 
   /**
-   * This class contains all attributes of a
-   * current rendering view (Viewers position for example).
+   * The camera and the render mode of a view.
    */
   class SIG_ViewSettings
     {
     public:
 
       /**
-       * The constructor of the SIG_ViewSettings.
-       *
-       * Initializes all attributes with standard values.
+       * Starts in wireframe mode, with the eye at (0, 1, 1) and the look point at the origin.
        */
       SIG_ViewSettings();
 
@@ -50,63 +47,41 @@ namespace SIGEL_Visualisation
       SIG_Vector getAbsoluteEyePoint() const;
 
       /**
-       * The type of the render Mode.
+       * How the scene is drawn. The simulation view shows shadows only in flatShaded and
+       * garoudShaded.
        */
       enum renderModeType
       { 
 	/**
-	 * Wireframe rendering.
-	 *
-	 * The wire's color is just given by the
-	 * object's attribute. No lighting is active.
+	 * Edges only, in each object's colour, without lighting.
 	 */
 	wireFrame,
 	/**
-	 * Wireframe rendering without the hidden lines.
-	 *
 	 * As wireFrame, but an edge behind a polygon is not drawn.
 	 */
 	hiddenLine,
 	/**
-	 * Point rendering.
-	 *
-	 * Only the vertices are drawn, as points, and a vertex behind a
-	 * polygon is not drawn. No lighting is active.
+	 * Vertices only, as points; a vertex behind a polygon is not drawn. No lighting.
 	 */
 	points,
 	/**
-	 * Flat shaded rendering.
-	 *
-	 * The polygons are filled.
-	 * The fill colors are calculated from the object's
-	 * atrribute and lighting with some light sources.
-	 * Their positions are reatively fixed to the robot's
-	 * main link position.
-	 * The normal vectors of the vertices of a polygon are set
-	 * to the normal vector of the polygon.
+	 * Filled, lit polygons; the lighting is the same across each polygon.
 	 */
 	flatShaded,
 	/**
-	 * Gouraud shaded rendering.
-	 *
-	 * The polygons are filled and garoud shaded.
-	 * The colors are calculated from the object's
-	 * atrribute and lighting with some light sources.
-	 * Their positions are reatively fixed to the robot's
-	 * main link position.
-	 * The normal vectors of the vertices of a polygon are set
-	 * to the normal vector of the polygon.
+	 * As flatShaded, but the colour is blended across each polygon. Every vertex has its
+	 * polygon's normal, so the picture differs little from flatShaded.
 	 */
 	garoudShaded
       };
 
       /**
-       * The viewers position.
+       * The eye's position; relative to lookPoint when relativeEyePoint is set.
        */
       SIG_Vector eyePoint;
 
       /**
-       * The viewers lookpoint.
+       * The point the eye looks at.
        */
       SIG_Vector lookPoint;
 
@@ -117,21 +92,12 @@ namespace SIGEL_Visualisation
        */
       SIG_Vector up;
 
-      /**
-       * If true, the real eyepoint is
-       * calculated by adding the SIG_Vector
-       * eyePoint to the SIG_Vector lookPoint.
-       */
       bool relativeEyePoint;
 
-      /**
-       * The currently active render mode.
-       */
       renderModeType renderMode;
 
       /**
-       * The actual aspect ratio defined by @f$\frac{x}{y}@f$ for
-       * the window width x and height y.
+       * The window's width divided by its height.
        */
       double aspectRatio;
     };
