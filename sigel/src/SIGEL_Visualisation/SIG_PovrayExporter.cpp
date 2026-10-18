@@ -72,6 +72,15 @@ namespace SIGEL_Visualisation
     NEWMAT::ColumnVector fillPosition( 3 );
     fillPosition << fill.x() << fill.y() << fill.z();
 
+    // The sky has the screen's colours: skyBottomColor at the horizon, skyTopColor overhead.
+    // The ground fog is dense at the floor and thin above it, so that the floor fades into
+    // the horizon while the robot, a few units away, stays clear.
+    NEWMAT::ColumnVector skyTopColor( 3 );
+    skyTopColor << SIG_Visualisation::skyTopColor.x() << SIG_Visualisation::skyTopColor.y() << SIG_Visualisation::skyTopColor.z();
+
+    NEWMAT::ColumnVector horizonColor( 3 );
+    horizonColor << SIG_Visualisation::skyBottomColor.x() << SIG_Visualisation::skyBottomColor.y() << SIG_Visualisation::skyBottomColor.z();
+
     stream << environmentDeclarations()
 	   << "\n"
 	   << robotDeclarations()
@@ -96,12 +105,24 @@ namespace SIGEL_Visualisation
 	   << "  orient\n"
 	   << "}\n"
 	   << "\n"
-	   << "background { srgb <0.258824,0.258824,0.435294> }\n"
+	   << "sky_sphere {\n"
+	   << "  pigment {\n"
+	   << "    gradient y\n"
+	   << "    color_map {\n"
+	   << "      [0.5 srgb " << vectorToPovray( horizonColor ) << "]\n"
+	   << "      [1.0 srgb " << vectorToPovray( skyTopColor ) << "]\n"
+	   << "    }\n"
+	   << "    scale 2\n"
+	   << "    translate -y\n"
+	   << "  }\n"
+	   << "}\n"
 	   << "\n"
 	   << "fog {\n"
-	   << "  fog_type 1\n"
-	   << "  distance 80\n"
-	   << "  srgb <0.258824,0.258824,0.435294>\n"
+	   << "  fog_type 2\n"
+	   << "  fog_offset 1\n"
+	   << "  fog_alt 3\n"
+	   << "  distance 60\n"
+	   << "  srgb " << vectorToPovray( horizonColor ) << "\n"
 	   << "}\n"
 	   << "\n";
 

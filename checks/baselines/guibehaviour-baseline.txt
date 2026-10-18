@@ -2600,7 +2600,7 @@ Do you want to replace it?]
 == POV EXPORT ==
 steps=120
 files=32
-  sigel_pic.inc bytes=19548 sha256=47ec78fd5ad2213e2921790c14d431755e661f22bd8253a5fb57092386b73f39
+  sigel_pic.inc bytes=19665 sha256=f4e9eca601f61d654f1fe510d6581434c4693dad728078a05829252527bf1dc5
   sigel_pic0000.pov bytes=1059 sha256=89ce4032d7c7d6802fda48d7200666b50e61bd5c9638af6f26fd11c2beda7b56
   sigel_pic0001.pov bytes=1070 sha256=f9e974b5ece4e62416315aea5b6d6ee7dbb846a53c6c9f0c0db965ce7172f357
   sigel_pic0002.pov bytes=1096 sha256=37569f07fc7003ddcb6dab1c9c804af228cdf9af2c0f2e60525371ce6e69a0e4
@@ -2815,12 +2815,24 @@ files=32
     orient
   }
   
-  background { srgb <0.258824,0.258824,0.435294> }
+  sky_sphere {
+    pigment {
+      gradient y
+      color_map {
+        [0.5 srgb <1, 1, 1>]
+        [1.0 srgb <0.7, 0.8, 0.95>]
+      }
+      scale 2
+      translate -y
+    }
+  }
   
   fog {
-    fog_type 1
-    distance 80
-    srgb <0.258824,0.258824,0.435294>
+    fog_type 2
+    fog_offset 1
+    fog_alt 3
+    distance 60
+    srgb <1, 1, 1>
   }
   
   

@@ -187,19 +187,17 @@ touched, because changing one changes behaviour against the reference binary.
   - **The camera.** A 100° lens about half a unit from the robot, aimed at
     the base link, which is one end of the robot; its distance changes per
     frame.
-  - **The lighting.** The background and fog are flat violet.
   - **The materials** are flat colour. A `.rrb` material carries
     only colour and density.
   - **The floor** moves with the robot. Harmless while it is one colour, but
     any pattern on it jumps, and a plain floor shows no motion.
   - **The rendering options.** povray's default jitter makes edges flicker
     from frame to frame; SIGEL gives the user no recommended options.
-  To decide: how far the export goes beyond rendering correctly (lighting,
-  materials, a patterned floor), whether a finish becomes part of the robot
-  format, how the camera moves, and whether options are switches in the
-  include file. Not checked in 2.0: whether recording stops at the end of
-  the evaluated time (1.3's did not), and whether a height-map terrain
-  exports.
+  To decide: the materials and a patterned floor, whether a finish becomes
+  part of the robot format, how the camera moves, and whether options are
+  switches in the include file. Not checked in 2.0: whether recording stops
+  at the end of the evaluated time (1.3's did not), and whether a height-map
+  terrain exports.
 
 ---
 

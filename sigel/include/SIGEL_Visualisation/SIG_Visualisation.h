@@ -80,11 +80,11 @@ namespace SIGEL_Visualisation
 
       QList< SIG_FloatingText * > floatingTexts;
 
-    private:
-
       static constexpr QVector3D skyTopColor = QVector3D( 0.70f, 0.80f, 0.95f );
 
       static constexpr QVector3D skyBottomColor = QVector3D( 1.0f, 1.0f, 1.0f );
+
+    private:
 
       /** The fog starts and ends this far behind the look point. */
       static constexpr float fogStart = 0.0f;
