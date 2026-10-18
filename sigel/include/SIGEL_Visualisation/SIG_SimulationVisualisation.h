@@ -143,6 +143,10 @@ namespace SIGEL_Visualisation
 		 */
 		double getRobotRadius() const { return robotRadius; }
 
+		SIG_EnvironmentRenderer const &getEnvironmentRenderer() const { return environmentRenderer; }
+
+		SIG_RobotRenderer const &getRobotRenderer() const { return robotRenderer; }
+
 		bool exportToPovray( QString includeFilename,
 		                     QString fileName );
 

@@ -84,6 +84,8 @@ namespace SIGEL_Visualisation
 					 double green,
 					 double blue );
 
+      NEWMAT::ColumnVector getAmbientSceneColor() const { return ambientSceneColor; }
+
       /**
        * This method recalculates the projection matrix
        * according to the actual aspect ratio.
