@@ -150,9 +150,6 @@ namespace SIGEL_Visualisation
 		bool exportToPovray( QString includeFilename,
 		                     QString fileName );
 
-		bool createPovrayIncludeFile( QString filename,
-		                              double aspectRatio );
-
 	private:
 
 		/**

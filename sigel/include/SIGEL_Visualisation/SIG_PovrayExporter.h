@@ -24,6 +24,8 @@
 #ifndef SIGEL_VISUALISATION_SIG_POVRAYEXPORTER_H
 #define SIGEL_VISUALISATION_SIG_POVRAYEXPORTER_H
 
+#include <qstring.h>
+
 namespace SIGEL_Visualisation
 {
 
@@ -38,6 +40,13 @@ namespace SIGEL_Visualisation
   {
   public:
     SIG_PovrayExporter( SIG_SimulationVisualisation const &visualisation );
+
+    /**
+     * Writes the include file that every frame includes.
+     *
+     * @return false if the file cannot be written.
+     */
+    bool writeIncludeFile( QString fileName, double aspectRatio ) const;
 
   private:
     SIG_SimulationVisualisation const &visualisation;

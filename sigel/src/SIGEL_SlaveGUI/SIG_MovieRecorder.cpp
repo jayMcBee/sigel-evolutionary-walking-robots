@@ -24,6 +24,7 @@
 #include "SIGEL_SlaveGUI/SIG_MovieRecorder.h"
 
 #include "SIGEL_Visualisation/SIG_SimulationVisualisation.h"
+#include "SIGEL_Visualisation/SIG_PovrayExporter.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
 #include <QDir>
@@ -252,7 +253,7 @@ namespace SIGEL_SlaveGUI
 
     double aspectRatio = double( settings.width ) / double( settings.height );
 
-    return visualisation.createPovrayIncludeFile( lastFileName, aspectRatio );
+    return SIGEL_Visualisation::SIG_PovrayExporter( visualisation ).writeIncludeFile( lastFileName, aspectRatio );
   }
 
   void SIG_MovieRecorder::reset()

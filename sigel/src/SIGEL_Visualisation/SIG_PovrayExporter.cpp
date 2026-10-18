@@ -23,11 +23,61 @@
 */
 #include "SIGEL_Visualisation/SIG_PovrayExporter.h"
 
+#include "SIGEL_Visualisation/SIG_SimulationVisualisation.h"
+
+#include <QFile>
+#include <QTextStream>
+#include <QtMath>
+
+#include <cmath>
+
 namespace SIGEL_Visualisation
 {
 
   SIG_PovrayExporter::SIG_PovrayExporter( SIG_SimulationVisualisation const &visualisation )
     : visualisation( visualisation )
   { }
+
+  bool SIG_PovrayExporter::writeIncludeFile( QString fileName, double aspectRatio ) const
+  {
+    QFile file( fileName );
+
+    if (!file.open( QIODevice::WriteOnly ))
+      return false;
+
+    QTextStream stream( &file );
+
+    static double const xAngle = 100;
+
+    static double const xAngleRad = qDegreesToRadians( xAngle );
+
+    static double const directionLength = 0.5 * 1 / std::tan( xAngleRad / 2 );
+
+    stream << visualisation.getEnvironmentRenderer().createPovrayDeclarations()
+	   << "\n"
+	   << visualisation.getRobotRenderer().createPovrayDeclarations()
+	   << "#declare cameraRight = " << aspectRatio << "*x;\n"
+	   << "#declare cameraDirection = <0,0," << directionLength << ">;\n"
+	   << "\n"
+	   << "#declare headLight = light_source {\n"
+	   << "                       <0,0,0>,\n"
+	   << "                       rgb 1\n"
+	   << "                       fade_distance 3\n"
+	   << "                       fade_power 1\n"
+	   << "                     }\n"
+	   << "\n"
+	   << "background { rgb <0.258824,0.258824,0.435294> }\n"
+	   << "\n"
+	   << "fog {\n"
+	   << "  fog_type 1\n"
+	   << "  distance 80\n"
+	   << "  rgb <0.258824,0.258824,0.435294>\n"
+	   << "}\n"
+	   << "\n";
+
+    file.close();
+
+    return true;
+  }
 
 }

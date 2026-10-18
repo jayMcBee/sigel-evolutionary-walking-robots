@@ -29,7 +29,6 @@
 #include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 
-#include <QtMath>
 #include <cmath>
 
 using namespace SIGEL_Tools;
@@ -589,49 +588,6 @@ namespace SIGEL_Visualisation
 		       << "global_settings { ambient_light rgb "
 		       << SIG_Renderer::vectorToPovray( ambientSceneColor )
 		       << " }\n";
-
-		file.close();
-
-		return true;
-	}
-
-	bool SIG_SimulationVisualisation::createPovrayIncludeFile( QString fileName,
-	                                                           double aspectRatio )
-	{
-		QFile file( fileName );
-
-		if (!file.open( QIODevice::WriteOnly ))
-			return false;
-
-		QTextStream stream( &file );
-
-		static double const xAngle = 100;
-
-		static double const xAngleRad = qDegreesToRadians( xAngle );
-
-		static double const directionLength = 0.5 * 1 / std::tan( xAngleRad / 2 );
-
-		stream << environmentRenderer.createPovrayDeclarations()
-		       << "\n"
-		       << robotRenderer.createPovrayDeclarations()
-		       << "#declare cameraRight = " << aspectRatio << "*x;\n"
-		       << "#declare cameraDirection = <0,0," << directionLength << ">;\n"
-		       << "\n"
-		       << "#declare headLight = light_source {\n"
-		       << "                       <0,0,0>,\n"
-		       << "                       rgb 1\n"
-		       << "                       fade_distance 3\n"
-		       << "                       fade_power 1\n"
-		       << "                     }\n"
-		       << "\n"
-		       << "background { rgb <0.258824,0.258824,0.435294> }\n"
-		       << "\n"
-		       << "fog {\n"
-		       << "  fog_type 1\n"
-		       << "  distance 80\n"
-		       << "  rgb <0.258824,0.258824,0.435294>\n"
-		       << "}\n"
-		       << "\n";
 
 		file.close();
 
