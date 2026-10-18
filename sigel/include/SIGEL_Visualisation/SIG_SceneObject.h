@@ -30,47 +30,27 @@ namespace SIGEL_Visualisation
 {
 
   /**
-   * This class contains the basic information set
-   * about one object that can change in each
-   * simulation step.
-   *
-   * This is the type of information that is recorded
-   * in each time step by the SIG_RenderRecorder.
+   * The position and rotation of one object. SIG_RenderRecorder keeps one for each link
+   * and sets it at each recorded step.
    */
   class SIG_SceneObject
     {
     public:
 
       /**
-       * The constructor of the SIG_SceneObject.
-       *
-       * The position starts at the origin and the rotation
-       * at the identity.
-       *
-       * @param number Initializes the attribute number.
+       * The position starts at the origin and the rotation at the identity.
        */
       SIG_SceneObject(int number);
 
       /**
-       * The number of this SIG_SceneObject.
-       *
-       * Should be equal to the position of the respective
-       * SIG_VisualSceneObject in the QList sceneObjects in
-       * the class SIG_Renderer.
-       * It makes sense if this number also equals some enumeration
-       * in the source datastructure (SIG_Link objects in the SIG_Robot
-       * for example).
+       * In SIG_RenderRecorder, the link number, which is also the index in robotLinks. In a
+       * SIG_VisualSceneObject, the index in SIG_Renderer::sceneObjects. An anchor point is
+       * different: it has the number of its link, which gives its position and rotation.
        */
       int const number;
 
-      /**
-       * The current position of the particular object.
-       */
       SIG_Vector position;
 
-      /**
-       * The current rotation of the particular object.
-       */
       SIG_Matrix rotation;
     };
 
