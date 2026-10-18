@@ -31,10 +31,8 @@ namespace SIGEL_Visualisation
 {
 
   /**
-   * This class records the current positions and orientations
-   * of the objects that take part in the SIGEL_Simulation::SIG_Simulation
-   * contained in the SIG_SimulationVisualisation that created this
-   * SIG_RenderRecorder.
+   * Records, at each simulation step, each link's position and rotation and the simulated
+   * time, for SIG_SimulationVisualisation.
    */
   class SIG_RenderRecorder : public SIGEL_Simulation::SIG_Recorder
     {
@@ -43,10 +41,7 @@ namespace SIGEL_Visualisation
     public:
 
       /**
-       * The constructor of the SIG_RenderRecorder.
-       *
-       * Initiallizes the attribute robotLinks with the
-       * supplied number of SIG_SceneObject objects.
+       * Creates noOfObjects scene objects in robotLinks, numbered from 0.
        */
       SIG_RenderRecorder(int noOfObjects);
 
@@ -60,30 +55,20 @@ namespace SIGEL_Visualisation
       SIG_RenderRecorder &operator=( const SIG_RenderRecorder & ) = delete;
 
       /**
-       * Initalizes the start positions and rotations of
-       * the elements of robotLinks taken from the
-       * appropriate SIGEL_Simulation::SIG_SimulationQueries.
-       *
-       * First it calls the method init of the superclass
-       * SIGEL_Simulation::SIG_Recorder.
+       * Records the start state.
        */
       void init() override;
 
       /**
-       * Updates the positions and rotations of the robotLinks
-       * with the actual data taken from the appropriate
-       * SIGEL_Simulation::SIG_SimulationQueries.
-       *
-       * First it calls the method record of the superclass
-       * SIGEL_Simulation::SIG_Recorder.
+       * Copies each link's position and rotation and the simulated time from the simulation
+       * queries.
        */
       void record() override;
 
     private:
 
       /**
-       * The data structure used to record the actual
-       * positions and rotations of the simulated objects.
+       * One scene object per link, at the index of its link number.
        */
       QList<SIG_SceneObject *> robotLinks;
 
