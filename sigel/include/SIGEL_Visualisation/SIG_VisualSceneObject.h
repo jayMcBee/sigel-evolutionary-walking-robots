@@ -37,101 +37,51 @@ namespace SIGEL_Visualisation
 {
 
   /**
-   * This class models a renderable object.
-   *
-   * The inherited attributes are now private.
-   * They may be only accessed via the appropriate
-   * set- ang get-methods, because their setting influences
-   * internal OpenGL-data.
-   * Together with color information it contains everything
-   * that can change during general visualisation (highlighting for
-   * example).
+   * An object that a renderer draws: its position, rotation, colour and visibility. The
+   * position and rotation are also kept as an OpenGL matrix, so they change only through
+   * the setters.
    */
   class SIG_VisualSceneObject : private SIG_SceneObject
     {
     public:
 
-      /**
-       * The constructor of the SIG_VisualSceneObject.
-       *
-       * Initializes the attributes.
-       *
-       * @param number Initializes the attribute number.
-       * @param name Initializes the attribute name.
-       * @param color Initializes the attribute color.
-       */
       SIG_VisualSceneObject(int number, QString name, SIG_Vector color = SIG_Vector());
 
-      /**
-       * Gets the objects number.
-       */
       int getNumber() const { return number; }
 
       /**
-       * Sets the object's position.
-       *
-       * Sets the attribute position and
-       * updates the transformation matrix transformationInternal.
-       * The last task is performed by calling the method
-       * updateTransformationInternal.
+       * Sets the position and its part of transformationInternal.
        */
       void setPosition(SIG_Vector newPosition);
 
-      /**
-       * Gets the object's position.
-       */
       SIG_Vector getPosition() const { return position; }
 
       /**
-       * Sets the object's rotation.
-       *
-       * Sets the attribute rotation and
-       * updates the transformation matrix transformationInternal.
-       * The last task is performed by calling the method
-       * updateTransformationInternal.
+       * Sets the rotation and its part of transformationInternal.
        */
       void setRotation(SIG_Matrix newRotation);
 
-      /**
-       * Gets the object's rotation.
-       */
       SIG_Matrix getRotation() const { return rotation; }
 
       /**
-       * Sets the object's color.
-       *
-       * Sets the attribute color and
-       * updates the attribute colorInternal.
+       * Sets the colour and colorInternal.
        */
       void setColor(SIG_Vector newColor);
 
-      /**
-       * Gets the object's color.
-       */
       SIG_Vector getColor() const { return color; }
 
       /**
-       * Executes appropriate OpenGL commands
-       * to apply this object's transformation matrix
-       * transformationInternal.
+       * Multiplies the current OpenGL matrix by transformationInternal.
        */
       void applyTransformation();
 
       /**
-       * Executes appropriate OpenGL command
-       * to apply this object's color
-       * by using the attribute coloInternal.
+       * Sets the current OpenGL colour to colorInternal.
        */
       void applyColor();
 
-      /**
-       * Sets the attribute visible.
-       */
       void setVisible( bool newVisible );
 
-      /**
-       * Gets the attribute visible.
-       */
       bool getVisible() const { return visible; }
 
       void setFloatingText( SIG_FloatingText *newFloatingText );
@@ -139,70 +89,48 @@ namespace SIGEL_Visualisation
       SIG_FloatingText *getFloatingText() const { return floatingText; }
 
       /**
-       * The name of this SIG_VisualSceneObject.
+       * The POV-Ray export uses this name to refer to the object's #declare, so the two
+       * names must be the same.
        */
       QString const name;
 
     private:
 
       /**
-       * Recalculate the elements of the attribute
-       * transformationInternal dependent from
-       * the attribute position from the actual
-       * position.
+       * Copies position into transformationInternal.
        */
       void updatePositionInternal();
 
       /**
-       * Recalculate the elements of the attribute
-       * transformationInternal dependent from
-       * the attribute rotation from the actual
-       * rotation.
+       * Copies rotation into transformationInternal.
        */
       void updateRotationInternal();
 
       /**
-       * Sets the elements of the attribute
-       * colorInternal according to the attribute color.
+       * Copies color into colorInternal.
        */
       void updateColorInternal();
 
-      /**
-       * The current color of this SIG_VisualSceneObject.
-       */
       SIG_Vector color;
 
       /**
-       * Internal representation of the
-       * attributes position and rotation as a
-       * homogenous transformation matrix.
-       *
-       * Used for OpenGL rendering.
-       * The QList contains the matrix columnwise, so it
-       * should contain 16 elements.
-       *
-       * @invariant transformationInternal has to perform the
-       *            same transformation as a %rotation about the
-       *            attribute rotation and a translation about
-       *            the attribute position. This is guaranted
-       *            by the method updateTransformationInternal.
+       * position and rotation as a 4 × 4 matrix, 16 elements in OpenGL's column order.
        */
       QList<GLdouble> transformationInternal;
 
       /**
-       * Internal representation the attribute color.
-       *
-       * Used for OpenGL rendering.
-       * The QList contains the R, G and B components
-       * of the object's color.
+       * color as red, green and blue for OpenGL.
        */
       QList<GLdouble> colorInternal;
 
       /**
-       * Controls if the object is rendered.
+       * Whether the renderer draws this object and the POV-Ray export writes it.
        */
       bool visible;
 
+      /**
+       * Not owned: the renderer's floatingTexts deletes it.
+       */
       SIG_FloatingText *floatingText;
     };
 
