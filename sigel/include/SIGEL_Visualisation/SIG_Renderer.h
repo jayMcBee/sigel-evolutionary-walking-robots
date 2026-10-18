@@ -93,6 +93,8 @@ namespace SIGEL_Visualisation
 
     static QString vectorToPovray( NEWMAT::ColumnVector input );
 
+    QString exportSceneObjectsToPovray() const;
+
     /**
      * The array of SIG_VisualSceneObjects.
      *
@@ -139,8 +141,6 @@ namespace SIGEL_Visualisation
      * @pre The display lists are builded.
      */
     void renderSceneObjects( GLuint first, GLuint end );
-
-    QString exportSceneObjectsToPovray() const;
   };
 
 }
