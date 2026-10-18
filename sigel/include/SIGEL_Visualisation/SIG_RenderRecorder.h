@@ -49,8 +49,6 @@ namespace SIGEL_Visualisation
        * The destructor. It frees the scene objects in robotLinks.
        */
       ~SIG_RenderRecorder() override;
-      // This class owns raw pointers in a QList and frees them in its
-      // destructor, so a copy would free them twice.
       SIG_RenderRecorder( const SIG_RenderRecorder & ) = delete;
       SIG_RenderRecorder &operator=( const SIG_RenderRecorder & ) = delete;
 

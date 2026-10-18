@@ -54,8 +54,6 @@ namespace SIGEL_Visualisation
      * Deletes the scene objects and the floating texts, and frees the display lists.
      */
     ~SIG_Renderer();
-    // This class owns raw pointers in a QList and frees them in its
-    // destructor, so a copy would free them twice.
     SIG_Renderer( const SIG_Renderer & ) = delete;
     SIG_Renderer &operator=( const SIG_Renderer & ) = delete;
 

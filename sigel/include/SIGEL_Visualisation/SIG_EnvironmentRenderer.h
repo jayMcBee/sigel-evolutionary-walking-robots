@@ -67,8 +67,6 @@ namespace SIGEL_Visualisation
      * Deletes the robot path points.
      */
     ~SIG_EnvironmentRenderer();
-    // This class owns raw pointers in a QList and frees them in its
-    // destructor, so a copy would free them twice.
     SIG_EnvironmentRenderer( const SIG_EnvironmentRenderer & ) = delete;
     SIG_EnvironmentRenderer &operator=( const SIG_EnvironmentRenderer & ) = delete;
 
