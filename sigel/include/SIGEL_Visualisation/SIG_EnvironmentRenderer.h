@@ -108,7 +108,7 @@ namespace SIGEL_Visualisation
      */
     bool getWithTexture() const { return withTexture; }
 
-    int getFieldEdgeLength() const { return fieldEdgeLength; }
+    int getGridSpacing() const { return gridSpacing; }
 
     QString exportToPovray() const;
 
@@ -205,7 +205,7 @@ namespace SIGEL_Visualisation
      */
     SIGEL_Environment::SIG_Environment const &environment;
 
-    GLint const fieldEdgeLength;
+    GLint const gridSpacing;
 
     SIG_Vector lookPoint;
 

@@ -158,20 +158,20 @@ namespace SIGEL_Visualisation
 	   << "                 }\n"
 	   << "\n";
 
-    int const fieldEdgeLength = environmentRenderer.getFieldEdgeLength();
+    int const gridSpacing = environmentRenderer.getGridSpacing();
 
     int const noOfFields = 70;
 
-    int const minX = - fieldEdgeLength * noOfFields;
-    int const maxX =   fieldEdgeLength * noOfFields;
-    int const minZ = - fieldEdgeLength * noOfFields;
-    int const maxZ =   fieldEdgeLength * noOfFields;
+    int const minX = - gridSpacing * noOfFields;
+    int const maxX =   gridSpacing * noOfFields;
+    int const minZ = - gridSpacing * noOfFields;
+    int const maxZ =   gridSpacing * noOfFields;
 
     NEWMAT::ColumnVector gridColorVector = SIG_TypeConverter::toColumnVector( environmentRenderer.sceneObjects[ 1 ]->getColor() );
 
     stream << "#declare Grid = union {\n";
 
-    for (int x=minX; x<=maxX; x+=fieldEdgeLength)
+    for (int x=minX; x<=maxX; x+=gridSpacing)
       {
 	stream << "  cylinder {\n"
 	       << "    <"
@@ -186,7 +186,7 @@ namespace SIGEL_Visualisation
 	       << "  }\n";
       };
 
-    for (int z=minZ; z<=maxZ; z+=fieldEdgeLength)
+    for (int z=minZ; z<=maxZ; z+=gridSpacing)
       {
 	stream << "  cylinder {\n"
 	       << "    <"

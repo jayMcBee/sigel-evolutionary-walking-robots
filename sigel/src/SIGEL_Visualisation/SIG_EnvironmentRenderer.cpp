@@ -40,7 +40,7 @@ namespace SIGEL_Visualisation
   SIG_EnvironmentRenderer::SIG_EnvironmentRenderer(SIGEL_Environment::SIG_Environment const &environment)
     : SIG_Renderer( 2, 0),
       environment(environment),
-      fieldEdgeLength( 1 ),
+      gridSpacing( 1 ),
       lookPoint(0, 0, 0),
       showRobotPath( false )
   {
@@ -234,8 +234,8 @@ namespace SIGEL_Visualisation
     QString resultString;
     QTextStream stream( &resultString, QIODevice::WriteOnly );
 
-    int xPos = static_cast< int >( std::floor( lookPoint.x / fieldEdgeLength ) * fieldEdgeLength );
-    int zPos = - static_cast< int >( std::floor( lookPoint.z / fieldEdgeLength ) * fieldEdgeLength );
+    int xPos = static_cast< int >( std::floor( lookPoint.x / gridSpacing ) * gridSpacing );
+    int zPos = - static_cast< int >( std::floor( lookPoint.z / gridSpacing ) * gridSpacing );
 
     stream << "union {\n"
 	   << exportSceneObjectsToPovray()
