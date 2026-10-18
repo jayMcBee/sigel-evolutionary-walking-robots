@@ -184,9 +184,6 @@ touched, because changing one changes behaviour against the reference binary.
   (`~/sigel-woody/bin/repair-povray-output.py`, `render-hq.py`,
   `hq/sigel-hq.inc`); they show what had to change. The export should not
   need a post-processing step.
-  - **The camera.** A 100° lens about half a unit from the robot, aimed at
-    the base link, which is one end of the robot; its distance changes per
-    frame.
   - **The materials** are flat colour. A `.rrb` material carries
     only colour and density.
   - **The floor** moves with the robot. Harmless while it is one colour, but
@@ -194,10 +191,9 @@ touched, because changing one changes behaviour against the reference binary.
   - **The rendering options.** povray's default jitter makes edges flicker
     from frame to frame; SIGEL gives the user no recommended options.
   To decide: the materials and a patterned floor, whether a finish becomes
-  part of the robot format, how the camera moves, and whether options are
-  switches in the include file. Not checked in 2.0: whether recording stops
-  at the end of the evaluated time (1.3's did not), and whether a height-map
-  terrain exports.
+  part of the robot format, and whether options are switches in the include
+  file. Not checked in 2.0: whether recording stops at the end of the
+  evaluated time (1.3's did not), and whether a height-map terrain exports.
 
 ---
 

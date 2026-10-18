@@ -2600,7 +2600,7 @@ Do you want to replace it?]
 == POV EXPORT ==
 steps=120
 files=32
-  sigel_pic.inc bytes=19665 sha256=f4e9eca601f61d654f1fe510d6581434c4693dad728078a05829252527bf1dc5
+  sigel_pic.inc bytes=19666 sha256=04c3278d20c7ae66920c003c01fb2b683008e476046701152e8c5f3fdca75c7c
   sigel_pic0000.pov bytes=1059 sha256=89ce4032d7c7d6802fda48d7200666b50e61bd5c9638af6f26fd11c2beda7b56
   sigel_pic0001.pov bytes=1070 sha256=f9e974b5ece4e62416315aea5b6d6ee7dbb846a53c6c9f0c0db965ce7172f357
   sigel_pic0002.pov bytes=1096 sha256=37569f07fc7003ddcb6dab1c9c804af228cdf9af2c0f2e60525371ce6e69a0e4
@@ -2795,7 +2795,7 @@ files=32
   }
   
   #declare cameraRight = 1.77778*x;
-  #declare cameraDirection = <0,0,0.41955>;
+  #declare cameraDirection = <0,0,0.866025>;
   
   light_source {
     <-486.66, 811.11, -324.44>

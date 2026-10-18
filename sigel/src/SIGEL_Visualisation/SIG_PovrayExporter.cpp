@@ -50,11 +50,8 @@ namespace SIGEL_Visualisation
 
     QTextStream stream( &file );
 
-    static double const xAngle = 100;
-
-    static double const xAngleRad = qDegreesToRadians( xAngle );
-
-    static double const directionLength = 0.5 * 1 / std::tan( xAngleRad / 2 );
+    // The screen's vertical field of view: the frame's height is 1 at this distance.
+    static double const directionLength = 0.5 / std::tan( qDegreesToRadians( SIG_Visualisation::fieldOfView ) / 2 );
 
     // Far enough that the light falls in parallel across the robot's whole walk.
     static double const lightDistance = 1000;
