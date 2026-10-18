@@ -69,12 +69,12 @@ namespace SIGEL_Visualisation
 	   << "                       fade_power 1\n"
 	   << "                     }\n"
 	   << "\n"
-	   << "background { rgb <0.258824,0.258824,0.435294> }\n"
+	   << "background { srgb <0.258824,0.258824,0.435294> }\n"
 	   << "\n"
 	   << "fog {\n"
 	   << "  fog_type 1\n"
 	   << "  distance 80\n"
-	   << "  rgb <0.258824,0.258824,0.435294>\n"
+	   << "  srgb <0.258824,0.258824,0.435294>\n"
 	   << "}\n"
 	   << "\n";
 
@@ -100,7 +100,13 @@ namespace SIGEL_Visualisation
 
     NEWMAT::ColumnVector lookPointColumnVector = SIG_TypeConverter::toColumnVector( viewSettings.lookPoint );
 
-    stream << "#include "
+    stream << "#version 3.7;\n"
+	   << "\n"
+	   << "global_settings { assumed_gamma 1.0 ambient_light srgb "
+	   << vectorToPovray( visualisation.getAmbientSceneColor() )
+	   << " }\n"
+	   << "\n"
+	   << "#include "
 	   << "\""
 	   << includeFileName
 	   << "\"\n"
@@ -124,11 +130,7 @@ namespace SIGEL_Visualisation
 	   << "  look_at "
 	   << vectorToPovray( SIG_TypeConverter::sigelToPovray() * lookPointColumnVector )
 	   << "\n"
-	   << "}\n"
-	   << "\n"
-	   << "global_settings { ambient_light rgb "
-	   << vectorToPovray( visualisation.getAmbientSceneColor() )
-	   << " }\n";
+	   << "}\n";
 
     file.close();
 
@@ -147,10 +149,10 @@ namespace SIGEL_Visualisation
     stream << "#declare Plane = plane {\n"
 	   << "                   <0,1,0>, 0\n"
 	   << "                   texture {\n"
-	   << "                     pigment { rgb "
+	   << "                     pigment { srgb "
 	   << vectorToPovray( planeColorVector )
 	   << " }\n"
-	   << "                     finish { ambient rgb "
+	   << "                     finish { ambient srgb "
 	   << vectorToPovray( planeColorVector )
 	   << "\n"
 	   << "                              diffuse 1 }\n"
@@ -202,8 +204,8 @@ namespace SIGEL_Visualisation
       };
 
     stream << "\n"
-	   << "  pigment { rgb " << vectorToPovray( gridColorVector ) << " }\n"
-	   << "  finish { ambient rgb " << vectorToPovray( gridColorVector ) << "\n"
+	   << "  pigment { srgb " << vectorToPovray( gridColorVector ) << " }\n"
+	   << "  finish { ambient srgb " << vectorToPovray( gridColorVector ) << "\n"
 	   << "           diffuse 1 }\n"
 	   << "}\n";
 
@@ -225,10 +227,10 @@ namespace SIGEL_Visualisation
 	stream << "#declare "
 	       << actMaterial.getName()
 	       << " = texture {\n"
-	       << "  pigment { rgb "
+	       << "  pigment { srgb "
 	       << vectorToPovray( SIG_TypeConverter::toColumnVector( actMaterial.getColour() ) )
 	       << " }\n"
-	       << "  finish { ambient rgb "
+	       << "  finish { ambient srgb "
 	       << vectorToPovray( SIG_TypeConverter::toColumnVector( actMaterial.getColour() ) )
 	       << "\n"
 	       << "           diffuse 1 }\n"
@@ -307,7 +309,7 @@ namespace SIGEL_Visualisation
 			    << "    "
 			    << actLink.getMaterial()->getName()
 			    << "\n"
-			    << "    pigment { rgb "
+			    << "    pigment { srgb "
 			    << vectorToPovray( linkColor )
 			    << " }\n"
 			    << "  }\n"
@@ -376,8 +378,8 @@ namespace SIGEL_Visualisation
 		   << vectorToPovray( cap )
 		   << ", 0.02\n"
 		   << "  open\n"
-		   << "  pigment { rgb <1,1,0> }\n"
-		   << "  finish { ambient rgb <1,1,0>\n"
+		   << "  pigment { srgb <1,1,0> }\n"
+		   << "  finish { ambient srgb <1,1,0>\n"
 		   << "           diffuse 1 }\n"
 		   << "}\n";
 	  };

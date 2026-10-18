@@ -2600,40 +2600,44 @@ Do you want to replace it?]
 == POV EXPORT ==
 steps=120
 files=32
-  sigel_pic.inc bytes=19590 sha256=b98a4fde652f8cfeef855d3e72712e022bbb5b78db4e2563b78bd067eaceae60
-  sigel_pic0000.pov bytes=959 sha256=7915deba91dac3f04dbe6bfc174886276e876894ca14adb773c6cb9e59532d2b
-  sigel_pic0001.pov bytes=970 sha256=47b218097cb4c531ee55dcea6d6be34f8a3b329998a888292832cbf18f762f1a
-  sigel_pic0002.pov bytes=996 sha256=e1fce60f27aa408028c51651bb1b47146f81d939b65d4b05092f19e65d7dbb0b
-  sigel_pic0003.pov bytes=995 sha256=2fe428a57576d2bc14ef964f7e88da422e75a01f91c9b50217fb7bce99d1ed58
-  sigel_pic0004.pov bytes=983 sha256=ccb2720faef64c55d6b447303979dbcf110432a745e9db706a6a86d2502c3b1c
-  sigel_pic0005.pov bytes=986 sha256=55b0589967fc86d629a881def4780c6e67233d9e867797ee0985b18d1420c02a
-  sigel_pic0006.pov bytes=983 sha256=ca8894c81715b571cacd5b1d167c49e2326bfe3bb8daa219b29df5abdf8b2c23
-  sigel_pic0007.pov bytes=983 sha256=6ed79fcea799f38275b5efc566df43ac6b81fa0792fb08cd3d1a394b9a7845ef
-  sigel_pic0008.pov bytes=983 sha256=37b96ba79afafbb7f33c483b47a9e1738bdc939ad3669064be747d7c7f9edd19
-  sigel_pic0009.pov bytes=988 sha256=56bbc624c48b69860405dc4841d371e4da08cf13919d900afcbcce36a42c16e4
-  sigel_pic0010.pov bytes=986 sha256=04dedcf142825cd10d5ab816cc1db5a0b60abb849f8b53f14d5eed99fa26f371
-  sigel_pic0011.pov bytes=990 sha256=bd56648f9ca61da7166be96494bcadb73d7b26165331aa58e45561a6e74078cb
-  sigel_pic0012.pov bytes=988 sha256=343559aa71bf1fd54c7ff72e1882de9351b16a7ef56209ebbfe79f2282423fc8
-  sigel_pic0013.pov bytes=1171 sha256=ab051bc48413ce90631609bbcc445e47c45be971407cc72bd646c52a7f24baa3
-  sigel_pic0014.pov bytes=1163 sha256=bc8ee085ee9c43aca4cf704df786698fbd8eade1a98013ffdad0f35f98467328
-  sigel_pic0015.pov bytes=1166 sha256=bfa462225e137a6f361c3b6d60ab1afa4c85e57f6f65fd28156f3810b38c20b8
-  sigel_pic0016.pov bytes=1172 sha256=bb1e0a833ed48184e51419000305d6a3d8304de6b882cc678508aeaec5ba4519
-  sigel_pic0017.pov bytes=1178 sha256=66b8cb0f2027b1ec7fdf7e2f63858e8d17bae086ab37a354a93aa3210284547f
-  sigel_pic0018.pov bytes=1170 sha256=1bbe6f859197f317beebd7b43255deaac08cbee6df13c44ef775c75c4fabf104
-  sigel_pic0019.pov bytes=1170 sha256=fc333d97013a9260116f886bd55d7b1520819db7687ce5ddd15ed5707ed32f53
-  sigel_pic0020.pov bytes=1180 sha256=0d6cb792048d4edf46f0d41e3a4e5839908d3c995bec439dea2a31f5d610bfc7
-  sigel_pic0021.pov bytes=1172 sha256=e82dc764b972c3d4ef00fbdb5322ae85f48d53b0e0d34a0911ece3d69c5d1a4a
-  sigel_pic0022.pov bytes=1175 sha256=ab08386d13485a56289b5778c9be1c10a38c4c5d9c37d0771e8f49ea8ad955d0
-  sigel_pic0023.pov bytes=1171 sha256=adcd19e9f0205e0c49fb1a73a96136607d03c5f6951f3e79ef91e02f21eb8836
-  sigel_pic0024.pov bytes=1171 sha256=cf63585aea37e5b3f368f885f8d90722597e55934201e43f36fcf7eb08cdc0e4
-  sigel_pic0025.pov bytes=1164 sha256=c3d953e344e13b5c13126b3ddee6fb0e096b1dbcd1cd6a92aed7c3e9fbca3af2
-  sigel_pic0026.pov bytes=1343 sha256=8689c1890a7e7bf88eef8cd9bfc0af6bbb0e04c05b1055a1393acabec970ba94
-  sigel_pic0027.pov bytes=1348 sha256=4a9ba0d1381e651eae5440ea3076008f5889fdb1402366ad3d3993de2ba3a88e
-  sigel_pic0028.pov bytes=1343 sha256=0a95d1242de3f501e31dbaf825a668155aa7ea841a53e5e83765e7bc005f8ea7
-  sigel_pic0029.pov bytes=1346 sha256=361b8186aa3db64525956befe2201f3fa79bb04a69c414f6fd20ce5823e3da54
-  sigel_pic0030.pov bytes=1352 sha256=0775d9666f9c14cf61d778a79fb5f4cf5da5142ffcb4714a6b51f156fc092884
+  sigel_pic.inc bytes=19604 sha256=b66f735093f69dcd31779424fe0814a20a0334f0ec3e7929544878a31f9b93fc
+  sigel_pic0000.pov bytes=993 sha256=014351588c846e0865741023b97439891b88d19169718338356c477b44964061
+  sigel_pic0001.pov bytes=1004 sha256=b79197485ef39d870acaa7232dd8c09faa39365b909a50a63477d1a501b62103
+  sigel_pic0002.pov bytes=1030 sha256=11229545a2ce01f2d8114961214865dc56b6e139189cfdab5632a6beef9e1e00
+  sigel_pic0003.pov bytes=1029 sha256=43e4a3645e20bf228a39541e495ffdd5ed670a4e5fcb824d28edbfe7c514d8fc
+  sigel_pic0004.pov bytes=1017 sha256=ce93e8f1a0726caaf074860c229bc0ca499242717e687fd3f53a8cdc84cfec52
+  sigel_pic0005.pov bytes=1020 sha256=08ec53b47836392be01fc19faf81d9da15029c2e23e36b77d2e26e6996e4e675
+  sigel_pic0006.pov bytes=1017 sha256=295b2921cced8fa32ba594e8d91fac146f660826644dafaf33904af4d3e27e33
+  sigel_pic0007.pov bytes=1017 sha256=17ad4ba4b0b49bd6c456f94d060fd74b07884802935c221050ed583b9efefe2a
+  sigel_pic0008.pov bytes=1017 sha256=d2dd70620546b735b23989828dde1e14068884a6c734569911c9a7805fe2717d
+  sigel_pic0009.pov bytes=1022 sha256=08f45aa07d30b649ce12337a8e6d289041918b9922b236a4e9939438af20d169
+  sigel_pic0010.pov bytes=1020 sha256=6bfcad39ce87175dd8dde738983df85bd8b9a44ab58114d04862462cf6aab76d
+  sigel_pic0011.pov bytes=1024 sha256=c2d3f731e18b59b7554fcf2e34d6ad84c565278b1fec7c87d1d18d63fc6108c7
+  sigel_pic0012.pov bytes=1022 sha256=41034a44b221e979b2e933ed7a77be697e7311263bb64416cad7bbf878cbd80c
+  sigel_pic0013.pov bytes=1207 sha256=d16521c11c4cb96b966db06e7edd63751a69843f38214d240f6c4c5d1d44fb69
+  sigel_pic0014.pov bytes=1199 sha256=d71a3a1056589be9d013783f8ba989cb5249889a539a464443be9674451f7aa6
+  sigel_pic0015.pov bytes=1202 sha256=ab2a8bed47638ab3795881204aa023102264c9a40c04676f5815ac246b0a9b36
+  sigel_pic0016.pov bytes=1208 sha256=6e182b66b1156136d21d21c79290a4dcabf97a4eb4124c39411181a04bd2377d
+  sigel_pic0017.pov bytes=1214 sha256=51cfbcec7a116c0cc0294f82fd3290aadcca5c517ee640bad2063a6d0e9fca06
+  sigel_pic0018.pov bytes=1206 sha256=20833e7701ce6f0859e2126c88aa320a2e623fc073cc2968ceea519c3f0dd797
+  sigel_pic0019.pov bytes=1206 sha256=fd0be159a8b372a5f567babf269511069b31c82fa3b9065c8367f3d23d11800e
+  sigel_pic0020.pov bytes=1216 sha256=83a6be00bf6bc120482ffe61e03a1b74b9aee5e8bdb50dde3dc87c93ac038608
+  sigel_pic0021.pov bytes=1208 sha256=090900bec3391c0eeb382fa2e0fb262d2d7e85a29a9555a1167fd6de52835b22
+  sigel_pic0022.pov bytes=1211 sha256=19c8d1914658e4f7c4cbeb7de50af9a92750cc7c1bbded6ccc7ef5dd91ac30ba
+  sigel_pic0023.pov bytes=1207 sha256=a932e299d3187c5f51c20505dd3ca6601accde2102363ade1e4e1680a6fcea61
+  sigel_pic0024.pov bytes=1207 sha256=37bed9e4247253b5e584ad79908753ee244301b53f9fc15b645ba42928588664
+  sigel_pic0025.pov bytes=1200 sha256=2b47afa1fc1569c1b0ebca02997bf0f845836052cba0b43e9de35b5c03bcc305
+  sigel_pic0026.pov bytes=1381 sha256=7804e5f99479fb7a194d7b1640266465fdcbb527930906e58bd977d93f1c9e97
+  sigel_pic0027.pov bytes=1386 sha256=6123181d97272a88a29243871a6461232933d6a01aa3f2d7ea3abd01f5214c35
+  sigel_pic0028.pov bytes=1381 sha256=142af9eed5bc90b64ca429c3a2d53c13bc4470cc79a1f985a70c748e5f85d409
+  sigel_pic0029.pov bytes=1384 sha256=ea4af41217eb2347170ca8ca53f6fde51ce3b4209b58021af5e9ea9395a7c72b
+  sigel_pic0030.pov bytes=1390 sha256=f8dd246a63542c691252d6fe65894bccc41f030e524acc19141d79279c85c3ee
 
 == sigel_pic0030.pov ==
+  #version 3.7;
+  
+  global_settings { assumed_gamma 1.0 ambient_light srgb <0.25, 0.25, 0.25> }
+  
   #include "sigel_pic.inc"
   
   union {
@@ -2661,15 +2665,15 @@ files=32
   cylinder {
     <7.8786e-11, 0.99968, -1.7663e-11>, <0.00010962, 0.99241, 1.6028e-05>, 0.02
     open
-    pigment { rgb <1,1,0> }
-    finish { ambient rgb <1,1,0>
+    pigment { srgb <1,1,0> }
+    finish { ambient srgb <1,1,0>
              diffuse 1 }
   }
   cylinder {
     <0.00010962, 0.99241, 1.6028e-05>, <0.0015463, 1.0747, 2.1893e-05>, 0.02
     open
-    pigment { rgb <1,1,0> }
-    finish { ambient rgb <1,1,0>
+    pigment { srgb <1,1,0> }
+    finish { ambient srgb <1,1,0>
              diffuse 1 }
   }
   
@@ -2704,15 +2708,13 @@ files=32
     look_at <1.0002, 0.99517, 1.9692e-05>
   }
   
-  global_settings { ambient_light rgb <0.25, 0.25, 0.25> }
-  
 
 == sigel_pic.inc, triangles and cylinders counted ==
   #declare Plane = plane {
                      <0,1,0>, 0
                      texture {
-                       pigment { rgb <0.49804, 0.49804, 0.49804> }
-                       finish { ambient rgb <0.49804, 0.49804, 0.49804>
+                       pigment { srgb <0.49804, 0.49804, 0.49804> }
+                       finish { ambient srgb <0.49804, 0.49804, 0.49804>
                                 diffuse 1 }
                      }
                    }
@@ -2720,14 +2722,14 @@ files=32
   #declare Grid = union {
     [282 cylinders]
   
-    pigment { rgb <0.31373, 0.31373, 0.31373> }
-    finish { ambient rgb <0.31373, 0.31373, 0.31373>
+    pigment { srgb <0.31373, 0.31373, 0.31373> }
+    finish { ambient srgb <0.31373, 0.31373, 0.31373>
              diffuse 1 }
   }
   
   #declare metal = texture {
-    pigment { rgb <0, 0, 0.5> }
-    finish { ambient rgb <0, 0, 0.5>
+    pigment { srgb <0, 0, 0.5> }
+    finish { ambient srgb <0, 0, 0.5>
              diffuse 1 }
   }
   
@@ -2747,7 +2749,7 @@ files=32
     <2, 0, 0>, 0.05
     texture {
       metal
-      pigment { rgb <0, 0, 0.2> }
+      pigment { srgb <0, 0, 0.2> }
     }
   }
   
@@ -2755,7 +2757,7 @@ files=32
     <1, 0, 0>, 0.05
     texture {
       metal
-      pigment { rgb <0, 0, 0.2> }
+      pigment { srgb <0, 0, 0.2> }
     }
   }
   
@@ -2763,7 +2765,7 @@ files=32
     <1, 0, 1>, 0.05
     texture {
       metal
-      pigment { rgb <0, 0, 0.2> }
+      pigment { srgb <0, 0, 0.2> }
     }
   }
   
@@ -2771,7 +2773,7 @@ files=32
     <-1, 0, 0>, 0.05
     texture {
       metal
-      pigment { rgb <0, 0, 0.2> }
+      pigment { srgb <0, 0, 0.2> }
     }
   }
   
@@ -2779,7 +2781,7 @@ files=32
     <0, 0, 0>, 0.05
     texture {
       metal
-      pigment { rgb <0, 0, 0.2> }
+      pigment { srgb <0, 0, 0.2> }
     }
   }
   
@@ -2787,7 +2789,7 @@ files=32
     <0, 0, 1>, 0.05
     texture {
       metal
-      pigment { rgb <0, 0, 0.2> }
+      pigment { srgb <0, 0, 0.2> }
     }
   }
   
@@ -2801,12 +2803,12 @@ files=32
                          fade_power 1
                        }
   
-  background { rgb <0.258824,0.258824,0.435294> }
+  background { srgb <0.258824,0.258824,0.435294> }
   
   fog {
     fog_type 1
     distance 80
-    rgb <0.258824,0.258824,0.435294>
+    srgb <0.258824,0.258824,0.435294>
   }
   
   
