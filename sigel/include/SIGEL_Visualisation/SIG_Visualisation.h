@@ -32,51 +32,33 @@
 #include <newmat.h>
 
 /**
- * This namespace (package) contains all classes that are responsible
- * for the visualisation of robots (class SIGEL_Robot::SIG_Robot),
- * environments (class SIGEL_Environment::SIG_Environment),
- * and simulations (class SIGEL_Simulation::SIG_Simulation).
- *
- * In detail they are responsibel for calling the appropriate
- * OpenGL commands. The GUI-side of the visualisation
- * is found in other packages.
+ * Draws robots, environments and simulations with OpenGL and writes them as POV-Ray
+ * scenes. The windows that show them are in other modules.
  */
 namespace SIGEL_Visualisation
 {
 
   /**
-   * This is the superclass of all
-   * visualisation classes.
-   *
-   * This classes task is to encapsulate all OpenGL
-   * commands for rendering of different kinds of things
-   * (robots, environments, simulations).
-   * Subclasses should contain objects inherited from
-   * the class SIG_Renderer.
+   * Base class of the visualisations: the OpenGL state, the camera, the sky and the fog.
+   * Subclasses draw their scene with SIG_Renderer objects.
    */
   class SIG_Visualisation
     {
     public:
 
       /**
-       * The constructor of the SIG_Visualisation.
+       * Sets the OpenGL state: depth test, lights, fog and the projection.
        *
-       * Maybe initializes some OpenGL stuff.
+       * @pre An OpenGL context is current.
        */
       SIG_Visualisation();
 
-      /**
-       * The destructor of the SIG_Visualisation.
-       */
       virtual ~SIG_Visualisation() = default;
 
       /**
-       * This method sets up the projection/modelview matrices
-       * according to the actual viewSettings.
-       *
-       * The method visualize of subclasses should first call
-       * SIG_Visualisation::visualize and after that initiate
-       * the final rendering.
+       * Clears the frame, draws the sky, and sets the camera, the fog, the light at the eye
+       * point and the render mode from viewSettings. A subclass's visualize calls this first,
+       * then draws its scene.
        */
       virtual void visualize();
 
@@ -85,12 +67,8 @@ namespace SIGEL_Visualisation
       NEWMAT::ColumnVector getAmbientSceneColor() const { return ambientSceneColor; }
 
       /**
-       * This method recalculates the projection matrix
-       * according to the actual aspect ratio.
-       *
-       * Is called by the constructor and the widget class
-       * class. Tha latter needs only to do this in case
-       * of changed widget proportions.
+       * Sets the projection matrix for viewSettings.aspectRatio. The widget calls it when its
+       * size changes.
        */
       void updateAspectRatio();
 
@@ -100,9 +78,7 @@ namespace SIGEL_Visualisation
       static double const fieldOfView;
 
       /**
-       * The current view settings.
-       *
-       * These should be used by the method visualize.
+       * The camera and the render mode.
        */
       SIG_ViewSettings viewSettings;
 
