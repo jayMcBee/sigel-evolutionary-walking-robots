@@ -42,26 +42,16 @@ namespace SIGEL_Visualisation
   {
   public:
     /**
-     * The constructor of the SIG_Renderer.
+     * Reserves one OpenGL display list per scene object.
      *
-     * May used to initialize some stuff concerning the
-     * OpenGL context. This could be the allocating of
-     * display lists indices and the call of the
-     * buildDisplayLists method.
-     *
-     * @param noOfObjects Becomes the value of the attribute
-     *                    noOfObjects and initializes the
-     *                    sizes of sceneObjects.
-     * @param noOfFloatingTexts Intializes the size of
-     *                          floatingTexts.
+     * @pre An OpenGL context is current.
+     * @param noOfObjects The size of sceneObjects.
+     * @param noOfFloatingTexts The size of floatingTexts.
      */
     SIG_Renderer(int noOfObjects, int noOfFloatingTexts);
 
     /**
-     * The destructor of the SIG_Renderer.
-     *
-     * May used to clean up some OpenGL stuff.
-     * For example the display lists could be cleared.
+     * Deletes the scene objects and the floating texts, and frees the display lists.
      */
     ~SIG_Renderer();
     // This class owns raw pointers in a QList and frees them in its
@@ -70,33 +60,17 @@ namespace SIGEL_Visualisation
     SIG_Renderer &operator=( const SIG_Renderer & ) = delete;
 
     /**
-     * This method finally starts the rendering
-     * into the current OpenGL context.
+     * Draws this renderer's objects into the current OpenGL context.
      *
-     * After the display lists are builded properly
-     * they are called in this method to do
-     * the rendering of the particular object(s).
-     * This is mainly done by calling the
-     * method renderSceneObjects. But if there is
-     * more to show than just what is defined in the
-     * display lists, this method is the place
-     * to do it.
-     *
-     * @pre The display lists are builded.
+     * @pre buildDisplayLists has run.
      */
     virtual void render() = 0;
 
     GLuint getNoOfObjects() const { return noOfObjects; }
 
     /**
-     * The array of SIG_VisualSceneObjects.
-     *
-     * It contains the actual properties of
-     * the objects that are used to render
-     * them. Its public so the object
-     * containing the SIG_Renderer can
-     * change the object properties with
-     * the progress of a simulation for example.
+     * Scene object i uses display list displayListsOffset + i. Public, so that the owner
+     * can move the objects as the simulation runs.
      */
     QList<SIG_VisualSceneObject *> sceneObjects;
 
@@ -117,13 +91,7 @@ namespace SIGEL_Visualisation
     GLuint noOfObjects;
 
     /**
-     * This method builds the OpenGL display lists.
-     *
-     * Dependend from the kind of thing that should
-     * be rendered a static (geometric) data structure
-     * supplied in the subclass could be read.
-     * OpenGL commands to draw this geometry are then
-     * recorded in display lists.
+     * Records the OpenGL commands that draw each scene object in its display list.
      */
     virtual void buildDisplayLists() = 0;
 
@@ -131,7 +99,7 @@ namespace SIGEL_Visualisation
      * Calls the display lists of the scene objects from
      * index first up to, but not including, index end.
      *
-     * @pre The display lists are builded.
+     * @pre buildDisplayLists has run.
      */
     void renderSceneObjects( GLuint first, GLuint end );
   };
