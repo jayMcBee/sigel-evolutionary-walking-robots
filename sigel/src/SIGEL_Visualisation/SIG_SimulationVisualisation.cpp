@@ -20,14 +20,11 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include <QIODevice>
-#include <QFile>
 #include <QOpenGLContext>
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
 #include "SIGEL_Visualisation/SIG_SimulationVisualisation.h"
 #include "SIGEL_Tools/SIG_IO.h"
-#include "SIGEL_Tools/SIG_TypeConverter.h"
 
 #include <cmath>
 
@@ -541,57 +538,6 @@ namespace SIGEL_Visualisation
 		centre.plusis( &position );
 
 		return centre;
-	}
-
-	bool SIG_SimulationVisualisation::exportToPovray( QString includeFilename,
-	                                                  QString fileName )
-	{
-		QFile file( fileName );
-
-		if (!file.open( QIODevice::WriteOnly ))
-			return false;
-
-		QTextStream stream( &file );
-
-		SIG_Vector finalEyePoint = viewSettings.getAbsoluteEyePoint();
-
-		NEWMAT::ColumnVector finalEyePointColumnVector = SIG_TypeConverter::toColumnVector( finalEyePoint );
-
-		NEWMAT::ColumnVector lookPointColumnVector = SIG_TypeConverter::toColumnVector( viewSettings.lookPoint );
-
-		stream << "#include "
-		       << "\""
-		       << includeFilename
-		       << "\"\n"
-		       << "\n"
-		       << environmentRenderer.exportToPovray()
-		       << robotRenderer.exportToPovray()
-		       << "object {\n"
-		       << "  headLight\n"
-		       << "  translate "
-		       << SIG_Renderer::vectorToPovray( SIG_TypeConverter::sigelToPovray() * finalEyePointColumnVector )
-		       << "\n"
-		       << "}\n"
-		       << "\n"
-		       << "camera {\n"
-		       << "  right cameraRight\n"
-		       << "  up y\n"
-		       << "  direction cameraDirection\n"
-		       << "  location "
-		       << SIG_Renderer::vectorToPovray( SIG_TypeConverter::sigelToPovray() * finalEyePointColumnVector )
-		       << "\n"
-		       << "  look_at "
-		       << SIG_Renderer::vectorToPovray( SIG_TypeConverter::sigelToPovray() * lookPointColumnVector )
-		       << "\n"
-		       << "}\n"
-		       << "\n"
-		       << "global_settings { ambient_light rgb "
-		       << SIG_Renderer::vectorToPovray( ambientSceneColor )
-		       << " }\n";
-
-		file.close();
-
-		return true;
 	}
 
 }

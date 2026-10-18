@@ -242,8 +242,7 @@ namespace SIGEL_SlaveGUI
   {
     startFrame( simulationSeconds );
 
-    return visualisation.exportToPovray( settings.filePrefix + ".inc",
-					 lastFileName );
+    return SIGEL_Visualisation::SIG_PovrayExporter( visualisation ).writeFrame( settings.filePrefix + ".inc", lastFileName );
   }
 
   bool SIG_MovieRecorder::createPovrayIncludeFile( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation )

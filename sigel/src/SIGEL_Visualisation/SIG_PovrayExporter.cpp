@@ -24,12 +24,15 @@
 #include "SIGEL_Visualisation/SIG_PovrayExporter.h"
 
 #include "SIGEL_Visualisation/SIG_SimulationVisualisation.h"
+#include "SIGEL_Tools/SIG_TypeConverter.h"
 
 #include <QFile>
 #include <QTextStream>
 #include <QtMath>
 
 #include <cmath>
+
+using namespace SIGEL_Tools;
 
 namespace SIGEL_Visualisation
 {
@@ -74,6 +77,58 @@ namespace SIGEL_Visualisation
 	   << "  rgb <0.258824,0.258824,0.435294>\n"
 	   << "}\n"
 	   << "\n";
+
+    file.close();
+
+    return true;
+  }
+
+  bool SIG_PovrayExporter::writeFrame( QString includeFileName, QString fileName ) const
+  {
+    QFile file( fileName );
+
+    if (!file.open( QIODevice::WriteOnly ))
+      return false;
+
+    QTextStream stream( &file );
+
+    SIG_ViewSettings const &viewSettings = visualisation.viewSettings;
+
+    SIG_Vector finalEyePoint = viewSettings.getAbsoluteEyePoint();
+
+    NEWMAT::ColumnVector finalEyePointColumnVector = SIG_TypeConverter::toColumnVector( finalEyePoint );
+
+    NEWMAT::ColumnVector lookPointColumnVector = SIG_TypeConverter::toColumnVector( viewSettings.lookPoint );
+
+    stream << "#include "
+	   << "\""
+	   << includeFileName
+	   << "\"\n"
+	   << "\n"
+	   << visualisation.getEnvironmentRenderer().exportToPovray()
+	   << visualisation.getRobotRenderer().exportToPovray()
+	   << "object {\n"
+	   << "  headLight\n"
+	   << "  translate "
+	   << SIG_Renderer::vectorToPovray( SIG_TypeConverter::sigelToPovray() * finalEyePointColumnVector )
+	   << "\n"
+	   << "}\n"
+	   << "\n"
+	   << "camera {\n"
+	   << "  right cameraRight\n"
+	   << "  up y\n"
+	   << "  direction cameraDirection\n"
+	   << "  location "
+	   << SIG_Renderer::vectorToPovray( SIG_TypeConverter::sigelToPovray() * finalEyePointColumnVector )
+	   << "\n"
+	   << "  look_at "
+	   << SIG_Renderer::vectorToPovray( SIG_TypeConverter::sigelToPovray() * lookPointColumnVector )
+	   << "\n"
+	   << "}\n"
+	   << "\n"
+	   << "global_settings { ambient_light rgb "
+	   << SIG_Renderer::vectorToPovray( visualisation.getAmbientSceneColor() )
+	   << " }\n";
 
     file.close();
 

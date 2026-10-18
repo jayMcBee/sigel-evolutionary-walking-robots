@@ -48,6 +48,13 @@ namespace SIGEL_Visualisation
      */
     bool writeIncludeFile( QString fileName, double aspectRatio ) const;
 
+    /**
+     * Writes one frame: the scene as it is now.
+     *
+     * @return false if the file cannot be written.
+     */
+    bool writeFrame( QString includeFileName, QString fileName ) const;
+
   private:
     SIG_SimulationVisualisation const &visualisation;
   };

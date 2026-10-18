@@ -147,9 +147,6 @@ namespace SIGEL_Visualisation
 
 		SIG_RobotRenderer const &getRobotRenderer() const { return robotRenderer; }
 
-		bool exportToPovray( QString includeFilename,
-		                     QString fileName );
-
 	private:
 
 		/**
