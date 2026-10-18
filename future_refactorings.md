@@ -184,16 +184,14 @@ touched, because changing one changes behaviour against the reference binary.
   (`~/sigel-woody/bin/repair-povray-output.py`, `render-hq.py`,
   `hq/sigel-hq.inc`); they show what had to change. The export should not
   need a post-processing step.
-  - **The materials** are flat colour. A `.rrb` material carries
-    only colour and density.
   - **The floor** moves with the robot. Harmless while it is one colour, but
     any pattern on it jumps, and a plain floor shows no motion.
   - **The rendering options.** povray's default jitter makes edges flicker
     from frame to frame; SIGEL gives the user no recommended options.
-  To decide: the materials and a patterned floor, whether a finish becomes
-  part of the robot format, and whether options are switches in the include
-  file. Not checked in 2.0: whether recording stops at the end of the
-  evaluated time (1.3's did not), and whether a height-map terrain exports.
+  To decide: a patterned floor, and whether options are switches in the
+  include file. Not checked in 2.0: whether recording stops at the end of
+  the evaluated time (1.3's did not), and whether a height-map terrain
+  exports.
 
 ---
 

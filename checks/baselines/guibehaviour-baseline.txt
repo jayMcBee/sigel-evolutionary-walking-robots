@@ -2600,7 +2600,7 @@ Do you want to replace it?]
 == POV EXPORT ==
 steps=120
 files=32
-  sigel_pic.inc bytes=19666 sha256=04c3278d20c7ae66920c003c01fb2b683008e476046701152e8c5f3fdca75c7c
+  sigel_pic.inc bytes=20480 sha256=bf559da1a42e873d2cdc9ebd158c52ae72b87397214053a56dac953cc1d0f3ac
   sigel_pic0000.pov bytes=1059 sha256=89ce4032d7c7d6802fda48d7200666b50e61bd5c9638af6f26fd11c2beda7b56
   sigel_pic0001.pov bytes=1070 sha256=f9e974b5ece4e62416315aea5b6d6ee7dbb846a53c6c9f0c0db965ce7172f357
   sigel_pic0002.pov bytes=1096 sha256=37569f07fc7003ddcb6dab1c9c804af228cdf9af2c0f2e60525371ce6e69a0e4
@@ -2729,9 +2729,42 @@ files=32
     finish { ambient 0 diffuse 1 }
   }
   
+  #declare sigelPaintFinish = finish {
+    ambient 0
+    diffuse 0.85
+    specular 0.3
+    roughness 0.01
+    reflection { 0.01, 0.1 falloff 3 }
+    conserve_energy
+  }
+  
+  #declare sigelSteel = texture {
+    pigment { srgb <0.42, 0.42, 0.43> }
+    finish {
+      ambient 0
+      diffuse 0.5
+      specular 0.5
+      roughness 0.02
+      metallic
+      reflection { 0.1, 0.25 metallic }
+      conserve_energy
+    }
+  }
+  
   #declare metal = texture {
-    pigment { srgb <0, 0, 0.5> }
-    finish { ambient 0 diffuse 1 }
+    bozo
+    turbulence 1
+    scale 0.236902
+    texture_map {
+      [0.00 pigment { srgb <0.012996, 0.012996, 0.233> }
+        normal { bumps 0.015 scale 0.4667 }
+        finish { sigelPaintFinish }]
+      [0.70 pigment { srgb <0.012996, 0.012996, 0.233> }
+        normal { bumps 0.015 scale 0.4667 }
+        finish { sigelPaintFinish }]
+      [0.73 sigelSteel]
+      [1.00 sigelSteel]
+    }
   }
   
   #declare base1 = mesh {
@@ -2749,48 +2782,48 @@ files=32
   #declare Base1AxisSuccNormal = sphere {
     <2, 0, 0>, 0.05
     texture {
-      metal
       pigment { srgb <0, 0, 0.2> }
+      finish { sigelPaintFinish }
     }
   }
   
   #declare Base1AxisSuccBase = sphere {
     <1, 0, 0>, 0.05
     texture {
-      metal
       pigment { srgb <0, 0, 0.2> }
+      finish { sigelPaintFinish }
     }
   }
   
   #declare Base1AxisSuccDir = sphere {
     <1, 0, 1>, 0.05
     texture {
-      metal
       pigment { srgb <0, 0, 0.2> }
+      finish { sigelPaintFinish }
     }
   }
   
   #declare Base2AxisSuccNormal = sphere {
     <-1, 0, 0>, 0.05
     texture {
-      metal
       pigment { srgb <0, 0, 0.2> }
+      finish { sigelPaintFinish }
     }
   }
   
   #declare Base2AxisSuccBase = sphere {
     <0, 0, 0>, 0.05
     texture {
-      metal
       pigment { srgb <0, 0, 0.2> }
+      finish { sigelPaintFinish }
     }
   }
   
   #declare Base2AxisSuccDir = sphere {
     <0, 0, 1>, 0.05
     texture {
-      metal
       pigment { srgb <0, 0, 0.2> }
+      finish { sigelPaintFinish }
     }
   }
   

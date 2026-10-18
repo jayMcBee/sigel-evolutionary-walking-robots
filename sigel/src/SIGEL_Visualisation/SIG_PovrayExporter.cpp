@@ -265,17 +265,70 @@ namespace SIGEL_Visualisation
 
     QTextStream stream( &declarationsString, QIODevice::WriteOnly );
 
+    // The patterns scale with the robot, so that a small and a large robot look alike. A
+    // robot without vertices has radius 0 and gets the patterns of a robot of radius 1.
+    double const robotRadius = visualisation.getRobotRadius();
+
+    double const patternSize = (robotRadius > 0) ? robotRadius : 1;
+
+    stream << "#declare sigelPaintFinish = finish {\n"
+	   << "  ambient 0\n"
+	   << "  diffuse 0.85\n"
+	   << "  specular 0.3\n"
+	   << "  roughness 0.01\n"
+	   << "  reflection { 0.01, 0.1 falloff 3 }\n"
+	   << "  conserve_energy\n"
+	   << "}\n"
+	   << "\n"
+	   << "#declare sigelSteel = texture {\n"
+	   << "  pigment { srgb <0.42, 0.42, 0.43> }\n"
+	   << "  finish {\n"
+	   << "    ambient 0\n"
+	   << "    diffuse 0.5\n"
+	   << "    specular 0.5\n"
+	   << "    roughness 0.02\n"
+	   << "    metallic\n"
+	   << "    reflection { 0.1, 0.25 metallic }\n"
+	   << "    conserve_energy\n"
+	   << "  }\n"
+	   << "}\n"
+	   << "\n";
+
+    // A robot file gives a material only a colour. It becomes paint, a little greyer and
+    // darker than the colour, so that pure colours look like paint and not like plastic.
+    // Where the noise pattern is high, the paint is worn off and the steel shows. The
+    // map's textures take on the pattern's scale, so the paint's bumps, at 14/30 of it,
+    // are robotRadius / 30 across.
     for ( SIGEL_Robot::SIG_Material *materialPtr : robot.getMaterials() )
       {
 	SIGEL_Robot::SIG_Material &actMaterial = *materialPtr;
 
+	NEWMAT::ColumnVector paintColor = SIG_TypeConverter::toColumnVector( actMaterial.getColour() );
+
+	double const grey = 0.2126 * paintColor( 1 ) + 0.7152 * paintColor( 2 ) + 0.0722 * paintColor( 3 );
+
+	for (int i=1; i<=3; i++)
+	  paintColor( i ) = (paintColor( i ) + (grey - paintColor( i )) * 0.45) * 0.8;
+
+	QString paint;
+	QTextStream paintStream( &paint, QIODevice::WriteOnly );
+
+	paintStream << "pigment { srgb " << vectorToPovray( paintColor ) << " }\n"
+		    << "      normal { bumps 0.015 scale 0.4667 }\n"
+		    << "      finish { sigelPaintFinish }";
+
 	stream << "#declare "
 	       << actMaterial.getName()
 	       << " = texture {\n"
-	       << "  pigment { srgb "
-	       << vectorToPovray( SIG_TypeConverter::toColumnVector( actMaterial.getColour() ) )
-	       << " }\n"
-	       << "  finish { ambient 0 diffuse 1 }\n"
+	       << "  bozo\n"
+	       << "  turbulence 1\n"
+	       << "  scale " << patternSize / 14 << "\n"
+	       << "  texture_map {\n"
+	       << "    [0.00 " << paint << "]\n"
+	       << "    [0.70 " << paint << "]\n"
+	       << "    [0.73 sigelSteel]\n"
+	       << "    [1.00 sigelSteel]\n"
+	       << "  }\n"
 	       << "}\n"
 	       << "\n";
       };
@@ -348,12 +401,10 @@ namespace SIGEL_Visualisation
 			    << vectorToPovray( pointPosition )
 			    << ", 0.05\n"
 			    << "  texture {\n"
-			    << "    "
-			    << actLink.getMaterial()->getName()
-			    << "\n"
 			    << "    pigment { srgb "
 			    << vectorToPovray( linkColor )
 			    << " }\n"
+			    << "    finish { sigelPaintFinish }\n"
 			    << "  }\n"
 			    << "}\n"
 			    << "\n";
