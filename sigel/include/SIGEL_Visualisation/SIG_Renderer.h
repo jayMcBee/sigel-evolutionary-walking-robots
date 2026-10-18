@@ -91,10 +91,6 @@ namespace SIGEL_Visualisation
      */
     virtual void render() = 0;
 
-    virtual QString exportToPovray() const = 0;
-
-    virtual QString createPovrayDeclarations() const = 0;
-
     static QString vectorToPovray( NEWMAT::ColumnVector input );
 
     /**

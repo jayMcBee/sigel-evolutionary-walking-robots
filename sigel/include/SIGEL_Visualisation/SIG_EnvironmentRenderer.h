@@ -108,9 +108,9 @@ namespace SIGEL_Visualisation
      */
     bool getWithTexture() const { return withTexture; }
 
-    QString exportToPovray() const override;
+    QString exportToPovray() const;
 
-    QString createPovrayDeclarations() const override;
+    QString createPovrayDeclarations() const;
 
     void setLookPoint( SIG_Vector newPosition );
 
