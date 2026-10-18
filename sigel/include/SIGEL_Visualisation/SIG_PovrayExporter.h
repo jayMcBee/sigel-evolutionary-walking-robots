@@ -58,6 +58,8 @@ namespace SIGEL_Visualisation
   private:
     QString environmentDeclarations() const;
 
+    QString robotDeclarations() const;
+
     SIG_SimulationVisualisation const &visualisation;
   };
 

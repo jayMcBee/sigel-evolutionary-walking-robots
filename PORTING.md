@@ -10331,7 +10331,7 @@ were "touched only by `loadGeometries`" and "only through `lookupMaterial`",
 **and that was wrong**: both are also iterated by
 `SIG_Robot::writeToFileTransfer`, so their order reaches `.exp` bytes, the PVM
 stream (`SIG_GPPVMData.cpp, loadPVMDataTransfer`) and the POV-Ray export
-(`SIG_RobotRenderer.cpp, createPovrayDeclarations`). No index, number or DynaMechs registration comes
+(`SIG_PovrayExporter.cpp, robotDeclarations`). No index, number or DynaMechs registration comes
 from either, so the conclusion holds and no fitness moves — but for a different
 reason than the one given. One latent path: `SIG_Material.cpp, SIG_Material` records a
 friction pair only if the partner is already loaded, so an **asymmetric**

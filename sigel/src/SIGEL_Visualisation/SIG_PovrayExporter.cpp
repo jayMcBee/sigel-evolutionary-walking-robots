@@ -58,7 +58,7 @@ namespace SIGEL_Visualisation
 
     stream << environmentDeclarations()
 	   << "\n"
-	   << visualisation.getRobotRenderer().createPovrayDeclarations()
+	   << robotDeclarations()
 	   << "#declare cameraRight = " << aspectRatio << "*x;\n"
 	   << "#declare cameraDirection = <0,0," << directionLength << ">;\n"
 	   << "\n"
@@ -206,6 +206,125 @@ namespace SIGEL_Visualisation
 	   << "  finish { ambient rgb " << SIG_Renderer::vectorToPovray( gridColorVector ) << "\n"
 	   << "           diffuse 1 }\n"
 	   << "}\n";
+
+    return declarationsString;
+  }
+
+  QString SIG_PovrayExporter::robotDeclarations() const
+  {
+    SIGEL_Robot::SIG_Robot const &robot = visualisation.getRobotRenderer().getRobot();
+
+    QString declarationsString;
+
+    QTextStream stream( &declarationsString, QIODevice::WriteOnly );
+
+    for ( SIGEL_Robot::SIG_Material *materialPtr : robot.getMaterials() )
+      {
+	SIGEL_Robot::SIG_Material &actMaterial = *materialPtr;
+
+	stream << "#declare "
+	       << actMaterial.getName()
+	       << " = texture {\n"
+	       << "  pigment { rgb "
+	       << SIG_Renderer::vectorToPovray( SIG_TypeConverter::toColumnVector( actMaterial.getColour() ) )
+	       << " }\n"
+	       << "  finish { ambient rgb "
+	       << SIG_Renderer::vectorToPovray( SIG_TypeConverter::toColumnVector( actMaterial.getColour() ) )
+	       << "\n"
+	       << "           diffuse 1 }\n"
+	       << "}\n"
+	       << "\n";
+      };
+
+    QString pointDataString;
+    QTextStream pointDataStream( &pointDataString, QIODevice::WriteOnly );
+
+    for ( SIGEL_Robot::SIG_Link *linkPtr : robot.getLinks() )
+      {
+	SIGEL_Robot::SIG_Link &actLink = *linkPtr;
+
+	int linkNumber = actLink.getNumber();
+
+	QString polygonDataString;
+	QTextStream polygonDataStream( &polygonDataString, QIODevice::WriteOnly );
+
+	stream << "#declare "
+	       << actLink.getName()
+	       << " = mesh {\n";
+
+	SIGEL_Robot::SIG_Geometry const *actGeometry = actLink.getGeometry();
+	SIGEL_Robot::SIG_GeometryIterator actGeoIter(actGeometry);
+
+	while (actGeoIter.valid())
+	  {
+	    SIGEL_Robot::SIG_Polygon const &actPolygon = actGeoIter.current();
+
+	    NEWMAT::ColumnVector firstVertex = SIG_TypeConverter::toColumnVector( actPolygon.getVertex( 0 ) );
+
+	    NEWMAT::ColumnVector secondVertex = SIG_TypeConverter::toColumnVector( actPolygon.getVertex( 1 ) );
+
+	    for ( int i=2; i < actPolygon.getNumVertices(); i++ )
+	      {
+		NEWMAT::ColumnVector thirdVertex = SIG_TypeConverter::toColumnVector( actPolygon.getVertex( i ) );
+
+		polygonDataStream << "  triangle {\n";
+
+		polygonDataStream << "    "
+				  << SIG_Renderer::vectorToPovray( firstVertex )
+				  << ", "
+				  << SIG_Renderer::vectorToPovray( secondVertex )
+				  << ", "
+				  << SIG_Renderer::vectorToPovray( thirdVertex )
+				  << "\n"
+				  << "  }\n";
+
+		secondVertex = thirdVertex;
+	      };
+
+	    actGeoIter.next();
+	  };
+
+	for ( const SIGEL_Robot::SIG_Link::NamedPoint &pointEntry : actLink.getPoints() )
+	  {
+	    NEWMAT::ColumnVector pointPosition = SIG_TypeConverter::toColumnVector( *pointEntry.value );
+
+	    NEWMAT::ColumnVector linkColor = SIG_TypeConverter::toColumnVector( actLink.getMaterial()->getColour() );
+
+	    for (int i=1; i<=3; i++)
+	      {
+		double newValue = linkColor( i ) - 0.3;
+		newValue = ( newValue < 0 ) ? 0 : newValue;
+		linkColor( i ) = newValue;
+	      };
+
+	    pointDataStream << "#declare "
+			    << pointEntry.name
+			    << " = sphere {\n"
+			    << "  "
+			    << SIG_Renderer::vectorToPovray( pointPosition )
+			    << ", 0.05\n"
+			    << "  texture {\n"
+			    << "    "
+			    << actLink.getMaterial()->getName()
+			    << "\n"
+			    << "    pigment { rgb "
+			    << SIG_Renderer::vectorToPovray( linkColor )
+			    << " }\n"
+			    << "  }\n"
+			    << "}\n"
+			    << "\n";
+	  };
+
+	stream << polygonDataString
+	       << "\n"
+	       << "  texture { "
+	       << actLink.getMaterial()->getName()
+	       << "  }\n"
+	       << "}\n"
+	       << "\n";
+      };
+
+    stream << pointDataString;
 
     return declarationsString;
   }
