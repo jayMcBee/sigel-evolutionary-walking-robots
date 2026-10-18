@@ -16,7 +16,7 @@ coredrive`, and `make B=build-asan coredrive pvm-link`.
    `sigel_slave` must start and stop cleanly when there is no PVM.
 5. **GUI behaviour.** Drives the real SIGEL window with simulated mouse and
    keyboard input, and compares what happens with
-   `baselines/guibehaviour-baseline.txt`. Eleven scenarios:
+   `baselines/guibehaviour-baseline.txt`. Twelve scenarios:
    - the main window: experiment tree, sorting, adding, deleting and
      resetting individuals;
    - every field on the five parameter pages;
@@ -29,6 +29,7 @@ coredrive`, and `make B=build-asan coredrive pvm-link`.
    - pages locked while an evolution runs;
    - the random numbers for a given seed;
    - a crash guard when an experiment is opened.
+   - the POV-Ray movie export, which povray must then read.
 
    It also fails on any broken signal-slot connection, and it runs the
    parameter pages again under German and Danish number formats.
