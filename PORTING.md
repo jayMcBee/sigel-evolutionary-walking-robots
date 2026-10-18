@@ -84,7 +84,7 @@ So every rounding decision is glibc's. Qt 6 formats doubles itself, through
 
 | set to | where | what it writes |
 |---|---|---|
-| **5** | `SIG_Renderer.cpp, vectorToPovray` | every POV `<x, y, z>` |
+| **5** | `SIG_PovrayExporter.cpp, vectorToPovray` | every POV `<x, y, z>` |
 | **6** (default) | — | `.exp`, `.rrb`, and the POV rotation matrix |
 | **50** | `SIG_GPPVMData.cpp:116, :157` | the master↔slave PVM transfer |
 

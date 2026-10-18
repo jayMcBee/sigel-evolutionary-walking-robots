@@ -26,8 +26,12 @@
 
 #include <qstring.h>
 
+#include <newmat.h>
+
 namespace SIGEL_Visualisation
 {
+
+  class SIG_Renderer;
 
   class SIG_SimulationVisualisation;
 
@@ -61,6 +65,10 @@ namespace SIGEL_Visualisation
     QString robotDeclarations() const;
 
     QString environmentObjects() const;
+
+    static QString sceneObjects( SIG_Renderer const &renderer );
+
+    static QString vectorToPovray( NEWMAT::ColumnVector input );
 
     SIG_SimulationVisualisation const &visualisation;
   };

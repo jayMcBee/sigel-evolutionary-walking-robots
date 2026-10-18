@@ -24,10 +24,6 @@
 #define SIGEL_VISUALISATION_SIG_RENDERER_H
 
 #include <QList>
-#include <qstring.h>
-#include <qtextstream.h>
-
-#include <newmat.h>
 
 #include <GL/gl.h>
 
@@ -91,9 +87,7 @@ namespace SIGEL_Visualisation
      */
     virtual void render() = 0;
 
-    static QString vectorToPovray( NEWMAT::ColumnVector input );
-
-    QString exportSceneObjectsToPovray() const;
+    GLuint getNoOfObjects() const { return noOfObjects; }
 
     /**
      * The array of SIG_VisualSceneObjects.

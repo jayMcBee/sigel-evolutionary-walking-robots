@@ -106,11 +106,11 @@ namespace SIGEL_Visualisation
 	   << "\"\n"
 	   << "\n"
 	   << environmentObjects()
-	   << visualisation.getRobotRenderer().exportSceneObjectsToPovray()
+	   << sceneObjects( visualisation.getRobotRenderer() )
 	   << "object {\n"
 	   << "  headLight\n"
 	   << "  translate "
-	   << SIG_Renderer::vectorToPovray( SIG_TypeConverter::sigelToPovray() * finalEyePointColumnVector )
+	   << vectorToPovray( SIG_TypeConverter::sigelToPovray() * finalEyePointColumnVector )
 	   << "\n"
 	   << "}\n"
 	   << "\n"
@@ -119,15 +119,15 @@ namespace SIGEL_Visualisation
 	   << "  up y\n"
 	   << "  direction cameraDirection\n"
 	   << "  location "
-	   << SIG_Renderer::vectorToPovray( SIG_TypeConverter::sigelToPovray() * finalEyePointColumnVector )
+	   << vectorToPovray( SIG_TypeConverter::sigelToPovray() * finalEyePointColumnVector )
 	   << "\n"
 	   << "  look_at "
-	   << SIG_Renderer::vectorToPovray( SIG_TypeConverter::sigelToPovray() * lookPointColumnVector )
+	   << vectorToPovray( SIG_TypeConverter::sigelToPovray() * lookPointColumnVector )
 	   << "\n"
 	   << "}\n"
 	   << "\n"
 	   << "global_settings { ambient_light rgb "
-	   << SIG_Renderer::vectorToPovray( visualisation.getAmbientSceneColor() )
+	   << vectorToPovray( visualisation.getAmbientSceneColor() )
 	   << " }\n";
 
     file.close();
@@ -148,10 +148,10 @@ namespace SIGEL_Visualisation
 	   << "                   <0,1,0>, 0\n"
 	   << "                   texture {\n"
 	   << "                     pigment { rgb "
-	   << SIG_Renderer::vectorToPovray( planeColorVector )
+	   << vectorToPovray( planeColorVector )
 	   << " }\n"
 	   << "                     finish { ambient rgb "
-	   << SIG_Renderer::vectorToPovray( planeColorVector )
+	   << vectorToPovray( planeColorVector )
 	   << "\n"
 	   << "                              diffuse 1 }\n"
 	   << "                   }\n"
@@ -202,8 +202,8 @@ namespace SIGEL_Visualisation
       };
 
     stream << "\n"
-	   << "  pigment { rgb " << SIG_Renderer::vectorToPovray( gridColorVector ) << " }\n"
-	   << "  finish { ambient rgb " << SIG_Renderer::vectorToPovray( gridColorVector ) << "\n"
+	   << "  pigment { rgb " << vectorToPovray( gridColorVector ) << " }\n"
+	   << "  finish { ambient rgb " << vectorToPovray( gridColorVector ) << "\n"
 	   << "           diffuse 1 }\n"
 	   << "}\n";
 
@@ -226,10 +226,10 @@ namespace SIGEL_Visualisation
 	       << actMaterial.getName()
 	       << " = texture {\n"
 	       << "  pigment { rgb "
-	       << SIG_Renderer::vectorToPovray( SIG_TypeConverter::toColumnVector( actMaterial.getColour() ) )
+	       << vectorToPovray( SIG_TypeConverter::toColumnVector( actMaterial.getColour() ) )
 	       << " }\n"
 	       << "  finish { ambient rgb "
-	       << SIG_Renderer::vectorToPovray( SIG_TypeConverter::toColumnVector( actMaterial.getColour() ) )
+	       << vectorToPovray( SIG_TypeConverter::toColumnVector( actMaterial.getColour() ) )
 	       << "\n"
 	       << "           diffuse 1 }\n"
 	       << "}\n"
@@ -270,11 +270,11 @@ namespace SIGEL_Visualisation
 		polygonDataStream << "  triangle {\n";
 
 		polygonDataStream << "    "
-				  << SIG_Renderer::vectorToPovray( firstVertex )
+				  << vectorToPovray( firstVertex )
 				  << ", "
-				  << SIG_Renderer::vectorToPovray( secondVertex )
+				  << vectorToPovray( secondVertex )
 				  << ", "
-				  << SIG_Renderer::vectorToPovray( thirdVertex )
+				  << vectorToPovray( thirdVertex )
 				  << "\n"
 				  << "  }\n";
 
@@ -301,14 +301,14 @@ namespace SIGEL_Visualisation
 			    << pointEntry.name
 			    << " = sphere {\n"
 			    << "  "
-			    << SIG_Renderer::vectorToPovray( pointPosition )
+			    << vectorToPovray( pointPosition )
 			    << ", 0.05\n"
 			    << "  texture {\n"
 			    << "    "
 			    << actLink.getMaterial()->getName()
 			    << "\n"
 			    << "    pigment { rgb "
-			    << SIG_Renderer::vectorToPovray( linkColor )
+			    << vectorToPovray( linkColor )
 			    << " }\n"
 			    << "  }\n"
 			    << "}\n"
@@ -348,7 +348,7 @@ namespace SIGEL_Visualisation
     int zPos = - static_cast< int >( std::floor( lookPoint.z / gridSpacing ) * gridSpacing );
 
     stream << "union {\n"
-	   << environmentRenderer.exportSceneObjectsToPovray()
+	   << sceneObjects( environmentRenderer )
 	   << "translate <"
 	   << xPos
 	   << ",0,"
@@ -371,9 +371,9 @@ namespace SIGEL_Visualisation
 
 	    stream << "cylinder {\n"
 		   << "  "
-		   << SIG_Renderer::vectorToPovray( base )
+		   << vectorToPovray( base )
 		   << ", "
-		   << SIG_Renderer::vectorToPovray( cap )
+		   << vectorToPovray( cap )
 		   << ", 0.02\n"
 		   << "  open\n"
 		   << "  pigment { rgb <1,1,0> }\n"
@@ -384,6 +384,60 @@ namespace SIGEL_Visualisation
 
 	stream << "\n";
       };
+
+    return resultString;
+  }
+
+  QString SIG_PovrayExporter::sceneObjects( SIG_Renderer const &renderer )
+  {
+    GLuint const noOfObjects = renderer.getNoOfObjects();
+
+    QString resultString;
+    QTextStream resultStream( &resultString, QIODevice::WriteOnly );
+
+    for (int i=0; i < noOfObjects; i++)
+      if (renderer.sceneObjects[ i ]->getVisible())
+	{
+	  NEWMAT::Matrix rotation = (   SIG_TypeConverter::sigelToPovray()
+	                              * SIG_TypeConverter::toMatrix( renderer.sceneObjects[ i ]->getRotation() ) ).t();
+	  NEWMAT::ColumnVector position =   SIG_TypeConverter::sigelToPovray()
+	                                  * SIG_TypeConverter::toColumnVector( renderer.sceneObjects[ i ]->getPosition() );
+
+	  resultStream << "object {\n"
+		       << "  "
+		       << renderer.sceneObjects[ i ]->name
+		       << "\n"
+		       << "  matrix <";
+	  for (int i=1; i<=3; i++)
+	    resultStream << " " << rotation( 1, i ) << ",";
+	  resultStream << "\n"
+		       << "          ";
+	  for (int j=1; j<=3; j++)
+	    resultStream << " " << rotation( 2, j ) << ",";
+	  resultStream << "\n"
+		       << "          ";
+	  for (int k=1; k<=3; k++)
+	    resultStream << " " << rotation( 3, k ) << ",";
+	  resultStream << "\n"
+		       << "           0 0 0 >\n"
+		       << "  translate "
+		       << vectorToPovray( position )
+		       << "\n"
+		       << "}\n"
+		       << "\n";
+	};
+
+    return resultString;
+  }
+
+  QString SIG_PovrayExporter::vectorToPovray( NEWMAT::ColumnVector input )
+  {
+    QString resultString;
+
+    QTextStream resultStream( &resultString, QIODevice::WriteOnly );
+    resultStream.setRealNumberPrecision( 5 );
+
+    resultStream << "<" << input( 1 ) << ", " << input( 2 ) << ", " << input( 3 ) << ">";
 
     return resultString;
   }
