@@ -229,13 +229,13 @@ namespace SIGEL_Visualisation
     glPopAttrib();
   }
 
-  QString SIG_EnvironmentRenderer::exportToPovray()
+  QString SIG_EnvironmentRenderer::exportToPovray() const
   {
     QString resultString;
     QTextStream stream( &resultString, QIODevice::WriteOnly );
 
-    int xPos = static_cast< int >( std::floor( lookPoint.get( 0 ) / fieldEdgeLength ) * fieldEdgeLength );
-    int zPos = - static_cast< int >( std::floor( lookPoint.get( 2 ) / fieldEdgeLength ) * fieldEdgeLength );
+    int xPos = static_cast< int >( std::floor( lookPoint.x / fieldEdgeLength ) * fieldEdgeLength );
+    int zPos = - static_cast< int >( std::floor( lookPoint.z / fieldEdgeLength ) * fieldEdgeLength );
 
     stream << "union {\n"
 	   << exportSceneObjectsToPovray()
@@ -278,7 +278,7 @@ namespace SIGEL_Visualisation
     return resultString;
   }
 
-  QString SIG_EnvironmentRenderer::createPovrayDeclarations()
+  QString SIG_EnvironmentRenderer::createPovrayDeclarations() const
   {
     QString declarationsString;
     QTextStream stream( &declarationsString, QIODevice::WriteOnly );

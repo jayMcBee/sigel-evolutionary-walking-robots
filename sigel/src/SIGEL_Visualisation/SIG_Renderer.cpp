@@ -64,7 +64,7 @@ namespace SIGEL_Visualisation
 	  };
   }
 
-  QString SIG_Renderer::exportSceneObjectsToPovray()
+  QString SIG_Renderer::exportSceneObjectsToPovray() const
   {
     QString resultString;
     QTextStream resultStream( &resultString, QIODevice::WriteOnly );

@@ -70,9 +70,9 @@ namespace SIGEL_Visualisation
      */
     void renderPoints();
 
-    QString exportToPovray() override;
+    QString exportToPovray() const override;
 
-    QString createPovrayDeclarations() override;
+    QString createPovrayDeclarations() const override;
 
     void setPointsVisible( bool visible );
 

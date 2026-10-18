@@ -198,12 +198,12 @@ namespace SIGEL_Visualisation
       };
   }
 
-  QString SIG_RobotRenderer::exportToPovray()
+  QString SIG_RobotRenderer::exportToPovray() const
   {
     return exportSceneObjectsToPovray();
   }
 
-  QString SIG_RobotRenderer::createPovrayDeclarations()
+  QString SIG_RobotRenderer::createPovrayDeclarations() const
   {
     QString declarationsString;
 
