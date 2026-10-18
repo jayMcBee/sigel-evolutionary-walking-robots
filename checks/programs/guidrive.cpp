@@ -138,6 +138,9 @@ extern "C" {
 #include "SIGEL_MasterGUI/SIG_AllIndividualsView.h"
 #include "SIGEL_MasterGUI/SIG_IndividualListItem.h"
 #include "SIGEL_MasterGUI/SIG_IndividualView.h"
+#include "SIGEL_SlaveGUI/SIG_SimulationWindow.h"
+#include "SIGEL_SlaveGUI/SIG_MovieSettingsDialog.h"
+#include "SIGEL_GP/SIG_GPExperiment.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
 // sigel.cpp:95 owns this global; anything that pulls MT_Controller needs it.
@@ -1512,6 +1515,112 @@ static int guidriveMain(int argc, char **argv)
     prevEnabled = collectEnabled();
     printf("== SCENARIO %s ==\n", qPrintable(scenario));
     step("fresh start, no experiment");
+
+    // `povexport': the slave's own window on individual 0, as sigel_slave
+    // -visualize opens it. The movie dialog is set to POV through its modal,
+    // then the Step action is pressed a fixed number of times. No timer runs,
+    // so every run writes the same files.
+    if (scenario == "povexport") {
+        QFile expIn(expFile);
+        if (!expIn.open(QIODevice::ReadOnly)) { printf("!! cannot open %s\n", qPrintable(expFile)); return 1; }
+        SIGEL_GP::SIG_GPExperiment experiment;
+        QTextStream expStream(&expIn);
+        experiment.loadExperiment(expStream);
+        SIGEL_Robot::SIG_Robot robot(experiment.robot);
+        robot.prepareDynaMechs();
+
+        SIGEL_SlaveGUI::SIG_SimulationWindow sim(nullptr, "simWindow");
+        sim.resize(900, 750);
+        sim.show();
+        (void)QTest::qWaitForWindowExposed(&sim);
+        sim.visualizeThis(robot, experiment.environment, experiment.simulationParameter,
+                          experiment.population.getIndividual(0).getProgramVar());
+        QTest::qWait(500);
+
+        // The grid and the path have export code of their own.
+        for (const char *label : { "Show grid", "Show robot path" }) {
+            QCheckBox *box = nullptr;
+            for (QCheckBox *c : sim.findChildren<QCheckBox *>())
+                if (c->text() == QLatin1String(label)) box = c;
+            if (!box) { printf("!! no checkbox [%s]\n", label); return 1; }
+            box->setChecked(true);
+        }
+
+        const QString dir = scratch() + "/povexport/";
+        QDir(dir).removeRecursively();
+        QDir().mkpath(dir);
+
+        bool dialogSeen = false;
+        whenModal([dir, &dialogSeen](QWidget *m) {
+            auto *d = qobject_cast<SIGEL_SlaveGUI::SIG_MovieSettingsDialog *>(m);
+            if (!d) { printf("  !! modal is not the movie dialog: %s\n", m->metaObject()->className()); m->close(); return; }
+            dialogSeen = true;
+            d->comboboxFormat->setCurrentIndex(d->comboboxFormat->findText("POV"));
+            d->lineeditDirectory->setText(dir);
+            d->spinboxMaxFrames->setValue(1000);
+            d->checkboxEnableMovie->setChecked(true);
+            d->accept();
+        });
+        QAction *movie = sim.findChild<QAction *>("alterMovieSettingsAction");
+        QAction *stepAction = sim.findChild<QAction *>("stepAction");
+        if (!movie || !stepAction) { printf("!! movie or step action not found\n"); return 1; }
+        movie->trigger();
+        QTest::qWait(1000);
+        if (!dialogSeen) { printf("!! the movie dialog did not appear\n"); return 1; }
+
+        // A path point is added every 0.5 s of simulated time, and a path
+        // needs two: 1.2 s gives three.
+        const int steps = qRound(1.2 / experiment.simulationParameter.getStepSize());
+        for (int i = 0; i < steps; ++i)
+            stepAction->trigger();
+        QTest::qWait(500);
+
+        printf("\n== POV EXPORT ==\nsteps=%d\n", steps);
+        const QStringList files = QDir(dir).entryList(QDir::Files, QDir::Name);
+        printf("files=%d\n", static_cast<int>(files.size()));
+        if (files.size() < 2) { printf("!! fewer than two files written\n"); return 1; }
+        for (const QString &name : files) {
+            QFile f(dir + name);
+            if (!f.open(QIODevice::ReadOnly)) { printf("!! cannot read %s\n", qPrintable(name)); return 1; }
+            const QByteArray all = f.readAll();
+            printf("  %s bytes=%lld sha256=%s\n", qPrintable(name), static_cast<long long>(all.size()),
+                   QCryptographicHash::hash(all, QCryptographicHash::Sha256).toHex().constData());
+        }
+
+        // The last frame in full, and the include file with the triangles of
+        // each mesh and the cylinders of the grid counted rather than listed:
+        // the sums above cover them. Every line is indented: check.sh drops
+        // baseline lines that start with `#', and these files have #include
+        // and #declare lines.
+        const QStringList frames = QDir(dir).entryList(QStringList("*.pov"), QDir::Files, QDir::Name);
+        const QStringList includes = QDir(dir).entryList(QStringList("*.inc"), QDir::Files, QDir::Name);
+        if (frames.isEmpty() || includes.size() != 1) { printf("!! expected frames and one include file\n"); return 1; }
+        QFile last(dir + frames.last());
+        QFile inc(dir + includes.first());
+        if (!last.open(QIODevice::ReadOnly) || !inc.open(QIODevice::ReadOnly)) { printf("!! cannot read the files back\n"); return 1; }
+        printf("\n== %s ==\n", qPrintable(QFileInfo(last).fileName()));
+        for (const QByteArray &line : last.readAll().split('\n'))
+            printf("  %s\n", line.constData());
+        printf("\n== %s, triangles and cylinders counted ==\n", qPrintable(QFileInfo(inc).fileName()));
+        QByteArray kind;
+        int count = 0;
+        auto flush = [&kind, &count]() {
+            if (count > 0) printf("    [%d %ss]\n", count, kind.trimmed().chopped(2).constData());
+            count = 0;
+        };
+        for (const QByteArray &line : inc.readAll().split('\n')) {
+            if (line == "  triangle {" || line == "  cylinder {") {
+                if (line != kind) flush();
+                kind = line;
+                ++count;
+                continue;
+            }
+            if (count > 0 && (line.startsWith("    <") || line == "  }")) continue;
+            flush();
+            printf("  %s\n", line.constData());
+        }
+        return 0;
+    }
 
     // `openfocus': the tree is given focus while File > Open is still reading
     // the file. SIG_ExperimentListView::slotLoadExperiment inserts into

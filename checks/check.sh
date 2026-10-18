@@ -305,7 +305,7 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
     # SIGEL_ROOT is sigelApp/, the folder SIGEL is started from: the driver
     # loads pixmaps and terrain from it. No scenario here spawns a sigel_slave.
     #
-    # ELEVEN scenarios make up the baseline, concatenated in this order:
+    # TWELVE scenarios make up the baseline, concatenated in this order:
     #   gate       the tree, sorting, add/delete/reset, the dialogs, the
     #              context menus, the MetaGP warning
     #   pages      the five View pages: every spin box, slider, combo,
@@ -345,6 +345,11 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
     #              file is being read. Reverting the guard alone moves
     #              `orphan'; reverting the null checks too makes it segfault,
     #              which fails the run rather than the diff.
+    #   povexport  the slave's movie recorder in POV format: twoBases, 1.2 s in
+    #              fixed steps, grid and path shown. Each file's size and
+    #              sha256, the last frame in full, the include file with its
+    #              triangles and cylinders counted. povray must then read the
+    #              last frame; no povray fails the section.
     #
     # $1 scenario, $2 outfile, $3.. extra NAME=VALUE for the child only.
     # The extras go through env, not as a prefix on the function call: a
@@ -370,10 +375,11 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
        && guidrive_run metadrive /tmp/bv.$$ \
        && guidrive_run runlock /tmp/bk.$$ \
        && guidrive_run rngseed /tmp/bz.$$ \
-       && guidrive_run openfocus /tmp/bq.$$; then
+       && guidrive_run openfocus /tmp/bq.$$ \
+       && guidrive_run povexport /tmp/bpx.$$; then
         # The GUI shows a slave directory by its physical path; strip the repo's.
         cat /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
-            /tmp/br.$$ /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ \
+            /tmp/br.$$ /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ /tmp/bpx.$$ \
             | awk -v r="$(cd "$ROOT" && pwd -P)" '{ while ((i = index($0, r)) > 0)
                   $0 = substr($0, 1, i - 1) "<REPOROOT>" substr($0, i + length(r)); print }' \
             > /tmp/ball.$$
@@ -436,12 +442,24 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
             bf=1; echo "  the GUI no longer behaves the way the baseline records:"
             head -16 /tmp/bd.$$ | sed 's/^/    /'
         fi
+        # povray must read what povexport wrote. The baseline pins the text;
+        # only povray can say that the text is a scene it accepts.
+        PX="${TMPDIR:-/tmp}/povexport"
+        if ! command -v povray >/dev/null; then
+            bf=1; bp=0
+            echo "  povray is not installed, so nothing read the POV-Ray export;"
+            echo "  install it (apt install povray) and re-run."
+        elif ! (cd "$PX" && povray -D -F +W32 +H18 +WT1 +I"$(ls *.pov | tail -1)") >/tmp/bpr.$$ 2>&1; then
+            bf=1; bp=0
+            echo "  povray does not read the POV-Ray export:"
+            command grep -i -A2 'error' /tmp/bpr.$$ | head -6 | sed 's/^/    /'
+        fi
     else
         bf=1
         echo "  the driver did not finish -- it exits(1) on an out-of-range pool"
         echo "  position, which is how the Qt 6 clear() regression showed up:"
         tail -6 /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
-             /tmp/br.$$ /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ 2>/dev/null | sed 's/^/    /'
+             /tmp/br.$$ /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ /tmp/bpx.$$ 2>/dev/null | sed 's/^/    /'
         # Stderr is most likely to say why on this path: a crash or a Qt fatal
         # lands there.
         if [ -s /tmp/berr.$$ ]; then
@@ -492,10 +510,10 @@ else
     bf=1; echo "  guidrive did not build:"; head -5 /tmp/bdb.$$ | sed 's/^/    /'
 fi
 rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ /tmp/br.$$ \
-      /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ \
+      /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ /tmp/bpx.$$ /tmp/bpr.$$ \
       /tmp/bl.$$ /tmp/bl2.$$ /tmp/ball.$$ \
       /tmp/bd.$$ /tmp/bdb.$$ /tmp/berr.$$
-# exportall, overwrite, roundtrip, dialogs and rngseed write files to TMPDIR,
+# exportall, overwrite, roundtrip, dialogs, rngseed and povexport write files to TMPDIR,
 # several MB in all. They are removed here.
 rm -f "${TMPDIR:-/tmp}"/x11b-gpp.gpp "${TMPDIR:-/tmp}"/x11b-sip.sip \
       "${TMPDIR:-/tmp}"/x11b-lap.lap "${TMPDIR:-/tmp}"/x11b-env.env \
@@ -503,6 +521,7 @@ rm -f "${TMPDIR:-/tmp}"/x11b-gpp.gpp "${TMPDIR:-/tmp}"/x11b-sip.sip \
       "${TMPDIR:-/tmp}"/x11b-ind.ind "${TMPDIR:-/tmp}"/x11b-dat.dat \
       "${TMPDIR:-/tmp}"/x11b-ow.sip "${TMPDIR:-/tmp}"/x11b-ow "${TMPDIR:-/tmp}"/x11b-ow-*.sip \
       "${TMPDIR:-/tmp}"/c11c-lap.lap "${TMPDIR:-/tmp}"/rngseed.exp
+rm -rf "${TMPDIR:-/tmp}/povexport"
 for e in gpp sip lap env pop; do
     rm -f "${TMPDIR:-/tmp}/rt-a-$e.$e" "${TMPDIR:-/tmp}/rt-b-$e.$e" \
           "${TMPDIR:-/tmp}/rt-a-$e"    "${TMPDIR:-/tmp}/rt-b-$e"
