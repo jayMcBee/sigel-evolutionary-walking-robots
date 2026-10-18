@@ -575,7 +575,9 @@ namespace SIGEL_Visualisation
 		       << "}\n"
 		       << "\n"
 		       << "camera {\n"
-		       << "  cameraSettings\n"
+		       << "  right cameraRight\n"
+		       << "  up y\n"
+		       << "  direction cameraDirection\n"
 		       << "  location "
 		       << SIG_Renderer::vectorToPovray( SIG_TypeConverter::sigelToPovray() * finalEyePointColumnVector )
 		       << "\n"
@@ -612,13 +614,8 @@ namespace SIGEL_Visualisation
 		stream << environmentRenderer.createPovrayDeclarations()
 		       << "\n"
 		       << robotRenderer.createPovrayDeclarations()
-		       << "#declare cameraSettings = camera {\n"
-		       << "                            right " << aspectRatio << "*x\n"
-		       << "                            up y\n"
-		       << "                            direction <0,0,"
-		       << directionLength
-		       << ">\n"
-		       << "                          }\n"
+		       << "#declare cameraRight = " << aspectRatio << "*x;\n"
+		       << "#declare cameraDirection = <0,0," << directionLength << ">;\n"
 		       << "\n"
 		       << "#declare headLight = light_source {\n"
 		       << "                       <0,0,0>,\n"

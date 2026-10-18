@@ -286,7 +286,7 @@ namespace SIGEL_Visualisation
     NEWMAT::ColumnVector planeColorVector = SIG_TypeConverter::toColumnVector( sceneObjects[ 0 ]->getColor() );
 
     stream << "#declare Plane = plane {\n"
-	   << " less                  <0,1,0>, 0\n"
+	   << "                   <0,1,0>, 0\n"
 	   << "                   texture {\n"
 	   << "                     pigment { rgb "
 	   << vectorToPovray( planeColorVector )
