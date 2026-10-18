@@ -196,11 +196,6 @@ namespace SIGEL_Visualisation
       };
   }
 
-  QString SIG_RobotRenderer::exportToPovray() const
-  {
-    return exportSceneObjectsToPovray();
-  }
-
   void SIG_RobotRenderer::setPointsVisible( bool visible )
   {
     for (int i = robot.getLinks().size(); i < noOfObjects; i++ )

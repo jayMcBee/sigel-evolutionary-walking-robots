@@ -106,7 +106,7 @@ namespace SIGEL_Visualisation
 	   << "\"\n"
 	   << "\n"
 	   << environmentObjects()
-	   << visualisation.getRobotRenderer().exportToPovray()
+	   << visualisation.getRobotRenderer().exportSceneObjectsToPovray()
 	   << "object {\n"
 	   << "  headLight\n"
 	   << "  translate "

@@ -70,8 +70,6 @@ namespace SIGEL_Visualisation
      */
     void renderPoints();
 
-    QString exportToPovray() const;
-
     SIGEL_Robot::SIG_Robot const &getRobot() const { return robot; }
 
     void setPointsVisible( bool visible );
