@@ -12,7 +12,7 @@ Paths are relative to `sigel/`, the source tree.
 
 ---
 
-## 2 · Ownership
+## 1 · Ownership
 
 - [ ] **140. Assess `DynaMechsLinkGuard`.** It is a hand-written struct in
   `SIG_DynaMechsSimulationData.cpp` that frees the links when the
@@ -27,7 +27,7 @@ Paths are relative to `sigel/`, the source tree.
 
 ---
 
-## 3 · Renames and translation
+## 2 · Renames and translation
 
 - [ ] **10. Rename the two `SIG_GPExperiment` variants.**
   `SIG_GPExperiment.cpp` builds `sigel`, `SIG_GPExperimentClean.cpp` builds
@@ -93,7 +93,7 @@ Paths are relative to `sigel/`, the source tree.
 
 ---
 
-## 4 · Defects preserved by the port
+## 3 · Defects preserved by the port
 
 All present in 1.3, none introduced here. Each needs a decision before it is
 touched, because changing one changes behaviour against the reference binary.
@@ -179,7 +179,7 @@ touched, because changing one changes behaviour against the reference binary.
 
 ---
 
-## 5 · The interface
+## 4 · The interface
 
 - [ ] **107. Review `SIG_GPPopulation::readFromFile` with the maintainer,**
   deciding each change before it is made. The method is long and hard to
@@ -222,7 +222,7 @@ touched, because changing one changes behaviour against the reference binary.
 
 ---
 
-## 6 · MetaGP
+## 5 · MetaGP
 
 - [ ] **142. Name the crossover points in `MT_Search::crossover`.** The list
   `XPoints` from `MT_Randomizer::getRandomXPoints` is read by bare index:
@@ -281,7 +281,7 @@ touched, because changing one changes behaviour against the reference binary.
 
 ---
 
-## 7 · GP engine
+## 6 · GP engine
 
 How programs control a robot, and how evolution changes programs. Every item
 here changes evolution results, so each is judged only by whether the best
@@ -379,7 +379,7 @@ problem; the choice is made before any code is written.
 
 ---
 
-## 8 · The robot language
+## 7 · The robot language
 
 - [ ] **160. The conditional instructions are `CMP`, `JLE` and `JMP`.**
   Today `JMP n` jumps only when `CMP` has set the compare flag, and no
@@ -410,7 +410,7 @@ problem; the choice is made before any code is written.
 
 ---
 
-## 10 · Experiments and robot models
+## 8 · Experiments and robot models
 
 - [ ] **166. Ship a second set of experiments that fits today's instructions.**
   The fixes to the robot instructions change how a saved program runs, so the
