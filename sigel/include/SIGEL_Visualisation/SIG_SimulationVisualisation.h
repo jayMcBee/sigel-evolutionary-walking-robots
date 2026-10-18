@@ -119,10 +119,10 @@ namespace SIGEL_Visualisation
 
 		SIG_RobotRenderer const &getRobotRenderer() const { return robotRenderer; }
 
-	private:
-
 		/** Towards the sun, in world coordinates, not normalised; the only light that casts shadows. */
 		static constexpr QVector3D sunDirection = QVector3D( -0.6f, 1.0f, 0.4f );
+
+	private:
 
 		/**
 		 * The diffuse intensity of the sun, the same for red, green and blue.

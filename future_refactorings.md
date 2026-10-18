@@ -187,9 +187,8 @@ touched, because changing one changes behaviour against the reference binary.
   - **The camera.** A 100° lens about half a unit from the robot, aimed at
     the base link, which is one end of the robot; its distance changes per
     frame.
-  - **The lighting.** A headlight at the eye burns a white spot into the
-    floor; every texture lights itself through `ambient`; the background
-    and fog are flat violet.
+  - **The lighting.** Every texture lights itself through `ambient`; the
+    background and fog are flat violet.
   - **The materials** are self-lit flat colour. A `.rrb` material carries
     only colour and density.
   - **The floor** moves with the robot. Harmless while it is one colour, but

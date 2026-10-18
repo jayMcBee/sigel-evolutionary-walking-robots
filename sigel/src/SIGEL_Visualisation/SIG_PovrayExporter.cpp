@@ -56,18 +56,45 @@ namespace SIGEL_Visualisation
 
     static double const directionLength = 0.5 * 1 / std::tan( xAngleRad / 2 );
 
+    // Far enough that the light falls in parallel across the robot's whole walk.
+    static double const lightDistance = 1000;
+
+    // The key light is the screen's sun, so the shadows fall the same way; the fill comes
+    // from the opposite side, lower down. The fill's colour is linear: a quarter of
+    // srgb <0.75, 0.82, 1>, since POV-Ray scales an srgb colour before it decodes it.
+    QVector3D const sun = SIG_SimulationVisualisation::sunDirection.normalized() * lightDistance;
+
+    QVector3D const fill = QVector3D( -sun.x(), sun.y() / 2, -sun.z() ).normalized() * lightDistance;
+
+    NEWMAT::ColumnVector keyPosition( 3 );
+    keyPosition << sun.x() << sun.y() << sun.z();
+
+    NEWMAT::ColumnVector fillPosition( 3 );
+    fillPosition << fill.x() << fill.y() << fill.z();
+
     stream << environmentDeclarations()
 	   << "\n"
 	   << robotDeclarations()
 	   << "#declare cameraRight = " << aspectRatio << "*x;\n"
 	   << "#declare cameraDirection = <0,0," << directionLength << ">;\n"
 	   << "\n"
-	   << "#declare headLight = light_source {\n"
-	   << "                       <0,0,0>,\n"
-	   << "                       rgb 1\n"
-	   << "                       fade_distance 3\n"
-	   << "                       fade_power 1\n"
-	   << "                     }\n"
+	   << "light_source {\n"
+	   << "  " << vectorToPovray( SIG_TypeConverter::sigelToPovray() * keyPosition ) << "\n"
+	   << "  srgb <1, 0.96, 0.9>\n"
+	   << "  area_light 100*x, 100*z, 9, 9\n"
+	   << "  adaptive 1\n"
+	   << "  circular\n"
+	   << "  orient\n"
+	   << "}\n"
+	   << "\n"
+	   << "light_source {\n"
+	   << "  " << vectorToPovray( SIG_TypeConverter::sigelToPovray() * fillPosition ) << "\n"
+	   << "  rgb <0.131, 0.16, 0.25>\n"
+	   << "  area_light 150*x, 150*z, 5, 5\n"
+	   << "  adaptive 1\n"
+	   << "  circular\n"
+	   << "  orient\n"
+	   << "}\n"
 	   << "\n"
 	   << "background { srgb <0.258824,0.258824,0.435294> }\n"
 	   << "\n"
@@ -113,13 +140,6 @@ namespace SIGEL_Visualisation
 	   << "\n"
 	   << environmentObjects()
 	   << sceneObjects( visualisation.getRobotRenderer() )
-	   << "object {\n"
-	   << "  headLight\n"
-	   << "  translate "
-	   << vectorToPovray( SIG_TypeConverter::sigelToPovray() * finalEyePointColumnVector )
-	   << "\n"
-	   << "}\n"
-	   << "\n"
 	   << "camera {\n"
 	   << "  right cameraRight\n"
 	   << "  up y\n"
