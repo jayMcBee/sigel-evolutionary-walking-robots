@@ -56,6 +56,8 @@ namespace SIGEL_Visualisation
     bool writeFrame( QString includeFileName, QString fileName ) const;
 
   private:
+    QString environmentDeclarations() const;
+
     SIG_SimulationVisualisation const &visualisation;
   };
 

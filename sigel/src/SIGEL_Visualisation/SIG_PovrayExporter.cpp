@@ -56,7 +56,7 @@ namespace SIGEL_Visualisation
 
     static double const directionLength = 0.5 * 1 / std::tan( xAngleRad / 2 );
 
-    stream << visualisation.getEnvironmentRenderer().createPovrayDeclarations()
+    stream << environmentDeclarations()
 	   << "\n"
 	   << visualisation.getRobotRenderer().createPovrayDeclarations()
 	   << "#declare cameraRight = " << aspectRatio << "*x;\n"
@@ -133,6 +133,81 @@ namespace SIGEL_Visualisation
     file.close();
 
     return true;
+  }
+
+  QString SIG_PovrayExporter::environmentDeclarations() const
+  {
+    SIG_EnvironmentRenderer const &environmentRenderer = visualisation.getEnvironmentRenderer();
+
+    QString declarationsString;
+    QTextStream stream( &declarationsString, QIODevice::WriteOnly );
+
+    NEWMAT::ColumnVector planeColorVector = SIG_TypeConverter::toColumnVector( environmentRenderer.sceneObjects[ 0 ]->getColor() );
+
+    stream << "#declare Plane = plane {\n"
+	   << "                   <0,1,0>, 0\n"
+	   << "                   texture {\n"
+	   << "                     pigment { rgb "
+	   << SIG_Renderer::vectorToPovray( planeColorVector )
+	   << " }\n"
+	   << "                     finish { ambient rgb "
+	   << SIG_Renderer::vectorToPovray( planeColorVector )
+	   << "\n"
+	   << "                              diffuse 1 }\n"
+	   << "                   }\n"
+	   << "                 }\n"
+	   << "\n";
+
+    int const fieldEdgeLength = environmentRenderer.getFieldEdgeLength();
+
+    int const noOfFields = 70;
+
+    int const minX = - fieldEdgeLength * noOfFields;
+    int const maxX =   fieldEdgeLength * noOfFields;
+    int const minZ = - fieldEdgeLength * noOfFields;
+    int const maxZ =   fieldEdgeLength * noOfFields;
+
+    NEWMAT::ColumnVector gridColorVector = SIG_TypeConverter::toColumnVector( environmentRenderer.sceneObjects[ 1 ]->getColor() );
+
+    stream << "#declare Grid = union {\n";
+
+    for (int x=minX; x<=maxX; x+=fieldEdgeLength)
+      {
+	stream << "  cylinder {\n"
+	       << "    <"
+	       << x
+	       << ",0.01,"
+	       << minZ
+	       << ">, <"
+	       << x
+	       << ",0.01,"
+	       << maxZ
+	       << ">, 0.02\n"
+	       << "  }\n";
+      };
+
+    for (int z=minZ; z<=maxZ; z+=fieldEdgeLength)
+      {
+	stream << "  cylinder {\n"
+	       << "    <"
+	       << minX
+	       << ",0.01,"
+	       << z
+	       << ">, <"
+	       << maxX
+	       << ",0.01,"
+	       << z
+	       << ">, 0.02\n"
+	       << "  }\n";
+      };
+
+    stream << "\n"
+	   << "  pigment { rgb " << SIG_Renderer::vectorToPovray( gridColorVector ) << " }\n"
+	   << "  finish { ambient rgb " << SIG_Renderer::vectorToPovray( gridColorVector ) << "\n"
+	   << "           diffuse 1 }\n"
+	   << "}\n";
+
+    return declarationsString;
   }
 
 }

@@ -108,9 +108,9 @@ namespace SIGEL_Visualisation
      */
     bool getWithTexture() const { return withTexture; }
 
-    QString exportToPovray() const;
+    int getFieldEdgeLength() const { return fieldEdgeLength; }
 
-    QString createPovrayDeclarations() const;
+    QString exportToPovray() const;
 
     void setLookPoint( SIG_Vector newPosition );
 
