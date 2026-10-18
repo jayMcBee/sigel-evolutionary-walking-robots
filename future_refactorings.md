@@ -179,15 +179,10 @@ touched, because changing one changes behaviour against the reference binary.
 
 - [ ] **173. Make the POV-Ray export usable.** Format POV in the movie
   settings writes one scene per frame and one include file, unchanged from
-  1.3. povray 3.7 does not parse them, and once they are fixed by hand the
-  picture is poor. Every 1.3 movie was made by rewriting the frames with
+  1.3. povray 3.7 renders them, but the picture is poor. Every 1.3 movie was made by rewriting the frames with
   external scripts (`~/sigel-woody/bin/repair-povray-output.py`,
   `render-hq.py`, `hq/sigel-hq.inc`); they show what had to change. The
   export should not need a post-processing step.
-  - **It does not parse.** A stray `less` in the plane declaration
-    (`SIG_EnvironmentRenderer::createPovrayDeclarations`), and a declared
-    camera with modifiers (`SIG_SimulationVisualisation::exportToPovray`),
-    which 3.7 rejects.
   - **The camera.** A 100° lens about half a unit from the robot, aimed at
     the base link, which is one end of the robot; its distance changes per
     frame.
