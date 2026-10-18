@@ -118,13 +118,9 @@ namespace SIGEL_Visualisation
 
     void setLookPoint( SIG_Vector newPosition );
 
-    void setPlaneColor( double red,
-			double green,
-			double blue );
+    void setPlaneColor( double red, double green, double blue );
 
-    void setGridColor( double red,
-		       double green,
-		       double blue );
+    void setGridColor( double red, double green, double blue );
 
     void setShowPlane( bool newShowPlane );
 

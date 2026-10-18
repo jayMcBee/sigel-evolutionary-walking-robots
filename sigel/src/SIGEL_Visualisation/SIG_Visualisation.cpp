@@ -194,9 +194,7 @@ namespace SIGEL_Visualisation
 		glFogfv( GL_FOG_COLOR, fogColor );
 	}
 
-  void SIG_Visualisation::setAmbientSceneColor( double red,
-						double green,
-						double blue )
+  void SIG_Visualisation::setAmbientSceneColor( double red, double green, double blue )
   {
     ambientSceneColor( 1 ) = red;
     ambientSceneColor( 2 ) = green;

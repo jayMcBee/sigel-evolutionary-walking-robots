@@ -32,9 +32,7 @@ namespace SIGEL_Visualisation
     {
     public:
 
-      SIG_FloatingText( int xPos = 0,
-			int yPos = 0,
-			QString textLabel = QString() );
+      SIG_FloatingText( int xPos = 0, int yPos = 0, QString textLabel = QString() );
 
       int xPos;
       int yPos;

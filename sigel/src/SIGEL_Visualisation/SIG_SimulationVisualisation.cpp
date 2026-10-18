@@ -364,16 +364,12 @@ namespace SIGEL_Visualisation
 		double green = double( newColor.green() ) / 255;
 		double blue = double( newColor.blue() ) / 255;
 
-		environmentRenderer.setPlaneColor( red,
-		                                   green,
-		                                   blue );
+		environmentRenderer.setPlaneColor( red, green, blue );
 	}
 
 	void SIG_SimulationVisualisation::setGridColor( QColor newColor )
 	{
-		environmentRenderer.setGridColor( newColor.redF(),
-		                                  newColor.greenF(),
-		                                  newColor.blueF() );
+		environmentRenderer.setGridColor( newColor.redF(), newColor.greenF(), newColor.blueF() );
 	}
 
 	void SIG_SimulationVisualisation::setShowPlane( bool newShowPlane )

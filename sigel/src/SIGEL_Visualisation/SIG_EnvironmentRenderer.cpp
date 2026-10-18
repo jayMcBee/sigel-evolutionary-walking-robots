@@ -72,22 +72,14 @@ namespace SIGEL_Visualisation
     robotPathPoints.clear();
   }
 
-  void SIG_EnvironmentRenderer::setPlaneColor( double red,
-					       double green,
-					       double blue )
+  void SIG_EnvironmentRenderer::setPlaneColor( double red, double green, double blue )
   {
-    sceneObjects[ 0 ]->setColor( SIG_Vector( red,
-					    green,
-					    blue ) );
+    sceneObjects[ 0 ]->setColor( SIG_Vector( red, green, blue ) );
   }
 
-  void SIG_EnvironmentRenderer::setGridColor( double red,
-					      double green,
-					      double blue )
+  void SIG_EnvironmentRenderer::setGridColor( double red, double green, double blue )
   {
-    sceneObjects[ 1 ]->setColor( SIG_Vector( red,
-					    green,
-					    blue ) );
+    sceneObjects[ 1 ]->setColor( SIG_Vector( red, green, blue ) );
   }
 
   double SIG_EnvironmentRenderer::groundDepth( const SIGEL_Environment::SIG_Terrain &terrain, int x, int z )

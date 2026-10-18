@@ -55,8 +55,7 @@ namespace SIGEL_Visualisation
      * @param noOfFloatingTexts Intializes the size of
      *                          floatingTexts.
      */
-    SIG_Renderer(int noOfObjects,
-		 int noOfFloatingTexts);
+    SIG_Renderer(int noOfObjects, int noOfFloatingTexts);
 
     /**
      * The destructor of the SIG_Renderer.

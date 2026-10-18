@@ -25,9 +25,7 @@
 namespace SIGEL_Visualisation
 {
 
-  SIG_FloatingText::SIG_FloatingText( int xPos,
-				      int yPos,
-				      QString textLabel )
+  SIG_FloatingText::SIG_FloatingText( int xPos, int yPos, QString textLabel )
     : xPos( xPos ),
       yPos( yPos ),
       textLabel( textLabel ),

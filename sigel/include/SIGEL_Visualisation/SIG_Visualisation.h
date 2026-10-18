@@ -80,9 +80,7 @@ namespace SIGEL_Visualisation
        */
       virtual void visualize();
 
-      virtual void setAmbientSceneColor( double red,
-					 double green,
-					 double blue );
+      virtual void setAmbientSceneColor( double red, double green, double blue );
 
       NEWMAT::ColumnVector getAmbientSceneColor() const { return ambientSceneColor; }
 
