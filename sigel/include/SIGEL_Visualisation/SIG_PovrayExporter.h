@@ -77,6 +77,9 @@ namespace SIGEL_Visualisation
      */
     double patternSize() const;
 
+    /** The radius of the grid lines and the robot's path: half a percent of patternSize. */
+    double lineRadius() const;
+
     static QString sceneObjects( SIG_Renderer const &renderer );
 
     static QString vectorToPovray( NEWMAT::ColumnVector input );

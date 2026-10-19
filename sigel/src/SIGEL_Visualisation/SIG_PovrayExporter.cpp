@@ -196,7 +196,7 @@ namespace SIGEL_Visualisation
 	       << x
 	       << ",0.01,"
 	       << maxZ
-	       << ">, 0.02\n"
+	       << ">, " << lineRadius() << "\n"
 	       << "  }\n";
       };
 
@@ -211,7 +211,7 @@ namespace SIGEL_Visualisation
 	       << maxX
 	       << ",0.01,"
 	       << z
-	       << ">, 0.02\n"
+	       << ">, " << lineRadius() << "\n"
 	       << "  }\n";
       };
 
@@ -391,7 +391,7 @@ namespace SIGEL_Visualisation
 		   << vectorToPovray( base )
 		   << ", "
 		   << vectorToPovray( cap )
-		   << ", 0.02\n"
+		   << ", " << lineRadius() << "\n"
 		   << "  open\n"
 		   << "  pigment { srgb <1,1,0> }\n"
 		   << "  finish { ambient 0 diffuse 1 }\n"
@@ -409,6 +409,11 @@ namespace SIGEL_Visualisation
     double const robotRadius = visualisation.getRobotRadius();
 
     return (robotRadius > 0) ? robotRadius : 1;
+  }
+
+  double SIG_PovrayExporter::lineRadius() const
+  {
+    return patternSize() / 200;
   }
 
   QString SIG_PovrayExporter::sceneObjects( SIG_Renderer const &renderer )
