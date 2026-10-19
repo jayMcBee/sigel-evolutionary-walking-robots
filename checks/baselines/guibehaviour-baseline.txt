@@ -2600,7 +2600,7 @@ Do you want to replace it?]
 == POV EXPORT ==
 steps=120
 files=32
-  sigel_pic.inc bytes=21331 sha256=a33288f12084f8050341177d08f004023feef2638068e3c6674ae8d9b6fd245a
+  sigel_pic.inc bytes=21092 sha256=d3f599cfc752df66b8bb9a2a1ecbb4e3c3223230538fbca7cdca63e8083ddb15
   sigel_pic0000.pov bytes=1059 sha256=89ce4032d7c7d6802fda48d7200666b50e61bd5c9638af6f26fd11c2beda7b56
   sigel_pic0001.pov bytes=1070 sha256=f9e974b5ece4e62416315aea5b6d6ee7dbb846a53c6c9f0c0db965ce7172f357
   sigel_pic0002.pov bytes=1096 sha256=37569f07fc7003ddcb6dab1c9c804af228cdf9af2c0f2e60525371ce6e69a0e4
@@ -2869,15 +2869,5 @@ files=32
       scale 2
       translate -y
     }
-  }
-  
-  // The ground fog is dense at the floor and thin above it, so that the floor fades into
-  // the horizon while the robot, a few units away, stays clear.
-  fog {
-    fog_type 2
-    fog_offset 1
-    fog_alt 3
-    distance 60
-    srgb sigelHorizonColor
   }
   

@@ -29,13 +29,3 @@ sky_sphere {
     translate -y
   }
 }
-
-// The ground fog is dense at the floor and thin above it, so that the floor fades into
-// the horizon while the robot, a few units away, stays clear.
-fog {
-  fog_type 2
-  fog_offset 1
-  fog_alt 3
-  distance 60
-  srgb sigelHorizonColor
-}
