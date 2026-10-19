@@ -413,11 +413,15 @@ namespace SIGEL_Visualisation
 
   double SIG_PovrayExporter::lineRadius() const
   {
+    // A tuning constant with no physical meaning: half a percent, tuned on sample renders
+    // of robots with radius 0.37 to 3.32.
     return patternSize() / 200;
   }
 
   double SIG_PovrayExporter::anchorPointRadius() const
   {
+    // A tuning constant from the same renders: five times the line radius, so that a point
+    // is larger than the path it sits on.
     return patternSize() / 40;
   }
 
