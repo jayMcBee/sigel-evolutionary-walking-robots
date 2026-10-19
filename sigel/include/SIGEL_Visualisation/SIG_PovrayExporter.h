@@ -28,6 +28,8 @@
 
 #include <newmat.h>
 
+class QTextStream;
+
 namespace SIGEL_Visualisation
 {
 
@@ -69,6 +71,9 @@ namespace SIGEL_Visualisation
     static QString sceneObjects( SIG_Renderer const &renderer );
 
     static QString vectorToPovray( NEWMAT::ColumnVector input );
+
+    /** Copies a POV-Ray text compiled into the program; false if it is missing. */
+    static bool writeResource( QTextStream &stream, QString fileName );
 
     SIG_SimulationVisualisation const &visualisation;
   };

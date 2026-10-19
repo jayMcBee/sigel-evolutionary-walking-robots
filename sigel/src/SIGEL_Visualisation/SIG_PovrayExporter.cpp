@@ -80,8 +80,12 @@ namespace SIGEL_Visualisation
     horizonColor << SIG_Visualisation::skyBottomColor.x() << SIG_Visualisation::skyBottomColor.y() << SIG_Visualisation::skyBottomColor.z();
 
     stream << environmentDeclarations()
-	   << "\n"
-	   << robotDeclarations()
+	   << "\n";
+
+    if (!writeResource( stream, "materials.inc" ))
+      return false;
+
+    stream << robotDeclarations()
 	   << "#declare cameraRight = " << aspectRatio << "*x;\n"
 	   << "#declare cameraDirection = <0,0," << directionLength << ">;\n"
 	   << "\n"
@@ -146,20 +150,15 @@ namespace SIGEL_Visualisation
 
     NEWMAT::ColumnVector lookPointColumnVector = SIG_TypeConverter::toColumnVector( viewSettings.lookPoint );
 
+    stream << "#version 3.7;\n"
+	   << "\n";
+
     // globalSettings.inc samples the radiosity densely with a low error bound, so that
     // the indirect light changes little from frame to frame.
-    QFile globalSettings( ":/SIG_PovrayExporter/povray/globalSettings.inc" );
+    if (!writeResource( stream, "globalSettings.inc" ))
+      return false;
 
-    if (!globalSettings.open( QIODevice::ReadOnly ))
-      {
-	SIG_IO::cerr << "Error: the POV-Ray global settings are missing from the program." << Qt::endl;
-	return false;
-      }
-
-    stream << "#version 3.7;\n"
-	   << "\n"
-	   << globalSettings.readAll()
-	   << "#include "
+    stream << "#include "
 	   << "\""
 	   << includeFileName
 	   << "\"\n"
@@ -267,29 +266,6 @@ namespace SIGEL_Visualisation
     double const robotRadius = visualisation.getRobotRadius();
 
     double const patternSize = (robotRadius > 0) ? robotRadius : 1;
-
-    stream << "#declare sigelPaintFinish = finish {\n"
-	   << "  ambient 0\n"
-	   << "  diffuse 0.85\n"
-	   << "  specular 0.3\n"
-	   << "  roughness 0.01\n"
-	   << "  reflection { 0.01, 0.1 falloff 3 }\n"
-	   << "  conserve_energy\n"
-	   << "}\n"
-	   << "\n"
-	   << "#declare sigelSteel = texture {\n"
-	   << "  pigment { srgb <0.42, 0.42, 0.43> }\n"
-	   << "  finish {\n"
-	   << "    ambient 0\n"
-	   << "    diffuse 0.5\n"
-	   << "    specular 0.5\n"
-	   << "    roughness 0.02\n"
-	   << "    metallic\n"
-	   << "    reflection { 0.1, 0.25 metallic }\n"
-	   << "    conserve_energy\n"
-	   << "  }\n"
-	   << "}\n"
-	   << "\n";
 
     // A robot file gives a material only a colour. It becomes paint, a little greyer and
     // darker than the colour, so that pure colours look like paint and not like plastic.
@@ -531,6 +507,21 @@ namespace SIGEL_Visualisation
     resultStream << "<" << input( 1 ) << ", " << input( 2 ) << ", " << input( 3 ) << ">";
 
     return resultString;
+  }
+
+  bool SIG_PovrayExporter::writeResource( QTextStream &stream, QString fileName )
+  {
+    QFile file( ":/SIG_PovrayExporter/povray/" + fileName );
+
+    if (!file.open( QIODevice::ReadOnly ))
+      {
+	SIG_IO::cerr << "Error: the POV-Ray text " << fileName << " is missing from the program." << Qt::endl;
+	return false;
+      }
+
+    stream << file.readAll();
+
+    return true;
   }
 
 }
