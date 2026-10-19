@@ -188,6 +188,11 @@ touched, because changing one changes behaviour against the reference binary.
     any pattern on it jumps, and a plain floor shows no motion.
   - **The rendering options.** povray's default jitter makes edges flicker
     from frame to frame; SIGEL gives the user no recommended options.
+  - **The picture looks hazy.** It should look clear.
+  - **The worn patches** stand out from the paint. They should be larger
+    and blend more with the base colour.
+  - **The static POV-Ray text** is written line by line in the code. It
+    moves into resource files, as the global settings already did.
   To decide: a patterned floor, and whether options are switches in the
   include file. Not checked in 2.0: whether recording stops at the end of
   the evaluated time (1.3's did not), and whether a height-map terrain
