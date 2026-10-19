@@ -67,7 +67,14 @@ namespace SIGEL_Visualisation
     bool writeFrame( QString includeFileName, QString fileName ) const;
 
   private:
-    QString environmentDeclarations() const;
+    /** @param floorImageName the floor's image file, or empty for a floor in one colour. */
+    QString environmentDeclarations( QString floorImageName ) const;
+
+    /**
+     * Writes the floor texture as the screen draws it: over the floor colour by the texture
+     * alpha, with a mirrored copy beside it. False if it cannot be read or written.
+     */
+    bool writeFloorImage( QString fileName ) const;
 
     QString robotDeclarations() const;
 
@@ -84,6 +91,9 @@ namespace SIGEL_Visualisation
 
     /** The radius of the anchor points' spheres: 2.5 percent of patternSize. */
     double anchorPointRadius() const;
+
+    /** The side of one floor texture image: twice patternSize. */
+    double floorTileSize() const;
 
     static QString sceneObjects( SIG_Renderer const &renderer, GLuint first, GLuint end );
 

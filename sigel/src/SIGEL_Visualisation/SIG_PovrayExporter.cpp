@@ -27,7 +27,11 @@
 #include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
+#include <QImage>
+#include <QPainter>
 #include <QTextStream>
 #include <QtMath>
 
@@ -76,7 +80,18 @@ namespace SIGEL_Visualisation
     NEWMAT::ColumnVector horizonColor( 3 );
     horizonColor << SIG_Visualisation::skyBottomColor.x() << SIG_Visualisation::skyBottomColor.y() << SIG_Visualisation::skyBottomColor.z();
 
-    stream << environmentDeclarations()
+    QString floorImageName;
+
+    if (visualisation.getEnvironmentRenderer().getWithTexture())
+      {
+	QFileInfo const includeFile( fileName );
+	floorImageName = includeFile.completeBaseName() + "_floor.png";
+
+	if (!writeFloorImage( includeFile.dir().filePath( floorImageName ) ))
+	  return false;
+      }
+
+    stream << environmentDeclarations( floorImageName )
 	   << "\n";
 
     if (!writeResource( stream, "materials.inc" ))
@@ -152,7 +167,7 @@ namespace SIGEL_Visualisation
     return true;
   }
 
-  QString SIG_PovrayExporter::environmentDeclarations() const
+  QString SIG_PovrayExporter::environmentDeclarations( QString floorImageName ) const
   {
     SIG_EnvironmentRenderer const &environmentRenderer = visualisation.getEnvironmentRenderer();
 
@@ -163,11 +178,17 @@ namespace SIGEL_Visualisation
 
     stream << "#declare Plane = plane {\n"
 	   << "                   <0,1,0>, 0\n"
-	   << "                   texture {\n"
-	   << "                     pigment { srgb "
-	   << vectorToPovray( planeColorVector )
-	   << " }\n"
-	   << "                     finish { ambient 0 diffuse 1 }\n"
+	   << "                   texture {\n";
+
+    // The image lies in the square from 0 to 1 in x and y; laid flat, its top row is
+    // towards +z, as on screen. It holds the texture twice, so it is two tiles wide.
+    if (floorImageName.isEmpty())
+      stream << "                     pigment { srgb " << vectorToPovray( planeColorVector ) << " }\n";
+    else
+      stream << "                     pigment { image_map { png \"" << floorImageName << "\" interpolate 2 }"
+	     << " scale <" << 2 * floorTileSize() << "," << floorTileSize() << ",1> rotate x*90 }\n";
+
+    stream << "                     finish { ambient 0 diffuse 1 }\n"
 	   << "                   }\n"
 	   << "                 }\n"
 	   << "\n";
@@ -430,6 +451,47 @@ namespace SIGEL_Visualisation
     // A tuning constant from the same renders: five times the line radius, so that a point
     // is larger than the path it sits on.
     return patternSize() / 40;
+  }
+
+  double SIG_PovrayExporter::floorTileSize() const
+  {
+    // A tuning constant from sample renders of the Flagstones texture.
+    return patternSize() * 2;
+  }
+
+  bool SIG_PovrayExporter::writeFloorImage( QString fileName ) const
+  {
+    SIG_EnvironmentRenderer const &environmentRenderer = visualisation.getEnvironmentRenderer();
+
+    SIGEL_Environment::SIG_Environment const &environment = environmentRenderer.getEnvironment();
+
+    // The screen ignores the image's own alpha.
+    QImage const texture = QImage( environment.getTextureFile() ).convertToFormat( QImage::Format_RGB32 );
+
+    if (texture.isNull())
+      {
+	SIG_IO::cerr << "Error: cannot read the floor texture " << environment.getTextureFile() << "." << Qt::endl;
+	return false;
+      }
+
+    SIG_Vector const floorColor = environmentRenderer.sceneObjects[ 0 ]->getColor();
+
+    QImage image( 2 * texture.width(), texture.height(), QImage::Format_RGB32 );
+    image.fill( QColor::fromRgbF( floorColor.x, floorColor.y, floorColor.z ) );
+
+    QPainter painter( &image );
+    painter.setOpacity( environment.getTexAlpha() / 255.0 );
+    painter.drawImage( 0, 0, texture );
+    painter.drawImage( texture.width(), 0, texture.flipped( Qt::Horizontal ) );
+    painter.end();
+
+    if (!image.save( fileName, "PNG" ))
+      {
+	SIG_IO::cerr << "Error: cannot write the floor image " << fileName << "." << Qt::endl;
+	return false;
+      }
+
+    return true;
   }
 
   QString SIG_PovrayExporter::sceneObjects( SIG_Renderer const &renderer, GLuint first, GLuint end )

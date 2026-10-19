@@ -94,6 +94,8 @@ namespace SIGEL_Visualisation
      */
     bool getWithTexture() const { return withTexture; }
 
+    SIGEL_Environment::SIG_Environment const &getEnvironment() const { return environment; }
+
     int getGridSpacing() const { return gridSpacing; }
 
     SIG_Vector const &getLookPoint() const { return lookPoint; }
