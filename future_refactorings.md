@@ -184,8 +184,8 @@ touched, because changing one changes behaviour against the reference binary.
   (`~/sigel-woody/bin/repair-povray-output.py`, `render-hq.py`,
   `hq/sigel-hq.inc`); they show what had to change. The export should not
   need a post-processing step.
-  - **The floor** moves with the robot. Harmless while it is one colour, but
-    any pattern on it jumps, and a plain floor shows no motion.
+  - **The floor** is too bright: the sunlight washes a texture out almost to
+    white. A plain floor shows no motion.
   - **The rendering options.** povray's default jitter makes edges flicker
     from frame to frame; SIGEL gives the user no recommended options.
   - **The picture looks hazy.** It should look clear.
@@ -197,7 +197,8 @@ touched, because changing one changes behaviour against the reference binary.
     from the screen-grab settings, most of which do not apply to the export.
     It offers a floor texture picked from the bundled set, and a switch for
     mirroring every other column of it: the screen mirrors, which seamless
-    textures do not need and which turns logos around. Output files moves
+    textures do not need and which turns logos around, and the tile size,
+    today twice the robot radius per texture image. Output files moves
     to the top as "Format and files", since the format decides the rest; POV
     shows the POV-Ray group in place of Overlay labels.
   To decide: a patterned floor, and whether options are switches in the
