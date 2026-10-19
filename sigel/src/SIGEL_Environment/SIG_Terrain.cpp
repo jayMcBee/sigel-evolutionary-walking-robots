@@ -143,3 +143,8 @@ double SIGEL_Environment::SIG_Terrain::getHeight( int x, int z ) const
 {
   return heights[ z * dimensionX + x ];
 }
+
+bool SIGEL_Environment::SIG_Terrain::isFlat() const
+{
+  return heights.count( 0.0 ) == heights.size();
+}

@@ -96,6 +96,8 @@ namespace SIGEL_Visualisation
 
     SIGEL_Environment::SIG_Environment const &getEnvironment() const { return environment; }
 
+    SIGEL_Environment::SIG_Terrain const &getTerrain() const { return terrain; }
+
     int getGridSpacing() const { return gridSpacing; }
 
     SIG_Vector const &getLookPoint() const { return lookPoint; }
@@ -137,6 +139,15 @@ namespace SIGEL_Visualisation
      */
     void drawInit( const SIGEL_Environment::SIG_Terrain &terrain );
 
+    /**
+     * The depth at column x and row z. The robot starts at the terrain's
+     * corner, so the ground is drawn as far again on the negative side of
+     * each axis, with the start in the middle. Past the terrain, DynaMechs
+     * gives each point the height of the nearest edge, so the ground
+     * continues each edge outward; this lookup does the same.
+     */
+    static double groundDepth( const SIGEL_Environment::SIG_Terrain &terrain, int x, int z );
+
   private:
 
     /**
@@ -155,15 +166,6 @@ namespace SIGEL_Visualisation
     void buildGrid( GLuint number, const SIGEL_Environment::SIG_Terrain &terrain );
 
     /**
-     * The depth at column x and row z. The robot starts at the terrain's
-     * corner, so the ground is drawn as far again on the negative side of
-     * each axis, with the start in the middle. Past the terrain, DynaMechs
-     * gives each point the height of the nearest edge, so the ground
-     * continues each edge outward; this lookup does the same.
-     */
-    static double groundDepth( const SIGEL_Environment::SIG_Terrain &terrain, int x, int z );
-
-    /**
      * Sets v to the terrain vertex at column x and row z.
      */
     static void setTerrainVertex( GLfloat v[3], int x, int z,
@@ -178,6 +180,9 @@ namespace SIGEL_Visualisation
     void renderRobotPath();
 
     SIGEL_Environment::SIG_Environment const &environment;
+
+    /** Made once: getTerrain prints its warning on each call. */
+    SIGEL_Environment::SIG_Terrain const terrain;
 
     GLint const gridSpacing;
 

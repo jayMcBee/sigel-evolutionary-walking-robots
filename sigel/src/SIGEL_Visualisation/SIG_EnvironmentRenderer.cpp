@@ -37,6 +37,7 @@ namespace SIGEL_Visualisation
   SIG_EnvironmentRenderer::SIG_EnvironmentRenderer(SIGEL_Environment::SIG_Environment const &environment)
     : SIG_Renderer( 2, 0),
       environment(environment),
+      terrain( environment.getTerrain() ),
       gridSpacing( 1 ),
       lookPoint(0, 0, 0),
       showRobotPath( false )
@@ -105,9 +106,6 @@ namespace SIGEL_Visualisation
 
   void SIG_EnvironmentRenderer::buildDisplayLists()
   {
-    // Made once: getTerrain prints its warning on each call.
-    const SIGEL_Environment::SIG_Terrain terrain = environment.getTerrain();
-
     GLuint planeListIndex = displayListsOffset;
     buildPlane( planeListIndex, terrain );
 

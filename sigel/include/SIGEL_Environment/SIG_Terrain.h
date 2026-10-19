@@ -62,6 +62,9 @@ namespace SIGEL_Environment
 
     double getHeight( int x, int z ) const;
 
+    /** True if every height is 0. */
+    bool isFlat() const;
+
   private:
 
     int dimensionX;

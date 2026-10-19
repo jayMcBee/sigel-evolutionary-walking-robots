@@ -76,6 +76,18 @@ namespace SIGEL_Visualisation
      */
     bool writeFloorImage( QString fileName ) const;
 
+    /** The grid lines on a flat floor: a square around the origin. */
+    QString flatGrid() const;
+
+    /** The vertices and triangles of a terrain that is not flat, as the OpenGL renderer draws it. */
+    QString terrainMesh() const;
+
+    /** The grid lines on a terrain that is not flat, as the OpenGL renderer draws them. */
+    QString terrainGrid() const;
+
+    /** The POV-Ray point of the terrain at column x and row z, raised by lift. */
+    QString terrainPoint( int x, int z, double lift ) const;
+
     QString robotDeclarations() const;
 
     QString environmentObjects() const;

@@ -177,9 +177,16 @@ namespace SIGEL_Visualisation
 
     NEWMAT::ColumnVector planeColorVector = SIG_TypeConverter::toColumnVector( environmentRenderer.sceneObjects[ 0 ]->getColor() );
 
-    stream << "#declare Plane = plane {\n"
-	   << "                   <0,1,0>, 0\n"
-	   << "                   texture {\n";
+    SIGEL_Environment::SIG_Terrain const &terrain = environmentRenderer.getTerrain();
+
+    if (terrain.isFlat())
+      stream << "#declare Plane = plane {\n"
+	     << "                   <0,1,0>, 0\n";
+    else
+      stream << "#declare Plane = mesh2 {\n"
+	     << terrainMesh();
+
+    stream << "                   texture {\n";
 
     // The image lies in the square from 0 to 1 in x and y; laid flat, its top row is
     // towards +z, as on screen. It holds the texture twice, so it is two tiles wide.
@@ -195,48 +202,10 @@ namespace SIGEL_Visualisation
 	   << "                 }\n"
 	   << "\n";
 
-    int const gridSpacing = environmentRenderer.getGridSpacing();
-
-    int const noOfFields = 70;
-
-    int const minX = - gridSpacing * noOfFields;
-    int const maxX =   gridSpacing * noOfFields;
-    int const minZ = - gridSpacing * noOfFields;
-    int const maxZ =   gridSpacing * noOfFields;
-
     NEWMAT::ColumnVector gridColorVector = SIG_TypeConverter::toColumnVector( environmentRenderer.sceneObjects[ 1 ]->getColor() );
 
-    stream << "#declare Grid = union {\n";
-
-    for (int x=minX; x<=maxX; x+=gridSpacing)
-      {
-	stream << "  cylinder {\n"
-	       << "    <"
-	       << x
-	       << ",0.01,"
-	       << minZ
-	       << ">, <"
-	       << x
-	       << ",0.01,"
-	       << maxZ
-	       << ">, " << lineRadius() << "\n"
-	       << "  }\n";
-      };
-
-    for (int z=minZ; z<=maxZ; z+=gridSpacing)
-      {
-	stream << "  cylinder {\n"
-	       << "    <"
-	       << minX
-	       << ",0.01,"
-	       << z
-	       << ">, <"
-	       << maxX
-	       << ",0.01,"
-	       << z
-	       << ">, " << lineRadius() << "\n"
-	       << "  }\n";
-      };
+    stream << "#declare Grid = union {\n"
+	   << (terrain.isFlat() ? flatGrid() : terrainGrid());
 
     stream << "\n"
 	   << "  pigment { srgb " << vectorToPovray( gridColorVector ) << " }\n"
@@ -385,11 +354,17 @@ namespace SIGEL_Visualisation
     QString resultString;
     QTextStream stream( &resultString, QIODevice::WriteOnly );
 
-    int xPos = static_cast< int >( std::floor( lookPoint.x / gridSpacing ) * gridSpacing );
-    int zPos = - static_cast< int >( std::floor( lookPoint.z / gridSpacing ) * gridSpacing );
+    int xPos = 0;
+    int zPos = 0;
 
-    // The grid moves with the look point, by whole grid cells; the plane stays, so that a
-    // texture on it does not jump.
+    // On a flat floor the grid moves with the look point, by whole grid cells; the plane
+    // stays, so that a texture on it does not jump. On a terrain both stay, as drawn.
+    if (environmentRenderer.getTerrain().isFlat())
+      {
+	xPos = static_cast< int >( std::floor( lookPoint.x / gridSpacing ) * gridSpacing );
+	zPos = - static_cast< int >( std::floor( lookPoint.z / gridSpacing ) * gridSpacing );
+      }
+
     stream << sceneObjects( environmentRenderer, 0, 1 );
 
     // An object, not a union: POV-Ray warns about a union of fewer than two objects.
@@ -432,6 +407,140 @@ namespace SIGEL_Visualisation
       };
 
     return resultString;
+  }
+
+  QString SIG_PovrayExporter::flatGrid() const
+  {
+    SIG_EnvironmentRenderer const &environmentRenderer = visualisation.getEnvironmentRenderer();
+
+    int const gridSpacing = environmentRenderer.getGridSpacing();
+
+    int const noOfFields = 70;
+
+    int const minX = - gridSpacing * noOfFields;
+    int const maxX =   gridSpacing * noOfFields;
+    int const minZ = - gridSpacing * noOfFields;
+    int const maxZ =   gridSpacing * noOfFields;
+
+    QString gridString;
+    QTextStream stream( &gridString, QIODevice::WriteOnly );
+
+    for (int x=minX; x<=maxX; x+=gridSpacing)
+      {
+	stream << "  cylinder {\n"
+	       << "    <"
+	       << x
+	       << ",0.01,"
+	       << minZ
+	       << ">, <"
+	       << x
+	       << ",0.01,"
+	       << maxZ
+	       << ">, " << lineRadius() << "\n"
+	       << "  }\n";
+      };
+
+    for (int z=minZ; z<=maxZ; z+=gridSpacing)
+      {
+	stream << "  cylinder {\n"
+	       << "    <"
+	       << minX
+	       << ",0.01,"
+	       << z
+	       << ">, <"
+	       << maxX
+	       << ",0.01,"
+	       << z
+	       << ">, " << lineRadius() << "\n"
+	       << "  }\n";
+      };
+
+    return gridString;
+  }
+
+  QString SIG_PovrayExporter::terrainMesh() const
+  {
+    SIGEL_Environment::SIG_Terrain const &terrain = visualisation.getEnvironmentRenderer().getTerrain();
+
+    // The vertices SIG_EnvironmentRenderer::drawInit draws.
+    int const minX = 1 - terrain.getDimensionX();
+    int const maxX = terrain.getDimensionX() - 1;
+    int const minZ = 1 - terrain.getDimensionZ();
+    int const maxZ = terrain.getDimensionZ() - 1;
+
+    int const rowLength = maxX - minX + 1;
+
+    QString meshString;
+    QTextStream stream( &meshString, QIODevice::WriteOnly );
+
+    stream << "  vertex_vectors {\n"
+	   << "    " << rowLength * (maxZ - minZ + 1);
+
+    for (int z=minZ; z<=maxZ; z++)
+      for (int x=minX; x<=maxX; x++)
+	stream << ",\n    " << terrainPoint( x, z, 0 );
+
+    stream << "\n"
+	   << "  }\n"
+	   << "  face_indices {\n"
+	   << "    " << 2 * (rowLength - 1) * (maxZ - minZ);
+
+    // Each cell is split along the same diagonal as in drawInit and in DynaMechs.
+    for (int z=minZ; z<maxZ; z++)
+      for (int x=minX; x<maxX; x++)
+	{
+	  int const lower = (z - minZ) * rowLength + (x - minX);
+	  int const upper = lower + rowLength;
+
+	  stream << ",\n    <" << upper << "," << lower << "," << upper + 1 << ">"
+		 << ", <" << upper + 1 << "," << lower << "," << lower + 1 << ">";
+	}
+
+    stream << "\n"
+	   << "  }\n";
+
+    return meshString;
+  }
+
+  QString SIG_PovrayExporter::terrainGrid() const
+  {
+    SIGEL_Environment::SIG_Terrain const &terrain = visualisation.getEnvironmentRenderer().getTerrain();
+
+    // The lines SIG_EnvironmentRenderer::buildGrid draws, raised by the same 0.01.
+    int const minX = 1 - terrain.getDimensionX();
+    int const maxX = terrain.getDimensionX() - 1;
+    int const minZ = 1 - terrain.getDimensionZ();
+    int const maxZ = terrain.getDimensionZ() - 1;
+
+    QString gridString;
+    QTextStream stream( &gridString, QIODevice::WriteOnly );
+
+    for (int z=minZ; z<maxZ; z++)
+      for (int x=minX; x<maxX; x++)
+	stream << "  cylinder {\n"
+	       << "    " << terrainPoint( x, z, 0.01 ) << ", " << terrainPoint( x + 1, z, 0.01 )
+	       << ", " << lineRadius() << "\n"
+	       << "  }\n";
+
+    for (int x=minX; x<maxX; x++)
+      for (int z=minZ; z<maxZ; z++)
+	stream << "  cylinder {\n"
+	       << "    " << terrainPoint( x, z, 0.01 ) << ", " << terrainPoint( x, z + 1, 0.01 )
+	       << ", " << lineRadius() << "\n"
+	       << "  }\n";
+
+    return gridString;
+  }
+
+  QString SIG_PovrayExporter::terrainPoint( int x, int z, double lift ) const
+  {
+    SIGEL_Environment::SIG_Terrain const &terrain = visualisation.getEnvironmentRenderer().getTerrain();
+
+    // drawInit turns the terrain over the x axis: row z lies at SIGEL z = -z.
+    NEWMAT::ColumnVector point( 3 );
+    point << x << SIG_EnvironmentRenderer::groundDepth( terrain, x, z ) + lift << -z;
+
+    return vectorToPovray( SIG_TypeConverter::sigelToPovray() * point );
   }
 
   double SIG_PovrayExporter::patternSize() const
