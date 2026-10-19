@@ -28,6 +28,8 @@
 
 #include <newmat.h>
 
+#include <GL/gl.h>
+
 class QTextStream;
 
 namespace SIGEL_Visualisation
@@ -83,7 +85,7 @@ namespace SIGEL_Visualisation
     /** The radius of the anchor points' spheres: 2.5 percent of patternSize. */
     double anchorPointRadius() const;
 
-    static QString sceneObjects( SIG_Renderer const &renderer );
+    static QString sceneObjects( SIG_Renderer const &renderer, GLuint first, GLuint end );
 
     static QString vectorToPovray( NEWMAT::ColumnVector input );
 

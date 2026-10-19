@@ -134,7 +134,7 @@ namespace SIGEL_Visualisation
 	   << "\"\n"
 	   << "\n"
 	   << environmentObjects()
-	   << sceneObjects( visualisation.getRobotRenderer() )
+	   << sceneObjects( visualisation.getRobotRenderer(), 0, visualisation.getRobotRenderer().getNoOfObjects() )
 	   << "camera {\n"
 	   << "  right cameraRight\n"
 	   << "  up y\n"
@@ -365,15 +365,21 @@ namespace SIGEL_Visualisation
     int xPos = static_cast< int >( std::floor( lookPoint.x / gridSpacing ) * gridSpacing );
     int zPos = - static_cast< int >( std::floor( lookPoint.z / gridSpacing ) * gridSpacing );
 
-    stream << "union {\n"
-	   << sceneObjects( environmentRenderer )
-	   << "translate <"
-	   << xPos
-	   << ",0,"
-	   << zPos
-	   << ">\n"
-	   << "}\n"
-	   << "\n";
+    // The grid moves with the look point, by whole grid cells; the plane stays, so that a
+    // texture on it does not jump.
+    stream << sceneObjects( environmentRenderer, 0, 1 );
+
+    // An object, not a union: POV-Ray warns about a union of fewer than two objects.
+    if (environmentRenderer.sceneObjects[ 1 ]->getVisible())
+      stream << "object {\n"
+	     << sceneObjects( environmentRenderer, 1, 2 )
+	     << "translate <"
+	     << xPos
+	     << ",0,"
+	     << zPos
+	     << ">\n"
+	     << "}\n"
+	     << "\n";
 
     if (showRobotPath && robotPathPoints.count() >= 2)
       {
@@ -426,14 +432,12 @@ namespace SIGEL_Visualisation
     return patternSize() / 40;
   }
 
-  QString SIG_PovrayExporter::sceneObjects( SIG_Renderer const &renderer )
+  QString SIG_PovrayExporter::sceneObjects( SIG_Renderer const &renderer, GLuint first, GLuint end )
   {
-    GLuint const noOfObjects = renderer.getNoOfObjects();
-
     QString resultString;
     QTextStream resultStream( &resultString, QIODevice::WriteOnly );
 
-    for (int i=0; i < noOfObjects; i++)
+    for (GLuint i=first; i < end; i++)
       if (renderer.sceneObjects[ i ]->getVisible())
 	{
 	  NEWMAT::Matrix rotation = (   SIG_TypeConverter::sigelToPovray()
