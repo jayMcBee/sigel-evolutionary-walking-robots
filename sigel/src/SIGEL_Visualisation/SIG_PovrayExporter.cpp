@@ -188,7 +188,8 @@ namespace SIGEL_Visualisation
       stream << "                     pigment { image_map { png \"" << floorImageName << "\" interpolate 2 }"
 	     << " scale <" << 2 * floorTileSize() << "," << floorTileSize() << ",1> rotate x*90 }\n";
 
-    stream << "                     finish { ambient 0 diffuse 1 }\n"
+    // A tuning constant from sample renders: at diffuse 1, the sun washes the floor out.
+    stream << "                     finish { ambient 0 diffuse 0.8 }\n"
 	   << "                   }\n"
 	   << "                 }\n"
 	   << "\n";

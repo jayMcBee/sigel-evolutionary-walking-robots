@@ -2600,7 +2600,7 @@ Do you want to replace it?]
 == POV EXPORT ==
 steps=120
 files=32
-  sigel_pic.inc bytes=22856 sha256=bc878b817517074a6ab46297465c0960ff663c4c7241bd0321a39b701bd5f8f2
+  sigel_pic.inc bytes=22858 sha256=eebbc28f4a56d0a7ed7c05e6fe4f3579480c96087a4fe0671533fb400ff4ed38
   sigel_pic0000.pov bytes=1079 sha256=660761bbb3cb63eee003af18452f78928f462d5922f25ded5015ed7428987b4a
   sigel_pic0001.pov bytes=1090 sha256=a5d5dc065a92ecdb7fb7e3f6cd9d331b8fd050a3ae18f0ae94d4e31013f3e29d
   sigel_pic0002.pov bytes=1116 sha256=90872b83c9ca99bb718c19044aee2972d1cdadd610a1a584c6d42b1450d002d7
@@ -2719,7 +2719,7 @@ files=32
                      <0,1,0>, 0
                      texture {
                        pigment { srgb <0.49804, 0.49804, 0.49804> }
-                       finish { ambient 0 diffuse 1 }
+                       finish { ambient 0 diffuse 0.8 }
                      }
                    }
   
