@@ -8,6 +8,7 @@ global_settings {
     error_bound 0.35
     recursion_limit 2
     always_sample off
+    brightness 0.6
   }
 }
 

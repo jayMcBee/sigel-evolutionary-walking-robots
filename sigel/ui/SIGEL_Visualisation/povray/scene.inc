@@ -1,8 +1,9 @@
-// The key light is the screen's sun. The fill light's colour is linear: a quarter of
-// srgb <0.75, 0.82, 1>, since POV-Ray scales an srgb colour before it decodes it.
+// The key light is the screen's sun. Both colours are linear, since POV-Ray scales an
+// srgb colour before it decodes it: the key is 1.4 times srgb <1, 0.96, 0.9>, the fill a
+// quarter of srgb <0.75, 0.82, 1>.
 light_source {
   sigelSunPosition
-  srgb <1, 0.96, 0.9>
+  rgb <1.4, 1.28, 1.1>
   area_light 100*x, 100*z, 9, 9
   adaptive 1
   circular

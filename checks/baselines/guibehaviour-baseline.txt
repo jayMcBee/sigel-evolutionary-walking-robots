@@ -2600,38 +2600,38 @@ Do you want to replace it?]
 == POV EXPORT ==
 steps=120
 files=32
-  sigel_pic.inc bytes=21092 sha256=d3f599cfc752df66b8bb9a2a1ecbb4e3c3223230538fbca7cdca63e8083ddb15
-  sigel_pic0000.pov bytes=1059 sha256=89ce4032d7c7d6802fda48d7200666b50e61bd5c9638af6f26fd11c2beda7b56
-  sigel_pic0001.pov bytes=1070 sha256=f9e974b5ece4e62416315aea5b6d6ee7dbb846a53c6c9f0c0db965ce7172f357
-  sigel_pic0002.pov bytes=1096 sha256=37569f07fc7003ddcb6dab1c9c804af228cdf9af2c0f2e60525371ce6e69a0e4
-  sigel_pic0003.pov bytes=1095 sha256=13d29f92b8f1e98b1b716792787d65f45c965a4286534f717957da5881fea2a4
-  sigel_pic0004.pov bytes=1083 sha256=be630cb2a7db325e02007cbfb725b3dfaacf9ae3835a089588d79c0634333ff6
-  sigel_pic0005.pov bytes=1086 sha256=3e60730739702afa1c4413b3c7bd7026cda2bbc44b0122e06378a5730b756ba5
-  sigel_pic0006.pov bytes=1083 sha256=ecc185004e2516cf1dad659146a5d84b9c2433697516bd437e81b72a57ea4b31
-  sigel_pic0007.pov bytes=1083 sha256=0f7355db6f08b02b73d725b8bfb8b5051747f372573c8e8c51c6cc4fb655bab2
-  sigel_pic0008.pov bytes=1083 sha256=417176700c790ec87887ef9323e101726ebc9357f79140422103cea51cb389e1
-  sigel_pic0009.pov bytes=1089 sha256=3e5860ae7a823ae6fa795850fba5fcf807232a65e10cc66a578a7bd604ae9b44
-  sigel_pic0010.pov bytes=1087 sha256=a551ee9f3aae4e48db23ced3ddf7f3b66d9a2a550910f3f7bbd7054c8304638c
-  sigel_pic0011.pov bytes=1090 sha256=8732b2a3ab07693d5e757945b7da722241b8bc447b7d90e7d3f79625b7fe80c9
-  sigel_pic0012.pov bytes=1088 sha256=1ccac0010eca548e314295821450db2106269d6712d11bcd9a13719c7829125a
-  sigel_pic0013.pov bytes=1251 sha256=e0bf50527e091a865fc9f1e6ea0e9e69480b2063952d5c5928a16c4d6f4f026e
-  sigel_pic0014.pov bytes=1243 sha256=819ec689c82889b598b259d5f14db23c64b1bcb947439fccc98fdff6b8dc63cb
-  sigel_pic0015.pov bytes=1246 sha256=ff4a91a481a9b242996f44cc186be75b7083d564d4f977c8fc5cb889c0b9d811
-  sigel_pic0016.pov bytes=1252 sha256=090e788f5b27188372d1af50d578730c6682f717bb98b20ea280c163ba58b1c6
-  sigel_pic0017.pov bytes=1258 sha256=e6367c61bb2e08367358384e424284199ab2a1a3c9b5afac011e8ed46f9f422c
-  sigel_pic0018.pov bytes=1250 sha256=3831a59895598e7df0f32fb045e5be2927db234cc2fe3ef1c3d1de30f8892978
-  sigel_pic0019.pov bytes=1250 sha256=0f4563adccd358d276867244e0b5b7aaffeabccf3c5ca56b0d3496b1de33fd7c
-  sigel_pic0020.pov bytes=1260 sha256=bfcc06f240585ec227ded6a254b65e47c254a680648023263f534559445eda72
-  sigel_pic0021.pov bytes=1252 sha256=c43c40fddb6baa7e52965edab73cb3a23f3dd96ddbe6d51206a5c7d1f06feed7
-  sigel_pic0022.pov bytes=1255 sha256=09a489ed0cc09bb466579274d0c8e122d13acd13f68f00c89e2a52350aabc193
-  sigel_pic0023.pov bytes=1251 sha256=f435cd779612983d012285faef5476dbb07f9975bcecd3d3faaf275d72146da4
-  sigel_pic0024.pov bytes=1252 sha256=0b868645fafcb4a845a755659c380afc114e1cde7de5409e6566d832e815d59c
-  sigel_pic0025.pov bytes=1245 sha256=5114a386f19b33638fc61966c52045c073cec379a20f9413dcf5b850eca994da
-  sigel_pic0026.pov bytes=1403 sha256=b70d11a1aa86919702a706bc62fd6b94f68c89945225c8d16355c69a02e0d77d
-  sigel_pic0027.pov bytes=1408 sha256=22717686e0e1e84fec2242d519fbf90559795668f1cf5747a8dbfb10c907b99a
-  sigel_pic0028.pov bytes=1403 sha256=6efc1bed1fa1d5a3afbd98e591c5fd10879e7e1979e5b2188aa313c13bab610a
-  sigel_pic0029.pov bytes=1407 sha256=f490f7a3d6d149c4307744e2da9f690cc0aeccb3301e23bf35db955fbd2cce58
-  sigel_pic0030.pov bytes=1413 sha256=73517445f4c4f171a74911c62b48793c2ecf3fe405c847e489066ee8aee84bdc
+  sigel_pic.inc bytes=21137 sha256=a98c0eff2dc6fec557d020d2283200a46398cd019ecc4748bce39e65cdea40e4
+  sigel_pic0000.pov bytes=1078 sha256=311789945331627b61d1b58d8f873e279f8d6fa2804901c5659e6914ade2aad4
+  sigel_pic0001.pov bytes=1089 sha256=2d9a6b672bd5d56d3c3d39993ed920de9bc4861c1a527268826a49cd117be7f7
+  sigel_pic0002.pov bytes=1115 sha256=7649c2ef367b46b0852a507a23642f3f98d41d76e1e55f0d655a7d3c0487b198
+  sigel_pic0003.pov bytes=1114 sha256=06ccbdd71c35fc910dfacddada37634fd3ecfc172fe508a26fd4794ff305c274
+  sigel_pic0004.pov bytes=1102 sha256=7a6662bf4c92cdd53fa871b29d59538a022b54ecaf7644ab1c8fb0b85707e832
+  sigel_pic0005.pov bytes=1105 sha256=de959ebb004aa62c15ee0e18ac41068e05bd19c776052adf5f0ad493e552c466
+  sigel_pic0006.pov bytes=1102 sha256=b93325a4f06fc0d518bf0e20be7b61aff1a5782aa8325ebb5bf611937fbede10
+  sigel_pic0007.pov bytes=1102 sha256=caeb4dd782a836fb4c324619fd3aa99088fb01c2d82ca0cd4a059faf64f29110
+  sigel_pic0008.pov bytes=1102 sha256=51a89bfc9c3f51be7210a7da102b3e96688743c04c307d61173e10033ce73d9b
+  sigel_pic0009.pov bytes=1108 sha256=d88702f32f988acaa38d36949325e826be30867a54b4d9deffb3cfb1e37f752b
+  sigel_pic0010.pov bytes=1106 sha256=e8798764ed749c9a65d159efe3e9a887ab5ebf2a9e0cf6659c28f1dfd6fa08bc
+  sigel_pic0011.pov bytes=1109 sha256=1cd8ab064a95da313655989ef451be93e687784c4ba7793fc6febc304b56b09a
+  sigel_pic0012.pov bytes=1107 sha256=19bdeb351d9275f75876ebe9800de5a5969b03255208673ca91ad01472385cc0
+  sigel_pic0013.pov bytes=1270 sha256=23ddb9fae17bedaddc6ef3b3bf5c67f2d2cfcd04d0ce75a2f4dbd822b0418f2c
+  sigel_pic0014.pov bytes=1262 sha256=4cabd1ab0ea9c9c0b34633a1207687a7d73e8ef12f941924cee18b80f83e9f4b
+  sigel_pic0015.pov bytes=1265 sha256=1d5f2078c3ad0c0c8595fb8964bff84cf162f36a422efb4ad7e190574f1999c3
+  sigel_pic0016.pov bytes=1271 sha256=4dc82fab416015f74ccf8afd38b8f73c316be4e53aa5acef151f9cda50c52743
+  sigel_pic0017.pov bytes=1277 sha256=af747ed212c56255c57714df53bc523f400da056bd8d3d4e6ce3ceced5a55e2d
+  sigel_pic0018.pov bytes=1269 sha256=dda78d33b3c0b14ac072555974e32c488fc5dc378251a019ca4ca433e2b7ed1b
+  sigel_pic0019.pov bytes=1269 sha256=bcc98c6f2b546b01498e5b9698ce0be5729fa2bca8ab2286821b4b955429d0b9
+  sigel_pic0020.pov bytes=1279 sha256=5c8f164d89254a2d7eb9c4b8c405cc57b38170d50cf56f1b94943a09959af358
+  sigel_pic0021.pov bytes=1271 sha256=1b7c9212830d16446e58197c6d4d943d34a510771fdcc1d29d2838e95ce240b6
+  sigel_pic0022.pov bytes=1274 sha256=f2054c13bd74a222c67275bfc1eee7707696876769b2d72648bf94426aed657b
+  sigel_pic0023.pov bytes=1270 sha256=5a48c15dad9b5f4c834a83890196f71cc7d55c1a15952ad430dcb384ba5f2989
+  sigel_pic0024.pov bytes=1271 sha256=f0e72f92c2a3fd6e6ee226516d784aa065b393bc19c14fa98ce4dfcc781bd6cc
+  sigel_pic0025.pov bytes=1264 sha256=69f04d1396a7e11b3f633d0ee734feed4ee08729cde3b5e41d949158ffead2af
+  sigel_pic0026.pov bytes=1422 sha256=6c60bbb95f1bd8a0aec41db8f0cb896a7f95e53ecec45828811dcc900cc62ecf
+  sigel_pic0027.pov bytes=1427 sha256=d5831810bee339c462fa68f78250c307e27714e68bac9bad2563d349f6796259
+  sigel_pic0028.pov bytes=1422 sha256=278e9d86b11210a5723a88afbddfffbf5f3b29831a1fed838129b3ca4eea8423
+  sigel_pic0029.pov bytes=1426 sha256=e2c9db8cad14e97d85a88e27596918b7c9e83768e39e17e4450dbd98ee1edf54
+  sigel_pic0030.pov bytes=1432 sha256=0c15445db29bdd1cc2b6ccd0bb4c16dc5638bc39e66f7f8cd2201cc746cc5ccf
 
 == sigel_pic0030.pov ==
   #version 3.7;
@@ -2646,6 +2646,7 @@ files=32
       error_bound 0.35
       recursion_limit 2
       always_sample off
+      brightness 0.6
     }
   }
   
@@ -2839,11 +2840,12 @@ files=32
   #declare sigelHorizonColor = <1, 1, 1>;
   #declare sigelSkyTopColor = <0.7, 0.8, 0.95>;
   
-  // The key light is the screen's sun. The fill light's colour is linear: a quarter of
-  // srgb <0.75, 0.82, 1>, since POV-Ray scales an srgb colour before it decodes it.
+  // The key light is the screen's sun. Both colours are linear, since POV-Ray scales an
+  // srgb colour before it decodes it: the key is 1.4 times srgb <1, 0.96, 0.9>, the fill a
+  // quarter of srgb <0.75, 0.82, 1>.
   light_source {
     sigelSunPosition
-    srgb <1, 0.96, 0.9>
+    rgb <1.4, 1.28, 1.1>
     area_light 100*x, 100*z, 9, 9
     adaptive 1
     circular

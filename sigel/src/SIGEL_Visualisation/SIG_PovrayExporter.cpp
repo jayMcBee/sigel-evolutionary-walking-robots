@@ -123,7 +123,8 @@ namespace SIGEL_Visualisation
 	   << "\n";
 
     // globalSettings.inc samples the radiosity densely with a low error bound, so that
-    // the indirect light changes little from frame to frame.
+    // the indirect light changes little from frame to frame. Its brightness 0.6 puts less
+    // sky light into the shadows, for more contrast.
     if (!writeResource( stream, "globalSettings.inc" ))
       return false;
 
