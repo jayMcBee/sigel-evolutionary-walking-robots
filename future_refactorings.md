@@ -184,8 +184,7 @@ touched, because changing one changes behaviour against the reference binary.
   (`~/sigel-woody/bin/repair-povray-output.py`, `render-hq.py`,
   `hq/sigel-hq.inc`); they show what had to change. The export should not
   need a post-processing step.
-  - **The floor** is too bright: the sunlight washes a texture out almost to
-    white. A plain floor shows no motion.
+  - **A plain floor shows no motion.**
   - **The rendering options.** povray's default jitter makes edges flicker
     from frame to frame; SIGEL gives the user no recommended options.
   - **The picture looks hazy.** It should look clear.
