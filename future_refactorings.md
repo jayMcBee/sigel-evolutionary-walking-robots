@@ -189,9 +189,11 @@ touched, because changing one changes behaviour against the reference binary.
   - **The rendering options.** povray's default jitter makes edges flicker
     from frame to frame; SIGEL gives the user no recommended options.
   - **The picture looks hazy.** It should look clear.
-  - **POV-Ray settings in a pane of their own** in the movie settings, apart
+  - **POV-Ray settings in a group of their own** in the movie settings, apart
     from the screen-grab settings, most of which do not apply to the export.
-    It offers a floor texture picked from the bundled set.
+    It offers a floor texture picked from the bundled set. Output files moves
+    to the top as "Format and files", since the format decides the rest; POV
+    shows the POV-Ray group in place of Overlay labels.
   To decide: a patterned floor, and whether options are switches in the
   include file. Not checked in 2.0: whether a height-map terrain exports.
 
