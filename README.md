@@ -3,8 +3,8 @@
 An independent fork of the SIGEL project that modernizes the code in an attempt to bring it up to current standards.
 It is not made, maintained or endorsed by SIGEL's original authors.
 
-SIGEL evolves control programs for walking robots by genetic programming and
-tests each program in a physics simulator.
+SIGEL (**Si**mulator für **G**P-**e**volvierte **L**aufrobotersteuerungen) stands for
+"simulator for walking-robot controllers created using genetic programming".
 
 To build and run it, see [Getting started](sigel/GETTING_STARTED).
 
