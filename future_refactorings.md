@@ -187,7 +187,6 @@ touched, because changing one changes behaviour against the reference binary.
   - **A plain floor shows no motion.**
   - **The rendering options.** povray's default jitter makes edges flicker
     from frame to frame; SIGEL gives the user no recommended options.
-  - **The picture looks hazy.** It should look clear.
   - **The frame size is split.** The export sets only the aspect ratio; the
     pixel size comes from the povray command line, and a mismatch stretches
     the picture. The export writes a povray `.ini` with the frame size, the
