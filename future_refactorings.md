@@ -190,9 +190,7 @@ touched, because changing one changes behaviour against the reference binary.
     from frame to frame; SIGEL gives the user no recommended options.
   - **The picture looks hazy.** It should look clear.
   To decide: a patterned floor, and whether options are switches in the
-  include file. Not checked in 2.0: whether recording stops at the end of
-  the evaluated time (1.3's did not), and whether a height-map terrain
-  exports.
+  include file. Not checked in 2.0: whether a height-map terrain exports.
 
 ---
 
