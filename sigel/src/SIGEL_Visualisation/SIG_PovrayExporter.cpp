@@ -58,8 +58,7 @@ namespace SIGEL_Visualisation
     static double const lightDistance = 1000;
 
     // The key light is the screen's sun, so the shadows fall the same way; the fill comes
-    // from the opposite side, lower down. The fill's colour is linear: a quarter of
-    // srgb <0.75, 0.82, 1>, since POV-Ray scales an srgb colour before it decodes it.
+    // from the opposite side, lower down.
     QVector3D const sun = SIG_SimulationVisualisation::sunDirection.normalized() * lightDistance;
 
     QVector3D const fill = QVector3D( -sun.x(), sun.y() / 2, -sun.z() ).normalized() * lightDistance;
@@ -71,8 +70,6 @@ namespace SIGEL_Visualisation
     fillPosition << fill.x() << fill.y() << fill.z();
 
     // The sky has the screen's colours: skyBottomColor at the horizon, skyTopColor overhead.
-    // The ground fog is dense at the floor and thin above it, so that the floor fades into
-    // the horizon while the robot, a few units away, stays clear.
     NEWMAT::ColumnVector skyTopColor( 3 );
     skyTopColor << SIG_Visualisation::skyTopColor.x() << SIG_Visualisation::skyTopColor.y() << SIG_Visualisation::skyTopColor.z();
 
@@ -88,45 +85,14 @@ namespace SIGEL_Visualisation
     stream << robotDeclarations()
 	   << "#declare cameraRight = " << aspectRatio << "*x;\n"
 	   << "#declare cameraDirection = <0,0," << directionLength << ">;\n"
-	   << "\n"
-	   << "light_source {\n"
-	   << "  " << vectorToPovray( SIG_TypeConverter::sigelToPovray() * keyPosition ) << "\n"
-	   << "  srgb <1, 0.96, 0.9>\n"
-	   << "  area_light 100*x, 100*z, 9, 9\n"
-	   << "  adaptive 1\n"
-	   << "  circular\n"
-	   << "  orient\n"
-	   << "}\n"
-	   << "\n"
-	   << "light_source {\n"
-	   << "  " << vectorToPovray( SIG_TypeConverter::sigelToPovray() * fillPosition ) << "\n"
-	   << "  rgb <0.131, 0.16, 0.25>\n"
-	   << "  area_light 150*x, 150*z, 5, 5\n"
-	   << "  adaptive 1\n"
-	   << "  circular\n"
-	   << "  orient\n"
-	   << "}\n"
-	   << "\n"
-	   << "sky_sphere {\n"
-	   << "  pigment {\n"
-	   << "    gradient y\n"
-	   << "    color_map {\n"
-	   << "      [0.5 srgb " << vectorToPovray( horizonColor ) << "]\n"
-	   << "      [1.0 srgb " << vectorToPovray( skyTopColor ) << "]\n"
-	   << "    }\n"
-	   << "    scale 2\n"
-	   << "    translate -y\n"
-	   << "  }\n"
-	   << "}\n"
-	   << "\n"
-	   << "fog {\n"
-	   << "  fog_type 2\n"
-	   << "  fog_offset 1\n"
-	   << "  fog_alt 3\n"
-	   << "  distance 60\n"
-	   << "  srgb " << vectorToPovray( horizonColor ) << "\n"
-	   << "}\n"
+	   << "#declare sigelSunPosition = " << vectorToPovray( SIG_TypeConverter::sigelToPovray() * keyPosition ) << ";\n"
+	   << "#declare sigelFillPosition = " << vectorToPovray( SIG_TypeConverter::sigelToPovray() * fillPosition ) << ";\n"
+	   << "#declare sigelHorizonColor = " << vectorToPovray( horizonColor ) << ";\n"
+	   << "#declare sigelSkyTopColor = " << vectorToPovray( skyTopColor ) << ";\n"
 	   << "\n";
+
+    if (!writeResource( stream, "scene.inc" ))
+      return false;
 
     file.close();
 
@@ -267,11 +233,11 @@ namespace SIGEL_Visualisation
 
     double const patternSize = (robotRadius > 0) ? robotRadius : 1;
 
+    stream << "#declare sigelPatternSize = " << patternSize << ";\n"
+	   << "\n";
+
     // A robot file gives a material only a colour. It becomes paint, a little greyer and
     // darker than the colour, so that pure colours look like paint and not like plastic.
-    // Where the noise pattern is high, the paint is worn off and the steel shows. The
-    // map's textures take on the pattern's scale, so the paint's bumps, at 14/30 of it,
-    // are robotRadius / 30 across.
     for ( SIGEL_Robot::SIG_Material *materialPtr : robot.getMaterials() )
       {
 	SIGEL_Robot::SIG_Material &actMaterial = *materialPtr;
@@ -283,26 +249,11 @@ namespace SIGEL_Visualisation
 	for (int i=1; i<=3; i++)
 	  paintColor( i ) = (paintColor( i ) + (grey - paintColor( i )) * 0.45) * 0.8;
 
-	QString paint;
-	QTextStream paintStream( &paint, QIODevice::WriteOnly );
-
-	paintStream << "pigment { srgb " << vectorToPovray( paintColor ) << " }\n"
-		    << "      normal { bumps 0.015 scale 0.4667 }\n"
-		    << "      finish { sigelPaintFinish }";
-
 	stream << "#declare "
 	       << actMaterial.getName()
-	       << " = texture {\n"
-	       << "  bozo\n"
-	       << "  turbulence 1\n"
-	       << "  scale " << patternSize / 14 << "\n"
-	       << "  texture_map {\n"
-	       << "    [0.00 " << paint << "]\n"
-	       << "    [0.70 " << paint << "]\n"
-	       << "    [0.73 sigelSteel]\n"
-	       << "    [1.00 sigelSteel]\n"
-	       << "  }\n"
-	       << "}\n"
+	       << " = sigelPaint( "
+	       << vectorToPovray( paintColor )
+	       << " )\n"
 	       << "\n";
       };
 

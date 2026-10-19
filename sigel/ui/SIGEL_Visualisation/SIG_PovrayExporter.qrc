@@ -2,5 +2,6 @@
     <qresource prefix="/SIG_PovrayExporter" >
         <file>povray/globalSettings.inc</file>
         <file>povray/materials.inc</file>
+        <file>povray/scene.inc</file>
     </qresource>
 </RCC>

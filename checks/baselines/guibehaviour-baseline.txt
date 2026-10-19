@@ -2600,7 +2600,7 @@ Do you want to replace it?]
 == POV EXPORT ==
 steps=120
 files=32
-  sigel_pic.inc bytes=20480 sha256=bf559da1a42e873d2cdc9ebd158c52ae72b87397214053a56dac953cc1d0f3ac
+  sigel_pic.inc bytes=21331 sha256=a33288f12084f8050341177d08f004023feef2638068e3c6674ae8d9b6fd245a
   sigel_pic0000.pov bytes=1059 sha256=89ce4032d7c7d6802fda48d7200666b50e61bd5c9638af6f26fd11c2beda7b56
   sigel_pic0001.pov bytes=1070 sha256=f9e974b5ece4e62416315aea5b6d6ee7dbb846a53c6c9f0c0db965ce7172f357
   sigel_pic0002.pov bytes=1096 sha256=37569f07fc7003ddcb6dab1c9c804af228cdf9af2c0f2e60525371ce6e69a0e4
@@ -2751,21 +2751,26 @@ files=32
     }
   }
   
-  #declare metal = texture {
-    bozo
-    turbulence 1
-    scale 0.236902
-    texture_map {
-      [0.00 pigment { srgb <0.012996, 0.012996, 0.233> }
-        normal { bumps 0.015 scale 0.4667 }
-        finish { sigelPaintFinish }]
-      [0.70 pigment { srgb <0.012996, 0.012996, 0.233> }
-        normal { bumps 0.015 scale 0.4667 }
-        finish { sigelPaintFinish }]
-      [0.73 sigelSteel]
-      [1.00 sigelSteel]
+  // A robot material: paint over steel. Where the noise pattern is high, the paint is
+  // worn off and the steel shows. The map's textures take on the pattern's scale, so the
+  // paint's bumps, at 14/30 of it, are sigelPatternSize / 30 across.
+  #macro sigelPaint( paintColor )
+    texture {
+      bozo
+      turbulence 1
+      scale sigelPatternSize / 14
+      texture_map {
+        [0.00 pigment { srgb paintColor } normal { bumps 0.015 scale 0.4667 } finish { sigelPaintFinish }]
+        [0.70 pigment { srgb paintColor } normal { bumps 0.015 scale 0.4667 } finish { sigelPaintFinish }]
+        [0.73 sigelSteel]
+        [1.00 sigelSteel]
+      }
     }
-  }
+  #end
+  
+  #declare sigelPatternSize = 3.31662;
+  
+  #declare metal = sigelPaint( <0.012996, 0.012996, 0.233> )
   
   #declare base1 = mesh {
     [16 triangles]
@@ -2829,9 +2834,15 @@ files=32
   
   #declare cameraRight = 1.77778*x;
   #declare cameraDirection = <0,0,0.866025>;
+  #declare sigelSunPosition = <-486.66, 811.11, -324.44>;
+  #declare sigelFillPosition = <683.76, 569.8, 455.84>;
+  #declare sigelHorizonColor = <1, 1, 1>;
+  #declare sigelSkyTopColor = <0.7, 0.8, 0.95>;
   
+  // The key light is the screen's sun. The fill light's colour is linear: a quarter of
+  // srgb <0.75, 0.82, 1>, since POV-Ray scales an srgb colour before it decodes it.
   light_source {
-    <-486.66, 811.11, -324.44>
+    sigelSunPosition
     srgb <1, 0.96, 0.9>
     area_light 100*x, 100*z, 9, 9
     adaptive 1
@@ -2840,7 +2851,7 @@ files=32
   }
   
   light_source {
-    <683.76, 569.8, 455.84>
+    sigelFillPosition
     rgb <0.131, 0.16, 0.25>
     area_light 150*x, 150*z, 5, 5
     adaptive 1
@@ -2852,20 +2863,21 @@ files=32
     pigment {
       gradient y
       color_map {
-        [0.5 srgb <1, 1, 1>]
-        [1.0 srgb <0.7, 0.8, 0.95>]
+        [0.5 srgb sigelHorizonColor]
+        [1.0 srgb sigelSkyTopColor]
       }
       scale 2
       translate -y
     }
   }
   
+  // The ground fog is dense at the floor and thin above it, so that the floor fades into
+  // the horizon while the robot, a few units away, stays clear.
   fog {
     fog_type 2
     fog_offset 1
     fog_alt 3
     distance 60
-    srgb <1, 1, 1>
+    srgb sigelHorizonColor
   }
-  
   

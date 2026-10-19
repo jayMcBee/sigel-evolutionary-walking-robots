@@ -20,3 +20,20 @@
   }
 }
 
+// A robot material: paint over steel. Where the noise pattern is high, the paint is
+// worn off and the steel shows. The map's textures take on the pattern's scale, so the
+// paint's bumps, at 14/30 of it, are sigelPatternSize / 30 across.
+#macro sigelPaint( paintColor )
+  texture {
+    bozo
+    turbulence 1
+    scale sigelPatternSize / 14
+    texture_map {
+      [0.00 pigment { srgb paintColor } normal { bumps 0.015 scale 0.4667 } finish { sigelPaintFinish }]
+      [0.70 pigment { srgb paintColor } normal { bumps 0.015 scale 0.4667 } finish { sigelPaintFinish }]
+      [0.73 sigelSteel]
+      [1.00 sigelSteel]
+    }
+  }
+#end
+
