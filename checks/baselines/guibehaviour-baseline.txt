@@ -2600,7 +2600,7 @@ Do you want to replace it?]
 == POV EXPORT ==
 steps=120
 files=32
-  sigel_pic.inc bytes=22844 sha256=666d508a60e0f2d06053b5016b4ae2c12dfb65f0e454c30829d6f7c3989d1276
+  sigel_pic.inc bytes=22856 sha256=bc878b817517074a6ab46297465c0960ff663c4c7241bd0321a39b701bd5f8f2
   sigel_pic0000.pov bytes=1078 sha256=311789945331627b61d1b58d8f873e279f8d6fa2804901c5659e6914ade2aad4
   sigel_pic0001.pov bytes=1089 sha256=2d9a6b672bd5d56d3c3d39993ed920de9bc4861c1a527268826a49cd117be7f7
   sigel_pic0002.pov bytes=1115 sha256=7649c2ef367b46b0852a507a23642f3f98d41d76e1e55f0d655a7d3c0487b198
@@ -2728,6 +2728,7 @@ files=32
   
     pigment { srgb <0.31373, 0.31373, 0.31373> }
     finish { ambient 0 diffuse 1 }
+    no_shadow
   }
   
   #declare sigelPaintFinish = finish {

@@ -218,6 +218,7 @@ namespace SIGEL_Visualisation
     stream << "\n"
 	   << "  pigment { srgb " << vectorToPovray( gridColorVector ) << " }\n"
 	   << "  finish { ambient 0 diffuse 1 }\n"
+	   << "  no_shadow\n"
 	   << "}\n";
 
     return declarationsString;
