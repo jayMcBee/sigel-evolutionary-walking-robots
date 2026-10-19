@@ -321,7 +321,7 @@ namespace SIGEL_Visualisation
 			    << " = sphere {\n"
 			    << "  "
 			    << vectorToPovray( pointPosition )
-			    << ", 0.05\n"
+			    << ", " << anchorPointRadius() << "\n"
 			    << "  texture {\n"
 			    << "    pigment { srgb "
 			    << vectorToPovray( linkColor )
@@ -414,6 +414,11 @@ namespace SIGEL_Visualisation
   double SIG_PovrayExporter::lineRadius() const
   {
     return patternSize() / 200;
+  }
+
+  double SIG_PovrayExporter::anchorPointRadius() const
+  {
+    return patternSize() / 40;
   }
 
   QString SIG_PovrayExporter::sceneObjects( SIG_Renderer const &renderer )

@@ -80,6 +80,9 @@ namespace SIGEL_Visualisation
     /** The radius of the grid lines and the robot's path: half a percent of patternSize. */
     double lineRadius() const;
 
+    /** The radius of the anchor points' spheres: 2.5 percent of patternSize. */
+    double anchorPointRadius() const;
+
     static QString sceneObjects( SIG_Renderer const &renderer );
 
     static QString vectorToPovray( NEWMAT::ColumnVector input );
