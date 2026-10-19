@@ -35,13 +35,10 @@ namespace SIGEL_Visualisation
 {
 
   /**
-   * The floor texture: 256 × 256 RGBA pixels, read from a PNM file.
+   * The floor texture: RGBA pixels, read from an image file.
    */
   typedef struct {
 		std::vector< GLubyte > imageData;
-
-		// Always 24: the file holds 8-bit RGB.
-		GLuint   bpp;
 
 		GLuint   width;
 		GLuint   height;
@@ -120,12 +117,11 @@ namespace SIGEL_Visualisation
     void addRobotPathPoint( SIG_Vector newPoint );
 
     /**
-     * Reads a binary PNM file (P6) of 256 × 256 pixels into texture, and gives each pixel
-     * the environment's texture alpha. The size is fixed, and the header after "P6" must be
-     * exactly 58 bytes. Shows a warning and returns false if the file does not open, is not
-     * P6 or is shorter than the header.
+     * Reads an image file of any size and format Qt reads (PNM, PNG, JPEG) into texture,
+     * and gives each pixel the environment's texture alpha. Shows a warning and returns
+     * false if the file cannot be read.
      */
-    bool loadPNMTexture(char *filename);
+    bool loadTexture( QString fileName );
 
     /**
      * Loads the environment's texture file and gives it to OpenGL. Shows a warning and

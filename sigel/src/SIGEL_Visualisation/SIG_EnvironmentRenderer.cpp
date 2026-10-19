@@ -20,6 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#include <QImage>
 #include <QVector3D>
 #include "SIGEL_Visualisation/SIG_EnvironmentRenderer.h"
 
@@ -244,59 +245,31 @@ namespace SIGEL_Visualisation
     robotPathPoints.append( newPointObject );
   }
 
-  bool SIG_EnvironmentRenderer::loadPNMTexture(char *filename) {
-		// the pnmMagic identifies a pnm file with pixmap (RGB) data
-		// and it is stored in raw data format
-		GLubyte		 pnmMagic[2] = { 'P', '6' };
-  	GLubyte    fileMagic[2];
+  bool SIG_EnvironmentRenderer::loadTexture( QString fileName )
+  {
+    QImage image( fileName );
 
-  	// Header data.
-  	GLubyte    header[58];
-  	GLuint     bytesPerPixel;
+    if (image.isNull())
+      {
+	QMessageBox warn(QMessageBox::Warning, "Warning", "Could not open the texture file.\nThe floor is shown without a texture.", QMessageBox::Retry, SIGEL_Tools::dialogParent());
+	warn.exec();
 
-  	GLuint     imageSize;
+	return false;
+      }
 
-  	FILE *file = fopen(filename, "rb");
+    image.convertTo( QImage::Format_RGBA8888 );
 
-  	// Start reading in the header, make sure we
-  	// have the right PNM data type.
-  	
-  	if(file == nullptr                                                           	||
-  			fread(fileMagic, 1, sizeof(fileMagic), file)  != sizeof(fileMagic) 			||
-  			memcmp(pnmMagic, fileMagic, sizeof(pnmMagic)) != 0                			||
-  			fread(header, 1, sizeof(header), file)        != sizeof(header))
-  	{
-  		QMessageBox warn(QMessageBox::Warning, "Warning", "Could not open the texture file.\nThe floor is shown without a texture.", QMessageBox::Retry, SIGEL_Tools::dialogParent());
-  		warn.exec();  	
+    texture.width  = image.width();
+    texture.height = image.height();
 
-  		return false;
-  	}
-  	
-  	// The size and colour depth are fixed, not read from the header.
-  	
-  	texture.width  = 256;
-  	texture.height = 256;
-  	texture.bpp  = 24;
-  	bytesPerPixel = 4;
-  	imageSize     = texture.width * texture.height * bytesPerPixel;
+    texture.imageData.assign( image.constBits(), image.constBits() + image.sizeInBytes() );
 
-  	texture.imageData.assign( imageSize, 0 );
+    GLubyte const alpha = environment.getTexAlpha();
 
-  	// this for loop reads the the image data of the specified file and
-  	// adds the missing (RGB)A information
-  	char *currentPixel;
-  	int alpha = environment.getTexAlpha();
-  	currentPixel = reinterpret_cast<char*>(texture.imageData.data());
-  	
-  	for(int i = 0; i < imageSize; i += bytesPerPixel) {
-  		fread(currentPixel, 1, 3, file);
-  		// this is the A information for RGBA
-  		texture.imageData[i + 3] = alpha;
-  		currentPixel += 4;
-  	}
-  	
-  	fclose (file);
-  	return true;
+    for (GLuint i = 3; i < texture.imageData.size(); i += 4)
+      texture.imageData[ i ] = alpha;
+
+    return true;
   }
 
   bool SIG_EnvironmentRenderer::initTexture() {
@@ -309,7 +282,7 @@ namespace SIGEL_Visualisation
     	return false;
     }
 
-    if ( !loadPNMTexture(texFile.toUtf8().data()) )
+    if ( !loadTexture( texFile ) )
     	return false;
 
     // Set up texture environment.

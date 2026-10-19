@@ -178,7 +178,7 @@ void SIG_EnvironmentView::getOutOfExperiment()
 	}
 	
   void SIG_EnvironmentView::slotSelectTextureFile() {
-  QString texFile = QFileDialog::getOpenFileName( this, QString(), theExperiment.environment.getTextureFile(), "Portable Pixmap (*.pnm *.ppm)" );
+  QString texFile = QFileDialog::getOpenFileName( this, QString(), theExperiment.environment.getTextureFile(), "Images (*.png *.jpg *.jpeg *.pnm *.ppm)" );
 		if (!texFile.isEmpty()) {
 			lineeditTextureFile->setText(texFile);
 			this->putIntoExperiment();
