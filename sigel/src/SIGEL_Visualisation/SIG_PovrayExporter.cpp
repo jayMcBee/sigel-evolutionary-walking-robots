@@ -24,6 +24,7 @@
 #include "SIGEL_Visualisation/SIG_PovrayExporter.h"
 
 #include "SIGEL_Visualisation/SIG_SimulationVisualisation.h"
+#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 
 #include <QFile>
@@ -145,23 +146,19 @@ namespace SIGEL_Visualisation
 
     NEWMAT::ColumnVector lookPointColumnVector = SIG_TypeConverter::toColumnVector( viewSettings.lookPoint );
 
-    // The radiosity samples densely with a low error bound, so that the indirect light
-    // changes little from frame to frame.
+    // globalSettings.inc samples the radiosity densely with a low error bound, so that
+    // the indirect light changes little from frame to frame.
+    QFile globalSettings( ":/SIG_PovrayExporter/povray/globalSettings.inc" );
+
+    if (!globalSettings.open( QIODevice::ReadOnly ))
+      {
+	SIG_IO::cerr << "Error: the POV-Ray global settings are missing from the program." << Qt::endl;
+	return false;
+      }
+
     stream << "#version 3.7;\n"
 	   << "\n"
-	   << "global_settings {\n"
-	   << "  assumed_gamma 1.0\n"
-	   << "  radiosity {\n"
-	   << "    pretrace_start 0.08\n"
-	   << "    pretrace_end 0.01\n"
-	   << "    count 300\n"
-	   << "    nearest_count 15\n"
-	   << "    error_bound 0.35\n"
-	   << "    recursion_limit 2\n"
-	   << "    always_sample off\n"
-	   << "  }\n"
-	   << "}\n"
-	   << "\n"
+	   << globalSettings.readAll()
 	   << "#include "
 	   << "\""
 	   << includeFileName

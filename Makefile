@@ -228,15 +228,17 @@ FORMS :=  MT_UI/MT_AddConstantsWidgetBase MT_UI/MT_AddIndividualsWidget \
             SIGEL_MasterUI/SIG_SimulationParameterBase \
             SIGEL_SlaveUI/SIG_MovieSettingsDialogBase \
             SIGEL_SlaveUI/SIG_SimulationWidgetBase
-QRCS  :=  SIGEL_SlaveUI/SIG_SimulationWidgetBase
+QRCS  :=  SIGEL_SlaveUI/SIG_SimulationWidgetBase \
+           SIGEL_Visualisation/SIG_PovrayExporter
 
 UI_HDRS  := $(patsubst %,$(B)/ui/ui_%.h,$(notdir $(FORMS)))
 QRC_OBJS := $(patsubst %,$(OBJ)/qrc/%.o,$(notdir $(QRCS)))
 QRC_SLAVE  := $(OBJ)/qrc/SIG_SimulationWidgetBase.o
+QRC_POVRAY := $(OBJ)/qrc/SIG_PovrayExporter.o
 
-# The images of the forms are compiled in with rcc. Their objects are named on
-# the link line: in an archive nothing references them, and the linker would
-# drop them. A .qrc that names a missing file is caught by check.sh, not here.
+# The images of the forms and the POV-Ray text are compiled in with rcc. Their
+# objects are named on the link line: in an archive nothing references them, and
+# the linker would drop them. A .qrc that names a missing file stops make.
 .PHONY: forms
 forms: $(UI_HDRS) $(QRC_OBJS)
 
@@ -249,7 +251,7 @@ endef
 $(foreach f,$(FORMS),$(eval $(call form_rule,$(f))))
 
 define qrc_rule
-$(B)/qrc/qrc_$(notdir $(1)).cpp: $(SRC)/ui/$(1).qrc
+$(B)/qrc/qrc_$(notdir $(1)).cpp: $(SRC)/ui/$(1).qrc $(shell $(RCC) --list $(SRC)/ui/$(1).qrc)
 	@mkdir -p $$(dir $$@)
 	$(RCC) --name $(notdir $(1)) $$< -o $$@
 endef
@@ -398,16 +400,16 @@ SIGLIBS = $(PVM_LIB) -ltirpc \
 
 $(B)/sigel: $(SRC)/src/sigel.cpp $(MOC_OBJS) $(QRC_OBJS) $(GUI_LIBS) $(CORE_LIBS) \
             $(VENDOR_LIBS) $(PVM_LIB)
-	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS) $(MASTER_OBJ) -o $@ \
+	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS) $(QRC_POVRAY) $(MASTER_OBJ) -o $@ \
 	  -Wl,--start-group $(GUI_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group $(SIGLIBS)
 	@want=`$(call ctor_size,$(MASTER_OBJ))`; got=`$(call ctor_size,$@)`; \
 	 test -n "$$want" && test "$$got" = "$$want" || { \
 	   echo "sigel linked the WRONG SIG_GPExperiment: constructor is $$got," \
 	        "the master's is $$want. Clean leaves mtController uninitialised." >&2; exit 1; }
 
-$(B)/sigel_slave: $(SRC)/src/sigel_slave.cpp $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(CLEAN_OBJ) \
+$(B)/sigel_slave: $(SRC)/src/sigel_slave.cpp $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(QRC_POVRAY) $(CLEAN_OBJ) \
                   $(GUI_SLAVE_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) $(PVM_LIB)
-	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(CLEAN_OBJ) -o $@ \
+	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(QRC_POVRAY) $(CLEAN_OBJ) -o $@ \
 	  -Wl,--start-group $(GUI_SLAVE_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group $(SIGLIBS)
 	@want=`$(call ctor_size,$(CLEAN_OBJ))`; got=`$(call ctor_size,$@)`; \
 	 test -n "$$want" && test "$$got" = "$$want" || { \
@@ -454,7 +456,7 @@ guidrive: $(B)/guidrive
 $(B)/guidrive: checks/programs/guidrive.cpp $(MOC_OBJS) $(QRC_OBJS) $(GUI_LIBS) $(CORE_LIBS) \
                $(VENDOR_LIBS) $(PVM_LIB)
 	$(SIGCXX) -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQT_TESTLIB_LIB \
-	  $(SIGINC) -isystem $(QTINC)/QtTest $< $(MOC_OBJS) $(QRC_SLAVE) $(MASTER_OBJ) -o $@ \
+	  $(SIGINC) -isystem $(QTINC)/QtTest $< $(MOC_OBJS) $(QRC_SLAVE) $(QRC_POVRAY) $(MASTER_OBJ) -o $@ \
 	  -Wl,--start-group $(GUI_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  -lQt6Test $(SIGLIBS)
 	@want=`$(call ctor_size,$(MASTER_OBJ))`; got=`$(call ctor_size,$@)`; \
