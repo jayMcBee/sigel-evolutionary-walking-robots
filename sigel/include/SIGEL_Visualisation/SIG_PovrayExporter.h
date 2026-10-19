@@ -71,6 +71,12 @@ namespace SIGEL_Visualisation
 
     QString environmentObjects() const;
 
+    /**
+     * The robot radius: patterns scale with it, so that a small and a large robot look
+     * alike. A robot without vertices has radius 0 and gets the size of radius 1.
+     */
+    double patternSize() const;
+
     static QString sceneObjects( SIG_Renderer const &renderer );
 
     static QString vectorToPovray( NEWMAT::ColumnVector input );

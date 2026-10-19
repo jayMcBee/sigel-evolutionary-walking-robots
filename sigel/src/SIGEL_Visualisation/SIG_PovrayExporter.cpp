@@ -231,13 +231,7 @@ namespace SIGEL_Visualisation
 
     QTextStream stream( &declarationsString, QIODevice::WriteOnly );
 
-    // The patterns scale with the robot, so that a small and a large robot look alike. A
-    // robot without vertices has radius 0 and gets the patterns of a robot of radius 1.
-    double const robotRadius = visualisation.getRobotRadius();
-
-    double const patternSize = (robotRadius > 0) ? robotRadius : 1;
-
-    stream << "#declare sigelPatternSize = " << patternSize << ";\n"
+    stream << "#declare sigelPatternSize = " << patternSize() << ";\n"
 	   << "\n";
 
     // A robot file gives a material only a colour. It becomes paint, a little greyer and
@@ -408,6 +402,13 @@ namespace SIGEL_Visualisation
       };
 
     return resultString;
+  }
+
+  double SIG_PovrayExporter::patternSize() const
+  {
+    double const robotRadius = visualisation.getRobotRadius();
+
+    return (robotRadius > 0) ? robotRadius : 1;
   }
 
   QString SIG_PovrayExporter::sceneObjects( SIG_Renderer const &renderer )
