@@ -33,6 +33,7 @@
 #include <QImage>
 #include <QPainter>
 #include <QTextStream>
+#include <QTransform>
 #include <QtMath>
 
 #include <cmath>
@@ -483,7 +484,9 @@ namespace SIGEL_Visualisation
     QPainter painter( &image );
     painter.setOpacity( environment.getTexAlpha() / 255.0 );
     painter.drawImage( 0, 0, texture );
-    painter.drawImage( texture.width(), 0, texture.flipped( Qt::Horizontal ) );
+    // Mirrors the second copy into the right half.
+    painter.setTransform( QTransform( -1, 0, 0, 1, 2 * texture.width(), 0 ) );
+    painter.drawImage( 0, 0, texture );
     painter.end();
 
     if (!image.save( fileName, "PNG" ))
