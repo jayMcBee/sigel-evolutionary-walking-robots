@@ -35,87 +35,87 @@ class QTextStream;
 namespace SIGEL_Visualisation
 {
 
-  class SIG_Renderer;
+	class SIG_Renderer;
 
-  class SIG_SimulationVisualisation;
+	class SIG_SimulationVisualisation;
 
-  /**
-   * Writes a SIG_SimulationVisualisation as POV-Ray scene files: one
-   * include file with the declarations of the plane, the grid and the
-   * robot, and one scene file per frame. The text that is the same for
-   * every scene is in the .inc resources in povray/ and is copied in
-   * unchanged. Where it needs a value from SIGEL, it reads a name that the
-   * code declares before POV-Ray needs it.
-   */
-  class SIG_PovrayExporter
-  {
-  public:
-    SIG_PovrayExporter( SIG_SimulationVisualisation const &visualisation );
+	/**
+	 * Writes a SIG_SimulationVisualisation as POV-Ray scene files: one
+	 * include file with the declarations of the plane, the grid and the
+	 * robot, and one scene file per frame. The text that is the same for
+	 * every scene is in the .inc resources in povray/ and is copied in
+	 * unchanged. Where it needs a value from SIGEL, it reads a name that the
+	 * code declares before POV-Ray needs it.
+	 */
+	class SIG_PovrayExporter
+	{
+	public:
+		SIG_PovrayExporter( SIG_SimulationVisualisation const &visualisation );
 
-    /**
-     * Writes the include file that every frame includes.
-     *
-     * @return false if the file cannot be written.
-     */
-    bool writeIncludeFile( QString fileName, double aspectRatio ) const;
+		/**
+		 * Writes the include file that every frame includes.
+		 *
+		 * @return false if the file cannot be written.
+		 */
+		bool writeIncludeFile( QString fileName, double aspectRatio ) const;
 
-    /**
-     * Writes one frame: the scene as it is now.
-     *
-     * @return false if the file cannot be written.
-     */
-    bool writeFrame( QString includeFileName, QString fileName ) const;
+		/**
+		 * Writes one frame: the scene as it is now.
+		 *
+		 * @return false if the file cannot be written.
+		 */
+		bool writeFrame( QString includeFileName, QString fileName ) const;
 
-  private:
-    /** @param floorImageName the floor's image file, or empty for a floor in one colour. */
-    QString environmentDeclarations( QString floorImageName ) const;
+	private:
+		/** @param floorImageName the floor's image file, or empty for a floor in one colour. */
+		QString environmentDeclarations( QString floorImageName ) const;
 
-    /**
-     * Writes the floor texture as the screen draws it: over the floor colour by the texture
-     * alpha, with a mirrored copy beside it. False if it cannot be read or written.
-     */
-    bool writeFloorImage( QString fileName ) const;
+		/**
+		 * Writes the floor texture as the screen draws it: over the floor colour by the texture
+		 * alpha, with a mirrored copy beside it. False if it cannot be read or written.
+		 */
+		bool writeFloorImage( QString fileName ) const;
 
-    /** The grid lines on a flat floor: a square around the origin. */
-    QString flatGrid() const;
+		/** The grid lines on a flat floor: a square around the origin. */
+		QString flatGrid() const;
 
-    /** The vertices and triangles of a terrain that is not flat, as the OpenGL renderer draws it. */
-    QString terrainMesh() const;
+		/** The vertices and triangles of a terrain that is not flat, as the OpenGL renderer draws it. */
+		QString terrainMesh() const;
 
-    /** The grid lines on a terrain that is not flat, as the OpenGL renderer draws them. */
-    QString terrainGrid() const;
+		/** The grid lines on a terrain that is not flat, as the OpenGL renderer draws them. */
+		QString terrainGrid() const;
 
-    /** The POV-Ray point of the terrain at column x and row z, raised by lift. */
-    QString terrainPoint( int x, int z, double lift ) const;
+		/** The POV-Ray point of the terrain at column x and row z, raised by lift. */
+		QString terrainPoint( int x, int z, double lift ) const;
 
-    QString robotDeclarations() const;
+		QString robotDeclarations() const;
 
-    QString environmentObjects() const;
+		QString environmentObjects() const;
 
-    /**
-     * The robot radius: patterns scale with it, so that a small and a large robot look
-     * alike. A robot without vertices has radius 0 and gets the size of radius 1.
-     */
-    double patternSize() const;
+		/**
+		 * The robot radius: patterns scale with it, so that a small and a large robot look
+		 * alike. A robot without vertices has radius 0 and gets the size of radius 1.
+		 */
+		double patternSize() const;
 
-    /** The radius of the grid lines and the robot's path: half a percent of patternSize. */
-    double lineRadius() const;
+		/** The radius of the grid lines and the robot's path: half a percent of patternSize. */
+		double lineRadius() const;
 
-    /** The radius of the anchor points' spheres: 2.5 percent of patternSize. */
-    double anchorPointRadius() const;
+		/** The radius of the anchor points' spheres: 2.5 percent of patternSize. */
+		double anchorPointRadius() const;
 
-    /** The side of one floor texture image: twice patternSize. */
-    double floorTileSize() const;
+		/** The side of one floor texture image: twice patternSize. */
+		double floorTileSize() const;
 
-    static QString sceneObjects( SIG_Renderer const &renderer, GLuint first, GLuint end );
+		static QString sceneObjects( SIG_Renderer const &renderer, GLuint first, GLuint end );
 
-    static QString vectorToPovray( NEWMAT::ColumnVector input );
+		static QString vectorToPovray( NEWMAT::ColumnVector input );
 
-    /** Copies a POV-Ray text compiled into the program; false if it is missing. */
-    static bool writeResource( QTextStream &stream, QString fileName );
+		/** Copies a POV-Ray text compiled into the program; false if it is missing. */
+		static bool writeResource( QTextStream &stream, QString fileName );
 
-    SIG_SimulationVisualisation const &visualisation;
-  };
+		SIG_SimulationVisualisation const &visualisation;
+	};
 
 }
 
