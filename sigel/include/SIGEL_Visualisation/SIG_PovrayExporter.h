@@ -40,7 +40,10 @@ namespace SIGEL_Visualisation
   /**
    * Writes a SIG_SimulationVisualisation as POV-Ray scene files: one
    * include file with the declarations of the plane, the grid and the
-   * robot, and one scene file per frame.
+   * robot, and one scene file per frame. The text that is the same for
+   * every scene is in the .inc resources in povray/ and is copied in
+   * unchanged. Where it needs a value from SIGEL, it reads a name that the
+   * code declares before POV-Ray needs it.
    */
   class SIG_PovrayExporter
   {

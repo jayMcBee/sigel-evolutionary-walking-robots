@@ -84,8 +84,11 @@ namespace SIGEL_Visualisation
 
     stream << robotDeclarations()
 	   << "#declare cameraRight = " << aspectRatio << "*x;\n"
-	   << "#declare cameraDirection = <0,0," << directionLength << ">;\n"
-	   << "#declare sigelSunPosition = " << vectorToPovray( SIG_TypeConverter::sigelToPovray() * keyPosition ) << ";\n"
+	   << "#declare cameraDirection = <0,0," << directionLength << ">;\n";
+
+    // Inputs to scene.inc: the light positions and sky colours, declared ahead of it for
+    // POV-Ray's single-pass parser.
+    stream << "#declare sigelSunPosition = " << vectorToPovray( SIG_TypeConverter::sigelToPovray() * keyPosition ) << ";\n"
 	   << "#declare sigelFillPosition = " << vectorToPovray( SIG_TypeConverter::sigelToPovray() * fillPosition ) << ";\n"
 	   << "#declare sigelHorizonColor = " << vectorToPovray( horizonColor ) << ";\n"
 	   << "#declare sigelSkyTopColor = " << vectorToPovray( skyTopColor ) << ";\n"
