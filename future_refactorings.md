@@ -199,14 +199,6 @@ touched, because changing one changes behaviour against the reference binary.
     today twice the robot radius per texture image. Output files moves
     to the top as "Format and files", since the format decides the rest; POV
     shows the POV-Ray group in place of Overlay labels.
-  - **A height-map terrain does not export.** The export writes only the
-    flat plane and never reads the terrain, while the physics uses it. On
-    bumps, the robot floats above the drawn floor with its shadow detached.
-    The screen draws the terrain as a mesh of 1-unit cells
-    (`SIG_EnvironmentRenderer::drawInit`); the export should write the same
-    shape, with the floor texture on it. No shipped experiment uses a height
-    map; a scratch copy of twoBases with `FLOORPICTUREFILE` set to a small
-    greyscale image shows it.
   To decide: a patterned floor, and whether options are switches in the
   include file.
 
