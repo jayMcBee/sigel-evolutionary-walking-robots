@@ -195,7 +195,9 @@ touched, because changing one changes behaviour against the reference binary.
     frame list and the render options, so one `povray` call renders it all.
   - **POV-Ray settings in a group of their own** in the movie settings, apart
     from the screen-grab settings, most of which do not apply to the export.
-    It offers a floor texture picked from the bundled set. Output files moves
+    It offers a floor texture picked from the bundled set, and a switch for
+    mirroring every other column of it: the screen mirrors, which seamless
+    textures do not need and which turns logos around. Output files moves
     to the top as "Format and files", since the format decides the rest; POV
     shows the POV-Ray group in place of Overlay labels.
   To decide: a patterned floor, and whether options are switches in the
