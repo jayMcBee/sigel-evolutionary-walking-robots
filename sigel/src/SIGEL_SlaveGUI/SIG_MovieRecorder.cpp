@@ -255,23 +255,31 @@ namespace SIGEL_SlaveGUI
     lastFileName = settings.directory + settings.filePrefix + ".inc";
     makeDirectory();
 
-    SIGEL_Visualisation::SIG_EnvironmentRenderer const &environmentRenderer = visualisation.getEnvironmentRenderer();
-
-    SIGEL_Visualisation::SIG_PovrayFloor floor;
-    floor.textureFile = settings.povrayFloorTexture;
-    floor.mirrored = settings.povrayMirrorFloor;
-    floor.tileSize = settings.povrayFloorTileSize;
-
-    if ( settings.povrayFloorFromExperiment )
-      {
-        floor.textureFile = environmentRenderer.getWithTexture() ? environmentRenderer.getEnvironment().getTextureFile() : QString();
-        floor.textureOpacity = environmentRenderer.getEnvironment().getTexAlpha() / 255.0;
-      }
-
-    if ( !SIGEL_Visualisation::SIG_PovrayExporter( visualisation ).writeIncludeFile( lastFileName, floor ) )
+    if ( !SIGEL_Visualisation::SIG_PovrayExporter( visualisation ).writeIncludeFile( lastFileName, povrayFloor( visualisation ) ) )
       return false;
 
     return writePovrayFrameList();
+  }
+
+  SIGEL_Visualisation::SIG_PovrayFloor SIG_MovieRecorder::povrayFloor( SIGEL_Visualisation::SIG_SimulationVisualisation const &visualisation ) const
+  {
+    SIGEL_Visualisation::SIG_PovrayFloor floor;
+    floor.mirrored = settings.povrayMirrorFloor;
+    floor.tileSize = settings.povrayFloorTileSize;
+
+    if ( !settings.povrayFloorFromExperiment )
+      {
+        floor.textureFile = settings.povrayFloorTexture;
+        return floor;
+      }
+
+    SIGEL_Visualisation::SIG_EnvironmentRenderer const &environmentRenderer = visualisation.getEnvironmentRenderer();
+
+    if ( environmentRenderer.getWithTexture() )
+      floor.textureFile = environmentRenderer.getEnvironment().getTextureFile();
+
+    floor.textureOpacity = environmentRenderer.getEnvironment().getTexAlpha() / 255.0;
+    return floor;
   }
 
   bool SIG_MovieRecorder::writePovrayFrameList()

@@ -207,7 +207,7 @@ namespace SIGEL_Visualisation
 		// The image lies in the square from 0 to 1 in x and y; laid flat, its top row is
 		// towards +z, as the OpenGL renderer draws it. A mirrored floor's image holds the
 		// texture twice, so it is two tiles wide.
-		double const tileSize = floor.tileSize * patternSize();
+		double const tileSize = floor.tileSize * 2 * patternSize();
 		double const imageWidth = floor.mirrored ? 2 * tileSize : tileSize;
 		if (floorImageName.isEmpty())
 			stream << "    pigment {\n"

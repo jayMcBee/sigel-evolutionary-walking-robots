@@ -305,7 +305,7 @@
                   </widget>
                 </item>
                 <item row="1" column="0">
-                  <widget class="QLabel" name="textlabelPovrayTileSize">
+                  <widget class="QLabel" name="textlabelPovrayFloorTileSize">
                     <property name="text">
                       <string>Tile size:</string>
                     </property>
@@ -320,7 +320,7 @@
                       <number>8</number>
                     </property>
                     <item>
-                      <widget class="QComboBox" name="comboboxPovrayTileSize">
+                      <widget class="QComboBox" name="comboboxPovrayFloorTileSize">
                         <property name="toolTip">
                           <string>The side of one texture image on the floor.</string>
                         </property>
@@ -334,7 +334,7 @@
                       </widget>
                     </item>
                     <item>
-                      <spacer name="spacerPovrayTileSize">
+                      <spacer name="spacerPovrayFloorTileSize">
                         <property name="orientation">
                           <enum>Qt::Horizontal</enum>
                         </property>

@@ -46,20 +46,10 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize
       view( view ),
       stepSize( stepSize )
 {
-	comboboxPovrayFloorTexture->addItem( "As in the experiment" );
-	comboboxPovrayFloorTexture->addItem( "None", QString() );
-
-	QDir const textures( QString( std::getenv( "SIGEL_ROOT" ) ) + "/textures" );
-
-	for ( QFileInfo const &texture : textures.entryInfoList( { "*.png", "*.jpg", "*.jpeg", "*.pnm", "*.ppm" }, QDir::Files, QDir::Name ) )
-	  comboboxPovrayFloorTexture->addItem( texture.completeBaseName(), texture.absoluteFilePath() );
-
-	for ( int halves = 1; halves <= 10; ++halves )
-	  comboboxPovrayTileSize->addItem( QString( "%1 \u00D7" ).arg( halves / 2.0 ), halves / 2.0 );
-
 	textlabelFrameFit->setForegroundRole( QPalette::PlaceholderText );
 	textlabelMovieLength->setForegroundRole( QPalette::PlaceholderText );
 	textlabelFrameTiming->setForegroundRole( QPalette::PlaceholderText );
+	fillPovrayFloorChoices();
 
 	// A maximised window keeps its size, so the resize would do nothing.
 	if ( view->window()->isMaximized() || view->window()->isFullScreen() )
@@ -90,6 +80,20 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize
 	slotUpdatePngCompression();
 }
 
+void SIG_MovieSettingsDialog::fillPovrayFloorChoices()
+{
+  comboboxPovrayFloorTexture->addItem( "As in the experiment" );
+  comboboxPovrayFloorTexture->addItem( "None", QString() );
+
+  QDir const textures( QString( std::getenv( "SIGEL_ROOT" ) ) + "/textures" );
+
+  for ( QFileInfo const &texture : textures.entryInfoList( { "*.png", "*.jpg", "*.jpeg", "*.pnm", "*.ppm" }, QDir::Files, QDir::Name ) )
+    comboboxPovrayFloorTexture->addItem( texture.completeBaseName(), texture.absoluteFilePath() );
+
+  for ( int halves = 1; halves <= 10; ++halves )
+    comboboxPovrayFloorTileSize->addItem( QString( "%1 \u00D7" ).arg( halves / 2.0 ), halves / 2.0 );
+}
+
 void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
 {
   spinboxWidth->setValue( settings.width );
@@ -116,7 +120,7 @@ void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
     comboboxPovrayFloorTexture->setCurrentIndex( comboboxPovrayFloorTexture->findData( settings.povrayFloorTexture ) );
 
   checkboxPovrayMirrorFloor->setChecked( settings.povrayMirrorFloor );
-  comboboxPovrayTileSize->setCurrentIndex( comboboxPovrayTileSize->findData( settings.povrayFloorTileSize ) );
+  comboboxPovrayFloorTileSize->setCurrentIndex( comboboxPovrayFloorTileSize->findData( settings.povrayFloorTileSize ) );
 }
 
 SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
@@ -143,7 +147,7 @@ SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
   settings.povrayFloorFromExperiment = comboboxPovrayFloorTexture->currentIndex() == 0;
   settings.povrayFloorTexture = comboboxPovrayFloorTexture->currentData().toString();
   settings.povrayMirrorFloor = checkboxPovrayMirrorFloor->isChecked();
-  settings.povrayFloorTileSize = comboboxPovrayTileSize->currentData().toDouble();
+  settings.povrayFloorTileSize = comboboxPovrayFloorTileSize->currentData().toDouble();
   return settings;
 }
 

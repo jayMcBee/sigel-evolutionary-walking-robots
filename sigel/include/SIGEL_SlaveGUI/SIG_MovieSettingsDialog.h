@@ -56,6 +56,12 @@ private slots:
 
 private:
     /**
+     * Fills the floor texture and tile size combo boxes; the first texture
+     * entry is the experiment's floor.
+     */
+    void fillPovrayFloorChoices();
+
+    /**
      * The view's size in framebuffer pixels, the pixels a frame is copied from.
      */
     QSize viewSize() const;

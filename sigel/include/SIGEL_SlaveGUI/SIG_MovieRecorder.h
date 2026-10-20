@@ -36,6 +36,8 @@ namespace SIGEL_Visualisation
 
   class SIG_SimulationVisualisation;
 
+  struct SIG_PovrayFloor;
+
 }
 
 namespace SIGEL_SlaveGUI
@@ -97,6 +99,9 @@ namespace SIGEL_SlaveGUI
 
     // A POV-Ray scene that includes the frame file of POV-Ray's frame_number.
     bool writePovrayFrameList();
+
+    // The floor as the settings pick it, from the experiment or not.
+    SIGEL_Visualisation::SIG_PovrayFloor povrayFloor( SIGEL_Visualisation::SIG_SimulationVisualisation const &visualisation ) const;
 
     // A POV-Ray .ini with the frame size and the frames written so far, so
     // that one povray call renders them all.

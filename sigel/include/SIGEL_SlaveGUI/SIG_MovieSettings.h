@@ -91,10 +91,10 @@ namespace SIGEL_SlaveGUI
     bool povrayMirrorFloor = true;
 
     /**
-     * The side of one floor texture image, in robot radii. The default is
-     * from sample renders of the Flagstones texture.
+     * The side of one floor texture image, in robot sizes: the robot's
+     * diameter. The default is from sample renders of the Flagstones texture.
      */
-    double povrayFloorTileSize = 2;
+    double povrayFloorTileSize = 1;
   };
 
 }

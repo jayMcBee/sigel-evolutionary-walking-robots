@@ -55,8 +55,8 @@ namespace SIGEL_Visualisation
 		/** Every other column of tiles is mirrored, as the OpenGL renderer draws it. */
 		bool mirrored = true;
 
-		/** The side of one tile, in robot radii. */
-		double tileSize = 2;
+		/** The side of one tile, in robot sizes: the robot's diameter. */
+		double tileSize = 1;
 	};
 
 	/**
