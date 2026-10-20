@@ -67,8 +67,8 @@ namespace SIGEL_Visualisation
     GLuint getNoOfObjects() const { return noOfObjects; }
 
     /**
-     * Scene object i uses display list displayListsOffset + i. Public, so that the owner
-     * can move the objects as the simulation runs.
+     * Scene object i uses display list displayListsOffset + i, unless the subclass draws it
+     * itself. Public, so that the owner can move the objects as the simulation runs.
      */
     QList<SIG_VisualSceneObject *> sceneObjects;
 
@@ -89,7 +89,8 @@ namespace SIGEL_Visualisation
     GLuint noOfObjects;
 
     /**
-     * Records the OpenGL commands that draw each scene object in its display list.
+     * Prepares the drawing, such as recording the OpenGL commands that draw each scene
+     * object in its display list.
      */
     virtual void buildDisplayLists() = 0;
 

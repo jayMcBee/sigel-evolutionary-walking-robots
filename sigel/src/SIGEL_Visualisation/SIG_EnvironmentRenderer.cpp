@@ -22,7 +22,9 @@
 */
 #include <QImage>
 #include <QVector3D>
+#include <QtMath>
 #include "SIGEL_Visualisation/SIG_EnvironmentRenderer.h"
+#include "SIGEL_Visualisation/SIG_Visualisation.h"
 
 #include "qmessagebox.h"
 #include "SIGEL_Tools/SIG_DialogParent.h"
@@ -40,6 +42,8 @@ namespace SIGEL_Visualisation
       terrain( environment.getTerrain() ),
       gridSpacing( 1 ),
       lookPoint(0, 0, 0),
+      eyePoint(0, 0, 0),
+      reach( SIG_Visualisation::farPlane ),
       showRobotPath( false )
   {
     SIG_Matrix idRotation;
@@ -106,67 +110,55 @@ namespace SIGEL_Visualisation
 
   void SIG_EnvironmentRenderer::buildDisplayLists()
   {
-    GLuint planeListIndex = displayListsOffset;
-    buildPlane( planeListIndex, terrain );
-
-    GLuint gridListIndex = displayListsOffset + 1;
-
-    buildGrid( gridListIndex, terrain );
-  }
-
-  void SIG_EnvironmentRenderer::buildPlane( GLuint number, const SIGEL_Environment::SIG_Terrain &terrain )
-  {
-    glNewList(number, GL_COMPILE);
-
-    glFrontFace( GL_CCW );
-
+    // The plane and the grid have no display lists: drawInit and drawGrid draw them each
+    // frame, around the eye. Only the texture is made once.
     withTexture = environment.getWithTexture();
-		if (withTexture == true)
-    	withTexture = initTexture();
-
-    drawInit( terrain );
-
-    glEndList();
+    if (withTexture == true)
+      withTexture = initTexture();
   }
 
-	void SIG_EnvironmentRenderer::buildGrid( GLuint number, const SIGEL_Environment::SIG_Terrain &terrain )
+  void SIG_EnvironmentRenderer::visibleCells( int &minX, int &maxX, int &minZ, int &maxZ ) const
   {
-   	int x,z;
-   	GLfloat vertex[2][3];
-	 	int x_dim = terrain.getDimensionX();
-	 	int z_dim = terrain.getDimensionZ();
-	 	
-  	glNewList(number, GL_COMPILE);
-    glFrontFace( GL_CCW );
+    // Row z lies at SIGEL z = -z.
+    minX = qFloor( eyePoint.x - reach );
+    maxX = qCeil( eyePoint.x + reach );
+    minZ = qFloor( -eyePoint.z - reach );
+    maxZ = qCeil( -eyePoint.z + reach );
+  }
 
-	 	glTranslatef(0,0.01,0);
-	 	glRotated(180,1,0,0);
+  void SIG_EnvironmentRenderer::drawGrid() const
+  {
+    int minX, maxX, minZ, maxZ;
+    visibleCells( minX, maxX, minZ, maxZ );
 
-   	for (z=1-z_dim; z<z_dim-1; ++z) {
+    GLfloat vertex[2][3];
+
+    glTranslatef(0,0.01,0);
+    glRotated(180,1,0,0);
+
+    for (int z=minZ; z<=maxZ; ++z) {
       glBegin(GL_LINES);
-    	for (x=1-x_dim; x<x_dim-1; ++x) {
-      	setTerrainVertex( vertex[0], x,   z, terrain );
-      	setTerrainVertex( vertex[1], x+1, z, terrain );
-	
-      	glVertex3fv(vertex[0]);
-      	glVertex3fv(vertex[1]);
+      for (int x=minX; x<maxX; ++x) {
+        setTerrainVertex( vertex[0], x,   z, terrain );
+        setTerrainVertex( vertex[1], x+1, z, terrain );
+
+        glVertex3fv(vertex[0]);
+        glVertex3fv(vertex[1]);
       }
       glEnd();
     }
-    	
-    for (x=1-x_dim; x<x_dim-1; ++x) {
+
+    for (int x=minX; x<=maxX; ++x) {
       glBegin(GL_LINES);
-      for (z=1-z_dim; z<z_dim-1; ++z) {
-      	setTerrainVertex( vertex[0], x, z,   terrain );
-      	setTerrainVertex( vertex[1], x, z+1, terrain );
-        	
-      	glVertex3fv(vertex[0]);
-      	glVertex3fv(vertex[1]);
+      for (int z=minZ; z<maxZ; ++z) {
+        setTerrainVertex( vertex[0], x, z,   terrain );
+        setTerrainVertex( vertex[1], x, z+1, terrain );
+
+        glVertex3fv(vertex[0]);
+        glVertex3fv(vertex[1]);
       }
       glEnd();
-    }	
-
-    glEndList();
+    }
   }
 
   void SIG_EnvironmentRenderer::renderRobotPath()
@@ -198,7 +190,14 @@ namespace SIGEL_Visualisation
 
   void SIG_EnvironmentRenderer::renderPlane()
   {
-    renderSceneObjects( 0, 1 );
+    if (!sceneObjects[ 0 ]->getVisible())
+      return;
+
+    sceneObjects[ 0 ]->applyColor();
+    glPushMatrix();
+    sceneObjects[ 0 ]->applyTransformation();
+    drawInit();
+    glPopMatrix();
   }
 
   void SIG_EnvironmentRenderer::renderGridAndPath()
@@ -208,7 +207,14 @@ namespace SIGEL_Visualisation
     glDisable( GL_LIGHTING );
     glDisable( GL_TEXTURE_2D );
 
-    renderSceneObjects( 1, noOfObjects );
+    if (sceneObjects[ 1 ]->getVisible())
+      {
+	sceneObjects[ 1 ]->applyColor();
+	glPushMatrix();
+	sceneObjects[ 1 ]->applyTransformation();
+	drawGrid();
+	glPopMatrix();
+      }
 
     if (showRobotPath)
       renderRobotPath();
@@ -219,6 +225,12 @@ namespace SIGEL_Visualisation
   void SIG_EnvironmentRenderer::setLookPoint( SIG_Vector newPosition )
   {
     lookPoint = newPosition;
+  }
+
+  void SIG_EnvironmentRenderer::setEyePoint( SIG_Vector newPosition, double newReach )
+  {
+    eyePoint = newPosition;
+    reach = newReach;
   }
 
   void SIG_EnvironmentRenderer::setShowPlane( bool newShowPlane )
@@ -306,11 +318,11 @@ namespace SIGEL_Visualisation
     return true;
   }
 
-  void SIG_EnvironmentRenderer::drawInit( const SIGEL_Environment::SIG_Terrain &terrain ) {
-   int x, z;
+  void SIG_EnvironmentRenderer::drawInit() const {
+   int minX, maxX, minZ, maxZ;
+   visibleCells( minX, maxX, minZ, maxZ );
 
-	 int x_dim = terrain.getDimensionX();
-	 int z_dim = terrain.getDimensionZ();
+   glFrontFace( GL_CCW );
 
 	 if (withTexture) {
    	 glEnable(GL_TEXTURE_2D);
@@ -319,13 +331,11 @@ namespace SIGEL_Visualisation
 
    glRotated(180,1,0,0);
 
-   // Each cell is drawn as two separate triangles. Strips in a display
-   // list may be joined into one draw, and the joins show as lines in the
-   // line modes.
+   // Each cell is two triangles, split along the same diagonal as in DynaMechs.
    GLfloat a0[3], b0[3], a1[3], b1[3];
-   for (z=1-z_dim; z<z_dim-1; ++z) {
+   for (int z=minZ; z<maxZ; ++z) {
        glBegin(GL_TRIANGLES);
-       for (x=2-x_dim; x<x_dim; ++x) {
+       for (int x=minX+1; x<=maxX; ++x) {
             // a is row z+1, b is row z; 0 is column x-1, 1 is column x.
             setTerrainVertex( a0, x-1, z+1, terrain );
             setTerrainVertex( b0, x-1, z,   terrain );

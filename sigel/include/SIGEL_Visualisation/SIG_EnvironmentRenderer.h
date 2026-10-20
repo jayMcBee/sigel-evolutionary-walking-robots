@@ -54,7 +54,7 @@ namespace SIGEL_Visualisation
   public:
 
     /**
-     * Creates the plane and the grid, which is hidden, and builds their display lists.
+     * Creates the plane and the grid, which is hidden, and loads the texture.
      *
      * @pre An OpenGL context is current.
      */
@@ -69,28 +69,21 @@ namespace SIGEL_Visualisation
 
     /**
      * Draws the plane, then the grid and the robot path, each if it is shown.
-     *
-     * @pre buildDisplayLists has run.
      */
     void render() override;
 
     /**
-     * Calls the display list of the plane only.
-     *
-     * @pre buildDisplayLists has run.
+     * Draws the plane, if it is shown.
      */
     void renderPlane();
 
     /**
-     * Calls the display list of the grid and draws the robot path,
-     * each if it is shown.
-     *
-     * @pre buildDisplayLists has run.
+     * Draws the grid and the robot path, each if it is shown.
      */
     void renderGridAndPath();
 
     /**
-     * Returns true if the plane's display list draws the texture.
+     * Returns true if the plane is drawn with the texture.
      */
     bool getWithTexture() const { return withTexture; }
 
@@ -107,6 +100,9 @@ namespace SIGEL_Visualisation
     QList< SIG_Vector * > const &getRobotPathPoints() const { return robotPathPoints; }
 
     void setLookPoint( SIG_Vector newPosition );
+
+    /** The plane and the grid are drawn as far as reach around the eye point. */
+    void setEyePoint( SIG_Vector newPosition, double newReach );
 
     void setPlaneColor( double red, double green, double blue );
 
@@ -134,36 +130,29 @@ namespace SIGEL_Visualisation
     bool initTexture();
 		
     /**
-     * Draws the terrain, textured if withTexture is set. buildPlane calls it inside the
-     * plane's display list.
+     * Draws the ground around the eye, textured if withTexture is set.
      */
-    void drawInit( const SIGEL_Environment::SIG_Terrain &terrain );
+    void drawInit() const;
 
     /**
-     * The depth at column x and row z. The robot starts at the terrain's
-     * corner, so the ground is drawn as far again on the negative side of
-     * each axis, with the start in the middle. Past the terrain, DynaMechs
-     * gives each point the height of the nearest edge, so the ground
-     * continues each edge outward; this lookup does the same.
+     * The depth at column x and row z. Past the terrain, DynaMechs gives each point the
+     * height of the nearest edge, so the ground continues each edge outward without end;
+     * this lookup does the same.
      */
     static double groundDepth( const SIGEL_Environment::SIG_Terrain &terrain, int x, int z );
 
   private:
 
     /**
-     * Builds the display lists of the plane and the grid.
+     * Loads the texture, if the environment has one.
      */
     void buildDisplayLists() override;
 
-    /**
-     * Builds the display list to render the plane that
-     * is part of every SIGEL_Environment::SIG_Environment.
-     *
-     * @param number The display list number to occupy.
-     */
-    void buildPlane( GLuint number, const SIGEL_Environment::SIG_Terrain &terrain );
+    /** The columns and rows of the cells within reach of the eye. */
+    void visibleCells( int &minX, int &maxX, int &minZ, int &maxZ ) const;
 
-    void buildGrid( GLuint number, const SIGEL_Environment::SIG_Terrain &terrain );
+    /** Draws the grid lines around the eye. */
+    void drawGrid() const;
 
     /**
      * Sets v to the terrain vertex at column x and row z.
@@ -187,6 +176,10 @@ namespace SIGEL_Visualisation
     GLint const gridSpacing;
 
     SIG_Vector lookPoint;
+
+    SIG_Vector eyePoint;
+
+    double reach;
 
     bool showRobotPath;
 

@@ -405,6 +405,7 @@ namespace SIGEL_Visualisation
 		SIG_Visualisation::visualize();
 
 		environmentRenderer.setLookPoint( viewSettings.lookPoint );
+		environmentRenderer.setEyePoint( viewSettings.getAbsoluteEyePoint(), drawnDistance() );
 
 		bool const pointMode = (viewSettings.renderMode == SIG_ViewSettings::points);
 		bool const hidden = (viewSettings.renderMode == SIG_ViewSettings::hiddenLine)

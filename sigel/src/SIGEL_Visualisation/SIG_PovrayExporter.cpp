@@ -463,7 +463,7 @@ namespace SIGEL_Visualisation
 	{
 		SIGEL_Environment::SIG_Terrain const &terrain = visualisation.getEnvironmentRenderer().getTerrain();
 
-		// The vertices SIG_EnvironmentRenderer::drawInit draws.
+		// The terrain and as far again on the negative side of each axis.
 		int const minX = 1 - terrain.getDimensionX();
 		int const maxX = terrain.getDimensionX() - 1;
 		int const minZ = 1 - terrain.getDimensionZ();
@@ -507,7 +507,7 @@ namespace SIGEL_Visualisation
 	{
 		SIGEL_Environment::SIG_Terrain const &terrain = visualisation.getEnvironmentRenderer().getTerrain();
 
-		// The lines SIG_EnvironmentRenderer::buildGrid draws, raised by the same 0.01.
+		// The lines over terrainMesh, raised by the same 0.01 as SIG_EnvironmentRenderer::drawGrid.
 		int const minX = 1 - terrain.getDimensionX();
 		int const maxX = terrain.getDimensionX() - 1;
 		int const minZ = 1 - terrain.getDimensionZ();
