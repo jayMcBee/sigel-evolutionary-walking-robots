@@ -184,7 +184,6 @@ touched, because changing one changes behaviour against the reference binary.
   (`~/sigel-woody/bin/repair-povray-output.py`, `render-hq.py`,
   `hq/sigel-hq.inc`); they show what had to change. The export should not
   need a post-processing step.
-  - **A plain floor shows no motion.**
   - **POV-Ray settings in a group of their own** in the movie settings, apart
     from the screen-grab settings, most of which do not apply to the export.
     It offers a floor texture picked from the bundled set, and a switch for
@@ -193,8 +192,7 @@ touched, because changing one changes behaviour against the reference binary.
     today twice the robot radius per texture image. Output files moves
     to the top as "Format and files", since the format decides the rest; POV
     shows the POV-Ray group in place of Overlay labels.
-  To decide: a patterned floor, and whether options are switches in the
-  include file.
+  To decide: whether options are switches in the include file.
 
 ---
 
