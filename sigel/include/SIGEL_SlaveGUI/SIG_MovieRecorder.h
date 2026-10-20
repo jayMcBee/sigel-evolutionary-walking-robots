@@ -72,10 +72,12 @@ namespace SIGEL_SlaveGUI
     // it also saves a thumbnail without labels if the settings ask for one.
     bool writeImage( QImage const &view, double simulationSeconds, double startDistance, double robotCentreHeight );
 
-    // Writes the frame as a POV-Ray scene file.
+    // Writes the frame as a POV-Ray scene file, and the render settings for
+    // the frames written so far.
     bool writePovray( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation, double simulationSeconds );
 
-    // Writes the include file that every POV-Ray scene file reads.
+    // Writes the include file that every POV-Ray scene file reads, and the
+    // frame list that the render settings name.
     bool createPovrayIncludeFile( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation );
 
     // Counts a frame that could not be written, too.
@@ -89,6 +91,16 @@ namespace SIGEL_SlaveGUI
   private:
 
     QString nextFrameFileName() const;
+
+    // The digits of a frame number, or 0 for a number without leading zeros.
+    int frameNumberWidth() const;
+
+    // A POV-Ray scene that includes the frame file of POV-Ray's frame_number.
+    bool writePovrayFrameList();
+
+    // A POV-Ray .ini with the frame size and the frames written so far, so
+    // that one povray call renders them all.
+    bool writePovrayRenderSettings();
 
     // Names the thumbnail of the frame just started after its second in the movie.
     QString thumbnailFileName() const;

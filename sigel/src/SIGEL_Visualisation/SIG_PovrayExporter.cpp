@@ -48,7 +48,7 @@ namespace SIGEL_Visualisation
 	{
 	}
 
-	bool SIG_PovrayExporter::writeIncludeFile( QString fileName, double aspectRatio ) const
+	bool SIG_PovrayExporter::writeIncludeFile( QString fileName ) const
 	{
 		QFile file( fileName );
 
@@ -100,7 +100,6 @@ namespace SIGEL_Visualisation
 			return false;
 
 		stream << robotDeclarations()
-		       << "#declare cameraRight = " << aspectRatio << "*x;\n"
 		       << "#declare cameraDirection = <0,0," << directionLength << ">;\n";
 
 		// Inputs to scene.inc: the light positions and sky colours, declared ahead of it for
@@ -153,7 +152,7 @@ namespace SIGEL_Visualisation
 		       << environmentObjects()
 		       << sceneObjects( visualisation.getRobotRenderer(), 0, visualisation.getRobotRenderer().getNoOfObjects() )
 		       << "camera {\n"
-		       << "  right cameraRight\n"
+		       << "  right x*image_width/image_height\n"
 		       << "  up y\n"
 		       << "  direction cameraDirection\n"
 		       << "  location "

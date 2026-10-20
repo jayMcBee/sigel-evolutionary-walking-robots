@@ -28,11 +28,13 @@
 #include "SIGEL_Tools/SIG_IO.h"
 
 #include <QDir>
+#include <QFile>
 #include <QFontDatabase>
 #include <QFontMetricsF>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPen>
+#include <QTextStream>
 
 #include <cmath>
 
@@ -242,7 +244,10 @@ namespace SIGEL_SlaveGUI
   {
     startFrame( simulationSeconds );
 
-    return SIGEL_Visualisation::SIG_PovrayExporter( visualisation ).writeFrame( settings.filePrefix + ".inc", lastFileName );
+    if ( !SIGEL_Visualisation::SIG_PovrayExporter( visualisation ).writeFrame( settings.filePrefix + ".inc", lastFileName ) )
+      return false;
+
+    return writePovrayRenderSettings();
   }
 
   bool SIG_MovieRecorder::createPovrayIncludeFile( SIGEL_Visualisation::SIG_SimulationVisualisation &visualisation )
@@ -250,9 +255,50 @@ namespace SIGEL_SlaveGUI
     lastFileName = settings.directory + settings.filePrefix + ".inc";
     makeDirectory();
 
-    double aspectRatio = double( settings.width ) / double( settings.height );
+    if ( !SIGEL_Visualisation::SIG_PovrayExporter( visualisation ).writeIncludeFile( lastFileName ) )
+      return false;
 
-    return SIGEL_Visualisation::SIG_PovrayExporter( visualisation ).writeIncludeFile( lastFileName, aspectRatio );
+    return writePovrayFrameList();
+  }
+
+  bool SIG_MovieRecorder::writePovrayFrameList()
+  {
+    lastFileName = settings.directory + settings.filePrefix + ".pov";
+
+    QFile file( lastFileName );
+
+    if ( !file.open( QIODevice::WriteOnly ) )
+      return false;
+
+    // A negative length pads the number with zeros, as nextFrameFileName does.
+    QTextStream( &file ) << "#version 3.7;\n"
+                         << "\n"
+                         << "#include concat( \"" << settings.filePrefix << "\", str( frame_number, " << -frameNumberWidth() << ", 0 ), \".pov\" )\n";
+
+    return true;
+  }
+
+  bool SIG_MovieRecorder::writePovrayRenderSettings()
+  {
+    QString const fileName = settings.directory + settings.filePrefix + ".ini";
+
+    QFile file( fileName );
+
+    if ( !file.open( QIODevice::WriteOnly ) )
+      {
+        lastFileName = fileName;
+        return false;
+      }
+
+    QTextStream( &file ) << "; Renders every frame: povray " << settings.filePrefix << ".ini\n"
+                         << "Input_File_Name=" << settings.filePrefix << ".pov\n"
+                         << "Output_File_Name=" << settings.filePrefix << "\n"
+                         << "Width=" << settings.width << "\n"
+                         << "Height=" << settings.height << "\n"
+                         << "Initial_Frame=0\n"
+                         << "Final_Frame=" << framesRecorded - 1 << "\n";
+
+    return true;
   }
 
   void SIG_MovieRecorder::reset()
@@ -263,12 +309,17 @@ namespace SIGEL_SlaveGUI
 
   QString SIG_MovieRecorder::nextFrameFileName() const
   {
-    QString number = QString::number( framesRecorded );
-
-    if ( settings.useLeadingZeros )
-      number = number.rightJustified( QString::number( settings.maxFrames ).length(), '0' );
+    QString number = QString::number( framesRecorded ).rightJustified( frameNumberWidth(), '0' );
 
     return settings.directory + settings.filePrefix + number + "." + settings.format;
+  }
+
+  int SIG_MovieRecorder::frameNumberWidth() const
+  {
+    if ( !settings.useLeadingZeros )
+      return 0;
+
+    return QString::number( settings.maxFrames ).length();
   }
 
   QString SIG_MovieRecorder::thumbnailFileName() const

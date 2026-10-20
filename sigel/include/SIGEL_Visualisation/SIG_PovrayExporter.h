@@ -59,7 +59,7 @@ namespace SIGEL_Visualisation
 		 *
 		 * @return false if the file cannot be written.
 		 */
-		bool writeIncludeFile( QString fileName, double aspectRatio ) const;
+		bool writeIncludeFile( QString fileName ) const;
 
 		/**
 		 * Writes one frame: the scene as it is now.

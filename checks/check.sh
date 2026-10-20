@@ -449,7 +449,11 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
             bf=1; bp=0
             echo "  povray is not installed, so nothing read the POV-Ray export;"
             echo "  install it (apt install povray) and re-run."
-        elif ! (cd "$PX" && povray -D -F +W32 +H18 +WT1 +I"$(ls *.pov | tail -1)") >/tmp/bpr.$$ 2>&1; then
+        # Through the .ini, last frame only: it reaches the frame by the frame
+        # list, as a whole render does. The .ini comes first, so that the
+        # options after it win.
+        elif ! (cd "$PX" && ini="$(ls *.ini)" && povray "$ini" -D -F +W32 +H18 +WT1 \
+                    +SF"$(sed -n 's/^Final_Frame=//p' "$ini")") >/tmp/bpr.$$ 2>&1; then
             bf=1; bp=0
             echo "  povray does not read the POV-Ray export:"
             command grep -i -A2 'error' /tmp/bpr.$$ | head -6 | sed 's/^/    /'

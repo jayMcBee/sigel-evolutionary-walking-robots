@@ -31,7 +31,7 @@ make
 This builds the supporting libraries, PVM and the three executables. Then it fills
 the directory "sigelApp", from which SIGEL is started, with:
 - the executables "sigel", "sigel_slave" and "manage_dyn_slave" (for dynamic clients, see below)
-- the scripts "sigelLauncher", "povrayLauncher", "sigelDynClient" (for dynamic clients, see below)
+- the scripts "sigelLauncher" and "sigelDynClient" (for dynamic clients, see below)
 - the file "stdConf.mt"
 - the subdirectories pixmaps and textures
 - the subdirectory supportingLibs/pvm3, a link to the PVM that was built
@@ -123,10 +123,11 @@ in the script to the full path of "sigelApp". A crontab entry can then be:
 SIGEL can plot the fitness curves with gnuplot. For this, gnuplot must be in a directory
 of your PATH variable.
 
-2.5 PovrayLauncher
+2.5 Rendering the POV-Ray export
 
-The script "povrayLauncher" calls Povray for all .pov files in the current directory and
-passes its arguments to Povray. Povray must be in a directory of your PATH variable.
+With the format POV, the movie settings write one scene file per frame, an include file,
+the frame list <prefix>.pov and <prefix>.ini. In the output directory, "povray <prefix>.ini"
+renders every frame at the output size. Povray 3.7 must be in a directory of your PATH variable.
 
 2.6 Dynamic clients and sigelDynClient
 

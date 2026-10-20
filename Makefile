@@ -429,7 +429,7 @@ $(B)/manage_dyn_slave: $(SRC)/src/manage_dyn_slave.c
 # change. cp -p leaves alone a copy that SIGEL has rewritten since. The programs come from build/ through a temporary
 # name, so a running copy is not overwritten. `make clean' leaves this folder.
 APP      := sigelApp
-APP_DATA := sigelLauncher povrayLauncher sigelDynClient stdConf.mt \
+APP_DATA := sigelLauncher sigelDynClient stdConf.mt \
             $(patsubst $(SRC)/%,%,$(wildcard $(SRC)/pixmaps/* $(SRC)/textures/*))
 
 .PHONY: sigelApp
