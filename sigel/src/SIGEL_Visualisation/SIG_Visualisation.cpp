@@ -203,11 +203,18 @@ namespace SIGEL_Visualisation
     glLightModelfv( GL_LIGHT_MODEL_AMBIENT, lightModelAmbientColor.data() );
   }
 
+  double SIG_Visualisation::drawnDistance() const
+  {
+    double const tanHalfHeight = std::tan( qDegreesToRadians( fieldOfView / 2 ) );
+    double const tanHalfWidth = tanHalfHeight * viewSettings.aspectRatio;
+
+    return farPlane * std::sqrt( 1 + tanHalfHeight * tanHalfHeight + tanHalfWidth * tanHalfWidth );
+  }
+
   void SIG_Visualisation::updateAspectRatio()
   {
     GLdouble const fovy = fieldOfView;
     GLdouble const nearPlane = 0.01;
-    GLdouble const farPlane = 50;
     GLdouble const aspectRatio = static_cast<GLdouble>(viewSettings.aspectRatio);
 
     glMatrixMode(GL_PROJECTION);

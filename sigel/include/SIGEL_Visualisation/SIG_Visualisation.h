@@ -73,6 +73,15 @@ namespace SIGEL_Visualisation
        */
       static double const fieldOfView;
 
+      /** The projection draws nothing deeper along the view direction than this. */
+      static constexpr double farPlane = 50;
+
+      /**
+       * The farthest the projection draws from the eye: at the corners of the view, the
+       * far plane is farther away than straight ahead.
+       */
+      double drawnDistance() const;
+
       /**
        * The camera and the render mode.
        */
