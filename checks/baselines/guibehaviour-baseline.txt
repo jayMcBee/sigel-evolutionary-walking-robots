@@ -2601,7 +2601,7 @@ Do you want to replace it?]
 steps=120
 files=34
   sigel_pic.inc bytes=6407 sha256=57f1a753d08a5b67e50ef95cfa7067c7fb3496ff8d81e5130d6e7749bd7049e4
-  sigel_pic.ini bytes=154 sha256=6b868c7ddfdc52f22006c87c0aed8f3c7924cd726a2af241c62fe61621bcb653
+  sigel_pic.ini bytes=239 sha256=266cfa9ead444d714439367a5ae4a4512658a4fc58e746cea9c0d337b812bf1f
   sigel_pic.pov bytes=82 sha256=9e045ec4be1f3153f7e12b4a41f968fb371a35d5355adbeeed9da856742bc192
   sigel_pic0000.pov bytes=1064 sha256=209278ec5d2829f478f4ea44b65470c6dabc84a67d8b3b0cf6b04c10936e0ed0
   sigel_pic0001.pov bytes=1075 sha256=58cf5836ebc4512c625e9456de31a86091afe0d28a2a08dd22bb03bb08e092a9

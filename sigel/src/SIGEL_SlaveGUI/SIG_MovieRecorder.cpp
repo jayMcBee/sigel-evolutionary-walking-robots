@@ -296,7 +296,13 @@ namespace SIGEL_SlaveGUI
                          << "Width=" << settings.width << "\n"
                          << "Height=" << settings.height << "\n"
                          << "Initial_Frame=0\n"
-                         << "Final_Frame=" << framesRecorded - 1 << "\n";
+                         << "Final_Frame=" << framesRecorded - 1 << "\n"
+                         << "Antialias=on\n"
+                         << "Sampling_Method=2\n"
+                         << "Antialias_Threshold=0.05\n"
+                         << "Antialias_Depth=3\n"
+                         // povray's default jitter moves the samples in every frame, so that edges flicker in the movie.
+                         << "Jitter=off\n";
 
     return true;
   }
