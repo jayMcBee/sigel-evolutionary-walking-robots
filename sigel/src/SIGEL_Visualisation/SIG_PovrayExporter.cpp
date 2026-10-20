@@ -181,41 +181,43 @@ namespace SIGEL_Visualisation
 		SIGEL_Environment::SIG_Terrain const &terrain = environmentRenderer.getTerrain();
 
 		if (terrain.isFlat())
-			stream << "#declare Plane = plane {\n"
-			       << "                   <0,1,0>, 0\n";
+			stream << "#declare Ground = plane { <0,1,0>, 0 }\n";
 		else
-			stream << "#declare Plane = union {\n"
+			stream << "#declare Ground = union {\n"
 			       << "  mesh2 {\n"
 			       << terrainMesh()
 			       << "  }\n"
 			       << "  mesh {\n"
 			       << terrainBeyondEdges()
-			       << "  }\n";
+			       << "  }\n"
+			       << "}\n";
 
-		stream << "                   texture {\n";
+		stream << "\n"
+		       << "#declare Plane = object {\n"
+		       << "  Ground\n"
+		       << "  texture {\n";
 
 		// The image lies in the square from 0 to 1 in x and y; laid flat, its top row is
 		// towards +z, as on screen. It holds the texture twice, so it is two tiles wide.
 		if (floorImageName.isEmpty())
-			stream << "                     pigment { srgb " << vectorToPovray( planeColorVector ) << " }\n";
+			stream << "    pigment { srgb " << vectorToPovray( planeColorVector ) << " }\n";
 		else
-			stream << "                     pigment { image_map { png \"" << floorImageName << "\" interpolate 2 }"
+			stream << "    pigment { image_map { png \"" << floorImageName << "\" interpolate 2 }"
 			       << " scale <" << 2 * floorTileSize() << "," << floorTileSize() << ",1> rotate x*90 }\n";
 
 		// A tuning constant from sample renders: at diffuse 1, the sun washes the floor out.
-		stream << "                     finish { ambient 0 diffuse 0.8 }\n"
-		       << "                   }\n"
-		       << "                 }\n"
+		stream << "    finish { ambient 0 diffuse 0.8 }\n"
+		       << "  }\n"
+		       << "}\n"
 		       << "\n";
 
-		NEWMAT::ColumnVector gridColorVector = SIG_TypeConverter::toColumnVector( environmentRenderer.sceneObjects[ 1 ]->getColor() );
-
-		stream << "#declare Grid = union {\n"
-		       << (terrain.isFlat() ? flatGrid() : terrainGrid());
-
-		stream << "\n"
-		       << "  pigment { srgb " << vectorToPovray( gridColorVector ) << " }\n"
-		       << "  finish { ambient 0 diffuse 1 }\n"
+		// The lines lie on a copy of the ground, raised as the OpenGL renderer raises them;
+		// the copy is clear between the lines.
+		stream << "#declare Grid = object {\n"
+		       << "  Ground\n"
+		       << "  translate <0,0.01,0>\n"
+		       << gridLines( "x" )
+		       << gridLines( "z" )
 		       << "  no_shadow\n"
 		       << "}\n";
 
@@ -349,10 +351,6 @@ namespace SIGEL_Visualisation
 	{
 		SIG_EnvironmentRenderer const &environmentRenderer = visualisation.getEnvironmentRenderer();
 
-		SIG_Vector const &lookPoint = environmentRenderer.getLookPoint();
-
-		int const gridSpacing = environmentRenderer.getGridSpacing();
-
 		bool const showRobotPath = environmentRenderer.getShowRobotPath();
 
 		QList< SIG_Vector * > const &robotPathPoints = environmentRenderer.getRobotPathPoints();
@@ -360,30 +358,7 @@ namespace SIGEL_Visualisation
 		QString resultString;
 		QTextStream stream( &resultString, QIODevice::WriteOnly );
 
-		int xPos = 0;
-		int zPos = 0;
-
-		// On a flat floor the grid moves with the look point, by whole grid cells; the plane
-		// stays, so that a texture on it does not jump. On a terrain both stay, as drawn.
-		if (environmentRenderer.getTerrain().isFlat())
-		{
-			xPos = static_cast< int >( std::floor( lookPoint.x / gridSpacing ) * gridSpacing );
-			zPos = - static_cast< int >( std::floor( lookPoint.z / gridSpacing ) * gridSpacing );
-		}
-
-		stream << sceneObjects( environmentRenderer, 0, 1 );
-
-		// An object, not a union: POV-Ray warns about a union of fewer than two objects.
-		if (environmentRenderer.sceneObjects[ 1 ]->getVisible())
-			stream << "object {\n"
-			       << sceneObjects( environmentRenderer, 1, 2 )
-			       << "translate <"
-			       << xPos
-			       << ",0,"
-			       << zPos
-			       << ">\n"
-			       << "}\n"
-			       << "\n";
+		stream << sceneObjects( environmentRenderer, 0, 2 );
 
 		if (showRobotPath && robotPathPoints.count() >= 2)
 		{
@@ -415,53 +390,39 @@ namespace SIGEL_Visualisation
 		return resultString;
 	}
 
-	QString SIG_PovrayExporter::flatGrid() const
+	QString SIG_PovrayExporter::gridLines( QString axis ) const
 	{
 		SIG_EnvironmentRenderer const &environmentRenderer = visualisation.getEnvironmentRenderer();
 
-		int const gridSpacing = environmentRenderer.getGridSpacing();
+		NEWMAT::ColumnVector const color = SIG_TypeConverter::toColumnVector( environmentRenderer.sceneObjects[ 1 ]->getColor() );
 
-		int const noOfFields = 70;
+		QString lineColor;
+		QTextStream( &lineColor ) << "srgbt <" << color( 1 ) << "," << color( 2 ) << "," << color( 3 ) << ",0>";
+		QString clear = "srgbt <0,0,0,1>";
 
-		int const minX = - gridSpacing * noOfFields;
-		int const maxX =   gridSpacing * noOfFields;
-		int const minZ = - gridSpacing * noOfFields;
-		int const maxZ =   gridSpacing * noOfFields;
+		// One line on each whole unit, as wide as a line of the robot's path.
+		double const halfWidth = lineRadius() / environmentRenderer.getGridSpacing();
 
-		QString gridString;
-		QTextStream stream( &gridString, QIODevice::WriteOnly );
+		QString linesString;
+		QTextStream stream( &linesString, QIODevice::WriteOnly );
 
-		for (int x=minX; x<=maxX; x+=gridSpacing)
-		{
-			stream << "  cylinder {\n"
-			       << "    <"
-			       << x
-			       << ",0.01,"
-			       << minZ
-			       << ">, <"
-			       << x
-			       << ",0.01,"
-			       << maxZ
-			       << ">, " << lineRadius() << "\n"
-			       << "  }\n";
-		};
+		stream << "  texture {\n"
+		       << "    pigment {\n"
+		       << "      gradient " << axis << "\n"
+		       << "      color_map {\n"
+		       << "        [0 " << lineColor << "]\n"
+		       << "        [" << halfWidth << " " << lineColor << "]\n"
+		       << "        [" << halfWidth << " " << clear << "]\n"
+		       << "        [" << 1 - halfWidth << " " << clear << "]\n"
+		       << "        [" << 1 - halfWidth << " " << lineColor << "]\n"
+		       << "        [1 " << lineColor << "]\n"
+		       << "      }\n"
+		       << "      scale " << environmentRenderer.getGridSpacing() << "\n"
+		       << "    }\n"
+		       << "    finish { ambient 0 diffuse 1 }\n"
+		       << "  }\n";
 
-		for (int z=minZ; z<=maxZ; z+=gridSpacing)
-		{
-			stream << "  cylinder {\n"
-			       << "    <"
-			       << minX
-			       << ",0.01,"
-			       << z
-			       << ">, <"
-			       << maxX
-			       << ",0.01,"
-			       << z
-			       << ">, " << lineRadius() << "\n"
-			       << "  }\n";
-		};
-
-		return gridString;
+		return linesString;
 	}
 
 	QString SIG_PovrayExporter::terrainMesh() const
@@ -484,7 +445,7 @@ namespace SIGEL_Visualisation
 
 		for (int z=minZ; z<=maxZ; z++)
 			for (int x=minX; x<=maxX; x++)
-				stream << ",\n    " << terrainPoint( x, z, 0 );
+				stream << ",\n    " << vectorToPovray( terrainVector( x, z ) );
 
 		stream << "\n"
 		       << "  }\n"
@@ -506,37 +467,6 @@ namespace SIGEL_Visualisation
 		       << "  }\n";
 
 		return meshString;
-	}
-
-	QString SIG_PovrayExporter::terrainGrid() const
-	{
-		SIGEL_Environment::SIG_Terrain const &terrain = visualisation.getEnvironmentRenderer().getTerrain();
-
-		// The terrain and as far again on the negative side of each axis, raised by the same
-		// 0.01 as SIG_EnvironmentRenderer::drawGrid.
-		int const minX = 1 - terrain.getDimensionX();
-		int const maxX = terrain.getDimensionX() - 1;
-		int const minZ = 1 - terrain.getDimensionZ();
-		int const maxZ = terrain.getDimensionZ() - 1;
-
-		QString gridString;
-		QTextStream stream( &gridString, QIODevice::WriteOnly );
-
-		for (int z=minZ; z<maxZ; z++)
-			for (int x=minX; x<maxX; x++)
-				stream << "  cylinder {\n"
-				       << "    " << terrainPoint( x, z, 0.01 ) << ", " << terrainPoint( x + 1, z, 0.01 )
-				       << ", " << lineRadius() << "\n"
-				       << "  }\n";
-
-		for (int x=minX; x<maxX; x++)
-			for (int z=minZ; z<maxZ; z++)
-				stream << "  cylinder {\n"
-				       << "    " << terrainPoint( x, z, 0.01 ) << ", " << terrainPoint( x, z + 1, 0.01 )
-				       << ", " << lineRadius() << "\n"
-				       << "  }\n";
-
-		return gridString;
 	}
 
 	QString SIG_PovrayExporter::terrainBeyondEdges() const
@@ -572,16 +502,6 @@ namespace SIGEL_Visualisation
 		       << edgeCorner( terrainVector( maxX, maxZ ), east, south );
 
 		return piecesString;
-	}
-
-	QString SIG_PovrayExporter::terrainPoint( int x, int z, double lift ) const
-	{
-		QVector3D const vector = terrainVector( x, z );
-
-		NEWMAT::ColumnVector point( 3 );
-		point << vector.x() << vector.y() + lift << vector.z();
-
-		return vectorToPovray( point );
 	}
 
 	QVector3D SIG_PovrayExporter::terrainVector( int x, int z ) const

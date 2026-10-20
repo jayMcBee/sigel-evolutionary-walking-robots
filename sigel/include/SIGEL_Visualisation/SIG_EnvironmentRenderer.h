@@ -93,13 +93,9 @@ namespace SIGEL_Visualisation
 
     int getGridSpacing() const { return gridSpacing; }
 
-    SIG_Vector const &getLookPoint() const { return lookPoint; }
-
     bool getShowRobotPath() const { return showRobotPath; }
 
     QList< SIG_Vector * > const &getRobotPathPoints() const { return robotPathPoints; }
-
-    void setLookPoint( SIG_Vector newPosition );
 
     /** The plane and the grid are drawn as far as reach around the eye point. */
     void setEyePoint( SIG_Vector newPosition, double newReach );
@@ -174,8 +170,6 @@ namespace SIGEL_Visualisation
     SIGEL_Environment::SIG_Terrain const terrain;
 
     GLint const gridSpacing;
-
-    SIG_Vector lookPoint;
 
     SIG_Vector eyePoint;
 

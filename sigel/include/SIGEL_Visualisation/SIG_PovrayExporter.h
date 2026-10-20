@@ -78,17 +78,11 @@ namespace SIGEL_Visualisation
 		 */
 		bool writeFloorImage( QString fileName ) const;
 
-		/** The grid lines on a flat floor: a square around the origin. */
-		QString flatGrid() const;
+		/** One layer of grid lines, across the axis "x" or "z": a pattern, so that it has no end. */
+		QString gridLines( QString axis ) const;
 
 		/** The vertices and triangles of a terrain that is not flat, over its own cells. */
 		QString terrainMesh() const;
-
-		/** The grid lines on a terrain that is not flat: the terrain and as far again on the negative side. */
-		QString terrainGrid() const;
-
-		/** The SIGEL point of the terrain at column x and row z, raised by lift. */
-		QString terrainPoint( int x, int z, double lift ) const;
 
 		/**
 		 * The ground past the edges of terrainMesh, to the horizon: as in DynaMechs, each

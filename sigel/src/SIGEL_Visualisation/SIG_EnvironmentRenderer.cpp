@@ -41,7 +41,6 @@ namespace SIGEL_Visualisation
       environment(environment),
       terrain( environment.getTerrain() ),
       gridSpacing( 1 ),
-      lookPoint(0, 0, 0),
       eyePoint(0, 0, 0),
       reach( SIG_Visualisation::farPlane ),
       showRobotPath( false )
@@ -220,11 +219,6 @@ namespace SIGEL_Visualisation
       renderRobotPath();
 
     glPopAttrib();
-  }
-
-  void SIG_EnvironmentRenderer::setLookPoint( SIG_Vector newPosition )
-  {
-    lookPoint = newPosition;
   }
 
   void SIG_EnvironmentRenderer::setEyePoint( SIG_Vector newPosition, double newReach )

@@ -1588,7 +1588,7 @@ static int guidriveMain(int argc, char **argv)
         }
 
         // The last frame in full, and the include file with the triangles of
-        // each mesh and the cylinders of the grid counted rather than listed:
+        // each mesh and any run of cylinders counted rather than listed:
         // the sums above cover them. Every line is indented: check.sh drops
         // baseline lines that start with `#', and these files have #include
         // and #declare lines.
