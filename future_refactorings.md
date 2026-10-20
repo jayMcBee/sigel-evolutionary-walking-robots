@@ -192,7 +192,6 @@ touched, because changing one changes behaviour against the reference binary.
     today twice the robot radius per texture image. Output files moves
     to the top as "Format and files", since the format decides the rest; POV
     shows the POV-Ray group in place of Overlay labels.
-  To decide: whether options are switches in the include file.
 
 ---
 
