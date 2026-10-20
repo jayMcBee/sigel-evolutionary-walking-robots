@@ -185,9 +185,6 @@ touched, because changing one changes behaviour against the reference binary.
   `hq/sigel-hq.inc`); they show what had to change. The export should not
   need a post-processing step.
   - **A plain floor shows no motion.**
-  - **The rendering options.** povray's default jitter makes edges flicker
-    from frame to frame; SIGEL gives the user no recommended options. They
-    go into the `.ini` the export writes.
   - **POV-Ray settings in a group of their own** in the movie settings, apart
     from the screen-grab settings, most of which do not apply to the export.
     It offers a floor texture picked from the bundled set, and a switch for
