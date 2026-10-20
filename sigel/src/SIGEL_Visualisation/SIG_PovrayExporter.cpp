@@ -184,8 +184,13 @@ namespace SIGEL_Visualisation
 			stream << "#declare Plane = plane {\n"
 			       << "                   <0,1,0>, 0\n";
 		else
-			stream << "#declare Plane = mesh2 {\n"
-			       << terrainMesh();
+			stream << "#declare Plane = union {\n"
+			       << "  mesh2 {\n"
+			       << terrainMesh()
+			       << "  }\n"
+			       << "  mesh {\n"
+			       << terrainBeyondEdges()
+			       << "  }\n";
 
 		stream << "                   texture {\n";
 
@@ -463,10 +468,10 @@ namespace SIGEL_Visualisation
 	{
 		SIGEL_Environment::SIG_Terrain const &terrain = visualisation.getEnvironmentRenderer().getTerrain();
 
-		// The terrain and as far again on the negative side of each axis.
-		int const minX = 1 - terrain.getDimensionX();
+		// The terrain itself; terrainBeyondEdges continues it.
+		int const minX = 0;
 		int const maxX = terrain.getDimensionX() - 1;
-		int const minZ = 1 - terrain.getDimensionZ();
+		int const minZ = 0;
 		int const maxZ = terrain.getDimensionZ() - 1;
 
 		int const rowLength = maxX - minX + 1;
@@ -507,7 +512,8 @@ namespace SIGEL_Visualisation
 	{
 		SIGEL_Environment::SIG_Terrain const &terrain = visualisation.getEnvironmentRenderer().getTerrain();
 
-		// The lines over terrainMesh, raised by the same 0.01 as SIG_EnvironmentRenderer::drawGrid.
+		// The terrain and as far again on the negative side of each axis, raised by the same
+		// 0.01 as SIG_EnvironmentRenderer::drawGrid.
 		int const minX = 1 - terrain.getDimensionX();
 		int const maxX = terrain.getDimensionX() - 1;
 		int const minZ = 1 - terrain.getDimensionZ();
@@ -533,16 +539,105 @@ namespace SIGEL_Visualisation
 		return gridString;
 	}
 
-	QString SIG_PovrayExporter::terrainPoint( int x, int z, double lift ) const
+	QString SIG_PovrayExporter::terrainBeyondEdges() const
 	{
 		SIGEL_Environment::SIG_Terrain const &terrain = visualisation.getEnvironmentRenderer().getTerrain();
 
-		// drawInit turns the terrain over the x axis: row z lies at SIGEL z = -z.
-		NEWMAT::ColumnVector point( 3 );
-		point << x << SIG_EnvironmentRenderer::groundDepth( terrain, x, z ) + lift << -z;
+		// The edges of terrainMesh.
+		int const minX = 0;
+		int const maxX = terrain.getDimensionX() - 1;
+		int const minZ = 0;
+		int const maxZ = terrain.getDimensionZ() - 1;
 
-		// In SIGEL coordinates, as the plane and the grid are declared: sceneObjects turns them into POV-Ray's.
+		// Row minZ lies at the largest SIGEL z.
+		QVector3D const west( -1, 0, 0 );
+		QVector3D const east( 1, 0, 0 );
+		QVector3D const north( 0, 0, 1 );
+		QVector3D const south( 0, 0, -1 );
+
+		QString piecesString;
+		QTextStream stream( &piecesString, QIODevice::WriteOnly );
+
+		for (int z=minZ; z<maxZ; z++)
+			stream << edgeStrip( terrainVector( minX, z ), terrainVector( minX, z + 1 ), west )
+			       << edgeStrip( terrainVector( maxX, z ), terrainVector( maxX, z + 1 ), east );
+
+		for (int x=minX; x<maxX; x++)
+			stream << edgeStrip( terrainVector( x, minZ ), terrainVector( x + 1, minZ ), north )
+			       << edgeStrip( terrainVector( x, maxZ ), terrainVector( x + 1, maxZ ), south );
+
+		stream << edgeCorner( terrainVector( minX, minZ ), west, north )
+		       << edgeCorner( terrainVector( maxX, minZ ), east, north )
+		       << edgeCorner( terrainVector( minX, maxZ ), west, south )
+		       << edgeCorner( terrainVector( maxX, maxZ ), east, south );
+
+		return piecesString;
+	}
+
+	QString SIG_PovrayExporter::terrainPoint( int x, int z, double lift ) const
+	{
+		QVector3D const vector = terrainVector( x, z );
+
+		NEWMAT::ColumnVector point( 3 );
+		point << vector.x() << vector.y() + lift << vector.z();
+
 		return vectorToPovray( point );
+	}
+
+	QVector3D SIG_PovrayExporter::terrainVector( int x, int z ) const
+	{
+		SIGEL_Environment::SIG_Terrain const &terrain = visualisation.getEnvironmentRenderer().getTerrain();
+
+		// drawInit turns the terrain over the x axis: row z lies at SIGEL z = -z. The plane and
+		// the grid are declared in SIGEL coordinates: sceneObjects turns them into POV-Ray's.
+		return QVector3D( x, SIG_EnvironmentRenderer::groundDepth( terrain, x, z ), -z );
+	}
+
+	QList< float > SIG_PovrayExporter::outwardSteps()
+	{
+		// Small cells near the terrain, where large ones show their seams; each one twice the last.
+		QList< float > steps = { 0 };
+
+		for (float step=1; step<=groundReach; step*=2)
+			steps.append( step );
+
+		return steps;
+	}
+
+	QString SIG_PovrayExporter::edgeStrip( QVector3D from, QVector3D to, QVector3D outward )
+	{
+		QList< float > const steps = outwardSteps();
+
+		QString stripString;
+
+		// The ground is the same along outward.
+		for (qsizetype i = 1; i < steps.size(); i++)
+			stripString += quadrangle( from + outward * steps[ i - 1 ], to + outward * steps[ i - 1 ],
+			                           to + outward * steps[ i ], from + outward * steps[ i ] );
+
+		return stripString;
+	}
+
+	QString SIG_PovrayExporter::edgeCorner( QVector3D corner, QVector3D outward1, QVector3D outward2 )
+	{
+		QList< float > const steps = outwardSteps();
+
+		QString cornerString;
+
+		for (qsizetype i = 1; i < steps.size(); i++)
+			for (qsizetype j = 1; j < steps.size(); j++)
+				cornerString += quadrangle( corner + outward1 * steps[ i - 1 ] + outward2 * steps[ j - 1 ],
+				                            corner + outward1 * steps[ i ] + outward2 * steps[ j - 1 ],
+				                            corner + outward1 * steps[ i ] + outward2 * steps[ j ],
+				                            corner + outward1 * steps[ i - 1 ] + outward2 * steps[ j ] );
+
+		return cornerString;
+	}
+
+	QString SIG_PovrayExporter::quadrangle( QVector3D a, QVector3D b, QVector3D c, QVector3D d )
+	{
+		return "    triangle { " + vectorToPovray( a ) + ", " + vectorToPovray( b ) + ", " + vectorToPovray( c ) + " }\n"
+		       + "    triangle { " + vectorToPovray( a ) + ", " + vectorToPovray( c ) + ", " + vectorToPovray( d ) + " }\n";
 	}
 
 	double SIG_PovrayExporter::patternSize() const
@@ -659,6 +754,14 @@ namespace SIGEL_Visualisation
 		resultStream << "<" << input( 1 ) << ", " << input( 2 ) << ", " << input( 3 ) << ">";
 
 		return resultString;
+	}
+
+	QString SIG_PovrayExporter::vectorToPovray( QVector3D input )
+	{
+		NEWMAT::ColumnVector vector( 3 );
+		vector << input.x() << input.y() << input.z();
+
+		return vectorToPovray( vector );
 	}
 
 	bool SIG_PovrayExporter::writeResource( QTextStream &stream, QString fileName )

@@ -25,6 +25,8 @@
 #define SIGEL_VISUALISATION_SIG_POVRAYEXPORTER_H
 
 #include <qstring.h>
+#include <QList>
+#include <QVector3D>
 
 #include <newmat.h>
 
@@ -79,14 +81,41 @@ namespace SIGEL_Visualisation
 		/** The grid lines on a flat floor: a square around the origin. */
 		QString flatGrid() const;
 
-		/** The vertices and triangles of a terrain that is not flat, as the OpenGL renderer draws it. */
+		/** The vertices and triangles of a terrain that is not flat, over its own cells. */
 		QString terrainMesh() const;
 
-		/** The grid lines on a terrain that is not flat, as the OpenGL renderer draws them. */
+		/** The grid lines on a terrain that is not flat: the terrain and as far again on the negative side. */
 		QString terrainGrid() const;
 
 		/** The SIGEL point of the terrain at column x and row z, raised by lift. */
 		QString terrainPoint( int x, int z, double lift ) const;
+
+		/**
+		 * The ground past the edges of terrainMesh, to the horizon: as in DynaMechs, each
+		 * edge cell continues outward at the edge heights, and each corner at the corner height.
+		 */
+		QString terrainBeyondEdges() const;
+
+		/** The SIGEL point of the terrain at column x and row z. */
+		QVector3D terrainVector( int x, int z ) const;
+
+		/**
+		 * How far the ground goes past the terrain: 2^20. From a camera below 500 units, its end
+		 * is less than a pixel below the horizon.
+		 */
+		static constexpr float groundReach = 1048576;
+
+		/** The distances from an edge at which the ground past it is cut into cells. */
+		static QList< float > outwardSteps();
+
+		/** The triangles of the ground from the edge from-to outward. */
+		static QString edgeStrip( QVector3D from, QVector3D to, QVector3D outward );
+
+		/** The triangles of the ground at the corner's height, outward in both directions. */
+		static QString edgeCorner( QVector3D corner, QVector3D outward1, QVector3D outward2 );
+
+		/** Two triangles: a, b, c and a, c, d. */
+		static QString quadrangle( QVector3D a, QVector3D b, QVector3D c, QVector3D d );
 
 		QString robotDeclarations() const;
 
@@ -110,6 +139,8 @@ namespace SIGEL_Visualisation
 		static QString sceneObjects( SIG_Renderer const &renderer, GLuint first, GLuint end );
 
 		static QString vectorToPovray( NEWMAT::ColumnVector input );
+
+		static QString vectorToPovray( QVector3D input );
 
 		/** Copies a POV-Ray text compiled into the program; false if it is missing. */
 		static bool writeResource( QTextStream &stream, QString fileName );
