@@ -240,6 +240,10 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_ViewSettings` starts in `wireFrame`; it should start in `hiddenLine`.
   The `points` render mode goes from SIGEL.
 
+- [ ] **175. Review the movie export formats.** The movie settings offer BMP,
+  PNG, PPM, XBM, XPM and POV. Decide which of them are still worth offering
+  today, and whether a format people use today is missing.
+
 ---
 
 ## 5 · MetaGP
