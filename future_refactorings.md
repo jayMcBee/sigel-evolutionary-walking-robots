@@ -177,22 +177,6 @@ touched, because changing one changes behaviour against the reference binary.
   import of such a robot closes SIGEL with no message. Handle it gracefully:
   the robot is loaded, or the user gets a message that names the file.
 
-- [ ] **173. Make the POV-Ray export usable.** Format POV in the movie
-  settings writes one scene per frame and one include file, unchanged from
-  1.3. povray 3.7 renders them, but the picture is poor. Every 1.3 movie
-  was made by rewriting the frames with external scripts
-  (`~/sigel-woody/bin/repair-povray-output.py`, `render-hq.py`,
-  `hq/sigel-hq.inc`); they show what had to change. The export should not
-  need a post-processing step.
-  - **POV-Ray settings in a group of their own** in the movie settings, apart
-    from the screen-grab settings, most of which do not apply to the export.
-    It offers a floor texture picked from the bundled set, and a switch for
-    mirroring every other column of it: the screen mirrors, which seamless
-    textures do not need and which turns logos around, and the tile size,
-    today twice the robot radius per texture image. Output files moves
-    to the top as "Format and files", since the format decides the rest; POV
-    shows the POV-Ray group in place of Overlay labels.
-
 ---
 
 ## 4 · The interface
