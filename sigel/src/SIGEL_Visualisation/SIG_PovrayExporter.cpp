@@ -541,7 +541,8 @@ namespace SIGEL_Visualisation
 		NEWMAT::ColumnVector point( 3 );
 		point << x << SIG_EnvironmentRenderer::groundDepth( terrain, x, z ) + lift << -z;
 
-		return vectorToPovray( SIG_TypeConverter::sigelToPovray() * point );
+		// In SIGEL coordinates, as the plane and the grid are declared: sceneObjects turns them into POV-Ray's.
+		return vectorToPovray( point );
 	}
 
 	double SIG_PovrayExporter::patternSize() const

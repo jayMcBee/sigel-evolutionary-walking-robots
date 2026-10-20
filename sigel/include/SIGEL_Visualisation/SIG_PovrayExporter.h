@@ -85,7 +85,7 @@ namespace SIGEL_Visualisation
 		/** The grid lines on a terrain that is not flat, as the OpenGL renderer draws them. */
 		QString terrainGrid() const;
 
-		/** The POV-Ray point of the terrain at column x and row z, raised by lift. */
+		/** The SIGEL point of the terrain at column x and row z, raised by lift. */
 		QString terrainPoint( int x, int z, double lift ) const;
 
 		QString robotDeclarations() const;
