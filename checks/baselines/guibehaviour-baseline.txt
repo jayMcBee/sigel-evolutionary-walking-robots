@@ -2600,7 +2600,7 @@ Do you want to replace it?]
 == POV EXPORT ==
 steps=120
 files=34
-  sigel_pic.inc bytes=6407 sha256=57f1a753d08a5b67e50ef95cfa7067c7fb3496ff8d81e5130d6e7749bd7049e4
+  sigel_pic.inc bytes=6661 sha256=8f365355c3813b3cb33166bcc715d93eaea5a12164e951be7034966cbfeff849
   sigel_pic.ini bytes=239 sha256=266cfa9ead444d714439367a5ae4a4512658a4fc58e746cea9c0d337b812bf1f
   sigel_pic.pov bytes=82 sha256=9e045ec4be1f3153f7e12b4a41f968fb371a35d5355adbeeed9da856742bc192
   sigel_pic0000.pov bytes=1064 sha256=209278ec5d2829f478f4ea44b65470c6dabc84a67d8b3b0cf6b04c10936e0ed0
@@ -2718,7 +2718,13 @@ files=34
   #declare Plane = object {
     Ground
     texture {
-      pigment { srgb <0.49804, 0.49804, 0.49804> }
+      pigment {
+        average
+        pigment_map {
+          [1 bozo color_map { [0 srgb <0.44325, 0.44325, 0.44325>] [1 srgb <0.55282, 0.55282, 0.55282>] } scale 3.31662]
+          [1 granite color_map { [0 srgb <0.44325, 0.44325, 0.44325>] [1 srgb <0.55282, 0.55282, 0.55282>] } scale 1.65831]
+        }
+      }
       finish { ambient 0 diffuse 0.8 }
     }
   }

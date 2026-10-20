@@ -196,10 +196,24 @@ namespace SIGEL_Visualisation
 		       << "  Ground\n"
 		       << "  texture {\n";
 
+		// A floor in one colour shows no motion when the camera follows the robot, so it gets a
+		// faint grain around that colour: two noise patterns that scale with the robot. The
+		// 11 percent are from sample renders.
+		NEWMAT::ColumnVector const darkGrainColor = planeColorVector * 0.89;
+		NEWMAT::ColumnVector const lightGrainColor = planeColorVector * 1.11;
+
+		QString const grainColorMap = "color_map { [0 srgb " + vectorToPovray( darkGrainColor ) + "] [1 srgb " + vectorToPovray( lightGrainColor ) + "] }";
+
 		// The image lies in the square from 0 to 1 in x and y; laid flat, its top row is
 		// towards +z, as on screen. It holds the texture twice, so it is two tiles wide.
 		if (floorImageName.isEmpty())
-			stream << "    pigment { srgb " << vectorToPovray( planeColorVector ) << " }\n";
+			stream << "    pigment {\n"
+			       << "      average\n"
+			       << "      pigment_map {\n"
+			       << "        [1 bozo " << grainColorMap << " scale " << patternSize() << "]\n"
+			       << "        [1 granite " << grainColorMap << " scale " << patternSize() / 2 << "]\n"
+			       << "      }\n"
+			       << "    }\n";
 		else
 			stream << "    pigment { image_map { png \"" << floorImageName << "\" interpolate 2 }"
 			       << " scale <" << 2 * floorTileSize() << "," << floorTileSize() << ",1> rotate x*90 }\n";
