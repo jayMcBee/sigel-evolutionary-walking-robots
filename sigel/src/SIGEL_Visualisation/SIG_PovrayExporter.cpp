@@ -48,7 +48,7 @@ namespace SIGEL_Visualisation
 	{
 	}
 
-	bool SIG_PovrayExporter::writeIncludeFile( QString fileName ) const
+	bool SIG_PovrayExporter::writeIncludeFile( QString fileName, SIG_PovrayFloor const &floor ) const
 	{
 		QFile file( fileName );
 
@@ -84,16 +84,16 @@ namespace SIGEL_Visualisation
 
 		QString floorImageName;
 
-		if (visualisation.getEnvironmentRenderer().getWithTexture())
+		if (!floor.textureFile.isEmpty())
 		{
 			QFileInfo const includeFile( fileName );
 			floorImageName = includeFile.completeBaseName() + "_floor.png";
 
-			if (!writeFloorImage( includeFile.dir().filePath( floorImageName ) ))
+			if (!writeFloorImage( includeFile.dir().filePath( floorImageName ), floor ))
 				return false;
 		}
 
-		stream << environmentDeclarations( floorImageName )
+		stream << environmentDeclarations( floorImageName, floor )
 		       << "\n";
 
 		if (!writeResource( stream, "materials.inc" ))
@@ -168,7 +168,7 @@ namespace SIGEL_Visualisation
 		return true;
 	}
 
-	QString SIG_PovrayExporter::environmentDeclarations( QString floorImageName ) const
+	QString SIG_PovrayExporter::environmentDeclarations( QString floorImageName, SIG_PovrayFloor const &floor ) const
 	{
 		SIG_EnvironmentRenderer const &environmentRenderer = visualisation.getEnvironmentRenderer();
 
@@ -205,7 +205,10 @@ namespace SIGEL_Visualisation
 		QString const grainColorMap = "color_map { [0 srgb " + vectorToPovray( darkGrainColor ) + "] [1 srgb " + vectorToPovray( lightGrainColor ) + "] }";
 
 		// The image lies in the square from 0 to 1 in x and y; laid flat, its top row is
-		// towards +z, as on screen. It holds the texture twice, so it is two tiles wide.
+		// towards +z, as the OpenGL renderer draws it. A mirrored floor's image holds the
+		// texture twice, so it is two tiles wide.
+		double const tileSize = floor.tileSize * patternSize();
+		double const imageWidth = floor.mirrored ? 2 * tileSize : tileSize;
 		if (floorImageName.isEmpty())
 			stream << "    pigment {\n"
 			       << "      average\n"
@@ -216,7 +219,7 @@ namespace SIGEL_Visualisation
 			       << "    }\n";
 		else
 			stream << "    pigment { image_map { png \"" << floorImageName << "\" interpolate 2 }"
-			       << " scale <" << 2 * floorTileSize() << "," << floorTileSize() << ",1> rotate x*90 }\n";
+			       << " scale <" << imageWidth << "," << tileSize << ",1> rotate x*90 }\n";
 
 		// A tuning constant from sample renders: at diffuse 1, the sun washes the floor out.
 		stream << "    finish { ambient 0 diffuse 0.8 }\n"
@@ -594,37 +597,35 @@ namespace SIGEL_Visualisation
 		return patternSize() / 40;
 	}
 
-	double SIG_PovrayExporter::floorTileSize() const
-	{
-		// A tuning constant from sample renders of the Flagstones texture.
-		return patternSize() * 2;
-	}
-
-	bool SIG_PovrayExporter::writeFloorImage( QString fileName ) const
+	bool SIG_PovrayExporter::writeFloorImage( QString fileName, SIG_PovrayFloor const &floor ) const
 	{
 		SIG_EnvironmentRenderer const &environmentRenderer = visualisation.getEnvironmentRenderer();
 
-		SIGEL_Environment::SIG_Environment const &environment = environmentRenderer.getEnvironment();
-
-		// The screen ignores the image's own alpha.
-		QImage const texture = QImage( environment.getTextureFile() ).convertToFormat( QImage::Format_RGB32 );
+		// The OpenGL renderer ignores the image's own alpha.
+		QImage const texture = QImage( floor.textureFile ).convertToFormat( QImage::Format_RGB32 );
 
 		if (texture.isNull())
 		{
-			SIG_IO::cerr << "Error: cannot read the floor texture " << environment.getTextureFile() << "." << Qt::endl;
+			SIG_IO::cerr << "Error: cannot read the floor texture " << floor.textureFile << "." << Qt::endl;
 			return false;
 		}
 
 		SIG_Vector const floorColor = environmentRenderer.sceneObjects[ 0 ]->getColor();
 
-		QImage image( 2 * texture.width(), texture.height(), QImage::Format_RGB32 );
+		int const copies = floor.mirrored ? 2 : 1;
+
+		QImage image( copies * texture.width(), texture.height(), QImage::Format_RGB32 );
 		image.fill( QColor::fromRgbF( floorColor.x, floorColor.y, floorColor.z ) );
 
 		QPainter painter( &image );
-		painter.setOpacity( environment.getTexAlpha() / 255.0 );
-		painter.drawImage( 0, 0, texture );
-		// Mirrors the second copy into the right half.
-		painter.setTransform( QTransform( -1, 0, 0, 1, 2 * texture.width(), 0 ) );
+		painter.setOpacity( floor.textureOpacity );
+
+		if (floor.mirrored)
+			painter.drawImage( 0, 0, texture );
+
+		// Laid flat, the image's columns run from right to left, so the mirrored copy is the
+		// one that reads as the texture does.
+		painter.setTransform( QTransform( -1, 0, 0, 1, image.width(), 0 ) );
 		painter.drawImage( 0, 0, texture );
 		painter.end();
 

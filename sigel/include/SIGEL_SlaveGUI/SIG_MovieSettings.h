@@ -75,6 +75,26 @@ namespace SIGEL_SlaveGUI
      * The file extension in lower case: bmp, png, ppm, xbm, xpm or pov.
      */
     QString format = "png";
+
+    /**
+     * The POV-Ray floor takes the experiment's texture and opacity, not
+     * povrayFloorTexture.
+     */
+    bool povrayFloorFromExperiment = true;
+
+    /**
+     * A bundled texture image for the POV-Ray floor at full opacity; empty
+     * gives the floor a grain in its colour.
+     */
+    QString povrayFloorTexture;
+
+    bool povrayMirrorFloor = true;
+
+    /**
+     * The side of one floor texture image, in robot radii. The default is
+     * from sample renders of the Flagstones texture.
+     */
+    double povrayFloorTileSize = 2;
   };
 
 }

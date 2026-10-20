@@ -255,7 +255,20 @@ namespace SIGEL_SlaveGUI
     lastFileName = settings.directory + settings.filePrefix + ".inc";
     makeDirectory();
 
-    if ( !SIGEL_Visualisation::SIG_PovrayExporter( visualisation ).writeIncludeFile( lastFileName ) )
+    SIGEL_Visualisation::SIG_EnvironmentRenderer const &environmentRenderer = visualisation.getEnvironmentRenderer();
+
+    SIGEL_Visualisation::SIG_PovrayFloor floor;
+    floor.textureFile = settings.povrayFloorTexture;
+    floor.mirrored = settings.povrayMirrorFloor;
+    floor.tileSize = settings.povrayFloorTileSize;
+
+    if ( settings.povrayFloorFromExperiment )
+      {
+        floor.textureFile = environmentRenderer.getWithTexture() ? environmentRenderer.getEnvironment().getTextureFile() : QString();
+        floor.textureOpacity = environmentRenderer.getEnvironment().getTexAlpha() / 255.0;
+      }
+
+    if ( !SIGEL_Visualisation::SIG_PovrayExporter( visualisation ).writeIncludeFile( lastFileName, floor ) )
       return false;
 
     return writePovrayFrameList();

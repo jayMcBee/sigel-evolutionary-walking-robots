@@ -21,12 +21,15 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_SlaveGUI/SIG_MovieSettingsDialog.h"
+#include <QDir>
 #include <QFileDialog>
 #include <QLabel>
 #include <QSpinBox>
 #include <QPushButton>
 #include <QScreen>
 #include <QEvent>
+
+#include <cstdlib>
 
 namespace SIGEL_SlaveGUI
 {
@@ -43,6 +46,17 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize
       view( view ),
       stepSize( stepSize )
 {
+	comboboxPovrayFloorTexture->addItem( "As in the experiment" );
+	comboboxPovrayFloorTexture->addItem( "None", QString() );
+
+	QDir const textures( QString( std::getenv( "SIGEL_ROOT" ) ) + "/textures" );
+
+	for ( QFileInfo const &texture : textures.entryInfoList( { "*.png", "*.jpg", "*.jpeg", "*.pnm", "*.ppm" }, QDir::Files, QDir::Name ) )
+	  comboboxPovrayFloorTexture->addItem( texture.completeBaseName(), texture.absoluteFilePath() );
+
+	for ( int halves = 1; halves <= 10; ++halves )
+	  comboboxPovrayTileSize->addItem( QString( "%1 \u00D7" ).arg( halves / 2.0 ), halves / 2.0 );
+
 	textlabelFrameFit->setForegroundRole( QPalette::PlaceholderText );
 	textlabelMovieLength->setForegroundRole( QPalette::PlaceholderText );
 	textlabelFrameTiming->setForegroundRole( QPalette::PlaceholderText );
@@ -61,7 +75,7 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize
 	connect( spinboxFrameRate, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateFrameTiming() ) );
 	connect( spinboxFrameRate, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateMovieLength() ) );
 	connect( spinboxMaxFrames, SIGNAL( valueChanged(int) ), this, SLOT( slotUpdateMovieLength() ) );
-	connect( comboboxFormat, SIGNAL( currentIndexChanged(int) ), this, SLOT( slotUpdateOverlayLabels() ) );
+	connect( comboboxFormat, SIGNAL( currentIndexChanged(int) ), this, SLOT( slotUpdateFormatGroups() ) );
 	connect( comboboxFormat, SIGNAL( currentIndexChanged(int) ), this, SLOT( slotUpdatePngCompression() ) );
 	connect( pushbutton720p, &QPushButton::clicked, this, [this]() { setOutputSize( 1280, 720 ); } );
 	connect( pushbutton1080p, &QPushButton::clicked, this, [this]() { setOutputSize( 1920, 1080 ); } );
@@ -72,7 +86,7 @@ SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize
 	slotUpdateSizeLabels();
 	slotUpdateFrameTiming();
 	slotUpdateMovieLength();
-	slotUpdateOverlayLabels();
+	slotUpdateFormatGroups();
 	slotUpdatePngCompression();
 }
 
@@ -94,6 +108,15 @@ void SIG_MovieSettingsDialog::setSettings( SIG_MovieSettings const &settings )
   checkboxOverlayStartDistance->setChecked( settings.showOverlayStartDistance );
   checkboxOverlayRobotHeight->setChecked( settings.showOverlayRobotHeight );
   checkboxSaveThumbnails->setChecked( settings.saveThumbnails );
+
+  // The first entry is the experiment's floor.
+  if ( settings.povrayFloorFromExperiment )
+    comboboxPovrayFloorTexture->setCurrentIndex( 0 );
+  else
+    comboboxPovrayFloorTexture->setCurrentIndex( comboboxPovrayFloorTexture->findData( settings.povrayFloorTexture ) );
+
+  checkboxPovrayMirrorFloor->setChecked( settings.povrayMirrorFloor );
+  comboboxPovrayTileSize->setCurrentIndex( comboboxPovrayTileSize->findData( settings.povrayFloorTileSize ) );
 }
 
 SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
@@ -117,6 +140,10 @@ SIG_MovieSettings SIG_MovieSettingsDialog::settings() const
   settings.showOverlayStartDistance = checkboxOverlayStartDistance->isChecked();
   settings.showOverlayRobotHeight = checkboxOverlayRobotHeight->isChecked();
   settings.saveThumbnails = checkboxSaveThumbnails->isChecked();
+  settings.povrayFloorFromExperiment = comboboxPovrayFloorTexture->currentIndex() == 0;
+  settings.povrayFloorTexture = comboboxPovrayFloorTexture->currentData().toString();
+  settings.povrayMirrorFloor = checkboxPovrayMirrorFloor->isChecked();
+  settings.povrayFloorTileSize = comboboxPovrayTileSize->currentData().toDouble();
   return settings;
 }
 
@@ -200,9 +227,14 @@ void SIG_MovieSettingsDialog::slotUpdateMovieLength()
 }
 
 // A POV frame is a scene file, so no label can be drawn into it.
-void SIG_MovieSettingsDialog::slotUpdateOverlayLabels()
+void SIG_MovieSettingsDialog::slotUpdateFormatGroups()
 {
-  groupboxOverlayLabels->setEnabled( comboboxFormat->currentText() != "POV" );
+  bool povray = comboboxFormat->currentText() == "POV";
+
+  groupboxOverlayLabels->setVisible( !povray );
+  groupboxPovray->setVisible( povray );
+  // The two groups differ in height, and the dialog would keep the taller one's.
+  adjustSize();
 }
 
 // Only the PNG writer uses the compression value.

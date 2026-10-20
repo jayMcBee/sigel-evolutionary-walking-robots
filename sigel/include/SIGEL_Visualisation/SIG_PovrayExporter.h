@@ -42,6 +42,24 @@ namespace SIGEL_Visualisation
 	class SIG_SimulationVisualisation;
 
 	/**
+	 * How the POV-Ray floor is covered: one texture image per tile, laid over the floor colour.
+	 */
+	struct SIG_PovrayFloor
+	{
+		/** The texture image, or empty for a floor with a grain in its colour. */
+		QString textureFile;
+
+		/** From 0 to 1: how much the texture covers the floor colour. */
+		double textureOpacity = 1;
+
+		/** Every other column of tiles is mirrored, as the OpenGL renderer draws it. */
+		bool mirrored = true;
+
+		/** The side of one tile, in robot radii. */
+		double tileSize = 2;
+	};
+
+	/**
 	 * Writes a SIG_SimulationVisualisation as POV-Ray scene files: one
 	 * include file with the declarations of the plane, the grid and the
 	 * robot, and one scene file per frame. The text that is the same for
@@ -59,7 +77,7 @@ namespace SIGEL_Visualisation
 		 *
 		 * @return false if the file cannot be written.
 		 */
-		bool writeIncludeFile( QString fileName ) const;
+		bool writeIncludeFile( QString fileName, SIG_PovrayFloor const &floor ) const;
 
 		/**
 		 * Writes one frame: the scene as it is now.
@@ -69,14 +87,15 @@ namespace SIGEL_Visualisation
 		bool writeFrame( QString includeFileName, QString fileName ) const;
 
 	private:
-		/** @param floorImageName the floor's image file, or empty for a floor in one colour. */
-		QString environmentDeclarations( QString floorImageName ) const;
+		/** @param floorImageName the floor's image file, or empty for a floor with a grain in its colour. */
+		QString environmentDeclarations( QString floorImageName, SIG_PovrayFloor const &floor ) const;
 
 		/**
-		 * Writes the floor texture as the screen draws it: over the floor colour by the texture
-		 * alpha, with a mirrored copy beside it. False if it cannot be read or written.
+		 * Writes the floor texture over the floor colour by its opacity: the texture and a
+		 * mirrored copy for a mirrored floor, else the mirrored copy only, which reads as the
+		 * texture does once POV-Ray lays it flat. False if it cannot be read or written.
 		 */
-		bool writeFloorImage( QString fileName ) const;
+		bool writeFloorImage( QString fileName, SIG_PovrayFloor const &floor ) const;
 
 		/** One layer of grid lines, across the axis "x" or "z": a pattern, so that it has no end. */
 		QString gridLines( QString axis ) const;
@@ -126,9 +145,6 @@ namespace SIGEL_Visualisation
 
 		/** The radius of the anchor points' spheres: 2.5 percent of patternSize. */
 		double anchorPointRadius() const;
-
-		/** The side of one floor texture image: twice patternSize. */
-		double floorTileSize() const;
 
 		static QString sceneObjects( SIG_Renderer const &renderer, GLuint first, GLuint end );
 
