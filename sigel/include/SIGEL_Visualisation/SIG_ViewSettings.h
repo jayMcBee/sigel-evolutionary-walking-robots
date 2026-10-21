@@ -61,10 +61,6 @@ namespace SIGEL_Visualisation
 	 */
 	hiddenLine,
 	/**
-	 * Vertices only, as points; a vertex behind a polygon is not drawn. No lighting.
-	 */
-	points,
-	/**
 	 * Filled, lit polygons; the lighting is the same across each polygon.
 	 */
 	flatShaded,

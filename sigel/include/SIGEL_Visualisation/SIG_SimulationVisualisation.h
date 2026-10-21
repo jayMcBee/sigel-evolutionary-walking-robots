@@ -130,8 +130,7 @@ namespace SIGEL_Visualisation
 		static constexpr float sunIntensity = 0.5f;
 
 		/**
-		 * The opacity of the plane in the wireframe, hidden lines and
-		 * points modes.
+		 * The opacity of the plane in the wireframe and hidden lines modes.
 		 */
 		static constexpr float unlitPlaneAlpha = 0.3f;
 

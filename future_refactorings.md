@@ -220,9 +220,8 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_IndividualView::SIG_IndividualView`,
   `SIG_AllIndividualsView::slotSelectionChanged`.
 
-- [ ] **174. Start the views in hidden-line mode, and drop the points mode.**
-  `SIG_ViewSettings` starts in `wireFrame`; it should start in `hiddenLine`.
-  The `points` render mode goes from SIGEL.
+- [ ] **174. Start the views in hidden-line mode.** `SIG_ViewSettings`
+  starts in `wireFrame`; it should start in `hiddenLine`.
 
 ---
 

@@ -71,8 +71,6 @@
 	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::wireFrame;
 	else if (string == "Hidden lines")
 	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::hiddenLine;
-	else if (string == "Points")
-	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::points;
 	else if (string == "Flat shaded")
 	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::flatShaded;
 	else if (string == "Gouraud shaded")

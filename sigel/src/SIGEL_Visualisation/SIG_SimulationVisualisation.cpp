@@ -338,13 +338,11 @@ namespace SIGEL_Visualisation
 
 		environmentRenderer.setEyePoint( viewSettings.getAbsoluteEyePoint(), drawnDistance() );
 
-		bool const pointMode = (viewSettings.renderMode == SIG_ViewSettings::points);
-		bool const hidden = (viewSettings.renderMode == SIG_ViewSettings::hiddenLine)
-		                 || (viewSettings.renderMode == SIG_ViewSettings::points);
+		bool const hidden = (viewSettings.renderMode == SIG_ViewSettings::hiddenLine);
 		if (hidden)
 		{
 			// The filled polygons go into the depth buffer only, pushed back a
-			// little, so that the edges or points drawn next are hidden behind them.
+			// little, so that the edges drawn next are hidden behind them.
 			glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 			glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
 			glEnable( GL_POLYGON_OFFSET_FILL );
@@ -355,21 +353,16 @@ namespace SIGEL_Visualisation
 
 			glDisable( GL_POLYGON_OFFSET_FILL );
 			glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
-			glPolygonMode( GL_FRONT_AND_BACK, pointMode ? GL_POINT : GL_LINE );
-			// Lines and points were drawn at the same depth in the first pass.
+			glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+			// The edges were drawn at the same depth in the first pass.
 			glDepthFunc( GL_LEQUAL );
 		};
-
-		// The robot's anchor points set their own point size, so it is set
-		// again here, before the visible pass.
-		if (pointMode)
-			glPointSize( 2 );
 
 		if (shadowed)
 			renderShadowedScene( lightMatrix );
 		else if (hidden || (viewSettings.renderMode == SIG_ViewSettings::wireFrame))
 		{
-			// The plane's many edges or points are blended in, so the robot stands out.
+			// The plane's many edges are blended in, so the robot stands out.
 			glPushAttrib( GL_COLOR_BUFFER_BIT );
 			glEnable( GL_BLEND );
 			glBlendColor( 0, 0, 0, unlitPlaneAlpha );

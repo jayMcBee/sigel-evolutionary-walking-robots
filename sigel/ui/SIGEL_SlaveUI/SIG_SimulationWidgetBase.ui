@@ -237,11 +237,6 @@
                       </item>
                       <item>
                         <property name="text">
-                          <string>Points</string>
-                        </property>
-                      </item>
-                      <item>
-                        <property name="text">
                           <string>Flat shaded</string>
                         </property>
                       </item>
