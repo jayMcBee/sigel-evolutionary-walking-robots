@@ -63,3 +63,34 @@ sky_sphere {
     finish { ambient 0 diffuse 0.8 }
   }
 }
+
+// One layer of grid lines across axis: a pattern, so that it has no end. One line every grid
+// spacing, as wide as the robot's path.
+#macro sigelGridLines( axis )
+  #local halfWidth = sigelLineRadius / sigelGridSpacing;
+  texture {
+    pigment {
+      gradient axis
+      color_map {
+        [0 srgb sigelGridColor]
+        [halfWidth srgb sigelGridColor]
+        [halfWidth srgbt <0,0,0,1>]
+        [1 - halfWidth srgbt <0,0,0,1>]
+        [1 - halfWidth srgb sigelGridColor]
+        [1 srgb sigelGridColor]
+      }
+      scale sigelGridSpacing
+    }
+    finish { ambient 0 diffuse 1 }
+  }
+#end
+
+// The lines lie on a copy of the ground, raised as the OpenGL renderer raises them; the copy
+// is clear between the lines.
+#declare Grid = object {
+  Ground
+  translate <0,0.01,0>
+  sigelGridLines( x )
+  sigelGridLines( z )
+  no_shadow
+}

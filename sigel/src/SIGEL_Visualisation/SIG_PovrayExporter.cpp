@@ -186,9 +186,14 @@ namespace SIGEL_Visualisation
 			       << terrainMesh()
 			       << "}\n";
 
-		// scene.inc reads these names to build the floor.
+		NEWMAT::ColumnVector const gridColor = SIG_TypeConverter::toColumnVector( environmentRenderer.sceneObjects[ 1 ]->getColor() );
+
+		// scene.inc reads these names to build the floor and the grid.
 		stream << "\n"
-		       << "#declare sigelFloorColor = " << vectorToPovray( planeColorVector ) << ";\n";
+		       << "#declare sigelFloorColor = " << vectorToPovray( planeColorVector ) << ";\n"
+		       << "#declare sigelGridColor = " << vectorToPovray( gridColor ) << ";\n"
+		       << "#declare sigelGridSpacing = " << environmentRenderer.getGridSpacing() << ";\n"
+		       << "#declare sigelLineRadius = " << lineRadius() << ";\n";
 
 		// A mirrored floor's image holds the texture twice, so it is two tiles wide.
 		if (!floorImageName.isEmpty())
@@ -200,18 +205,6 @@ namespace SIGEL_Visualisation
 			       << "#declare sigelFloorImageWidth = " << imageWidth << ";\n"
 			       << "#declare sigelFloorTileSize = " << tileSize << ";\n";
 		}
-
-		stream << "\n";
-
-		// The lines lie on a copy of the ground, raised as the OpenGL renderer raises them;
-		// the copy is clear between the lines.
-		stream << "#declare Grid = object {\n"
-		       << "  Ground\n"
-		       << "  translate <0,0.01,0>\n"
-		       << gridLines( "x" )
-		       << gridLines( "z" )
-		       << "  no_shadow\n"
-		       << "}\n";
 
 		return declarationsString;
 	}
@@ -380,41 +373,6 @@ namespace SIGEL_Visualisation
 		};
 
 		return resultString;
-	}
-
-	QString SIG_PovrayExporter::gridLines( QString axis ) const
-	{
-		SIG_EnvironmentRenderer const &environmentRenderer = visualisation.getEnvironmentRenderer();
-
-		NEWMAT::ColumnVector const color = SIG_TypeConverter::toColumnVector( environmentRenderer.sceneObjects[ 1 ]->getColor() );
-
-		QString lineColor;
-		QTextStream( &lineColor ) << "srgbt <" << color( 1 ) << "," << color( 2 ) << "," << color( 3 ) << ",0>";
-		QString clear = "srgbt <0,0,0,1>";
-
-		// One line every grid spacing, as wide as the robot's path.
-		double const halfWidth = lineRadius() / environmentRenderer.getGridSpacing();
-
-		QString linesString;
-		QTextStream stream( &linesString, QIODevice::WriteOnly );
-
-		stream << "  texture {\n"
-		       << "    pigment {\n"
-		       << "      gradient " << axis << "\n"
-		       << "      color_map {\n"
-		       << "        [0 " << lineColor << "]\n"
-		       << "        [" << halfWidth << " " << lineColor << "]\n"
-		       << "        [" << halfWidth << " " << clear << "]\n"
-		       << "        [" << 1 - halfWidth << " " << clear << "]\n"
-		       << "        [" << 1 - halfWidth << " " << lineColor << "]\n"
-		       << "        [1 " << lineColor << "]\n"
-		       << "      }\n"
-		       << "      scale " << environmentRenderer.getGridSpacing() << "\n"
-		       << "    }\n"
-		       << "    finish { ambient 0 diffuse 1 }\n"
-		       << "  }\n";
-
-		return linesString;
 	}
 
 	QString SIG_PovrayExporter::terrainMesh() const

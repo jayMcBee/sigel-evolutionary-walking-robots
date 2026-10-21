@@ -116,9 +116,6 @@ namespace SIGEL_Visualisation
 		 */
 		bool writeFloorImage( QString fileName, SIG_PovrayFloor const &floor ) const;
 
-		/** One layer of grid lines, across the axis "x" or "z": a pattern, so that it has no end. */
-		QString gridLines( QString axis ) const;
-
 		/** The vertices and triangles of a terrain that is not flat and of the ground past its edges. */
 		QString terrainMesh() const;
 
