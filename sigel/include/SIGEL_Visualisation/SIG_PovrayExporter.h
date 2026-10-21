@@ -57,14 +57,14 @@ namespace SIGEL_Visualisation
 		/** Every other column of tiles is mirrored, as the OpenGL renderer draws it. */
 		bool mirrored = true;
 
-		/** The side of one tile, in robot sizes: the robot's diameter. */
+		/** The side of one tile, in robot diameters. */
 		double tileSize = 1;
 	};
 
 	/**
-	 * Triangles that share their vertices, as a POV-Ray mesh2 lists them. Neighbouring
-	 * triangles meet only if they share the very same vertices: rays slip through the seam
-	 * between separate triangles, or between vertices that are rounded apart.
+	 * Triangles that share their vertices, as a POV-Ray mesh2 lists them. Rays slip through
+	 * the seam between two triangles unless both use the very same vertices; vertices that
+	 * rounding has moved apart leave a gap.
 	 */
 	struct SIG_PovrayMesh
 	{
@@ -79,12 +79,10 @@ namespace SIGEL_Visualisation
 	};
 
 	/**
-	 * Writes a SIG_SimulationVisualisation as POV-Ray scene files: one
-	 * include file with the declarations of the plane, the grid and the
-	 * robot, and one scene file per frame. The text that is the same for
-	 * every scene is in the .inc resources in povray/ and is copied in
-	 * unchanged. Where it needs a value from SIGEL, it reads a name that the
-	 * code declares before POV-Ray needs it.
+	 * Writes a SIG_SimulationVisualisation as POV-Ray scene files: one include file with
+	 * what all frames share, and one scene file per frame. The text that is the same for
+	 * every scene comes unchanged from the .inc resources in povray/. Where that text needs
+	 * a value from SIGEL, it reads a name that this class declares before it.
 	 */
 	class SIG_PovrayExporter
 	{
@@ -92,16 +90,18 @@ namespace SIGEL_Visualisation
 		SIG_PovrayExporter( SIG_SimulationVisualisation const &visualisation );
 
 		/**
-		 * Writes the include file that every frame includes.
+		 * Writes the include file that every frame includes. With a floor texture, it also
+		 * writes the floor image beside it.
 		 *
-		 * @return false if the file cannot be written.
+		 * @return false if a file cannot be written, the texture cannot be read or a POV-Ray
+		 * text is missing.
 		 */
 		bool writeIncludeFile( QString fileName, SIG_PovrayFloor const &floor ) const;
 
 		/**
 		 * Writes one frame: the scene as it is now.
 		 *
-		 * @return false if the file cannot be written.
+		 * @return false if the file cannot be written or a POV-Ray text is missing.
 		 */
 		bool writeFrame( QString includeFileName, QString fileName ) const;
 
@@ -110,9 +110,9 @@ namespace SIGEL_Visualisation
 		QString environmentDeclarations( QString floorImageName, SIG_PovrayFloor const &floor ) const;
 
 		/**
-		 * Writes the floor texture over the floor colour by its opacity: the texture and a
-		 * mirrored copy for a mirrored floor, else the mirrored copy only, which reads as the
-		 * texture does once POV-Ray lays it flat. False if it cannot be read or written.
+		 * Writes the floor image: the texture over the floor colour, at textureOpacity. A
+		 * mirrored floor gets the texture and a mirrored copy; otherwise only the mirrored copy.
+		 * False if the texture cannot be read or the image cannot be written.
 		 */
 		bool writeFloorImage( QString fileName, SIG_PovrayFloor const &floor ) const;
 
@@ -132,16 +132,16 @@ namespace SIGEL_Visualisation
 		QVector3D terrainVector( int x, int z ) const;
 
 		/**
-		 * How far the ground goes past the terrain: 2^16. From a camera below 30 units, its end
-		 * is less than a pixel below the horizon. From 2^19 on, rays slip through between the
-		 * grid and the ground.
+		 * How far the ground goes past a terrain that is not flat: 2^16. From a camera below
+		 * 30 units, its end is less than a pixel below the horizon. From 2^19 on, rays slip
+		 * through between the grid and the ground.
 		 */
 		static constexpr float groundReach = 65536;
 
 		/** The distances from an edge at which the ground past it is cut into cells. */
 		static QList< float > outwardSteps();
 
-		/** Adds the ground from the edge from-to outward. */
+		/** Adds the ground past the edge from 'from' to 'to', in the direction 'outward'. */
 		static void edgeStrip( SIG_PovrayMesh &mesh, QVector3D from, QVector3D to, QVector3D outward );
 
 		/** Adds the ground at the corner's height, outward in both directions. */
@@ -160,8 +160,8 @@ namespace SIGEL_Visualisation
 		QString environmentObjects() const;
 
 		/**
-		 * The robot radius: patterns scale with it, so that a small and a large robot look
-		 * alike. A robot without vertices has radius 0 and gets the size of radius 1.
+		 * The robot radius, or 1 for a robot without vertices. Patterns scale with it, so a
+		 * small and a large robot look alike.
 		 */
 		double patternSize() const;
 

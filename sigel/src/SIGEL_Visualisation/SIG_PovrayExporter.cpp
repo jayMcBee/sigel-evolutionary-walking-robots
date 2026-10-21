@@ -57,14 +57,14 @@ namespace SIGEL_Visualisation
 
 		QTextStream stream( &file );
 
-		// The screen's vertical field of view: the frame's height is 1 at this distance.
+		// The OpenGL renderer's vertical field of view: at this distance the frame is 1 high.
 		static double const directionLength = 0.5 / std::tan( qDegreesToRadians( SIG_Visualisation::fieldOfView ) / 2 );
 
 		// Far enough that the light falls in parallel across the robot's whole walk.
 		static double const lightDistance = 1000;
 
-		// The key light is the screen's sun, so the shadows fall the same way; the fill comes
-		// from the opposite side, lower down.
+		// The key light is the OpenGL renderer's sun, so shadows fall the same way. The fill
+		// light comes from the opposite side, lower down.
 		QVector3D const sun = SIG_SimulationVisualisation::sunDirection.normalized() * lightDistance;
 
 		QVector3D const fill = QVector3D( -sun.x(), sun.y() / 2, -sun.z() ).normalized() * lightDistance;
@@ -75,7 +75,8 @@ namespace SIGEL_Visualisation
 		NEWMAT::ColumnVector fillPosition( 3 );
 		fillPosition << fill.x() << fill.y() << fill.z();
 
-		// The sky has the screen's colours: skyBottomColor at the horizon, skyTopColor overhead.
+		// The sky has the OpenGL renderer's colours: skyBottomColor at the horizon, skyTopColor
+		// overhead.
 		NEWMAT::ColumnVector skyTopColor( 3 );
 		skyTopColor << SIG_Visualisation::skyTopColor.x() << SIG_Visualisation::skyTopColor.y() << SIG_Visualisation::skyTopColor.z();
 
@@ -102,8 +103,7 @@ namespace SIGEL_Visualisation
 		stream << robotDeclarations()
 		       << "#declare cameraDirection = <0,0," << directionLength << ">;\n";
 
-		// Inputs to scene.inc: the light positions and sky colours, declared ahead of it for
-		// POV-Ray's single-pass parser.
+		// scene.inc reads these names. POV-Ray parses in one pass, so they come before it.
 		stream << "#declare sigelSunPosition = " << vectorToPovray( SIG_TypeConverter::sigelToPovray() * keyPosition ) << ";\n"
 		       << "#declare sigelFillPosition = " << vectorToPovray( SIG_TypeConverter::sigelToPovray() * fillPosition ) << ";\n"
 		       << "#declare sigelHorizonColor = " << vectorToPovray( horizonColor ) << ";\n"
@@ -138,9 +138,9 @@ namespace SIGEL_Visualisation
 		stream << "#version 3.7;\n"
 		       << "\n";
 
-		// globalSettings.inc samples the radiosity densely with a low error bound, so that
-		// the indirect light changes little from frame to frame. Its brightness 0.6 puts less
-		// sky light into the shadows, for more contrast.
+		// globalSettings.inc: dense radiosity with a low error bound, so the indirect light
+		// changes little between frames. Its brightness 0.6 puts less sky light into the
+		// shadows, for more contrast.
 		if (!writeResource( stream, "globalSettings.inc" ))
 			return false;
 
@@ -191,17 +191,18 @@ namespace SIGEL_Visualisation
 		       << "  Ground\n"
 		       << "  texture {\n";
 
-		// A floor in one colour shows no motion when the camera follows the robot, so it gets a
-		// faint grain around that colour: two noise patterns that scale with the robot. The
-		// 11 percent are from sample renders.
+		// Without a texture, a floor of one colour shows no motion while the camera follows the
+		// robot. So it gets a faint grain, 11 percent either side of its colour: two noise
+		// patterns that scale with the robot. The 11 percent is a tuning constant from sample
+		// renders.
 		NEWMAT::ColumnVector const darkGrainColor = planeColorVector * 0.89;
 		NEWMAT::ColumnVector const lightGrainColor = planeColorVector * 1.11;
 
 		QString const grainColorMap = "color_map { [0 srgb " + vectorToPovray( darkGrainColor ) + "] [1 srgb " + vectorToPovray( lightGrainColor ) + "] }";
 
-		// The image lies in the square from 0 to 1 in x and y; laid flat, its top row is
-		// towards +z, as the OpenGL renderer draws it. A mirrored floor's image holds the
-		// texture twice, so it is two tiles wide.
+		// The image fills the square from 0 to 1 in x and y. Laid flat, its top row points to
+		// SIGEL +z, as in the OpenGL renderer. A mirrored floor's image holds the texture
+		// twice, so it is two tiles wide.
 		double const tileSize = floor.tileSize * 2 * patternSize();
 		double const imageWidth = floor.mirrored ? 2 * tileSize : tileSize;
 		if (floorImageName.isEmpty())
@@ -411,7 +412,7 @@ namespace SIGEL_Visualisation
 		QTextStream( &lineColor ) << "srgbt <" << color( 1 ) << "," << color( 2 ) << "," << color( 3 ) << ",0>";
 		QString clear = "srgbt <0,0,0,1>";
 
-		// One line on each whole unit, as wide as a line of the robot's path.
+		// One line every grid spacing, as wide as the robot's path.
 		double const halfWidth = lineRadius() / environmentRenderer.getGridSpacing();
 
 		QString linesString;
@@ -442,7 +443,8 @@ namespace SIGEL_Visualisation
 
 		SIG_PovrayMesh mesh;
 
-		// Each cell is split along the same diagonal as in drawInit and in DynaMechs.
+		// Each cell is split along the same diagonal as in SIG_EnvironmentRenderer::drawInit
+		// and in DynaMechs.
 		for (int z=0; z<terrain.getDimensionZ()-1; z++)
 			for (int x=0; x<terrain.getDimensionX()-1; x++)
 			{
@@ -471,7 +473,7 @@ namespace SIGEL_Visualisation
 		int const minZ = 0;
 		int const maxZ = terrain.getDimensionZ() - 1;
 
-		// Row minZ lies at the largest SIGEL z.
+		// Row minZ lies at the largest SIGEL z, so its edge faces north.
 		QVector3D const west( -1, 0, 0 );
 		QVector3D const east( 1, 0, 0 );
 		QVector3D const north( 0, 0, 1 );
@@ -499,8 +501,8 @@ namespace SIGEL_Visualisation
 	{
 		SIGEL_Environment::SIG_Terrain const &terrain = visualisation.getEnvironmentRenderer().getTerrain();
 
-		// drawInit turns the terrain over the x axis: row z lies at SIGEL z = -z. The plane and
-		// the grid are declared in SIGEL coordinates: sceneObjects turns them into POV-Ray's.
+		// As in SIG_EnvironmentRenderer::drawInit, row z lies at SIGEL z = -z. The mesh is in
+		// SIGEL coordinates; sceneObjects turns it into POV-Ray's.
 		return QVector3D( x, SIG_EnvironmentRenderer::groundDepth( terrain, x, z ), -z );
 	}
 
@@ -519,7 +521,7 @@ namespace SIGEL_Visualisation
 	{
 		QList< float > const steps = outwardSteps();
 
-		// The ground is the same along outward.
+		// Outward, the ground keeps the edge's height.
 		for (qsizetype i = 1; i < steps.size(); i++)
 			quadrangle( mesh, from + outward * steps[ i - 1 ], to + outward * steps[ i - 1 ],
 			            to + outward * steps[ i ], from + outward * steps[ i ] );
@@ -571,8 +573,7 @@ namespace SIGEL_Visualisation
 
 	double SIG_PovrayExporter::lineRadius() const
 	{
-		// A tuning constant with no physical meaning: half a percent, tuned on sample renders
-		// of robots with radius 0.37 to 3.32.
+		// A tuning constant: half a percent, from sample renders of robots with radius 0.37 to 3.32.
 		return patternSize() / 200;
 	}
 
