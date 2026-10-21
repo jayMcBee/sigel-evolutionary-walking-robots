@@ -182,13 +182,8 @@ namespace SIGEL_Visualisation
 		if (terrain.isFlat())
 			stream << "#declare Ground = plane { <0,1,0>, 0 }\n";
 		else
-			stream << "#declare Ground = union {\n"
-			       << "  mesh2 {\n"
+			stream << "#declare Ground = mesh2 {\n"
 			       << terrainMesh()
-			       << "  }\n"
-			       << "  mesh {\n"
-			       << terrainBeyondEdges()
-			       << "  }\n"
 			       << "}\n";
 
 		stream << "\n"
@@ -445,51 +440,32 @@ namespace SIGEL_Visualisation
 	{
 		SIGEL_Environment::SIG_Terrain const &terrain = visualisation.getEnvironmentRenderer().getTerrain();
 
-		// The terrain itself; terrainBeyondEdges continues it.
-		int const minX = 0;
-		int const maxX = terrain.getDimensionX() - 1;
-		int const minZ = 0;
-		int const maxZ = terrain.getDimensionZ() - 1;
-
-		int const rowLength = maxX - minX + 1;
-
-		QString meshString;
-		QTextStream stream( &meshString, QIODevice::WriteOnly );
-
-		stream << "  vertex_vectors {\n"
-		       << "    " << rowLength * (maxZ - minZ + 1);
-
-		for (int z=minZ; z<=maxZ; z++)
-			for (int x=minX; x<=maxX; x++)
-				stream << ",\n    " << vectorToPovray( terrainVector( x, z ) );
-
-		stream << "\n"
-		       << "  }\n"
-		       << "  face_indices {\n"
-		       << "    " << 2 * (rowLength - 1) * (maxZ - minZ);
+		SIG_PovrayMesh mesh;
 
 		// Each cell is split along the same diagonal as in drawInit and in DynaMechs.
-		for (int z=minZ; z<maxZ; z++)
-			for (int x=minX; x<maxX; x++)
+		for (int z=0; z<terrain.getDimensionZ()-1; z++)
+			for (int x=0; x<terrain.getDimensionX()-1; x++)
 			{
-				int const lower = (z - minZ) * rowLength + (x - minX);
-				int const upper = lower + rowLength;
-
-				stream << ",\n    <" << upper << "," << lower << "," << upper + 1 << ">"
-				       << ", <" << upper + 1 << "," << lower << "," << lower + 1 << ">";
+				triangle( mesh, terrainVector( x, z + 1 ), terrainVector( x, z ), terrainVector( x + 1, z + 1 ) );
+				triangle( mesh, terrainVector( x + 1, z + 1 ), terrainVector( x, z ), terrainVector( x + 1, z ) );
 			}
 
-		stream << "\n"
-		       << "  }\n";
+		terrainBeyondEdges( mesh );
 
-		return meshString;
+		return "  vertex_vectors {\n"
+		       "    " + QString::number( mesh.vertices.size() ) + ",\n"
+		       "    " + mesh.vertices.join( ",\n    " ) + "\n"
+		       "  }\n"
+		       "  face_indices {\n"
+		       "    " + QString::number( mesh.faces.size() ) + ",\n"
+		       "    " + mesh.faces.join( ",\n    " ) + "\n"
+		       "  }\n";
 	}
 
-	QString SIG_PovrayExporter::terrainBeyondEdges() const
+	void SIG_PovrayExporter::terrainBeyondEdges( SIG_PovrayMesh &mesh ) const
 	{
 		SIGEL_Environment::SIG_Terrain const &terrain = visualisation.getEnvironmentRenderer().getTerrain();
 
-		// The edges of terrainMesh.
 		int const minX = 0;
 		int const maxX = terrain.getDimensionX() - 1;
 		int const minZ = 0;
@@ -501,23 +477,22 @@ namespace SIGEL_Visualisation
 		QVector3D const north( 0, 0, 1 );
 		QVector3D const south( 0, 0, -1 );
 
-		QString piecesString;
-		QTextStream stream( &piecesString, QIODevice::WriteOnly );
-
 		for (int z=minZ; z<maxZ; z++)
-			stream << edgeStrip( terrainVector( minX, z ), terrainVector( minX, z + 1 ), west )
-			       << edgeStrip( terrainVector( maxX, z ), terrainVector( maxX, z + 1 ), east );
+		{
+			edgeStrip( mesh, terrainVector( minX, z ), terrainVector( minX, z + 1 ), west );
+			edgeStrip( mesh, terrainVector( maxX, z ), terrainVector( maxX, z + 1 ), east );
+		}
 
 		for (int x=minX; x<maxX; x++)
-			stream << edgeStrip( terrainVector( x, minZ ), terrainVector( x + 1, minZ ), north )
-			       << edgeStrip( terrainVector( x, maxZ ), terrainVector( x + 1, maxZ ), south );
+		{
+			edgeStrip( mesh, terrainVector( x, minZ ), terrainVector( x + 1, minZ ), north );
+			edgeStrip( mesh, terrainVector( x, maxZ ), terrainVector( x + 1, maxZ ), south );
+		}
 
-		stream << edgeCorner( terrainVector( minX, minZ ), west, north )
-		       << edgeCorner( terrainVector( maxX, minZ ), east, north )
-		       << edgeCorner( terrainVector( minX, maxZ ), west, south )
-		       << edgeCorner( terrainVector( maxX, maxZ ), east, south );
-
-		return piecesString;
+		edgeCorner( mesh, terrainVector( minX, minZ ), west, north );
+		edgeCorner( mesh, terrainVector( maxX, minZ ), east, north );
+		edgeCorner( mesh, terrainVector( minX, maxZ ), west, south );
+		edgeCorner( mesh, terrainVector( maxX, maxZ ), east, south );
 	}
 
 	QVector3D SIG_PovrayExporter::terrainVector( int x, int z ) const
@@ -540,40 +515,51 @@ namespace SIGEL_Visualisation
 		return steps;
 	}
 
-	QString SIG_PovrayExporter::edgeStrip( QVector3D from, QVector3D to, QVector3D outward )
+	void SIG_PovrayExporter::edgeStrip( SIG_PovrayMesh &mesh, QVector3D from, QVector3D to, QVector3D outward )
 	{
 		QList< float > const steps = outwardSteps();
-
-		QString stripString;
 
 		// The ground is the same along outward.
 		for (qsizetype i = 1; i < steps.size(); i++)
-			stripString += quadrangle( from + outward * steps[ i - 1 ], to + outward * steps[ i - 1 ],
-			                           to + outward * steps[ i ], from + outward * steps[ i ] );
-
-		return stripString;
+			quadrangle( mesh, from + outward * steps[ i - 1 ], to + outward * steps[ i - 1 ],
+			            to + outward * steps[ i ], from + outward * steps[ i ] );
 	}
 
-	QString SIG_PovrayExporter::edgeCorner( QVector3D corner, QVector3D outward1, QVector3D outward2 )
+	void SIG_PovrayExporter::edgeCorner( SIG_PovrayMesh &mesh, QVector3D corner, QVector3D outward1, QVector3D outward2 )
 	{
 		QList< float > const steps = outwardSteps();
 
-		QString cornerString;
-
 		for (qsizetype i = 1; i < steps.size(); i++)
 			for (qsizetype j = 1; j < steps.size(); j++)
-				cornerString += quadrangle( corner + outward1 * steps[ i - 1 ] + outward2 * steps[ j - 1 ],
-				                            corner + outward1 * steps[ i ] + outward2 * steps[ j - 1 ],
-				                            corner + outward1 * steps[ i ] + outward2 * steps[ j ],
-				                            corner + outward1 * steps[ i - 1 ] + outward2 * steps[ j ] );
-
-		return cornerString;
+				quadrangle( mesh, corner + outward1 * steps[ i - 1 ] + outward2 * steps[ j - 1 ],
+				            corner + outward1 * steps[ i ] + outward2 * steps[ j - 1 ],
+				            corner + outward1 * steps[ i ] + outward2 * steps[ j ],
+				            corner + outward1 * steps[ i - 1 ] + outward2 * steps[ j ] );
 	}
 
-	QString SIG_PovrayExporter::quadrangle( QVector3D a, QVector3D b, QVector3D c, QVector3D d )
+	void SIG_PovrayExporter::quadrangle( SIG_PovrayMesh &mesh, QVector3D a, QVector3D b, QVector3D c, QVector3D d )
 	{
-		return "    triangle { " + vectorToPovray( a ) + ", " + vectorToPovray( b ) + ", " + vectorToPovray( c ) + " }\n"
-		       + "    triangle { " + vectorToPovray( a ) + ", " + vectorToPovray( c ) + ", " + vectorToPovray( d ) + " }\n";
+		triangle( mesh, a, b, c );
+		triangle( mesh, a, c, d );
+	}
+
+	void SIG_PovrayExporter::triangle( SIG_PovrayMesh &mesh, QVector3D a, QVector3D b, QVector3D c )
+	{
+		mesh.faces.append( QString( "<%1,%2,%3>" ).arg( vertexIndex( mesh, a ) ).arg( vertexIndex( mesh, b ) ).arg( vertexIndex( mesh, c ) ) );
+	}
+
+	int SIG_PovrayExporter::vertexIndex( SIG_PovrayMesh &mesh, QVector3D vertex )
+	{
+		// Nine digits keep every float exactly; vectorToPovray's five move the far vertices.
+		QString const text = QString( "<%1, %2, %3>" ).arg( vertex.x(), 0, 'g', 9 ).arg( vertex.y(), 0, 'g', 9 ).arg( vertex.z(), 0, 'g', 9 );
+
+		if (mesh.vertexIndices.contains( text ))
+			return mesh.vertexIndices.value( text );
+
+		mesh.vertexIndices.insert( text, mesh.vertices.size() );
+		mesh.vertices.append( text );
+
+		return mesh.vertices.size() - 1;
 	}
 
 	double SIG_PovrayExporter::patternSize() const

@@ -25,7 +25,9 @@
 #define SIGEL_VISUALISATION_SIG_POVRAYEXPORTER_H
 
 #include <qstring.h>
+#include <QHash>
 #include <QList>
+#include <QStringList>
 #include <QVector3D>
 
 #include <newmat.h>
@@ -57,6 +59,23 @@ namespace SIGEL_Visualisation
 
 		/** The side of one tile, in robot sizes: the robot's diameter. */
 		double tileSize = 1;
+	};
+
+	/**
+	 * Triangles that share their vertices, as a POV-Ray mesh2 lists them. Neighbouring
+	 * triangles meet only if they share the very same vertices: rays slip through the seam
+	 * between separate triangles, or between vertices that are rounded apart.
+	 */
+	struct SIG_PovrayMesh
+	{
+		/** Each vertex once, as POV-Ray text at full precision. */
+		QStringList vertices;
+
+		/** The index in vertices of each vertex text. */
+		QHash< QString, int > vertexIndices;
+
+		/** The triangles as vertex indices, each as POV-Ray text. */
+		QStringList faces;
 	};
 
 	/**
@@ -100,35 +119,41 @@ namespace SIGEL_Visualisation
 		/** One layer of grid lines, across the axis "x" or "z": a pattern, so that it has no end. */
 		QString gridLines( QString axis ) const;
 
-		/** The vertices and triangles of a terrain that is not flat, over its own cells. */
+		/** The vertices and triangles of a terrain that is not flat and of the ground past its edges. */
 		QString terrainMesh() const;
 
 		/**
-		 * The ground past the edges of terrainMesh, to the horizon: as in DynaMechs, each
+		 * Adds the ground past the edges of the terrain, to the horizon: as in DynaMechs, each
 		 * edge cell continues outward at the edge heights, and each corner at the corner height.
 		 */
-		QString terrainBeyondEdges() const;
+		void terrainBeyondEdges( SIG_PovrayMesh &mesh ) const;
 
 		/** The SIGEL point of the terrain at column x and row z. */
 		QVector3D terrainVector( int x, int z ) const;
 
 		/**
-		 * How far the ground goes past the terrain: 2^20. From a camera below 500 units, its end
-		 * is less than a pixel below the horizon.
+		 * How far the ground goes past the terrain: 2^16. From a camera below 30 units, its end
+		 * is less than a pixel below the horizon. From 2^19 on, rays slip through between the
+		 * grid and the ground.
 		 */
-		static constexpr float groundReach = 1048576;
+		static constexpr float groundReach = 65536;
 
 		/** The distances from an edge at which the ground past it is cut into cells. */
 		static QList< float > outwardSteps();
 
-		/** The triangles of the ground from the edge from-to outward. */
-		static QString edgeStrip( QVector3D from, QVector3D to, QVector3D outward );
+		/** Adds the ground from the edge from-to outward. */
+		static void edgeStrip( SIG_PovrayMesh &mesh, QVector3D from, QVector3D to, QVector3D outward );
 
-		/** The triangles of the ground at the corner's height, outward in both directions. */
-		static QString edgeCorner( QVector3D corner, QVector3D outward1, QVector3D outward2 );
+		/** Adds the ground at the corner's height, outward in both directions. */
+		static void edgeCorner( SIG_PovrayMesh &mesh, QVector3D corner, QVector3D outward1, QVector3D outward2 );
 
-		/** Two triangles: a, b, c and a, c, d. */
-		static QString quadrangle( QVector3D a, QVector3D b, QVector3D c, QVector3D d );
+		/** Adds two triangles: a, b, c and a, c, d. */
+		static void quadrangle( SIG_PovrayMesh &mesh, QVector3D a, QVector3D b, QVector3D c, QVector3D d );
+
+		static void triangle( SIG_PovrayMesh &mesh, QVector3D a, QVector3D b, QVector3D c );
+
+		/** The index of vertex in mesh, which adds it if it is new. */
+		static int vertexIndex( SIG_PovrayMesh &mesh, QVector3D vertex );
 
 		QString robotDeclarations() const;
 
