@@ -37,6 +37,33 @@ SIGEL_Environment::SIG_Terrain::SIG_Terrain()
 {
 }
 
+QList<SIGEL_Environment::SIG_TerrainPreset> const &SIGEL_Environment::SIG_Terrain::presets()
+{
+  static QList<SIG_TerrainPreset> const list =
+  {
+    { "Valley", "0.15*abs(x-cx)" },
+    { "Hill", "4*exp(-((x-cx)^2+(z-cz)^2)/100)" },
+    { "Washboard", "0.3*sin(x/1.5)" },
+    { "Crater", "2.5*exp(-((sqrt((x-cx)^2+(z-cz)^2)-12)^2)/10)" },
+    { "Gravel", "0.15*abs(sin(x*12.9898+z*78.233)*43758.5453%1)" },
+    { "Ripples", "-sin(sqrt(x^2+z^2))" },
+    { "Rice terraces", "0.5*floor(8*exp(0-((x-cx)^2+(z-cz)^2)/250))" },
+    { "Amphitheatre", "0.3*floor(sqrt((x-cx)^2+(z-cz)^2)/3)" },
+    { "Speed bumps", "0.3*(1+cos(x*0.8))^3/8" },
+    { "Volcano", "4*exp(0-((x-cx)^2+(z-cz)^2)/150)-2.5*exp(0-((x-cx)^2+(z-cz)^2)/12)" },
+  };
+  return list;
+}
+
+QString SIGEL_Environment::SIG_Terrain::presetFunction( SIG_TerrainPreset const &preset, int dimensionX, int dimensionZ )
+{
+  // The grid points are 1 apart and start at 0, so the middle of X points is (X - 1) / 2.
+  QString function = preset.function;
+  function.replace( "cx", QString::number( ( dimensionX - 1 ) / 2.0 ) );
+  function.replace( "cz", QString::number( ( dimensionZ - 1 ) / 2.0 ) );
+  return function;
+}
+
 bool SIGEL_Environment::SIG_Terrain::setFromFunction( const QString &function, int newDimensionX, int newDimensionZ )
 {
   FunctionParser fp;

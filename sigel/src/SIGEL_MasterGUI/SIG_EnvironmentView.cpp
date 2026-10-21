@@ -33,6 +33,7 @@
 
 #include "SIGEL_MasterGUI/SIG_EnvironmentView.h"
 
+#include "SIGEL_Environment/SIG_Terrain.h"
 #include "SIGEL_Tools/SIG_Vector.h"
 
 namespace SIGEL_MasterGUI
@@ -75,7 +76,13 @@ SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent,  const char* name, Qt
 		v->setLocale( cLocale );
 
 	QMenu *functionPresetMenu = new QMenu( pushbuttonFunctionPresets );
-	functionPresetMenu->addAction( "Ripples", this, [this]() { lineeditFunction->setText( "-sin(sqrt(x^2+z^2))" ); } );
+	for ( SIGEL_Environment::SIG_TerrainPreset const &preset : SIGEL_Environment::SIG_Terrain::presets() )
+	{
+		functionPresetMenu->addAction( preset.name, this, [this, preset]()
+		{
+			lineeditFunction->setText( SIGEL_Environment::SIG_Terrain::presetFunction( preset, lineeditXDim->text().toInt(), lineeditZDim->text().toInt() ) );
+		} );
+	}
 	// Not setMenu: its menu indicator is drawn smaller than the button's text.
 	connect( pushbuttonFunctionPresets, &QPushButton::clicked, this, [this, functionPresetMenu]()
 	{

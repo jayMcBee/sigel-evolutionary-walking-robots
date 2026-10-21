@@ -31,6 +31,15 @@ namespace SIGEL_Environment
 {
 
   /**
+   * A floor function with a name. cx and cz in the function stand for the centre of the grid.
+   */
+  struct SIG_TerrainPreset
+  {
+    QString name;
+    QString function;
+  };
+
+  /**
    * The heights of a floor on a grid with a spacing of 1.
    */
   class SIG_Terrain
@@ -39,6 +48,12 @@ namespace SIGEL_Environment
 
     /** An empty grid of 0 by 0. */
     SIG_Terrain();
+
+    /** The preset floor functions. */
+    static QList<SIG_TerrainPreset> const &presets();
+
+    /** The preset's function, with cx and cz replaced by the centre of a grid of dimensionX by dimensionZ. */
+    static QString presetFunction( SIG_TerrainPreset const &preset, int dimensionX, int dimensionZ );
 
     /**
      * Makes the heights of function, which depends on x and z, on a grid of newDimensionX by newDimensionZ.
