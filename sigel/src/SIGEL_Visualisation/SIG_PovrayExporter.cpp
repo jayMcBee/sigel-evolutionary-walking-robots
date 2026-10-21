@@ -186,42 +186,22 @@ namespace SIGEL_Visualisation
 			       << terrainMesh()
 			       << "}\n";
 
+		// scene.inc reads these names to build the floor.
 		stream << "\n"
-		       << "#declare Plane = object {\n"
-		       << "  Ground\n"
-		       << "  texture {\n";
+		       << "#declare sigelFloorColor = " << vectorToPovray( planeColorVector ) << ";\n";
 
-		// Without a texture, a floor of one colour shows no motion while the camera follows the
-		// robot. So it gets a faint grain, 11 percent either side of its colour: two noise
-		// patterns that scale with the robot. The 11 percent is a tuning constant from sample
-		// renders.
-		NEWMAT::ColumnVector const darkGrainColor = planeColorVector * 0.89;
-		NEWMAT::ColumnVector const lightGrainColor = planeColorVector * 1.11;
+		// A mirrored floor's image holds the texture twice, so it is two tiles wide.
+		if (!floorImageName.isEmpty())
+		{
+			double const tileSize = floor.tileSize * 2 * patternSize();
+			double const imageWidth = floor.mirrored ? 2 * tileSize : tileSize;
 
-		QString const grainColorMap = "color_map { [0 srgb " + vectorToPovray( darkGrainColor ) + "] [1 srgb " + vectorToPovray( lightGrainColor ) + "] }";
+			stream << "#declare sigelFloorImage = \"" << floorImageName << "\";\n"
+			       << "#declare sigelFloorImageWidth = " << imageWidth << ";\n"
+			       << "#declare sigelFloorTileSize = " << tileSize << ";\n";
+		}
 
-		// The image fills the square from 0 to 1 in x and y. Laid flat, its top row points to
-		// SIGEL +z, as in the OpenGL renderer. A mirrored floor's image holds the texture
-		// twice, so it is two tiles wide.
-		double const tileSize = floor.tileSize * 2 * patternSize();
-		double const imageWidth = floor.mirrored ? 2 * tileSize : tileSize;
-		if (floorImageName.isEmpty())
-			stream << "    pigment {\n"
-			       << "      average\n"
-			       << "      pigment_map {\n"
-			       << "        [1 bozo " << grainColorMap << " scale " << patternSize() << "]\n"
-			       << "        [1 granite " << grainColorMap << " scale " << patternSize() / 2 << "]\n"
-			       << "      }\n"
-			       << "    }\n";
-		else
-			stream << "    pigment { image_map { png \"" << floorImageName << "\" interpolate 2 }"
-			       << " scale <" << imageWidth << "," << tileSize << ",1> rotate x*90 }\n";
-
-		// A tuning constant from sample renders: at diffuse 1, the sun washes the floor out.
-		stream << "    finish { ambient 0 diffuse 0.8 }\n"
-		       << "  }\n"
-		       << "}\n"
-		       << "\n";
+		stream << "\n";
 
 		// The lines lie on a copy of the ground, raised as the OpenGL renderer raises them;
 		// the copy is clear between the lines.
