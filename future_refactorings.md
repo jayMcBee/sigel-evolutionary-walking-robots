@@ -228,6 +228,13 @@ touched, because changing one changes behaviour against the reference binary.
   PNG, PPM, XBM, XPM and POV. Decide which of them are still worth offering
   today, and whether a format people use today is missing.
 
+- [ ] **176. Move more POV-Ray text out of `SIG_PovrayExporter`.** The fixed
+  text is in the `.inc` resource files in `povray/`, but the class still writes
+  POV-Ray text of its own, around the scene's values. Find out how much more of
+  it can move to the resource files, as declarations or macros fed with
+  SIGEL's values, so that the look of the export can be changed in POV-Ray
+  text alone.
+
 ---
 
 ## 5 · MetaGP
