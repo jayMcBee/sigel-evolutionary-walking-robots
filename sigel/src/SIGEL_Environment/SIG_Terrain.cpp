@@ -69,7 +69,7 @@ bool SIGEL_Environment::SIG_Terrain::setFromFunction( const QString &function, i
   FunctionParser fp;
   if ( fp.Parse( function.toUtf8().constData(), "xz" ) != -1 )
     {
-      SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain function could not be parsed. It must depend on x and z, and contain only valid expressions -- see the documentation in supportingLibs/fparser." << Qt::endl;
+      SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain function could not be parsed. It must depend on x and z, and contain only valid expressions." << Qt::endl;
       return false;
     }
 
