@@ -80,169 +80,169 @@
 
   void SIG_SimulationVisualisationWidget::setShowAncorPoints( int state )
   {
-    if (visualisation)
-      {
-	SIGEL_Visualisation::SIG_SimulationVisualisation *simulationVisualisation =
-	  static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation* >( visualisation );
+    if (!visualisation)
+      return;
 
-	if (state > 0)
-	  simulationVisualisation->setPointsVisible( true );
-	else
-	  simulationVisualisation->setPointsVisible( false );
+    SIGEL_Visualisation::SIG_SimulationVisualisation *simulationVisualisation =
+      static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation* >( visualisation );
 
-	SIG_VisualisationWidget::setShowAncorPoints( state );
-      };
+    if (state > 0)
+      simulationVisualisation->setPointsVisible( true );
+    else
+      simulationVisualisation->setPointsVisible( false );
+
+    SIG_VisualisationWidget::setShowAncorPoints( state );
   }
 
   void SIG_SimulationVisualisationWidget::choosePlaneColor()
   {
-    if (visualisation)
+    if (!visualisation)
+      return;
+
+    SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation = static_cast<SIGEL_Visualisation::SIG_SimulationVisualisation&>(*visualisation);
+
+    QColor newPlaneColor = QColorDialog::getColor( planeColor, this );
+
+    if (newPlaneColor.isValid())
       {
-	SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation = static_cast<SIGEL_Visualisation::SIG_SimulationVisualisation&>(*visualisation);
+        planeColor = newPlaneColor;
+        simulationVisualisation.setPlaneColor( planeColor );
+        emit signalPlaneColorChanged( planeColor );
 
-	QColor newPlaneColor = QColorDialog::getColor( planeColor, this );
-
-	if (newPlaneColor.isValid())
-	  {
-	    planeColor = newPlaneColor;
-	    simulationVisualisation.setPlaneColor( planeColor );
-	    emit signalPlaneColorChanged( planeColor );
-
-	    if (automaticRefresh)
-	      update();
-	  };
+        if (automaticRefresh)
+          update();
       };
   }
 
   void SIG_SimulationVisualisationWidget::chooseGridColor()
   {
-    if (visualisation)
+    if (!visualisation)
+      return;
+
+    SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation = static_cast<SIGEL_Visualisation::SIG_SimulationVisualisation&>(*visualisation);
+
+    QColor newGridColor = QColorDialog::getColor( gridColor, this );
+
+    if (newGridColor.isValid())
       {
-	SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation = static_cast<SIGEL_Visualisation::SIG_SimulationVisualisation&>(*visualisation);
+        gridColor = newGridColor;
+        simulationVisualisation.setGridColor( gridColor );
+        emit signalGridColorChanged( gridColor );
 
-	QColor newGridColor = QColorDialog::getColor( gridColor, this );
-
-	if (newGridColor.isValid())
-	  {
-	    gridColor = newGridColor;
-	    simulationVisualisation.setGridColor( gridColor );
-	    emit signalGridColorChanged( gridColor );
-
-	    if (automaticRefresh)
-	      update();
-	  };
+        if (automaticRefresh)
+          update();
       };
   }
 
   void SIG_SimulationVisualisationWidget::setShowPlane( int state )
   {
-    if (visualisation)
+    if (!visualisation)
+      return;
+
+    SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
+      static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
+
+    switch (state)
       {
-	SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
-	  static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
-
-	switch (state)
-	  {
-	  case 0:
-	    simulationVisualisation.setShowPlane( false );
-	    break;
-	  case 2:
-	    simulationVisualisation.setShowPlane( true );
-	    break;
-	  };
-
-	if (automaticRefresh)
-	  update();
+      case 0:
+        simulationVisualisation.setShowPlane( false );
+        break;
+      case 2:
+        simulationVisualisation.setShowPlane( true );
+        break;
       };
+
+    if (automaticRefresh)
+      update();
   }
 
   void SIG_SimulationVisualisationWidget::setShowGrid( int state )
   {
-    if (visualisation)
+    if (!visualisation)
+      return;
+
+    SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
+      static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
+
+    switch (state)
       {
-	SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
-	  static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
-
-	switch (state)
-	  {
-	  case 0:
-	    simulationVisualisation.setShowGrid( false );
-	    break;
-	  case 2:
-	    simulationVisualisation.setShowGrid( true );
-	    break;
-	  };
-
-	if (automaticRefresh)
-	  update();
+      case 0:
+        simulationVisualisation.setShowGrid( false );
+        break;
+      case 2:
+        simulationVisualisation.setShowGrid( true );
+        break;
       };
+
+    if (automaticRefresh)
+      update();
   }
 
   void SIG_SimulationVisualisationWidget::setShowRobotPath( int state )
   {
-    if (visualisation)
+    if (!visualisation)
+      return;
+
+    SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
+      static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
+
+    switch (state)
       {
-	SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
-	  static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
-
-	switch (state)
-	  {
-	  case 0:
-	    simulationVisualisation.setShowRobotPath( false );
-	    break;
-	  case 2:
-	    simulationVisualisation.setShowRobotPath( true );
-	    break;
-	  };
-
-	if (automaticRefresh)
-	  update();
+      case 0:
+        simulationVisualisation.setShowRobotPath( false );
+        break;
+      case 2:
+        simulationVisualisation.setShowRobotPath( true );
+        break;
       };
+
+    if (automaticRefresh)
+      update();
   }
 
   void SIG_SimulationVisualisationWidget::setShowShadows( bool show )
   {
-    if (visualisation)
-      {
-	static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation* >( visualisation )->setShowShadows( show );
+    if (!visualisation)
+      return;
 
-	if (automaticRefresh)
-	  update();
-      };
+    static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation* >( visualisation )->setShowShadows( show );
+
+    if (automaticRefresh)
+      update();
   }
 
 	void SIG_SimulationVisualisationWidget::makeTimeSteps( int noOfSteps )
 	{
-		if ( visualisation )
+		if ( !visualisation )
+			return;
+
+		SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
+			static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
+
+		try
 		{
-			SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
-				static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
-
-			try
-			{
-				simulationVisualisation.makeTimeSteps( noOfSteps );
-			}
-			catch ( SIGEL_Tools::SIG_Exception &e )
-			{
-				if ( simulationRunning() )
-				{
-					slotStartSimulation();
-					emit signalSimulationAbort();
-				}
-
-				QMessageBox::warning( this, "Simulation Exception", e.getMessage() );
-			}
-
-			emit signalSimulationProgress( simulationVisualisation.getCurrentSimulationSeconds() );
-
-			if ( traceRobot )
-				moveLookPointTowardsRobot( simulationVisualisation, noOfSteps * simulationParameters->getStepSize() );
-
-			double seconds = simulationVisualisation.getCurrentSimulationSeconds();
-
-			if ( movieRecorder.needsToRecordFrameAt( seconds ) )
-				recordFrame( simulationVisualisation, seconds );
+			simulationVisualisation.makeTimeSteps( noOfSteps );
 		}
+		catch ( SIGEL_Tools::SIG_Exception &e )
+		{
+			if ( simulationRunning() )
+			{
+				slotStartSimulation();
+				emit signalSimulationAbort();
+			}
+
+			QMessageBox::warning( this, "Simulation Exception", e.getMessage() );
+		}
+
+		emit signalSimulationProgress( simulationVisualisation.getCurrentSimulationSeconds() );
+
+		if ( traceRobot )
+			moveLookPointTowardsRobot( simulationVisualisation, noOfSteps * simulationParameters->getStepSize() );
+
+		double seconds = simulationVisualisation.getCurrentSimulationSeconds();
+
+		if ( movieRecorder.needsToRecordFrameAt( seconds ) )
+			recordFrame( simulationVisualisation, seconds );
 	}
 
 	void SIG_SimulationVisualisationWidget::moveLookPointTowardsRobot( SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation, double elapsedSeconds )
@@ -463,134 +463,134 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 
   void SIG_SimulationVisualisationWidget::slotNavigateForward()
   {
-    if (visualisation)
-      {
-	// distance regulates how much a click in this control moves us in 3d space
-	double const distance = 0.1;
+    if (!visualisation)
+      return;
 
-	double actXPos = visualisation->viewSettings.lookPoint.get( 0 );
-	double actZPos = visualisation->viewSettings.lookPoint.get( 2 );
+    // distance regulates how much a click in this control moves us in 3d space
+    double const distance = 0.1;
 
-	double viewDirectionAngle = yaw + 180;
-	if (viewDirectionAngle > 360)
-	  viewDirectionAngle -= 360;
+    double actXPos = visualisation->viewSettings.lookPoint.get( 0 );
+    double actZPos = visualisation->viewSettings.lookPoint.get( 2 );
 
-	double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
+    double viewDirectionAngle = yaw + 180;
+    if (viewDirectionAngle > 360)
+      viewDirectionAngle -= 360;
 
-	double newXPos = actXPos + ( std::sin( radViewDirectionAngle ) * distance );
-	double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
+    double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
 
-	visualisation->viewSettings.lookPoint.set( 0 , newXPos );
-	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
+    double newXPos = actXPos + ( std::sin( radViewDirectionAngle ) * distance );
+    double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
 
-	if (automaticRefresh)
-	  update();
-      };
+    visualisation->viewSettings.lookPoint.set( 0 , newXPos );
+    visualisation->viewSettings.lookPoint.set( 2 , newZPos );
+
+    if (automaticRefresh)
+      update();
   }
 
   void SIG_SimulationVisualisationWidget::slotNavigateBackward()
   {
-    if (visualisation)
-      {
-	double const distance = 0.1;
+    if (!visualisation)
+      return;
 
-	double actXPos = visualisation->viewSettings.lookPoint.get( 0 );
-	double actZPos = visualisation->viewSettings.lookPoint.get( 2 );
+    double const distance = 0.1;
 
-	double radViewDirectionAngle = qDegreesToRadians( yaw );
+    double actXPos = visualisation->viewSettings.lookPoint.get( 0 );
+    double actZPos = visualisation->viewSettings.lookPoint.get( 2 );
 
-	double newXPos = actXPos + ( std::sin( radViewDirectionAngle ) * distance );
-	double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
+    double radViewDirectionAngle = qDegreesToRadians( yaw );
 
-	visualisation->viewSettings.lookPoint.set( 0 , newXPos );
-	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
+    double newXPos = actXPos + ( std::sin( radViewDirectionAngle ) * distance );
+    double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
 
-	if (automaticRefresh)
-	  update();
-      };
+    visualisation->viewSettings.lookPoint.set( 0 , newXPos );
+    visualisation->viewSettings.lookPoint.set( 2 , newZPos );
+
+    if (automaticRefresh)
+      update();
   }
 
   void SIG_SimulationVisualisationWidget::slotNavigateRight()
   {
-    if (visualisation)
-      {
-	double const distance = 0.1;
+    if (!visualisation)
+      return;
 
-	double actXPos = visualisation->viewSettings.lookPoint.get( 0 );
+    double const distance = 0.1;
 
-	double actZPos = visualisation->viewSettings.lookPoint.get( 2 );
+    double actXPos = visualisation->viewSettings.lookPoint.get( 0 );
 
-	double viewDirectionAngle = yaw + 90;
-	if (viewDirectionAngle > 360)
-	  viewDirectionAngle -= 360;
+    double actZPos = visualisation->viewSettings.lookPoint.get( 2 );
 
-	double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
+    double viewDirectionAngle = yaw + 90;
+    if (viewDirectionAngle > 360)
+      viewDirectionAngle -= 360;
 
-	double newXPos = actXPos + ( std::sin( radViewDirectionAngle ) * distance );
-	double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
+    double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
 
-	visualisation->viewSettings.lookPoint.set( 0 , newXPos );
-	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
+    double newXPos = actXPos + ( std::sin( radViewDirectionAngle ) * distance );
+    double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
 
-	if (automaticRefresh)
-	  update();
-      };
+    visualisation->viewSettings.lookPoint.set( 0 , newXPos );
+    visualisation->viewSettings.lookPoint.set( 2 , newZPos );
+
+    if (automaticRefresh)
+      update();
   }
 
   void SIG_SimulationVisualisationWidget::slotNavigateLeft()
   {
-    if (visualisation)
-      {
-	double const distance = 0.1;
+    if (!visualisation)
+      return;
 
-	double actXPos = visualisation->viewSettings.lookPoint.get( 0 );
-	double actZPos = visualisation->viewSettings.lookPoint.get( 2 );
+    double const distance = 0.1;
 
-	double viewDirectionAngle = yaw - 90;
-	if (viewDirectionAngle < 360)
-	  viewDirectionAngle += 360;
+    double actXPos = visualisation->viewSettings.lookPoint.get( 0 );
+    double actZPos = visualisation->viewSettings.lookPoint.get( 2 );
 
-	double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
+    double viewDirectionAngle = yaw - 90;
+    if (viewDirectionAngle < 360)
+      viewDirectionAngle += 360;
 
-	double newXPos = actXPos + ( std::sin( radViewDirectionAngle ) * distance );
-	double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
+    double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
 
-	visualisation->viewSettings.lookPoint.set( 0 , newXPos );
-	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
+    double newXPos = actXPos + ( std::sin( radViewDirectionAngle ) * distance );
+    double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
 
-	if (automaticRefresh)
-	  update();
-      };
+    visualisation->viewSettings.lookPoint.set( 0 , newXPos );
+    visualisation->viewSettings.lookPoint.set( 2 , newZPos );
+
+    if (automaticRefresh)
+      update();
   }
 
   void SIG_SimulationVisualisationWidget::slotNavigateDown()
   {
-    if (visualisation)
-      {
-	double const distance = 0.1;
+    if (!visualisation)
+      return;
 
-	double actHeight = visualisation->viewSettings.lookPoint.get( 1 );
+    double const distance = 0.1;
 
-	visualisation->viewSettings.lookPoint.set( 1, actHeight - distance );
+    double actHeight = visualisation->viewSettings.lookPoint.get( 1 );
 
-	if (automaticRefresh)
-	  update();
-      };
+    visualisation->viewSettings.lookPoint.set( 1, actHeight - distance );
+
+    if (automaticRefresh)
+      update();
   }
 
   void SIG_SimulationVisualisationWidget::slotNavigateUp()
   {
-    if (visualisation)
-      {
-	double const distance = 0.1;
+    if (!visualisation)
+      return;
 
-	double actHeight = visualisation->viewSettings.lookPoint.get( 1 );
+    double const distance = 0.1;
 
-	visualisation->viewSettings.lookPoint.set( 1, actHeight + distance );
+    double actHeight = visualisation->viewSettings.lookPoint.get( 1 );
 
-	if (automaticRefresh)
-	  update();
-      };
+    visualisation->viewSettings.lookPoint.set( 1, actHeight + distance );
+
+    if (automaticRefresh)
+      update();
   }
 
   bool SIG_SimulationVisualisationWidget::canShowShadows() const
@@ -620,19 +620,19 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 
   void SIG_SimulationVisualisationWidget::slotNavigateCenter()
   {
-    if (visualisation)
-      {
-	SIGEL_Visualisation::SIG_SimulationVisualisation *simulationVisualisation =
-	  static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation* >( visualisation );
+    if (!visualisation)
+      return;
 
-	SIG_Vector robotCentre = simulationVisualisation->getRobotCentre();
-	simulationVisualisation->viewSettings.lookPoint.assign( &robotCentre );
-	lastRobotCentre.assign( &robotCentre );
-	smoothedVelocity = SIG_Vector( 0.0, 0.0, 0.0 );
+    SIGEL_Visualisation::SIG_SimulationVisualisation *simulationVisualisation =
+      static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation* >( visualisation );
 
-	if (automaticRefresh)
-	  update();
-      };
+    SIG_Vector robotCentre = simulationVisualisation->getRobotCentre();
+    simulationVisualisation->viewSettings.lookPoint.assign( &robotCentre );
+    lastRobotCentre.assign( &robotCentre );
+    smoothedVelocity = SIG_Vector( 0.0, 0.0, 0.0 );
+
+    if (automaticRefresh)
+      update();
   }
 
   void SIG_SimulationVisualisationWidget::slotAlterMovieSettingsClicked()
@@ -684,12 +684,12 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
   {
     SIG_VisualisationWidget::paintGL();
 
-    if (visualisation)
-      {
-	// The look point lags behind the robot while it follows it.
-	if (traceRobot)
-	  emit signalPosition( static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation* >( visualisation )->getRobotCentre() );
-	else
-	  emit signalPosition( visualisation->viewSettings.lookPoint );
-      };
+    if (!visualisation)
+      return;
+
+    // The look point lags behind the robot while it follows it.
+    if (traceRobot)
+      emit signalPosition( static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation* >( visualisation )->getRobotCentre() );
+    else
+      emit signalPosition( visualisation->viewSettings.lookPoint );
   }
