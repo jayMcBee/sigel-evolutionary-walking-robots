@@ -2604,40 +2604,40 @@ Do you want to replace it?]
 == POV EXPORT ==
 steps=120
 files=34
-  sigel_pic.inc bytes=7522 sha256=0d1b119e5d62ed8110d546a7590fb211dba7fd42fbe1066ed9fc79659fa657bc
+  sigel_pic.inc bytes=7973 sha256=4b3eec6fe7af76292756bef725ef7ada21d029dfa34a7291b8d6f6de06c70f74
   sigel_pic.ini bytes=239 sha256=266cfa9ead444d714439367a5ae4a4512658a4fc58e746cea9c0d337b812bf1f
   sigel_pic.pov bytes=82 sha256=9e045ec4be1f3153f7e12b4a41f968fb371a35d5355adbeeed9da856742bc192
-  sigel_pic0000.pov bytes=1064 sha256=209278ec5d2829f478f4ea44b65470c6dabc84a67d8b3b0cf6b04c10936e0ed0
-  sigel_pic0001.pov bytes=1075 sha256=58cf5836ebc4512c625e9456de31a86091afe0d28a2a08dd22bb03bb08e092a9
-  sigel_pic0002.pov bytes=1101 sha256=7aba5c26e1b3eca4e65f4c884121583d415a7c4ebda8075bd9a6ec84bd508382
-  sigel_pic0003.pov bytes=1100 sha256=eb71415d77b1190d327245433180fea798d4e1142add94fd87fc5b408f0de311
-  sigel_pic0004.pov bytes=1088 sha256=951bcd87ff02712cd3d8631c3f0f4ea8a112d6beb9ecbce7bc373b60bbedf905
-  sigel_pic0005.pov bytes=1091 sha256=21eae604d5c50a9c5e35f66e4fea5a4325642251416409d389f7351d6bc839c1
-  sigel_pic0006.pov bytes=1088 sha256=1e2ef3fd32603e063fa4f94c451997141e4bee22969060848a218c2c0e5b2fc1
-  sigel_pic0007.pov bytes=1088 sha256=dcd477ae0d4adfad5adb41cb0f9f8be911ffc3e6076ea66cd4fb89f4e899b83c
-  sigel_pic0008.pov bytes=1088 sha256=0abecceddb69cf9dc2cdb02b3419b0fb1cedc2ecce33ce57561212b6385e5c9e
-  sigel_pic0009.pov bytes=1094 sha256=b0772eb78522685b02e356036b720838edab7f1fbfffaf7aaf6784324d0d6db1
-  sigel_pic0010.pov bytes=1092 sha256=82027f8c90a9f5c079f41356208ac0799933d24a8a1a76b7636cce901fb76fe1
-  sigel_pic0011.pov bytes=1095 sha256=23233fd22ae818011bdcdd3ef9cc44c9d6cea6fe967453d75ceb6c172936167f
-  sigel_pic0012.pov bytes=1093 sha256=6479fe7dce689b5424f8b54b7f152ef622f00f3018fa014ae7a729c37b7740f7
-  sigel_pic0013.pov bytes=1261 sha256=d87097fcf57ce17613fd3ec8bef834499cdcb3d98481d01642199c601c445f99
-  sigel_pic0014.pov bytes=1253 sha256=bfd29009cdc564f4a4b1445da98b3bb17aec584da0d6015f08bde8e2a2b78b97
-  sigel_pic0015.pov bytes=1256 sha256=3230c75571bde89c45241c8c239591b81d41b493ddc603d93749aefe694e2d46
-  sigel_pic0016.pov bytes=1262 sha256=653a77a4a6ce71c8892eec494983b28744a3ec0b45c74aa78d91ee735862904f
-  sigel_pic0017.pov bytes=1268 sha256=80a4f85fef35e063c2f4a004b908e1556c7f385becdc09a1939bf5a1fb78340e
-  sigel_pic0018.pov bytes=1260 sha256=0b9d94d87a0976750e5270e0204b7f24a729dab4cf59f9cd6def1c27e25e7dbb
-  sigel_pic0019.pov bytes=1260 sha256=47be609030eab93717850eabfd6be0cb272a6162cbbab221043183c761639484
-  sigel_pic0020.pov bytes=1270 sha256=c16b93c08f1b146c97a33fc46fb434fc3129afa4231b67cad1e8d707c681a194
-  sigel_pic0021.pov bytes=1262 sha256=e186da32419c7a98b95f818b1abf8028d739f5b84588716841017e9b3ba6a526
-  sigel_pic0022.pov bytes=1265 sha256=0a4b292e579a3341772f60d8554f1af43c7743d71eaaf59e802f7180100c9c40
-  sigel_pic0023.pov bytes=1261 sha256=d3ff02a3e6fb8280b8e65edd7e3e4c8b322542ce83d75f400828fdd900b36045
-  sigel_pic0024.pov bytes=1262 sha256=cd43181ec9d1cf01f3ca75f21ee5d3bc3b83ac921aa21e141309a483bb719bcc
-  sigel_pic0025.pov bytes=1255 sha256=ed617bb6cd4b197031ac9dcac590f3334e9f70aa6007052ad0ec0fe8be457c08
-  sigel_pic0026.pov bytes=1418 sha256=e8b7062cffe245b61a2526f5a808303d1648e2dac4e976252115b44c045c23b3
-  sigel_pic0027.pov bytes=1423 sha256=40c0d4228ce682ff9fe7b369cdc9a514e07c00c2efa424ab3ac076347b002f91
-  sigel_pic0028.pov bytes=1418 sha256=40569e4c4f0c76056d3a1e8e9515ab720164868ea707ca5d80c8bc8676f46186
-  sigel_pic0029.pov bytes=1422 sha256=c133fe50d77a8d1f08a0a43cc851914ca0269c3491cd831c994e2edea8ed0851
-  sigel_pic0030.pov bytes=1428 sha256=14e71a8f8cf86967dcf3bef8ddaeebb37bf1aafb2f9a69692ea2d626060b6491
+  sigel_pic0000.pov bytes=978 sha256=cd0786253c232274d1c4786d0c14ada309c021fafb9bd482f36cf5531a8d4dc7
+  sigel_pic0001.pov bytes=989 sha256=495f4c3cf13aaaf8f58daac827c0ee2c0dce5b9a0124492bf858083d3ca9f42c
+  sigel_pic0002.pov bytes=1015 sha256=7f6369e495e5788f54d96d4f2568a0f5fc1849a1467f1147705ad66cb48398d8
+  sigel_pic0003.pov bytes=1014 sha256=a02e8a58b04a4e676b65a38a8cf7d1897cc5c0c88fa11621d8af44ea3b9846e2
+  sigel_pic0004.pov bytes=1002 sha256=43fdbaa8113e656ccebee965cf71a2ff89bfdfdbbf103fd3e2624ab61e011f33
+  sigel_pic0005.pov bytes=1005 sha256=f5c471094c45abc400d36844eb229b23a55ac1114e9d22425c17b9180d9d1913
+  sigel_pic0006.pov bytes=1002 sha256=def059a21a5572e189cd6a36ff9ffb1b2c45cbee4674bccafdf20d43a0388a17
+  sigel_pic0007.pov bytes=1002 sha256=8c55d99afef7487da17b7e109490a40a098984de6feb57de7bb9a345022ab0e4
+  sigel_pic0008.pov bytes=1002 sha256=0b6a7fdf7ca9e0d93df71977a98ec444eca817a8e2a38aaa25093afce0b632f9
+  sigel_pic0009.pov bytes=1008 sha256=149744edea04df49570d07c7a642cb3224e96f13f804f33784f8b646c712262f
+  sigel_pic0010.pov bytes=1006 sha256=62772726cefa3ad172099b7f4d352824f34e4b63784cb980c0090d6bb5c94156
+  sigel_pic0011.pov bytes=1009 sha256=d44e266145199f325de85990e2a3b74ef5fcd35d25e4f51daba78601f3c69209
+  sigel_pic0012.pov bytes=1007 sha256=064438809150b303fca11810b17e0d81a4713eb624701d103d2d2a13f6165996
+  sigel_pic0013.pov bytes=1102 sha256=78ef39ce89686bac6486f9979828b9239a99b3a9f60028e45fe526c9ceeef8ca
+  sigel_pic0014.pov bytes=1094 sha256=7256445e320373a0c3f3dbf4ca54fb7dcf23a9c2ef6d53d69c72b1888511f1d3
+  sigel_pic0015.pov bytes=1097 sha256=a13cda32e3c1a82dcd9bcf921f141aa9af3062e7223dea4f815894909258c981
+  sigel_pic0016.pov bytes=1103 sha256=fd8b755f5038191b7afa55898dfe77681a6944b6a4a894bb8a741198e0970c7d
+  sigel_pic0017.pov bytes=1109 sha256=b2431d2f173aec3e4360355889a10db0e93119dff58597ad9a66f0f8bda29b68
+  sigel_pic0018.pov bytes=1101 sha256=ed6cd24a7c7af2cd863988c90104028ba8bd0f75f70fd9a7163c654a9814ee00
+  sigel_pic0019.pov bytes=1101 sha256=75ded8425067f387a9e97de42541adb01a2636cdfbc6a8c3b83241724a021a7a
+  sigel_pic0020.pov bytes=1111 sha256=d35f05bd29376f954b97f44a5f145e3451160bcb3dbdfa1c4703ed0ce81e1ed7
+  sigel_pic0021.pov bytes=1103 sha256=85cadfc0629533cbcde4444040497d40ab36051fb7f6706ac55abfb56fdfc9b6
+  sigel_pic0022.pov bytes=1106 sha256=06f977f76ed415ecd7fe11363f2e3e93a547093df98101a56eda7b13283167f6
+  sigel_pic0023.pov bytes=1102 sha256=a32d7e0644a60de8d0efac689c177d397400b261861a93a3af0085cf618dbb6b
+  sigel_pic0024.pov bytes=1103 sha256=65cf1126c7b3f32bd8193aee47d6c9d53e7a3b8c1f6774de1ab9e9a11bee3854
+  sigel_pic0025.pov bytes=1096 sha256=15c7f6c7e0afa59cd01fed2284ccc1846dee6aa221f43a6ad4d4127531c02b39
+  sigel_pic0026.pov bytes=1186 sha256=a249e1ddaf6ea3d40e5fe42288494a577f9d3cff90af44b786adc118bcab40da
+  sigel_pic0027.pov bytes=1191 sha256=ef2417f9400c2f086f8d04b3fc6a5db396fa725e6659085d4bef7a906cdd5aed
+  sigel_pic0028.pov bytes=1186 sha256=9c45ace9f7de7270e3992496d6aebe972ef3249809276ce1e553b20377b64734
+  sigel_pic0029.pov bytes=1190 sha256=0a39623d71f80a48920ae64bd55493f8c61cfb6c709d587ec1bc0fc9b4cf0841
+  sigel_pic0030.pov bytes=1196 sha256=8c7376942ec7e198102d925db47cf355f4f9560d7f6e7d4e3cede0c2c7390606
 
 == sigel_pic0030.pov ==
   #version 3.7;
@@ -2676,18 +2676,8 @@ files=34
     translate <0, 0, 0>
   }
   
-  cylinder {
-    <7.8786e-11, 0.99968, -1.7663e-11>, <0.00010962, 0.99241, 1.6028e-05>, 0.0165831
-    open
-    pigment { srgb <1,1,0> }
-    finish { ambient 0 diffuse 1 }
-  }
-  cylinder {
-    <0.00010962, 0.99241, 1.6028e-05>, <0.0015463, 1.0747, 2.1893e-05>, 0.0165831
-    open
-    pigment { srgb <1,1,0> }
-    finish { ambient 0 diffuse 1 }
-  }
+  sigelPathSegment( <7.8786e-11, 0.99968, -1.7663e-11>, <0.00010962, 0.99241, 1.6028e-05> )
+  sigelPathSegment( <0.00010962, 0.99241, 1.6028e-05>, <0.0015463, 1.0747, 2.1893e-05> )
   
   object {
     base1
@@ -2707,13 +2697,7 @@ files=34
     translate <1.0002, 0.9682, 2.2148e-05>
   }
   
-  camera {
-    right x*image_width/image_height
-    up y
-    direction cameraDirection
-    location <0.93387, 7.577, 3.7994>
-    look_at <1.0002, 0.99517, 1.9692e-05>
-  }
+  sigelCamera( <0.93387, 7.577, 3.7994>, <1.0002, 0.99517, 1.9692e-05> )
   
 
 == sigel_pic.inc, triangles and cylinders counted ==
@@ -2764,7 +2748,19 @@ files=34
     }
   #end
   
+  // An anchor point: a sphere in the colour of its link, darker by 0.3.
+  #macro sigelAnchorPoint( position, linkColor )
+    sphere {
+      position, sigelAnchorPointRadius
+      texture {
+        pigment { srgb <max( linkColor.x - 0.3, 0 ), max( linkColor.y - 0.3, 0 ), max( linkColor.z - 0.3, 0 )> }
+        finish { sigelPaintFinish }
+      }
+    }
+  #end
+  
   #declare sigelPatternSize = 3.31662;
+  #declare sigelAnchorPointRadius = 0.0829156;
   
   #declare metal = sigelPaint( <0.012996, 0.012996, 0.233> )
   
@@ -2780,53 +2776,17 @@ files=34
     texture { metal  }
   }
   
-  #declare Base1AxisSuccNormal = sphere {
-    <2, 0, 0>, 0.0829156
-    texture {
-      pigment { srgb <0, 0, 0.2> }
-      finish { sigelPaintFinish }
-    }
-  }
+  #declare Base1AxisSuccNormal = sigelAnchorPoint( <2, 0, 0>, <0, 0, 0.5> )
   
-  #declare Base1AxisSuccBase = sphere {
-    <1, 0, 0>, 0.0829156
-    texture {
-      pigment { srgb <0, 0, 0.2> }
-      finish { sigelPaintFinish }
-    }
-  }
+  #declare Base1AxisSuccBase = sigelAnchorPoint( <1, 0, 0>, <0, 0, 0.5> )
   
-  #declare Base1AxisSuccDir = sphere {
-    <1, 0, 1>, 0.0829156
-    texture {
-      pigment { srgb <0, 0, 0.2> }
-      finish { sigelPaintFinish }
-    }
-  }
+  #declare Base1AxisSuccDir = sigelAnchorPoint( <1, 0, 1>, <0, 0, 0.5> )
   
-  #declare Base2AxisSuccNormal = sphere {
-    <-1, 0, 0>, 0.0829156
-    texture {
-      pigment { srgb <0, 0, 0.2> }
-      finish { sigelPaintFinish }
-    }
-  }
+  #declare Base2AxisSuccNormal = sigelAnchorPoint( <-1, 0, 0>, <0, 0, 0.5> )
   
-  #declare Base2AxisSuccBase = sphere {
-    <0, 0, 0>, 0.0829156
-    texture {
-      pigment { srgb <0, 0, 0.2> }
-      finish { sigelPaintFinish }
-    }
-  }
+  #declare Base2AxisSuccBase = sigelAnchorPoint( <0, 0, 0>, <0, 0, 0.5> )
   
-  #declare Base2AxisSuccDir = sphere {
-    <0, 0, 1>, 0.0829156
-    texture {
-      pigment { srgb <0, 0, 0.2> }
-      finish { sigelPaintFinish }
-    }
-  }
+  #declare Base2AxisSuccDir = sigelAnchorPoint( <0, 0, 1>, <0, 0, 0.5> )
   
   #declare cameraDirection = <0,0,0.866025>;
   #declare sigelSunPosition = <-486.66, 811.11, -324.44>;
@@ -2930,4 +2890,25 @@ files=34
     sigelGridLines( z )
     no_shadow
   }
+  
+  // The OpenGL renderer's camera: cameraDirection gives its vertical field of view.
+  #macro sigelCamera( eyePoint, lookPoint )
+    camera {
+      right x*image_width/image_height
+      up y
+      direction cameraDirection
+      location eyePoint
+      look_at lookPoint
+    }
+  #end
+  
+  // One piece of the robot's path, in the OpenGL renderer's yellow.
+  #macro sigelPathSegment( base, cap )
+    [1 cylinders]
+      base, cap, sigelLineRadius
+      open
+      pigment { srgb <1,1,0> }
+      finish { ambient 0 diffuse 1 }
+    }
+  #end
   
