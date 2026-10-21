@@ -51,24 +51,24 @@ namespace SIGEL_Visualisation
        * gouraudShaded.
        */
       enum renderModeType
-      { 
-	/**
-	 * Edges only, in each object's colour, without lighting.
-	 */
-	wireFrame,
-	/**
-	 * As wireFrame, but an edge behind a polygon is not drawn.
-	 */
-	hiddenLine,
-	/**
-	 * Filled, lit polygons; the lighting is the same across each polygon.
-	 */
-	flatShaded,
-	/**
-	 * As flatShaded, but the colour is blended across each polygon. Every vertex has its
-	 * polygon's normal, so the picture differs little from flatShaded.
-	 */
-	gouraudShaded
+      {
+        /**
+         * Edges only, in each object's colour, without lighting.
+         */
+        wireFrame,
+        /**
+         * As wireFrame, but an edge behind a polygon is not drawn.
+         */
+        hiddenLine,
+        /**
+         * Filled, lit polygons; the lighting is the same across each polygon.
+         */
+        flatShaded,
+        /**
+         * As flatShaded, but the colour is blended across each polygon. Every vertex has its
+         * polygon's normal, so the picture differs little from flatShaded.
+         */
+        gouraudShaded
       };
 
       /**
