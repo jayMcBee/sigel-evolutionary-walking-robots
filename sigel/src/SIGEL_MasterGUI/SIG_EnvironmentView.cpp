@@ -38,60 +38,60 @@
 namespace SIGEL_MasterGUI
 {
 
-/* 
- *  Constructs a SIG_Environment which is a child of 'parent', with the 
- *  name 'name' and widget flags set to 'f' 
+/*
+ *  Constructs a SIG_Environment which is a child of 'parent', with the
+ *  name 'name' and widget flags set to 'f'
  */
 SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
-  : SIG_EnvironmentBase( parent, name, fl ), theExperiment( theExperiment )
+	: SIG_EnvironmentBase( parent, name, fl ), theExperiment( theExperiment )
 {
-  // gravity validators
-  lineeditGravityX->setValidator( new QDoubleValidator( lineeditGravityX ) );
-  lineeditGravityY->setValidator( new QDoubleValidator( lineeditGravityY ) );
-  lineeditGravityZ->setValidator( new QDoubleValidator( lineeditGravityZ ) );
+	// gravity validators
+	lineeditGravityX->setValidator( new QDoubleValidator( lineeditGravityX ) );
+	lineeditGravityY->setValidator( new QDoubleValidator( lineeditGravityY ) );
+	lineeditGravityZ->setValidator( new QDoubleValidator( lineeditGravityZ ) );
 
-  // start position validators
-  lineeditStartPositionX->setValidator( new QDoubleValidator( lineeditStartPositionX ) );
-  lineeditStartPositionY->setValidator( new QDoubleValidator( lineeditStartPositionY ) );
-  lineeditStartPositionZ->setValidator( new QDoubleValidator( lineeditStartPositionZ ) );
+	// start position validators
+	lineeditStartPositionX->setValidator( new QDoubleValidator( lineeditStartPositionX ) );
+	lineeditStartPositionY->setValidator( new QDoubleValidator( lineeditStartPositionY ) );
+	lineeditStartPositionZ->setValidator( new QDoubleValidator( lineeditStartPositionZ ) );
 
-  // floor properties validators
+	// floor properties validators
 	lineeditXDim->setValidator(new QIntValidator(lineeditXDim ) );
 	lineeditZDim->setValidator(new QIntValidator(lineeditZDim ) );
-	
-  // validators for the dynaMechs lineedits
-  lineeditPlanarSpringConstant->setValidator( new QDoubleValidator(lineeditPlanarSpringConstant) );
-  lineeditNormalSpringConstant->setValidator( new QDoubleValidator(lineeditNormalSpringConstant) );
-  lineeditPlanarDamperConstant->setValidator( new QDoubleValidator(lineeditPlanarDamperConstant) );
-  lineeditNormalDamperConstant->setValidator( new QDoubleValidator(lineeditNormalDamperConstant) );
-  lineeditStaticFrictionCoefficient->setValidator( new QDoubleValidator(lineeditStaticFrictionCoefficient) );
-  lineeditKineticFrictionCoefficient->setValidator( new QDoubleValidator(lineeditKineticFrictionCoefficient) );
 
-  // The read-back is QString::toDouble(), which always wants '.'. The C locale
-  // alone still takes "0,375" as grouped, so the group separator is rejected.
-  QLocale cLocale = QLocale::c();
-  cLocale.setNumberOptions( QLocale::RejectGroupSeparator );
-  for ( QValidator *v : findChildren<QValidator *>() )
-    v->setLocale( cLocale );
+	// validators for the dynaMechs lineedits
+	lineeditPlanarSpringConstant->setValidator( new QDoubleValidator(lineeditPlanarSpringConstant) );
+	lineeditNormalSpringConstant->setValidator( new QDoubleValidator(lineeditNormalSpringConstant) );
+	lineeditPlanarDamperConstant->setValidator( new QDoubleValidator(lineeditPlanarDamperConstant) );
+	lineeditNormalDamperConstant->setValidator( new QDoubleValidator(lineeditNormalDamperConstant) );
+	lineeditStaticFrictionCoefficient->setValidator( new QDoubleValidator(lineeditStaticFrictionCoefficient) );
+	lineeditKineticFrictionCoefficient->setValidator( new QDoubleValidator(lineeditKineticFrictionCoefficient) );
 
-  QMenu *functionPresetMenu = new QMenu( pushbuttonFunctionPresets );
-  functionPresetMenu->addAction( "Ripples", this, [this]() { lineeditFunction->setText( "-sin(sqrt(x^2+z^2))" ); } );
-  // Not setMenu: its menu indicator is drawn smaller than the button's text.
-  connect( pushbuttonFunctionPresets, &QPushButton::clicked, this, [this, functionPresetMenu]()
-  {
-    functionPresetMenu->popup( pushbuttonFunctionPresets->mapToGlobal( QPoint( 0, pushbuttonFunctionPresets->height() ) ) );
-  } );
+	// The read-back is QString::toDouble(), which always wants '.'. The C locale
+	// alone still takes "0,375" as grouped, so the group separator is rejected.
+	QLocale cLocale = QLocale::c();
+	cLocale.setNumberOptions( QLocale::RejectGroupSeparator );
+	for ( QValidator *v : findChildren<QValidator *>() )
+		v->setLocale( cLocale );
+
+	QMenu *functionPresetMenu = new QMenu( pushbuttonFunctionPresets );
+	functionPresetMenu->addAction( "Ripples", this, [this]() { lineeditFunction->setText( "-sin(sqrt(x^2+z^2))" ); } );
+	// Not setMenu: its menu indicator is drawn smaller than the button's text.
+	connect( pushbuttonFunctionPresets, &QPushButton::clicked, this, [this, functionPresetMenu]()
+	{
+		functionPresetMenu->popup( pushbuttonFunctionPresets->mapToGlobal( QPoint( 0, pushbuttonFunctionPresets->height() ) ) );
+	} );
 }
 
 void SIG_EnvironmentView::putIntoExperiment()
 {
-  // put the gravity values out of the widgets into the experiment ( lineedits )
-  SIG_Vector gravityVector( lineeditGravityX->text().toDouble(),
-			   lineeditGravityY->text().toDouble(),
-			   lineeditGravityZ->text().toDouble() );
-  theExperiment.environment.setGravity( gravityVector );
+	// put the gravity values out of the widgets into the experiment ( lineedits )
+	SIG_Vector gravityVector( lineeditGravityX->text().toDouble(),
+	                          lineeditGravityY->text().toDouble(),
+	                          lineeditGravityZ->text().toDouble() );
+	theExperiment.environment.setGravity( gravityVector );
 
-  // floor parameters of the dynaMechs Environment
+	// floor parameters of the dynaMechs Environment
 	theExperiment.environment.setFloorDimensionX(lineeditXDim->text().toInt());
 	theExperiment.environment.setFloorDimensionZ(lineeditZDim->text().toInt());
 	theExperiment.environment.setFloorFunction(lineeditFunction->text());
@@ -99,120 +99,133 @@ void SIG_EnvironmentView::putIntoExperiment()
 	theExperiment.environment.setTextureFile(lineeditTextureFile->text());
 	theExperiment.environment.setTexAlpha(sliderAlpha->value());
 
-  SIG_Vector startPositionVector( lineeditStartPositionX->text().toDouble(),
-				 lineeditStartPositionY->text().toDouble(),
-				 lineeditStartPositionZ->text().toDouble() );
-  theExperiment.environment.setStartPosition( startPositionVector );
+	SIG_Vector startPositionVector( lineeditStartPositionX->text().toDouble(),
+	                                lineeditStartPositionY->text().toDouble(),
+	                                lineeditStartPositionZ->text().toDouble() );
+	theExperiment.environment.setStartPosition( startPositionVector );
 
-  // put the dynaMechs values into the experiment
-  theExperiment.environment.setGroundPlanarSpringConstant( lineeditPlanarSpringConstant->text().toDouble() );
-  theExperiment.environment.setGroundNormalSpringConstant( lineeditNormalSpringConstant->text().toDouble() );
-  theExperiment.environment.setGroundPlanarDamperConstant( lineeditPlanarDamperConstant->text().toDouble() );
-  theExperiment.environment.setGroundNormalDamperConstant( lineeditNormalDamperConstant->text().toDouble() );
-  theExperiment.environment.setFrictionCoeff_u_s( lineeditStaticFrictionCoefficient->text().toDouble() );
-  theExperiment.environment.setFrictionCoeff_u_k( lineeditKineticFrictionCoefficient->text().toDouble() );
+	// put the dynaMechs values into the experiment
+	theExperiment.environment.setGroundPlanarSpringConstant( lineeditPlanarSpringConstant->text().toDouble() );
+	theExperiment.environment.setGroundNormalSpringConstant( lineeditNormalSpringConstant->text().toDouble() );
+	theExperiment.environment.setGroundPlanarDamperConstant( lineeditPlanarDamperConstant->text().toDouble() );
+	theExperiment.environment.setGroundNormalDamperConstant( lineeditNormalDamperConstant->text().toDouble() );
+	theExperiment.environment.setFrictionCoeff_u_s( lineeditStaticFrictionCoefficient->text().toDouble() );
+	theExperiment.environment.setFrictionCoeff_u_k( lineeditKineticFrictionCoefficient->text().toDouble() );
 }
 
 void SIG_EnvironmentView::getOutOfExperiment()
 {
-  // set the gravity vector according to the experiment (three lineedits)
-  SIG_Vector gravityVector = theExperiment.environment.getGravity();
-  lineeditGravityX->setText( QString::number( gravityVector.x) );
-  lineeditGravityY->setText( QString::number( gravityVector.y) );
-  lineeditGravityZ->setText( QString::number( gravityVector.z) );
+	// set the gravity vector according to the experiment (three lineedits)
+	SIG_Vector gravityVector = theExperiment.environment.getGravity();
+	lineeditGravityX->setText( QString::number( gravityVector.x) );
+	lineeditGravityY->setText( QString::number( gravityVector.y) );
+	lineeditGravityZ->setText( QString::number( gravityVector.z) );
 
-  // get the start position
-  SIG_Vector startPositionVector = theExperiment.environment.getStartPosition();
-  lineeditStartPositionX->setText( QString::number( startPositionVector.x ) );
-  lineeditStartPositionY->setText( QString::number( startPositionVector.y ) );
-  lineeditStartPositionZ->setText( QString::number( startPositionVector.z ) );
+	// get the start position
+	SIG_Vector startPositionVector = theExperiment.environment.getStartPosition();
+	lineeditStartPositionX->setText( QString::number( startPositionVector.x ) );
+	lineeditStartPositionY->setText( QString::number( startPositionVector.y ) );
+	lineeditStartPositionZ->setText( QString::number( startPositionVector.z ) );
 
-  // get the floor properties
-  lineeditXDim->setText( QString::number( theExperiment.environment.getFloorDimensionX() ) );
-  lineeditZDim->setText( QString::number( theExperiment.environment.getFloorDimensionZ() ) );
-  lineeditFunction->setText( theExperiment.environment.getFloorFunction() );
-  lineeditPictureFile->setText( theExperiment.environment.getFloorPictureFile() );
-  lineeditTextureFile->setText(theExperiment.environment.getTextureFile());
+	// get the floor properties
+	lineeditXDim->setText( QString::number( theExperiment.environment.getFloorDimensionX() ) );
+	lineeditZDim->setText( QString::number( theExperiment.environment.getFloorDimensionZ() ) );
+	lineeditFunction->setText( theExperiment.environment.getFloorFunction() );
+	lineeditPictureFile->setText( theExperiment.environment.getFloorPictureFile() );
+	lineeditTextureFile->setText(theExperiment.environment.getTextureFile());
 	sliderAlpha->setValue(theExperiment.environment.getTexAlpha());
 	checkboxTextureFile->setChecked(theExperiment.environment.getWithTexture());
 	this->slotTextureSelect();
-  radiobuttonFunction->setChecked(theExperiment.environment.getFloorFuncSelected());
-  radiobuttonPictureFile->setChecked(!theExperiment.environment.getFloorFuncSelected());
-  this->slotFloorSelectionChanged();
-	
-  // get the dynaMechs values
-  lineeditPlanarSpringConstant->setText( QString::number( theExperiment.environment.getGroundPlanarSpringConstant() ) );
-  lineeditNormalSpringConstant->setText( QString::number( theExperiment.environment.getGroundNormalSpringConstant() ) );
-  lineeditPlanarDamperConstant->setText( QString::number( theExperiment.environment.getGroundPlanarDamperConstant() ) );
-  lineeditNormalDamperConstant->setText( QString::number( theExperiment.environment.getGroundNormalDamperConstant() ) );
-  lineeditStaticFrictionCoefficient->setText( QString::number( theExperiment.environment.getFrictionCoeff_u_s() ) );
-  lineeditKineticFrictionCoefficient->setText( QString::number( theExperiment.environment.getFrictionCoeff_u_k() ) );
+	radiobuttonFunction->setChecked(theExperiment.environment.getFloorFuncSelected());
+	radiobuttonPictureFile->setChecked(!theExperiment.environment.getFloorFuncSelected());
+	this->slotFloorSelectionChanged();
+
+	// get the dynaMechs values
+	lineeditPlanarSpringConstant->setText( QString::number( theExperiment.environment.getGroundPlanarSpringConstant() ) );
+	lineeditNormalSpringConstant->setText( QString::number( theExperiment.environment.getGroundNormalSpringConstant() ) );
+	lineeditPlanarDamperConstant->setText( QString::number( theExperiment.environment.getGroundPlanarDamperConstant() ) );
+	lineeditNormalDamperConstant->setText( QString::number( theExperiment.environment.getGroundNormalDamperConstant() ) );
+	lineeditStaticFrictionCoefficient->setText( QString::number( theExperiment.environment.getFrictionCoeff_u_s() ) );
+	lineeditKineticFrictionCoefficient->setText( QString::number( theExperiment.environment.getFrictionCoeff_u_k() ) );
 }
-	
-	void SIG_EnvironmentView::slotFloorSelectionChanged() {
-		if (radiobuttonFunction->isChecked()) {
-			lineeditFunction->setEnabled(true);
-			pushbuttonFunctionPresets->setEnabled(true);
-			lineeditXDim->setEnabled(true);
-			lineeditZDim->setEnabled(true);
-			pushbuttonCenterOnTerrain->setEnabled(true);
-			lineeditPictureFile->setDisabled(true);
-			pushbuttonSelectFile->setDisabled(true);
-			theExperiment.environment.setFloorFuncSelected(true);
-		}
-		else { // picture-file selected
-			lineeditPictureFile->setEnabled(true);
-			pushbuttonSelectFile->setEnabled(true);
-			lineeditFunction->setDisabled(true);
-			pushbuttonFunctionPresets->setDisabled(true);
-			lineeditXDim->setDisabled(true);
-			lineeditZDim->setDisabled(true);
-			// The picture file sets the floor's size, not the X and Z fields.
-			pushbuttonCenterOnTerrain->setDisabled(true);
-			theExperiment.environment.setFloorFuncSelected(false);
-		}
+
+void SIG_EnvironmentView::slotFloorSelectionChanged()
+{
+	if (radiobuttonFunction->isChecked())
+	{
+		lineeditFunction->setEnabled(true);
+		pushbuttonFunctionPresets->setEnabled(true);
+		lineeditXDim->setEnabled(true);
+		lineeditZDim->setEnabled(true);
+		pushbuttonCenterOnTerrain->setEnabled(true);
+		lineeditPictureFile->setDisabled(true);
+		pushbuttonSelectFile->setDisabled(true);
+		theExperiment.environment.setFloorFuncSelected(true);
 	}
-	
-	void SIG_EnvironmentView::slotCenterOnTerrain() {
-		// The floor's grid points are 1 apart and start at 0, so a floor of
-		// X points ends at X - 1.
-		lineeditStartPositionX->setText( QString::number( ( lineeditXDim->text().toInt() - 1 ) / 2.0 ) );
-		lineeditStartPositionZ->setText( QString::number( ( lineeditZDim->text().toInt() - 1 ) / 2.0 ) );
+	else
+	{
+		// picture-file selected
+		lineeditPictureFile->setEnabled(true);
+		pushbuttonSelectFile->setEnabled(true);
+		lineeditFunction->setDisabled(true);
+		pushbuttonFunctionPresets->setDisabled(true);
+		lineeditXDim->setDisabled(true);
+		lineeditZDim->setDisabled(true);
+		// The picture file sets the floor's size, not the X and Z fields.
+		pushbuttonCenterOnTerrain->setDisabled(true);
+		theExperiment.environment.setFloorFuncSelected(false);
 	}
-	
-	void SIG_EnvironmentView::slotSelectFile() {
-		QString picFile = QFileDialog::getOpenFileName( this, QString(), theExperiment.environment.getFloorPictureFile(), "Portable Greymap (*.pnm *.pgm)" );
-		if (!picFile.isEmpty()) {
-			lineeditPictureFile->setText(picFile);
-			this->putIntoExperiment();
-		}
-	}
-	
-  void SIG_EnvironmentView::slotSelectTextureFile() {
-  QString texFile = QFileDialog::getOpenFileName( this, QString(), theExperiment.environment.getTextureFile(), "Images (*.png *.jpg *.jpeg *.pnm *.ppm)" );
-		if (!texFile.isEmpty()) {
-			lineeditTextureFile->setText(texFile);
-			this->putIntoExperiment();
-		}
-  }
-  	
-	void SIG_EnvironmentView::slotAlpha() {
+}
+
+void SIG_EnvironmentView::slotCenterOnTerrain()
+{
+	// The floor's grid points are 1 apart and start at 0, so a floor of
+	// X points ends at X - 1.
+	lineeditStartPositionX->setText( QString::number( ( lineeditXDim->text().toInt() - 1 ) / 2.0 ) );
+	lineeditStartPositionZ->setText( QString::number( ( lineeditZDim->text().toInt() - 1 ) / 2.0 ) );
+}
+
+void SIG_EnvironmentView::slotSelectFile()
+{
+	QString picFile = QFileDialog::getOpenFileName( this, QString(), theExperiment.environment.getFloorPictureFile(), "Portable Greymap (*.pnm *.pgm)" );
+	if (!picFile.isEmpty())
+	{
+		lineeditPictureFile->setText(picFile);
 		this->putIntoExperiment();
 	}
-	
-	void SIG_EnvironmentView::slotTextureSelect() {
-		if (checkboxTextureFile->isChecked()) {
-			lineeditTextureFile->setEnabled(true);
-			pushbuttonSelectTextureFile->setEnabled(true);
-			sliderAlpha->setEnabled(true);
-			theExperiment.environment.setWithTexture(true);
-		}
-		else {
-			lineeditTextureFile->setDisabled(true);
-			pushbuttonSelectTextureFile->setDisabled(true);
-			sliderAlpha->setDisabled(true);
-			theExperiment.environment.setWithTexture(false);
-		}
+}
+
+void SIG_EnvironmentView::slotSelectTextureFile()
+{
+	QString texFile = QFileDialog::getOpenFileName( this, QString(), theExperiment.environment.getTextureFile(), "Images (*.png *.jpg *.jpeg *.pnm *.ppm)" );
+	if (!texFile.isEmpty())
+	{
+		lineeditTextureFile->setText(texFile);
+		this->putIntoExperiment();
 	}
+}
+
+void SIG_EnvironmentView::slotAlpha()
+{
+	this->putIntoExperiment();
+}
+
+void SIG_EnvironmentView::slotTextureSelect()
+{
+	if (checkboxTextureFile->isChecked())
+	{
+		lineeditTextureFile->setEnabled(true);
+		pushbuttonSelectTextureFile->setEnabled(true);
+		sliderAlpha->setEnabled(true);
+		theExperiment.environment.setWithTexture(true);
+	}
+	else
+	{
+		lineeditTextureFile->setDisabled(true);
+		pushbuttonSelectTextureFile->setDisabled(true);
+		sliderAlpha->setDisabled(true);
+		theExperiment.environment.setWithTexture(false);
+	}
+}
 
 }
