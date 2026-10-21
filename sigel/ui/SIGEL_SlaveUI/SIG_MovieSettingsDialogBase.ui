@@ -112,31 +112,11 @@
             <item row="2" column="1">
               <widget class="QComboBox" name="comboboxFormat">
                 <property name="toolTip">
-                  <string>Sets the format in which the simulation will be grabbed. Some are lossy.</string>
+                  <string>Sets the format of the recorded frames: PNG images, or POV-Ray scenes to render later.</string>
                 </property>
                 <item>
                   <property name="text">
-                    <string>BMP</string>
-                  </property>
-                </item>
-                <item>
-                  <property name="text">
                     <string>PNG</string>
-                  </property>
-                </item>
-                <item>
-                  <property name="text">
-                    <string>PPM</string>
-                  </property>
-                </item>
-                <item>
-                  <property name="text">
-                    <string>XBM</string>
-                  </property>
-                </item>
-                <item>
-                  <property name="text">
-                    <string>XPM</string>
                   </property>
                 </item>
                 <item>

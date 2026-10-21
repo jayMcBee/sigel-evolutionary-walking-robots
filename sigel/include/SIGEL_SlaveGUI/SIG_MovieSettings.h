@@ -72,7 +72,7 @@ namespace SIGEL_SlaveGUI
     QString filePrefix = "sigel_pic";
 
     /**
-     * The file extension in lower case: bmp, png, ppm, xbm, xpm or pov.
+     * The file extension in lower case: png or pov.
      */
     QString format = "png";
 
