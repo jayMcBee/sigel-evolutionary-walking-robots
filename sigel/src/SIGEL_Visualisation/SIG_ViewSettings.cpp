@@ -30,7 +30,7 @@ namespace SIGEL_Visualisation
       lookPoint(0,0,0),
       up(0,1,0),
       relativeEyePoint(false),
-      renderMode(wireFrame),
+      renderMode(hiddenLine),
       aspectRatio(1)
   { }
 

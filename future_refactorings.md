@@ -220,9 +220,6 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_IndividualView::SIG_IndividualView`,
   `SIG_AllIndividualsView::slotSelectionChanged`.
 
-- [ ] **174. Start the views in hidden-line mode.** `SIG_ViewSettings`
-  starts in `wireFrame`; it should start in `hiddenLine`.
-
 ---
 
 ## 5 · MetaGP
