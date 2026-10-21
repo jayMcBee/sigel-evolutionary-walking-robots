@@ -34,13 +34,7 @@
 namespace SIGEL_SlaveGUI
 {
 
-/* 
- *  Constructs a SIG_MovieSettingsDialog which is a child of 'parent', with the 
- *  name 'name' and widget flags set to 'f' 
- *
- *  The dialog will by default be modeless, unless you set 'modal' to
- *  TRUE to construct a modal dialog.
- */
+// The movie settings for the view 'view', whose simulation advances by 'stepSize' seconds per step.
 SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize, QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
     : SIG_MovieSettingsDialogBase( parent, name, modal, fl ),
       view( view ),
