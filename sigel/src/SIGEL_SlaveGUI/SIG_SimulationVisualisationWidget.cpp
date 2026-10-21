@@ -373,11 +373,11 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 
   void SIG_SimulationVisualisationWidget::pauseForDialog()
   {
-    if (simulationRunning())
-      {
-	simulationTimer->stop();
-	pausedForDialog = true;
-      };
+    if (!simulationRunning())
+      return;
+
+    simulationTimer->stop();
+    pausedForDialog = true;
   }
 
   void SIG_SimulationVisualisationWidget::resumeAfterDialog()
@@ -404,20 +404,20 @@ void SIG_SimulationVisualisationWidget::reportAndEncodeRecording()
 
   void SIG_SimulationVisualisationWidget::slotStepSimulation()
   {
-    if (!simulationRunning())
-      {
-	makeTimeSteps(1);
-	update();
-      };
+    if (simulationRunning())
+      return;
+
+    makeTimeSteps(1);
+    update();
   }
 
   void SIG_SimulationVisualisationWidget::slotFForwardSimulation()
   {
-    if (!simulationRunning())
-      {
-	makeTimeSteps( noOfFFSteps );
-	update();
-      };
+    if (simulationRunning())
+      return;
+
+    makeTimeSteps( noOfFFSteps );
+    update();
   }
 
   void SIG_SimulationVisualisationWidget::slotSetFrameDelay(int fframeDelay)
