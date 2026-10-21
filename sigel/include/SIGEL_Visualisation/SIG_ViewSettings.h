@@ -48,7 +48,7 @@ namespace SIGEL_Visualisation
 
       /**
        * How the scene is drawn. The simulation view shows shadows only in flatShaded and
-       * garoudShaded.
+       * gouraudShaded.
        */
       enum renderModeType
       { 
@@ -68,7 +68,7 @@ namespace SIGEL_Visualisation
 	 * As flatShaded, but the colour is blended across each polygon. Every vertex has its
 	 * polygon's normal, so the picture differs little from flatShaded.
 	 */
-	garoudShaded
+	gouraudShaded
       };
 
       /**

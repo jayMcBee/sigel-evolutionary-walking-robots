@@ -74,7 +74,7 @@
 	else if (string == "Flat shaded")
 	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::flatShaded;
 	else if (string == "Gouraud shaded")
-	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::garoudShaded;
+	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::gouraudShaded;
 	if (automaticRefresh)
 	  update();
       };

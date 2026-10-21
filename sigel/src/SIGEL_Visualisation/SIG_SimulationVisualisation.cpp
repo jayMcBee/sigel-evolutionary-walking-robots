@@ -329,7 +329,7 @@ namespace SIGEL_Visualisation
 		bool const shadowed = showShadows
 		                   && (shadowProgram != nullptr)
 		                   && (   (viewSettings.renderMode == SIG_ViewSettings::flatShaded)
-		                       || (viewSettings.renderMode == SIG_ViewSettings::garoudShaded) );
+		                       || (viewSettings.renderMode == SIG_ViewSettings::gouraudShaded) );
 		QMatrix4x4 lightMatrix;
 		if (shadowed)
 			lightMatrix = renderShadowMap();

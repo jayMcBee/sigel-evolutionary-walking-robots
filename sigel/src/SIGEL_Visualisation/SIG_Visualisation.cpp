@@ -115,7 +115,7 @@ namespace SIGEL_Visualisation
        	glEnable( GL_COLOR_MATERIAL );
        	glEnable( GL_CULL_FACE );
        	break;
-      case SIG_ViewSettings::garoudShaded:
+      case SIG_ViewSettings::gouraudShaded:
        	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
        	glShadeModel( GL_SMOOTH );
        	glEnable( GL_LIGHTING );
