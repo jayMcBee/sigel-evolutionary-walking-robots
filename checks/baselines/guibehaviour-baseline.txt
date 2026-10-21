@@ -859,6 +859,7 @@ we do with the system?]
       side effect: pushbuttonCenterOnTerrain now greyed
       side effect: radiobuttonFunction now unchecked
       side effect: lineeditFunction now greyed
+      side effect: pushbuttonFunctionPresets now greyed
       side effect: lineeditPictureFile now ENABLED
       side effect: pushbuttonSelectFile now ENABLED
       side effect: lineeditXDim now greyed
