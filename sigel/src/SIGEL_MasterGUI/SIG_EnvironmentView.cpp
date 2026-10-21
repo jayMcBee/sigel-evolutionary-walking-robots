@@ -180,9 +180,9 @@ void SIG_EnvironmentView::slotFloorSelectionChanged()
 void SIG_EnvironmentView::slotCenterOnTerrain()
 {
 	// The floor's grid points are 1 apart and start at 0, so a floor of
-	// X points ends at X - 1.
+	// X points ends at X - 1. Row z lies at SIGEL z = -z.
 	lineeditStartPositionX->setText( QString::number( ( lineeditXDim->text().toInt() - 1 ) / 2.0 ) );
-	lineeditStartPositionZ->setText( QString::number( ( lineeditZDim->text().toInt() - 1 ) / 2.0 ) );
+	lineeditStartPositionZ->setText( QString::number( -( lineeditZDim->text().toInt() - 1 ) / 2.0 ) );
 }
 
 void SIG_EnvironmentView::slotSelectFile()
