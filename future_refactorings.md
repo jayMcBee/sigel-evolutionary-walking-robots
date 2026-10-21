@@ -68,10 +68,6 @@ Paths are relative to `sigel/`, the source tree.
   is time.
   `pixmaps/altLogo.png`, with a `Sigel v1.0` caption, is kept but unused.
 
-- [ ] **30. Cut comments over two lines that do not earn their place.** A
-  longer comment must carry something the code cannot say. **Comments the port
-  itself wrote come first.** File by file, each pass signed off first.
-
 - [ ] **144. Put the 4x4 identity and translation matrix in one helper
   class.** `SIG_Body::load`, `SIG_Body::readVRMLNode`, the long function in
   `IFunctions.cpp` and `SIG_DynaMechsLink::buildTranslationMatrix` each write
