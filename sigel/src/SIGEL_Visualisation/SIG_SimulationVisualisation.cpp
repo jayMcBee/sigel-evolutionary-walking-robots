@@ -33,74 +33,6 @@ using namespace SIGEL_Tools;
 namespace SIGEL_Visualisation
 {
 
-	// Lighting per vertex, as GL_LIGHT0 and GL_LIGHT1 give it. The sun goes
-	// out in the secondary colour, so the fragment shader shadows only it.
-	char const *const SIG_SimulationVisualisation::shadowVertexShaderSource =
-		"#version 120\n"
-		"uniform mat4 shadowMatrix;\n"
-		"uniform vec3 sunDirection;\n"
-		"uniform float sunIntensity;\n"
-		"varying vec4 shadowCoordinate;\n"
-		"vec3 cameraLight( int index, vec3 normal, vec3 eyePosition )\n"
-		"{\n"
-		"  vec3 towardsLight = normalize( gl_LightSource[ index ].position.xyz - eyePosition );\n"
-		"  return max( dot( normal, towardsLight ), 0.0 ) * gl_LightSource[ index ].diffuse.rgb;\n"
-		"}\n"
-		"void main()\n"
-		"{\n"
-		"  vec4 eyePosition = gl_ModelViewMatrix * gl_Vertex;\n"
-		"  vec3 normal = normalize( gl_NormalMatrix * gl_Normal );\n"
-		"  vec3 light = gl_LightModel.ambient.rgb\n"
-		"             + cameraLight( 0, normal, eyePosition.xyz )\n"
-		"             + cameraLight( 1, normal, eyePosition.xyz );\n"
-		"  gl_FrontColor = vec4( light * gl_Color.rgb, gl_Color.a );\n"
-		"  vec3 sun = max( dot( normal, sunDirection ), 0.0 ) * sunIntensity * gl_Color.rgb;\n"
-		"  gl_FrontSecondaryColor = vec4( sun, 1.0 );\n"
-		"  gl_TexCoord[ 0 ] = gl_MultiTexCoord0;\n"
-		"  shadowCoordinate = shadowMatrix * eyePosition;\n"
-		"  gl_FogFragCoord = abs( eyePosition.z );\n"
-		"  gl_Position = ftransform();\n"
-		"}\n";
-
-	// Each of the 16 Poisson disk taps is a hardware 2x2 comparison, as the
-	// shadow map filters linearly. The terrain texture is applied as
-	// GL_DECAL does it, and the fog as GL_LINEAR does it.
-	char const *const SIG_SimulationVisualisation::shadowFragmentShaderSource =
-		"#version 120\n"
-		"uniform sampler2D terrainTexture;\n"
-		"uniform sampler2DShadow shadowMap;\n"
-		"uniform bool terrainTextured;\n"
-		"uniform float shadowFilterRadius;\n"
-		"varying vec4 shadowCoordinate;\n"
-		"const int poissonTapCount = 16;\n"
-		"const vec2 poissonDisk[ poissonTapCount ] = vec2[ poissonTapCount ](\n"
-		"  vec2( -0.94201624, -0.39906216 ), vec2(  0.94558609, -0.76890725 ),\n"
-		"  vec2( -0.09418410, -0.92938870 ), vec2(  0.34495938,  0.29387760 ),\n"
-		"  vec2( -0.91588581,  0.45771432 ), vec2( -0.81544232, -0.87912464 ),\n"
-		"  vec2( -0.38277543,  0.27676845 ), vec2(  0.97484398,  0.75648379 ),\n"
-		"  vec2(  0.44323325, -0.97511554 ), vec2(  0.53742981, -0.47373420 ),\n"
-		"  vec2( -0.26496911, -0.41893023 ), vec2(  0.79197514,  0.19090188 ),\n"
-		"  vec2( -0.24188840,  0.99706507 ), vec2( -0.81409955,  0.91437590 ),\n"
-		"  vec2(  0.19984126,  0.78641367 ), vec2(  0.14383161, -0.14100790 ) );\n"
-		"void main()\n"
-		"{\n"
-		"  vec3 coordinate = shadowCoordinate.xyz / shadowCoordinate.w;\n"
-		"  float sunlight = 0.0;\n"
-		"  for (int i = 0; i < poissonTapCount; i++)\n"
-		"    sunlight += shadow2D( shadowMap, vec3( coordinate.xy + poissonDisk[ i ] * shadowFilterRadius,\n"
-		"                                           coordinate.z ) ).r;\n"
-		"  sunlight /= float( poissonTapCount );\n"
-		"  vec4 color = vec4( min( gl_Color.rgb + gl_SecondaryColor.rgb * sunlight, 1.0 ), gl_Color.a );\n"
-		"  if (terrainTextured)\n"
-		"  {\n"
-		"    vec4 texel = texture2D( terrainTexture, gl_TexCoord[ 0 ].st );\n"
-		"    color.rgb = mix( color.rgb, texel.rgb, texel.a );\n"
-		"  }\n"
-		"  float clearness = clamp( (gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale, 0.0, 1.0 );\n"
-		"  color.rgb = mix( gl_Fog.color.rgb, color.rgb, clearness );\n"
-		"  gl_FragColor = color;\n"
-		"}\n";
-
 	SIG_SimulationVisualisation::SIG_SimulationVisualisation(SIGEL_Robot::SIG_Robot const &robot,
 	                                                         SIGEL_Environment::SIG_Environment const &environment,
 	                                                         SIGEL_Simulation::SIG_SimulationParameters const &simulationParameter,
@@ -236,10 +168,10 @@ namespace SIGEL_Visualisation
 		if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE)
 			failure = QString( "the shadow map framebuffer is incomplete, status 0x%1." )
 			  .arg( framebufferStatus, 0, 16 );
-		else if (!program->addShaderFromSourceCode( QOpenGLShader::Vertex, shadowVertexShaderSource ))
-			failure = "the vertex shader does not compile:\n" + program->log();
-		else if (!program->addShaderFromSourceCode( QOpenGLShader::Fragment, shadowFragmentShaderSource ))
-			failure = "the fragment shader does not compile:\n" + program->log();
+		else if (!program->addShaderFromSourceFile( QOpenGLShader::Vertex, ":/SIG_SimulationVisualisation/shaders/shadow.vert" ))
+			failure = "the vertex shader cannot be loaded or does not compile:\n" + program->log();
+		else if (!program->addShaderFromSourceFile( QOpenGLShader::Fragment, ":/SIG_SimulationVisualisation/shaders/shadow.frag" ))
+			failure = "the fragment shader cannot be loaded or does not compile:\n" + program->log();
 		else if (!program->link())
 			failure = "the shader program does not link:\n" + program->log();
 

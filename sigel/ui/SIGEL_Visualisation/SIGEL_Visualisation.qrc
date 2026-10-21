@@ -4,4 +4,8 @@
         <file>povray/materials.inc</file>
         <file>povray/scene.inc</file>
     </qresource>
+    <qresource prefix="/SIG_SimulationVisualisation" >
+        <file>shaders/shadow.frag</file>
+        <file>shaders/shadow.vert</file>
+    </qresource>
 </RCC>

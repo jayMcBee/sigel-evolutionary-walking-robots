@@ -152,13 +152,6 @@ namespace SIGEL_Visualisation
 		static constexpr float shadowFilterRadius = 1.5f;
 
 		/**
-		 * The GLSL sources of the program that draws the lit plane and
-		 * robot links with the sun's shadow.
-		 */
-		static char const *const shadowVertexShaderSource;
-		static char const *const shadowFragmentShaderSource;
-
-		/**
 		 * Creates the shadow map, its framebuffer and the program in the
 		 * current OpenGL context and sets shadowProgram. On a failure it
 		 * prints the error to SIG_IO::cerr, frees what it created and
