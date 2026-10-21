@@ -46,7 +46,7 @@ The best individual in the 3-D view of the simulation:
 
 <img src="sigel/doc/screenshot-3d-view.png" width="275" alt="3-D view">
 
-## Origin
+## Version history
 
 - **SIGEL 1.0 (2001):** written by project group PG 368 at the University of
   Dortmund, including the GP system, the robot language, the simulator and the
@@ -57,6 +57,8 @@ The best individual in the 3-D view of the simulation:
   and Wolfgang Banzhaf's research
   ([CLAWAR 2003](http://www.cs.mun.ca/~banzhaf/papers/ZieglerBanzhaf.pdf));
   it cannot currently start on Linux.
+- **SIGEL 1.4 (2026):** the first release of this fork. SIGEL 1.3 ported to
+  Qt 6, to build and run on today's Linux; Windows support is dropped.
 - The original 1.3 binaries still run on today's Linux: see the
   [Quick Guide](verification-against-sigel-1.3/README.txt).
 
