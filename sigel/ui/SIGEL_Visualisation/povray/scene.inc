@@ -105,3 +105,13 @@ sky_sphere {
     look_at lookPoint
   }
 #end
+
+// One piece of the robot's path, in the OpenGL renderer's yellow.
+#macro sigelPathSegment( base, cap )
+  cylinder {
+    base, cap, sigelLineRadius
+    open
+    pigment { srgb <1,1,0> }
+    finish { ambient 0 diffuse 1 }
+  }
+#end

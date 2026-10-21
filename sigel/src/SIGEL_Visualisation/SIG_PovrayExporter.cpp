@@ -339,16 +339,11 @@ namespace SIGEL_Visualisation
 				NEWMAT::ColumnVector cap =   SIG_TypeConverter::sigelToPovray()
 				                           * SIG_TypeConverter::toColumnVector( *actPoint );
 
-				stream << "cylinder {\n"
-				       << "  "
+				stream << "sigelPathSegment( "
 				       << vectorToPovray( base )
 				       << ", "
 				       << vectorToPovray( cap )
-				       << ", " << lineRadius() << "\n"
-				       << "  open\n"
-				       << "  pigment { srgb <1,1,0> }\n"
-				       << "  finish { ambient 0 diffuse 1 }\n"
-				       << "}\n";
+				       << " )\n";
 			};
 
 			stream << "\n";
