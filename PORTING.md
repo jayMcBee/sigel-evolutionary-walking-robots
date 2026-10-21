@@ -8222,9 +8222,9 @@ carried; other items and this file cite them, so they do not change.
   decided 2026-09-29: the shipped experiments keep their start at the
   terrain's corner, and the Environment page has a "Center on Terrain"
   button in the Robot group box. `SIG_EnvironmentView::slotCenterOnTerrain`
-  sets the start position's X and Z to (X − 1) / 2 and (Z − 1) / 2 of the
-  floor size fields, because the grid points are 1 apart and start at 0;
-  Y stays. The button is disabled while a picture file is the floor, whose
+  sets the start position's X and Z to (X − 1) / 2 and −(Z − 1) / 2 of the
+  floor size fields, because the grid points are 1 apart and start at 0,
+  and row z lies at SIGEL z = −z; Y stays. The button is disabled while a picture file is the floor, whose
   size comes from the file. No file format changes; `gui behaviour`'s
   baseline gains the button's greying when "Picture:" is chosen.
 
