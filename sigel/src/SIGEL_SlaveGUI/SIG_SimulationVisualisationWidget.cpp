@@ -430,8 +430,8 @@ void SIG_SimulationVisualisationWidget::slotSetFrameDelay(int fframeDelay)
 
 void SIG_SimulationVisualisationWidget::slotSimulationProgress()
 {
-	// Wait until the last step is on screen; without a GL context no frame
-	// comes, so don't wait.
+	// A timer tick does nothing until the frame of the last step is on screen.
+	// A widget without an OpenGL context never shows a frame, so it does not wait.
 	if (!frameShown && isValid())
 		return;
 
