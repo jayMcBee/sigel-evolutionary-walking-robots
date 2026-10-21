@@ -29,6 +29,7 @@
 #include <qfiledialog.h>
 #include <qslider.h>
 #include <qcheckbox.h>
+#include <qmenu.h>
 
 #include "SIGEL_MasterGUI/SIG_EnvironmentView.h"
 
@@ -72,6 +73,14 @@ SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent,  const char* name, Qt
   cLocale.setNumberOptions( QLocale::RejectGroupSeparator );
   for ( QValidator *v : findChildren<QValidator *>() )
     v->setLocale( cLocale );
+
+  QMenu *functionPresetMenu = new QMenu( pushbuttonFunctionPresets );
+  functionPresetMenu->addAction( "Ripples", this, [this]() { lineeditFunction->setText( "-sin(sqrt(x^2+z^2))" ); } );
+  // Not setMenu: its menu indicator is drawn smaller than the button's text.
+  connect( pushbuttonFunctionPresets, &QPushButton::clicked, this, [this, functionPresetMenu]()
+  {
+    functionPresetMenu->popup( pushbuttonFunctionPresets->mapToGlobal( QPoint( 0, pushbuttonFunctionPresets->height() ) ) );
+  } );
 }
 
 void SIG_EnvironmentView::putIntoExperiment()
@@ -143,6 +152,7 @@ void SIG_EnvironmentView::getOutOfExperiment()
 	void SIG_EnvironmentView::slotFloorSelectionChanged() {
 		if (radiobuttonFunction->isChecked()) {
 			lineeditFunction->setEnabled(true);
+			pushbuttonFunctionPresets->setEnabled(true);
 			lineeditXDim->setEnabled(true);
 			lineeditZDim->setEnabled(true);
 			pushbuttonCenterOnTerrain->setEnabled(true);
@@ -154,6 +164,7 @@ void SIG_EnvironmentView::getOutOfExperiment()
 			lineeditPictureFile->setEnabled(true);
 			pushbuttonSelectFile->setEnabled(true);
 			lineeditFunction->setDisabled(true);
+			pushbuttonFunctionPresets->setDisabled(true);
 			lineeditXDim->setDisabled(true);
 			lineeditZDim->setDisabled(true);
 			// The picture file sets the floor's size, not the X and Z fields.

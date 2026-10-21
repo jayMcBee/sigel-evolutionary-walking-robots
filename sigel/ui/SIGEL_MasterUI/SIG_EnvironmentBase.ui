@@ -327,72 +327,68 @@
                         <property name="title">
                           <string>Floor definition</string>
                         </property>
-                        <layout class="QVBoxLayout">
+                        <layout class="QGridLayout">
                           <property name="margin">
                             <number>11</number>
                           </property>
                           <property name="spacing">
                             <number>6</number>
                           </property>
-                          <item>
-                            <layout class="QHBoxLayout">
-                              <property name="margin">
-                                <number>0</number>
+                          <item row="0" column="0">
+                            <widget class="QRadioButton" name="radiobuttonFunction">
+                              <property name="text">
+                                <string>Function:</string>
                               </property>
-                              <property name="spacing">
-                                <number>6</number>
-                              </property>
-                              <item>
-                                <widget class="QRadioButton" name="radiobuttonFunction">
-                                  <property name="text">
-                                    <string>Function:</string>
-                                  </property>
-                                </widget>
-                              </item>
-                              <item>
-                                <widget class="QLineEdit" name="lineeditFunction">
-                                  <property name="toolTip">
-                                    <string>A C-style formula in x and z that gives the floor's height at each grid point. Angles are in radians.&lt;p&gt;&lt;b&gt;Operators&lt;/b&gt;, highest precedence first&lt;/p&gt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;()&lt;/td&gt;&lt;td&gt;parentheses&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-A&lt;/td&gt;&lt;td&gt;unary minus&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;A^B&lt;/td&gt;&lt;td&gt;A to the power B&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;A*B  A/B  A%B&lt;/td&gt;&lt;td&gt;multiplication, division, modulo&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;A+B  A-B&lt;/td&gt;&lt;td&gt;addition, subtraction&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;p&gt;&lt;b&gt;Functions&lt;/b&gt;&lt;/p&gt;abs, acos, asin, atan, ceil, cos, cosh, exp, floor, int, log, sin, sinh, sqrt, tan, tanh&lt;p&gt;&lt;b&gt;Examples&lt;/b&gt;&lt;/p&gt;0 (a flat floor)&lt;br&gt;-sin(sqrt(x^2+z^2))</string>
-                                  </property>
-                                </widget>
-                              </item>
-                            </layout>
+                            </widget>
                           </item>
-                          <item>
-                            <layout class="QHBoxLayout">
-                              <property name="margin">
-                                <number>0</number>
+                          <item row="0" column="1">
+                            <widget class="QLineEdit" name="lineeditFunction">
+                              <property name="toolTip">
+                                <string>A C-style formula in x and z that gives the floor's height at each grid point. Angles are in radians.&lt;p&gt;&lt;b&gt;Operators&lt;/b&gt;, highest precedence first&lt;/p&gt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;()&lt;/td&gt;&lt;td&gt;parentheses&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-A&lt;/td&gt;&lt;td&gt;unary minus&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;A^B&lt;/td&gt;&lt;td&gt;A to the power B&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;A*B  A/B  A%B&lt;/td&gt;&lt;td&gt;multiplication, division, modulo&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;A+B  A-B&lt;/td&gt;&lt;td&gt;addition, subtraction&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;p&gt;&lt;b&gt;Functions&lt;/b&gt;&lt;/p&gt;abs, acos, asin, atan, ceil, cos, cosh, exp, floor, int, log, sin, sinh, sqrt, tan, tanh&lt;p&gt;&lt;b&gt;Examples&lt;/b&gt;&lt;/p&gt;0 (a flat floor)&lt;br&gt;-sin(sqrt(x^2+z^2))</string>
                               </property>
-                              <property name="spacing">
-                                <number>6</number>
+                            </widget>
+                          </item>
+                          <item row="0" column="2">
+                            <widget class="QPushButton" name="pushbuttonFunctionPresets">
+                              <property name="maximumSize">
+                                <size>
+                                  <width>20</width>
+                                  <height>32767</height>
+                                </size>
                               </property>
-                              <item>
-                                <widget class="QRadioButton" name="radiobuttonPictureFile">
-                                  <property name="enabled">
-                                    <bool>true</bool>
-                                  </property>
-                                  <property name="text">
-                                    <string>Picture:</string>
-                                  </property>
-                                </widget>
-                              </item>
-                              <item>
-                                <widget class="QLineEdit" name="lineeditPictureFile"/>
-                              </item>
-                              <item>
-                                <widget class="QPushButton" name="pushbuttonSelectFile">
-                                  <property name="maximumSize">
-                                    <size>
-                                      <width>20</width>
-                                      <height>32767</height>
-                                    </size>
-                                  </property>
-                                  <property name="text">
-                                    <string>...</string>
-                                  </property>
-                                </widget>
-                              </item>
-                            </layout>
+                              <property name="toolTip">
+                                <string>Fills in a predefined function.</string>
+                              </property>
+                              <property name="text">
+                                <string>▾</string>
+                              </property>
+                            </widget>
+                          </item>
+                          <item row="1" column="0">
+                            <widget class="QRadioButton" name="radiobuttonPictureFile">
+                              <property name="enabled">
+                                <bool>true</bool>
+                              </property>
+                              <property name="text">
+                                <string>Picture:</string>
+                              </property>
+                            </widget>
+                          </item>
+                          <item row="1" column="1">
+                            <widget class="QLineEdit" name="lineeditPictureFile"/>
+                          </item>
+                          <item row="1" column="2">
+                            <widget class="QPushButton" name="pushbuttonSelectFile">
+                              <property name="maximumSize">
+                                <size>
+                                  <width>20</width>
+                                  <height>32767</height>
+                                </size>
+                              </property>
+                              <property name="text">
+                                <string>...</string>
+                              </property>
+                            </widget>
                           </item>
                         </layout>
                       </widget>
@@ -661,6 +657,7 @@
     <tabstop>pushbuttonCenterOnTerrain</tabstop>
     <tabstop>radiobuttonFunction</tabstop>
     <tabstop>lineeditFunction</tabstop>
+    <tabstop>pushbuttonFunctionPresets</tabstop>
     <tabstop>lineeditXDim</tabstop>
     <tabstop>lineeditZDim</tabstop>
     <tabstop>radiobuttonPictureFile</tabstop>
