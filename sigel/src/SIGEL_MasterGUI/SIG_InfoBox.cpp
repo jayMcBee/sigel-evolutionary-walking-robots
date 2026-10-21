@@ -72,6 +72,8 @@ SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::Win
 		   "</ul><br>"
 		   "<h3>MetaGP (v1.1&ndash;1.3):</h3>"
 		   "Implements the fitness meta-models from Jens Ziegler and Wolfgang Banzhaf's research (CLAWAR 2003).<br><br>"
+		   "<h3>SIGEL 1.4 (2026):</h3>"
+		   "The first release of this fork. SIGEL 1.3 ported to Qt 6, to build and run on today's Linux; Windows support is dropped.<br><br>"
 		   "<h3>Modernised edition:</h3>"
 		   "An independent update of SIGEL for current systems.<br>"
 		   "<tt>github.com/jayMcBee/sigel-evolutionary-walking-robots</tt>"

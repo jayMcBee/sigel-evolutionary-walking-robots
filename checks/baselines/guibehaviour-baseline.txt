@@ -1394,7 +1394,7 @@ Do you want to replace it?]
   [dialog] class=QDialog title=[About SIGEL] modal=1
     parent [SIGEL_MasterGUI::SIG_MainWindow] tiedToMainWindow=1
     label pixmap=1 size=256x256
-    text lines=25 vScrollPolicy=1
+    text lines=29 vScrollPolicy=1
     | SIGEL v1.5
     | SIGEL 1.0 (2001) by PG 368:
     | Christian "Krasstexta" Aue
@@ -1415,6 +1415,10 @@ Do you want to replace it?]
     | 
     | MetaGP (v1.1–1.3):
     | Implements the fitness meta-models from Jens Ziegler and Wolfgang Banzhaf's research (CLAWAR 2003).
+    | 
+    | 
+    | SIGEL 1.4 (2026):
+    | The first release of this fork. SIGEL 1.3 ported to Qt 6, to build and run on today's Linux; Windows support is dropped.
     | 
     | 
     | Modernised edition:
