@@ -218,6 +218,7 @@ namespace SIGEL_Visualisation
 		QTextStream stream( &declarationsString, QIODevice::WriteOnly );
 
 		stream << "#declare sigelPatternSize = " << patternSize() << ";\n"
+		       << "#declare sigelAnchorPointRadius = " << anchorPointRadius() << ";\n"
 		       << "\n";
 
 		// A robot file gives a material only a colour. It becomes paint, a little greyer and
@@ -293,28 +294,15 @@ namespace SIGEL_Visualisation
 			{
 				NEWMAT::ColumnVector pointPosition = SIG_TypeConverter::toColumnVector( *pointEntry.value );
 
-				NEWMAT::ColumnVector linkColor = SIG_TypeConverter::toColumnVector( actLink.getMaterial()->getColour() );
-
-				for (int i=1; i<=3; i++)
-				{
-					double newValue = linkColor( i ) - 0.3;
-					newValue = ( newValue < 0 ) ? 0 : newValue;
-					linkColor( i ) = newValue;
-				};
+				NEWMAT::ColumnVector const linkColor = SIG_TypeConverter::toColumnVector( actLink.getMaterial()->getColour() );
 
 				pointDataStream << "#declare "
 				                << pointEntry.name
-				                << " = sphere {\n"
-				                << "  "
+				                << " = sigelAnchorPoint( "
 				                << vectorToPovray( pointPosition )
-				                << ", " << anchorPointRadius() << "\n"
-				                << "  texture {\n"
-				                << "    pigment { srgb "
+				                << ", "
 				                << vectorToPovray( linkColor )
-				                << " }\n"
-				                << "    finish { sigelPaintFinish }\n"
-				                << "  }\n"
-				                << "}\n"
+				                << " )\n"
 				                << "\n";
 			};
 

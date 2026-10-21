@@ -38,3 +38,14 @@
   }
 #end
 
+// An anchor point: a sphere in the colour of its link, darker by 0.3.
+#macro sigelAnchorPoint( position, linkColor )
+  sphere {
+    position, sigelAnchorPointRadius
+    texture {
+      pigment { srgb <max( linkColor.x - 0.3, 0 ), max( linkColor.y - 0.3, 0 ), max( linkColor.z - 0.3, 0 )> }
+      finish { sigelPaintFinish }
+    }
+  }
+#end
+
