@@ -151,17 +151,11 @@ namespace SIGEL_Visualisation
 		       << "\n"
 		       << environmentObjects()
 		       << sceneObjects( visualisation.getRobotRenderer(), 0, visualisation.getRobotRenderer().getNoOfObjects() )
-		       << "camera {\n"
-		       << "  right x*image_width/image_height\n"
-		       << "  up y\n"
-		       << "  direction cameraDirection\n"
-		       << "  location "
+		       << "sigelCamera( "
 		       << vectorToPovray( SIG_TypeConverter::sigelToPovray() * finalEyePointColumnVector )
-		       << "\n"
-		       << "  look_at "
+		       << ", "
 		       << vectorToPovray( SIG_TypeConverter::sigelToPovray() * lookPointColumnVector )
-		       << "\n"
-		       << "}\n";
+		       << " )\n";
 
 		file.close();
 

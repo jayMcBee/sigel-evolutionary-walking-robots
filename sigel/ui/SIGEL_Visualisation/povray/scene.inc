@@ -94,3 +94,14 @@ sky_sphere {
   sigelGridLines( z )
   no_shadow
 }
+
+// The OpenGL renderer's camera: cameraDirection gives its vertical field of view.
+#macro sigelCamera( eyePoint, lookPoint )
+  camera {
+    right x*image_width/image_height
+    up y
+    direction cameraDirection
+    location eyePoint
+    look_at lookPoint
+  }
+#end
