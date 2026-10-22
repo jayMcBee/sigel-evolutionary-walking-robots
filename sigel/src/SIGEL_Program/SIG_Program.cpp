@@ -75,28 +75,19 @@ void SIGEL_Program::SIG_Program::writeToFile( QTextStream &file ) const
 
 void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
 {
-	int                             pos=-1;
-	int                             oldpos=0;
-	int                             lineCnt=0;
-
 	lines.clear();
 
 	QString programText = file.readAll();
 
-	while((pos=programText.indexOf(QChar('\n'), oldpos))!=-1)
+	for( QString lineText : programText.split( QChar( '\n' ) ) )
 	{
-		QString lineText = programText.mid( oldpos, pos - oldpos );
 		SIGEL_Program::SIG_ProgramLine prgLine;
 		if( prgLine.readFromFile( lineText, &prgLine ) )
-		{
 			appendLine( prgLine );
-			lineCnt++;
-		}
-		oldpos = pos + 1;
 	}
 
 #ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "Program read with " << lineCnt << " lines." << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "Program read with " << getProgramLength() << " lines." << Qt::endl;
 #endif
 }
 
