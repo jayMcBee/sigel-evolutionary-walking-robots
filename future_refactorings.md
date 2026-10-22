@@ -117,7 +117,7 @@ touched, because changing one changes behaviour against the reference binary.
   (`SIG_GPPopulation::readFromFile`, `SIG_GPIndividual::readFromFile`): a
   program shorter than the minimum or longer than the maximum loads
   unchanged. A short one could be padded with the NOP logic of
-  `SIG_Program::checkLength` and recorded with `addLengthIncreasedInfo`;
+  `SIG_Program::clampLengthToLimits` and recorded with `addLengthIncreasedInfo`;
   unlikely edge cases, such as a stored fitness after padding, would not be
   handled.
 
@@ -371,7 +371,7 @@ problem; the choice is made before any code is written.
 - [ ] **165. Mutation adds a line also if there is no maximum length.**
   With "Ignore maximum length" the maximum is 0. `SIG_GPOperations::mutation`
   compares the new length with that 0, so it never adds a line. Crossover
-  and `SIG_Program::checkLength` read 0 as "no maximum".
+  and `SIG_Program::clampLengthToLimits` read 0 as "no maximum".
 
 ---
 

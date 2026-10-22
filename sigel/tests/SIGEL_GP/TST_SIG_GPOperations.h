@@ -46,7 +46,7 @@ namespace SIGEL_GP
   class SIG_GPIndividual;
 
   /**
-   * The unit tests of SIG_GPOperations and SIG_Program::checkLength.
+   * The unit tests of SIG_GPOperations and SIG_Program::clampLengthToLimits.
    *
    * The operators take their random numbers from a seeded SIG_Randomizer. Each test runs
    * the seeds 1 to seeds and checks rules that hold for every seed, not exact programs: one
@@ -96,13 +96,13 @@ namespace SIGEL_GP
 
     void reproductionCutsALongParentAtTheEnd();
 
-    void checkLengthLeavesAProgramInsideTheLimits();
+    void clampLengthToLimitsLeavesAProgramInsideTheLimits();
 
-    void checkLengthPadsAShortProgramWithNops();
+    void clampLengthToLimitsPadsAShortProgramWithNops();
 
-    void checkLengthCutsALongProgramAtTheEnd();
+    void clampLengthToLimitsCutsALongProgramAtTheEnd();
 
-    void checkLengthWithMaximumZeroHasNoMaximum();
+    void clampLengthToLimitsWithMaximumZeroHasNoMaximum();
 
   private:
 

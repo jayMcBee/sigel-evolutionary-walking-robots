@@ -231,22 +231,22 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 
 	QDateTime actTime = QDateTime::currentDateTime();
 
-	newProgram1.checkLength( minLength,
-	                         maxLength,
-	                         randomizer,
-	                         languageParameters,
-	                         gpParameter.getInstructionProbabilities(),
-	                         historyInfo );
+	newProgram1.clampLengthToLimits( minLength,
+	                                 maxLength,
+	                                 randomizer,
+	                                 languageParameters,
+	                                 gpParameter.getInstructionProbabilities(),
+	                                 historyInfo );
 
 	if( historyInfo > 0 ) crossoverInd1->addLengthIncreasedInfo( actTime, historyInfo );
 	if( historyInfo < 0 ) crossoverInd1->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
 
-	newProgram2.checkLength( minLength,
-	                         maxLength,
-	                         randomizer,
-	                         languageParameters,
-	                         gpParameter.getInstructionProbabilities(),
-	                         historyInfo );
+	newProgram2.clampLengthToLimits( minLength,
+	                                 maxLength,
+	                                 randomizer,
+	                                 languageParameters,
+	                                 gpParameter.getInstructionProbabilities(),
+	                                 historyInfo );
 
 	if( historyInfo > 0 ) crossoverInd2->addLengthIncreasedInfo( actTime, historyInfo );
 	if( historyInfo < 0 ) crossoverInd2->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
@@ -315,12 +315,12 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	// Check length of (winner) program if length is greater (or equal) than minLength and
 	// smaller (or equal) than maxLength:
 
-	newProgram.checkLength( minLength,
-	                        maxLength,
-	                        randomizer,
-	                        languageParameters,
-	                        gpParameter.getInstructionProbabilities(),
-	                        historyInfo );
+	newProgram.clampLengthToLimits( minLength,
+	                                maxLength,
+	                                randomizer,
+	                                languageParameters,
+	                                gpParameter.getInstructionProbabilities(),
+	                                historyInfo );
 
 	// Compute randomly mutation point:
 
@@ -610,12 +610,12 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::reproduction( SIGEL_GP::
 
 	reproducedInd->getProgramVar() = winner.getProgramVar();
 
-	reproducedInd->getProgramVar().checkLength( minLength,
-	                                            maxLength,
-	                                            randomizer,
-	                                            languageParameters,
-	                                            gpParameter.getInstructionProbabilities(),
-	                                            historyInfo );
+	reproducedInd->getProgramVar().clampLengthToLimits( minLength,
+	                                                    maxLength,
+	                                                    randomizer,
+	                                                    languageParameters,
+	                                                    gpParameter.getInstructionProbabilities(),
+	                                                    historyInfo );
 
 	QDateTime actTime = QDateTime::currentDateTime();
 

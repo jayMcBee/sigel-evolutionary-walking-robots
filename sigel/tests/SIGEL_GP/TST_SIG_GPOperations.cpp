@@ -520,7 +520,7 @@ void SIGEL_GP::TST_SIG_GPOperations::reproductionCutsALongParentAtTheEnd()
   QVERIFY( added.contains( "Removed Length: 2" ) );
 }
 
-void SIGEL_GP::TST_SIG_GPOperations::checkLengthLeavesAProgramInsideTheLimits()
+void SIGEL_GP::TST_SIG_GPOperations::clampLengthToLimitsLeavesAProgramInsideTheLimits()
 {
   SIG_GPParameter gpParameter;
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
@@ -529,13 +529,13 @@ void SIGEL_GP::TST_SIG_GPOperations::checkLengthLeavesAProgramInsideTheLimits()
   QStringList const lines = lineTexts( checked );
   int historyInfo = -1;
 
-  checked.checkLength( 5, 10, randomizer, languageParameters, gpParameter.getInstructionProbabilities(), historyInfo );
+  checked.clampLengthToLimits( 5, 10, randomizer, languageParameters, gpParameter.getInstructionProbabilities(), historyInfo );
 
   QCOMPARE( lineTexts( checked ), lines );
   QCOMPARE( historyInfo, 0 );
 }
 
-void SIGEL_GP::TST_SIG_GPOperations::checkLengthPadsAShortProgramWithNops()
+void SIGEL_GP::TST_SIG_GPOperations::clampLengthToLimitsPadsAShortProgramWithNops()
 {
   SIG_GPParameter gpParameter;
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
@@ -544,13 +544,13 @@ void SIGEL_GP::TST_SIG_GPOperations::checkLengthPadsAShortProgramWithNops()
   QStringList const lines = lineTexts( checked );
   int historyInfo = 0;
 
-  checked.checkLength( 5, 10, randomizer, languageParameters, gpParameter.getInstructionProbabilities(), historyInfo );
+  checked.clampLengthToLimits( 5, 10, randomizer, languageParameters, gpParameter.getInstructionProbabilities(), historyInfo );
 
   QCOMPARE( lineTexts( checked ), lines + QStringList( { nopText(), nopText() } ) );
   QCOMPARE( historyInfo, 2 );
 }
 
-void SIGEL_GP::TST_SIG_GPOperations::checkLengthCutsALongProgramAtTheEnd()
+void SIGEL_GP::TST_SIG_GPOperations::clampLengthToLimitsCutsALongProgramAtTheEnd()
 {
   SIG_GPParameter gpParameter;
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
@@ -559,13 +559,13 @@ void SIGEL_GP::TST_SIG_GPOperations::checkLengthCutsALongProgramAtTheEnd()
   QStringList const lines = lineTexts( checked );
   int historyInfo = 0;
 
-  checked.checkLength( 5, 10, randomizer, languageParameters, gpParameter.getInstructionProbabilities(), historyInfo );
+  checked.clampLengthToLimits( 5, 10, randomizer, languageParameters, gpParameter.getInstructionProbabilities(), historyInfo );
 
   QCOMPARE( lineTexts( checked ), lines.mid( 0, 10 ) );
   QCOMPARE( historyInfo, -2 );
 }
 
-void SIGEL_GP::TST_SIG_GPOperations::checkLengthWithMaximumZeroHasNoMaximum()
+void SIGEL_GP::TST_SIG_GPOperations::clampLengthToLimitsWithMaximumZeroHasNoMaximum()
 {
   SIG_GPParameter gpParameter;
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
@@ -574,7 +574,7 @@ void SIGEL_GP::TST_SIG_GPOperations::checkLengthWithMaximumZeroHasNoMaximum()
   QStringList const lines = lineTexts( checked );
   int historyInfo = -1;
 
-  checked.checkLength( 5, 0, randomizer, languageParameters, gpParameter.getInstructionProbabilities(), historyInfo );
+  checked.clampLengthToLimits( 5, 0, randomizer, languageParameters, gpParameter.getInstructionProbabilities(), historyInfo );
 
   QCOMPARE( lineTexts( checked ), lines );
   QCOMPARE( historyInfo, 0 );

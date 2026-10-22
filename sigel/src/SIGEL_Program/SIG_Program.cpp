@@ -137,7 +137,7 @@ void SIGEL_Program::SIG_Program::checkLineNumber( long no ) const
 
 void SIGEL_Program::SIG_Program::deleteLine( long no )
 {
-  // An index past the end deletes nothing; checkLength relies on that.
+  // An index past the end deletes nothing; clampLengthToLimits relies on that.
   if( no<lines.size() )
     lines.erase( lines.begin() + no );
 }
@@ -192,12 +192,12 @@ SIGEL_Program::SIG_Program::SIG_Program()
 {
 }
 
-void SIGEL_Program::SIG_Program::checkLength( long minimumLength, 
-					      long maximumLength, 
-					      SIGEL_Tools::SIG_Randomizer &randomizer, 
-					      SIGEL_Robot::SIG_LanguageParameters &languageParameters,
-					      QList< int > &prob,
-					      int &historyInfo )
+void SIGEL_Program::SIG_Program::clampLengthToLimits( long minimumLength, 
+						      long maximumLength, 
+						      SIGEL_Tools::SIG_Randomizer &randomizer, 
+						      SIGEL_Robot::SIG_LanguageParameters &languageParameters,
+						      QList< int > &prob,
+						      int &historyInfo )
 {
   long prgLength = getProgramLength();
   historyInfo    = 0;

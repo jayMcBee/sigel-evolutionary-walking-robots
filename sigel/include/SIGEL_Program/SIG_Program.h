@@ -267,12 +267,12 @@ class SIG_Program
  */
   
    public:
-   void checkLength( long minimum,
-		     long maximum,
-		     SIGEL_Tools::SIG_Randomizer &randomizer, 
-		     SIGEL_Robot::SIG_LanguageParameters &languageParameters,
-		     QList< int > &prob,
-		     int &historyInfo );
+   void clampLengthToLimits( long minimum,
+			     long maximum,
+			     SIGEL_Tools::SIG_Randomizer &randomizer, 
+			     SIGEL_Robot::SIG_LanguageParameters &languageParameters,
+			     QList< int > &prob,
+			     int &historyInfo );
    };
 
 }
