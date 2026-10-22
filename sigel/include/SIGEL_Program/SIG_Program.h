@@ -70,7 +70,7 @@ class SIG_Program
  */
    
    public:
-   SIGEL_Program::SIG_Program& operator =(SIGEL_Program::SIG_Program& prg);
+   SIGEL_Program::SIG_Program &operator=( SIGEL_Program::SIG_Program const & ) = default;
 
 /**
  * This constructor creates an empty program (that contains no program lines).

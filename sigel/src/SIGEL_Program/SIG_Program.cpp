@@ -40,16 +40,6 @@ SIGEL_Program::SIG_Program::SIG_Program( SIGEL_GP::SIG_GPParameter &gpParameter,
 	generateRandomProgram( gpParameter, languageParameters, randomizer );
 }
 
-SIGEL_Program::SIG_Program& SIGEL_Program::SIG_Program::operator =(SIGEL_Program::SIG_Program &prg)
-{
-	lines.clear();
-
-	for( long i=0; i<prg.getProgramLength(); i++ )
-		appendLine( prg.getLine( i ) );
-
-	return *this;
-}
-
 long SIGEL_Program::SIG_Program::getProgramLength() const
 {
 	return lines.size();
