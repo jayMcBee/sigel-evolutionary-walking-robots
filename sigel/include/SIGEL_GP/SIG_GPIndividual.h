@@ -549,7 +549,7 @@ class SIG_GPIndividual{
   */
 
  public:
- SIGEL_GP::SIG_GPIndividual& operator =(SIGEL_GP::SIG_GPIndividual& ind); 
+ SIGEL_GP::SIG_GPIndividual& operator =(SIGEL_GP::SIG_GPIndividual const &ind);
 
  public:
  void generateRandomIndividual(SIGEL_Tools::SIG_Randomizer& randomizer,

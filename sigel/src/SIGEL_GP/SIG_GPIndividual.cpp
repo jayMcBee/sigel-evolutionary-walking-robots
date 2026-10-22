@@ -24,13 +24,13 @@
 #include "SIGEL_Tools/SIG_Exception.h"
 
 
-SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPIndividual::operator =(SIG_GPIndividual& ind)
+SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPIndividual::operator =(SIG_GPIndividual const &ind)
 {
 	setAge(0);
 	history=ind.getHistory();
 	setName(ind.getName());
 	setPoolPos(ind.getPoolPos());
-	getProgramVar()=ind.getProgramVar();
+	getProgramVar()=ind.getProgram();
 	setFitness( ind.getFitness() );
 	return *this;
 }
