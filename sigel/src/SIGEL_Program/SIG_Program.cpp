@@ -27,6 +27,19 @@
 #include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
+SIGEL_Program::SIG_Program::SIG_Program()
+	: lines()
+{
+}
+
+SIGEL_Program::SIG_Program::SIG_Program( SIGEL_GP::SIG_GPParameter &gpParameter,
+                                         SIGEL_Robot::SIG_LanguageParameters &languageParameters,
+                                         SIGEL_Tools::SIG_Randomizer& randomizer )
+	: lines()
+{
+	generateRandomProgram( gpParameter, languageParameters, randomizer );
+}
+
 SIGEL_Program::SIG_Program& SIGEL_Program::SIG_Program::operator =(SIGEL_Program::SIG_Program &prg)
 {
 	lines.clear();
@@ -171,11 +184,6 @@ void SIGEL_Program::SIG_Program::exportProgram( QString& filename ) const
 	}
 }
 
-SIGEL_Program::SIG_Program::SIG_Program()
-	: lines()
-{
-}
-
 void SIGEL_Program::SIG_Program::clampLengthToLimits( long minimumLength,
                                                       long maximumLength,
                                                       SIGEL_Tools::SIG_Randomizer &randomizer,
@@ -223,14 +231,6 @@ void SIGEL_Program::SIG_Program::clampLengthToLimits( long minimumLength,
 		SIGEL_Tools::SIG_IO::cerr << "Program truncated to " << getProgramLength() << " lines." << Qt::endl;
 #endif
 	}
-}
-
-SIGEL_Program::SIG_Program::SIG_Program( SIGEL_GP::SIG_GPParameter &gpParameter,
-                                         SIGEL_Robot::SIG_LanguageParameters &languageParameters,
-                                         SIGEL_Tools::SIG_Randomizer& randomizer )
-	: lines()
-{
-	generateRandomProgram( gpParameter, languageParameters, randomizer );
 }
 
 void SIGEL_Program::SIG_Program::generateRandomProgram( SIGEL_GP::SIG_GPParameter &gpParameter,
