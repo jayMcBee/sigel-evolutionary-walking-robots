@@ -514,7 +514,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 	if( generalMutationType == 1 )
 	{
-		if( newProgram.getProgramLength() + 1 <= maxLength )
+		if( maxLength == 0 || newProgram.getProgramLength() + 1 <= maxLength )
 		{
 #ifdef SIG_DEBUG
 
@@ -544,7 +544,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 		}
 		else
 		{
-			if( newProgram.getProgramLength() + 1 <= maxLength )
+			if( maxLength == 0 || newProgram.getProgramLength() + 1 <= maxLength )
 			{
 #ifdef SIG_DEBUG
 
