@@ -31,246 +31,249 @@
 
 
 SIGEL_Program::SIG_Program& SIGEL_Program::SIG_Program::operator =(SIGEL_Program::SIG_Program &prg)
-{ 
-  lines.clear();
+{
+	lines.clear();
 
-  for( long i=0; i<prg.getProgramLength(); i++ )
-     appendLine( prg.getLine( i ) );
+	for( long i=0; i<prg.getProgramLength(); i++ )
+		appendLine( prg.getLine( i ) );
 
 #ifdef SIG_DEBUG
-  if( prg.getProgramLength() != lines.size() )
-    {
-      SIGEL_Tools::SIG_IO::cerr << "Ouch [2] !!!!" << Qt::endl; 
-      exit(1);
-    };
+	if( prg.getProgramLength() != lines.size() )
+	{
+		SIGEL_Tools::SIG_IO::cerr << "Ouch [2] !!!!" << Qt::endl;
+		exit(1);
+	};
 #endif
 
-  return *this;
+	return *this;
 }
 
 long SIGEL_Program::SIG_Program::getProgramLength() const
 {
-     return lines.size();
+	return lines.size();
 }
 
 std::vector< SIGEL_Program::SIG_ProgramLine > &SIGEL_Program::SIG_Program::getPrgLines()
 {
-     return lines;
+	return lines;
 }
 
 void SIGEL_Program::SIG_Program::printToString( QString &str ) const
 {
-  for( long i=0; i<lines.size(); i++ )
-    {
-      QString buffer;
-      lines[i].printToString(buffer);
-      str += buffer;
-    };
+	for( long i=0; i<lines.size(); i++ )
+	{
+		QString buffer;
+		lines[i].printToString(buffer);
+		str += buffer;
+	};
 }
 
 void SIGEL_Program::SIG_Program::print() const
-
 {
-  for (int i=0; i<lines.size(); i++ ) lines[i].print();
+	for (int i=0; i<lines.size(); i++ ) lines[i].print();
 }
 
 void SIGEL_Program::SIG_Program::writeToFile( QTextStream &file ) const
 {
-  for( long i=0; i<getProgramLength(); i++ )
-    {
-      lines[i].writeToFile(file);
-    }
+	for( long i=0; i<getProgramLength(); i++ )
+	{
+		lines[i].writeToFile(file);
+	}
 }
 
 void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
-{ 
-   int                             pos=-1;
-   int                             oldpos=0;
-   int                             lineCnt=0;
+{
+	int                             pos=-1;
+	int                             oldpos=0;
+	int                             lineCnt=0;
 
 #ifdef SIG_DEBUG
 
-   SIGEL_Tools::SIG_IO::cerr << "Reading Program: ..." << Qt::endl;
-   
+	SIGEL_Tools::SIG_IO::cerr << "Reading Program: ..." << Qt::endl;
+
 #endif
 
-   lines.clear();
-   
-   QString programText = file.readAll();
+	lines.clear();
 
-   while((pos=programText.indexOf(QChar('\n'), oldpos))!=-1)
-     {
-        QString lineText = programText.mid( oldpos, pos - oldpos );
-        SIGEL_Program::SIG_ProgramLine prgLine;
-        if( prgLine.readFromFile( lineText, &prgLine ) )
-	  {
-            appendLine( prgLine );
-            lineCnt++;
-	  }
-        oldpos = pos + 1;
-     }
+	QString programText = file.readAll();
+
+	while((pos=programText.indexOf(QChar('\n'), oldpos))!=-1)
+	{
+		QString lineText = programText.mid( oldpos, pos - oldpos );
+		SIGEL_Program::SIG_ProgramLine prgLine;
+		if( prgLine.readFromFile( lineText, &prgLine ) )
+		{
+			appendLine( prgLine );
+			lineCnt++;
+		}
+		oldpos = pos + 1;
+	}
 
 #ifdef SIG_DEBUG
 
-   SIGEL_Tools::SIG_IO::cerr << lineCnt << " LINES READ." << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << lineCnt << " LINES READ." << Qt::endl;
 
 #endif
 }
 
 SIGEL_Program::SIG_ProgramLine const &SIGEL_Program::SIG_Program::getLine( long no ) const
 {
-  checkLineNumber( no );
-  return lines[no];
+	checkLineNumber( no );
+	return lines[no];
 }
 
 void SIGEL_Program::SIG_Program::setLine( long no, SIGEL_Program::SIG_ProgramLine const &line )
 {
-  checkLineNumber( no );
-  lines[no] = line;
+	checkLineNumber( no );
+	lines[no] = line;
 }
 
 void SIGEL_Program::SIG_Program::checkLineNumber( long no ) const
 {
-  if( no < 0 || no >= getProgramLength() )
-    throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, QString( "Program line %1 does not exist; the program has %2 lines." ).arg( no ).arg( lines.size() ) );
+	if( no < 0 || no >= getProgramLength() )
+		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, QString( "Program line %1 does not exist; the program has %2 lines." ).arg( no ).arg( lines.size() ) );
 }
 
 void SIGEL_Program::SIG_Program::deleteLine( long no )
 {
-  // An index past the end deletes nothing; clampLengthToLimits relies on that.
-  if( no<lines.size() )
-    lines.erase( lines.begin() + no );
+	// An index past the end deletes nothing; clampLengthToLimits relies on that.
+	if( no<lines.size() )
+		lines.erase( lines.begin() + no );
 }
 
 void SIGEL_Program::SIG_Program::appendLine( SIGEL_Program::SIG_ProgramLine const &line )
 {
-  lines.push_back( line );
+	lines.push_back( line );
 }
 
 void SIGEL_Program::SIG_Program::insertLine( long no, SIGEL_Program::SIG_ProgramLine const &line )
 {
-  lines.insert( lines.begin() + no, line );
+	lines.insert( lines.begin() + no, line );
 }
 
 void SIGEL_Program::SIG_Program::importProgram( QString& filename )
 {
-   QFile prgFile( filename );
+	QFile prgFile( filename );
 
-   if( prgFile.open( QIODeviceBase::ReadOnly ) )
-     {
-       // The program stays as it was when the read throws.
-       SIG_Program importedProgram;
-       QTextStream buffer( &prgFile );
-       importedProgram.readFromFile( buffer );
-       lines = importedProgram.lines;
-       prgFile.close();
-     }
-   else
-     SIGEL_Tools::SIG_IO::cerr << "Could not import program from "
-			       << filename
-			       << "!" << Qt::endl;  
+	if( prgFile.open( QIODeviceBase::ReadOnly ) )
+	{
+		// The program stays as it was when the read throws.
+		SIG_Program importedProgram;
+		QTextStream buffer( &prgFile );
+		importedProgram.readFromFile( buffer );
+		lines = importedProgram.lines;
+		prgFile.close();
+	}
+	else
+	{
+		SIGEL_Tools::SIG_IO::cerr << "Could not import program from "
+		                          << filename
+		                          << "!" << Qt::endl;
+	}
 }
 
 void SIGEL_Program::SIG_Program::exportProgram( QString& filename ) const
 {
-   QFile prgFile( filename );
+	QFile prgFile( filename );
 
-   if( prgFile.open( QIODeviceBase::WriteOnly ) )
-     {
-       QTextStream buffer( &prgFile );
-       writeToFile( buffer );
-       prgFile.close();
-     }
-   else
-     SIGEL_Tools::SIG_IO::cerr << "Could not export program to "
-			       << filename
-			       << "!" << Qt::endl;  
+	if( prgFile.open( QIODeviceBase::WriteOnly ) )
+	{
+		QTextStream buffer( &prgFile );
+		writeToFile( buffer );
+		prgFile.close();
+	}
+	else
+	{
+		SIGEL_Tools::SIG_IO::cerr << "Could not export program to "
+		                          << filename
+		                          << "!" << Qt::endl;
+	}
 }
 
 SIGEL_Program::SIG_Program::SIG_Program()
-  : lines()
+	: lines()
 {
 }
 
-void SIGEL_Program::SIG_Program::clampLengthToLimits( long minimumLength, 
-						      long maximumLength, 
-						      SIGEL_Tools::SIG_Randomizer &randomizer, 
-						      SIGEL_Robot::SIG_LanguageParameters &languageParameters,
-						      QList< int > &prob,
-						      int &historyInfo )
+void SIGEL_Program::SIG_Program::clampLengthToLimits( long minimumLength,
+                                                      long maximumLength,
+                                                      SIGEL_Tools::SIG_Randomizer &randomizer,
+                                                      SIGEL_Robot::SIG_LanguageParameters &languageParameters,
+                                                      QList< int > &prob,
+                                                      int &historyInfo )
 {
-  long prgLength = getProgramLength();
-  historyInfo    = 0;
+	long prgLength = getProgramLength();
+	historyInfo    = 0;
 
-  if( minimumLength > 0 && prgLength < minimumLength )
-    {
+	if( minimumLength > 0 && prgLength < minimumLength )
+	{
 #ifdef SIG_DEBUG
-     SIGEL_Tools::SIG_IO::cerr << "Program length " << prgLength << " is below the minimum " << minimumLength << "." << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Program length " << prgLength << " is below the minimum " << minimumLength << "." << Qt::endl;
 #endif
-     historyInfo = minimumLength - prgLength;
+		historyInfo = minimumLength - prgLength;
 
-     for( long i = 0; i < minimumLength - prgLength; i++ )
-       {
-        SIGEL_Program::SIG_ProgramLine newLine( randomizer, languageParameters, prob );
+		for( long i = 0; i < minimumLength - prgLength; i++ )
+		{
+			SIGEL_Program::SIG_ProgramLine newLine( randomizer, languageParameters, prob );
 
-        // If there is a problem during the evolution, try to delete the following
-        // instruction:
+			// If there is a problem during the evolution, try to delete the following
+			// instruction:
 
-        newLine.setRobotInstruction( SIGEL_Program::NOP, 0, 0 );
+			newLine.setRobotInstruction( SIGEL_Program::NOP, 0, 0 );
 
-        // If the problem is still existing, please try to delete the line 135 (resizeElements( 0 );)
-        // within the function SIGEL_Program::SIG_ProgramLine::setRobotInstruction.
-  
-        appendLine( newLine );
-       } 
+			// If the problem is still existing, please try to delete the line 135 (resizeElements( 0 );)
+			// within the function SIGEL_Program::SIG_ProgramLine::setRobotInstruction.
 
-#ifdef SIG_DEBUG
-     SIGEL_Tools::SIG_IO::cerr << "Program padded with NOPs to " << getProgramLength() << " lines." << Qt::endl;
-#endif
-    }
-
-  prgLength = getProgramLength();
-
-  if( maximumLength > 0 && prgLength > maximumLength )
-    {
-#ifdef SIG_DEBUG
-     SIGEL_Tools::SIG_IO::cerr << "Program length " << prgLength << " is above the maximum " << maximumLength << "." << Qt::endl;
-#endif
-     historyInfo = maximumLength - prgLength;
-
-     for( long i = prgLength; i >= maximumLength; i-- )
-        deleteLine( i );
+			appendLine( newLine );
+		}
 
 #ifdef SIG_DEBUG
-     SIGEL_Tools::SIG_IO::cerr << "Program truncated to " << getProgramLength() << " lines." << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Program padded with NOPs to " << getProgramLength() << " lines." << Qt::endl;
 #endif
-    }
+	}
+
+	prgLength = getProgramLength();
+
+	if( maximumLength > 0 && prgLength > maximumLength )
+	{
+#ifdef SIG_DEBUG
+		SIGEL_Tools::SIG_IO::cerr << "Program length " << prgLength << " is above the maximum " << maximumLength << "." << Qt::endl;
+#endif
+		historyInfo = maximumLength - prgLength;
+
+		for( long i = prgLength; i >= maximumLength; i-- )
+			deleteLine( i );
+
+#ifdef SIG_DEBUG
+		SIGEL_Tools::SIG_IO::cerr << "Program truncated to " << getProgramLength() << " lines." << Qt::endl;
+#endif
+	}
 }
 
-SIGEL_Program::SIG_Program::SIG_Program( SIGEL_GP::SIG_GPParameter &gpParameter, 
-                                         SIGEL_Robot::SIG_LanguageParameters &languageParameters, 
+SIGEL_Program::SIG_Program::SIG_Program( SIGEL_GP::SIG_GPParameter &gpParameter,
+                                         SIGEL_Robot::SIG_LanguageParameters &languageParameters,
                                          SIGEL_Tools::SIG_Randomizer& randomizer )
-  : lines()
+	: lines()
 {
-  generateRandomProgram( gpParameter, languageParameters, randomizer );
+	generateRandomProgram( gpParameter, languageParameters, randomizer );
 }
 
-void SIGEL_Program::SIG_Program::generateRandomProgram( SIGEL_GP::SIG_GPParameter &gpParameter, 
-                                                        SIGEL_Robot::SIG_LanguageParameters &languageParameters, 
-						        SIGEL_Tools::SIG_Randomizer& randomizer )
+void SIGEL_Program::SIG_Program::generateRandomProgram( SIGEL_GP::SIG_GPParameter &gpParameter,
+                                                        SIGEL_Robot::SIG_LanguageParameters &languageParameters,
+                                                        SIGEL_Tools::SIG_Randomizer& randomizer )
 {
-    lines.clear();
+	lines.clear();
 
-    long programLength = gpParameter.getMinIndLength();
+	long programLength = gpParameter.getMinIndLength();
 
-    // A maximum length of 0 means that there is no maximum.
-    if( gpParameter.getMaxIndLength() > 0 )
-      programLength += randomizer.getRandomInt( gpParameter.getMaxIndLength() - gpParameter.getMinIndLength() + 1 );
+	// A maximum length of 0 means that there is no maximum.
+	if( gpParameter.getMaxIndLength() > 0 )
+		programLength += randomizer.getRandomInt( gpParameter.getMaxIndLength() - gpParameter.getMinIndLength() + 1 );
 
-    for( long x=0; x<programLength; x++ )
-      {
-        SIGEL_Program::SIG_ProgramLine newLine( randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
+	for( long x=0; x<programLength; x++ )
+	{
+		SIGEL_Program::SIG_ProgramLine newLine( randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
 
-        appendLine( newLine );
-      }
+		appendLine( newLine );
+	}
 }
