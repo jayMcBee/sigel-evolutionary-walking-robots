@@ -368,11 +368,6 @@ problem; the choice is made before any code is written.
   every program. The x86 machine got around it without root by giving PVM the
   master's network address in a host file (`PVMHOSTFILE` with `ip=`).
 
-- [ ] **165. Mutation adds a line also if there is no maximum length.**
-  With "Ignore maximum length" the maximum is 0. `SIG_GPOperations::mutation`
-  compares the new length with that 0, so it never adds a line. Crossover
-  and `SIG_Program::clampLengthToLimits` read 0 as "no maximum".
-
 ---
 
 ## 7 · The robot language
