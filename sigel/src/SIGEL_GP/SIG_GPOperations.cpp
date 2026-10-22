@@ -224,40 +224,6 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 		}
 	}
 
-	// truncate programs if they grew too long thus violating the max. prog. length limit
-	long int prgLength1 = newProgram1.getProgramLength();
-	long int prgLength2 = newProgram2.getProgramLength();
-
-	if ((maxLength > 0) && (prgLength1 > maxLength))
-	{
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "\n-> new program (1) too long (length=" << newProgram1.getProgramLength() << ") -> length decreased" << Qt::endl;
-#endif
-
-		for( long int i = maxLength - 1; i < prgLength1; i++ )
-		{	newProgram1.deleteLine( i );
-		}
-
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "-> new length = " << newProgram1.getProgramLength() << Qt::endl;
-#endif
-	}
-
-	if ((maxLength > 0) && (prgLength2 > maxLength))
-	{
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "\n-> new program (2) too long (length=" << newProgram2.getProgramLength() << ") -> length decreased" << Qt::endl;
-#endif
-
-		for( long int i = maxLength - 1; i < prgLength2; i++ )
-		{	newProgram2.deleteLine( i );
-		}
-
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "-> new length = " << newProgram2.getProgramLength() << Qt::endl;
-#endif
-	}
-
 #ifdef SIG_DEBUG
 	SIGEL_Tools::SIG_IO::cerr << "-> new program (1) length = " << newProgram1.getProgramLength() << Qt::endl;
 	SIGEL_Tools::SIG_IO::cerr << "-> new program (2) length = " << newProgram2.getProgramLength() << Qt::endl;

@@ -137,7 +137,7 @@ void SIGEL_Program::SIG_Program::checkLineNumber( long no ) const
 
 void SIGEL_Program::SIG_Program::deleteLine( long no )
 {
-  // An index past the end deletes nothing; crossOver and checkLength rely on that.
+  // An index past the end deletes nothing; checkLength relies on that.
   if( no<lines.size() )
     lines.erase( lines.begin() + no );
 }
