@@ -251,7 +251,7 @@ void SIGEL_Program::SIG_Program::checkLength( long minimumLength,
                                << "): ";
 
 #endif 
-     historyInfo = - prgLength - maximumLength; 
+     historyInfo = maximumLength - prgLength;
 
      for( long i = prgLength; i >= maximumLength; i-- )
         deleteLine( i );
@@ -262,7 +262,6 @@ void SIGEL_Program::SIG_Program::checkLength( long minimumLength,
 			       << getProgramLength()
 			       << " lines." << Qt::endl;
 #endif
-     historyInfo = 2;
     }
 }
 
