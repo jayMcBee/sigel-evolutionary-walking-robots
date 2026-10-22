@@ -77,6 +77,8 @@ namespace SIGEL_Program
 
     void readFromFileReplacesTheOldLines();
 
+    void readFromFileReadsALastLineWithoutALineEnd();
+
     void exportProgramWritesTheFileTextAndImportProgramReadsIt();
 
     void exportProgramReplacesAnExistingFile();

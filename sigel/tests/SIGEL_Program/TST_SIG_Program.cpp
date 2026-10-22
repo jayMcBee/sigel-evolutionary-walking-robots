@@ -246,6 +246,17 @@ void SIGEL_Program::TST_SIG_Program::readFromFileReplacesTheOldLines()
   QCOMPARE( lineTexts( program ), expectedTexts( 1, 2 ) );
 }
 
+void SIGEL_Program::TST_SIG_Program::readFromFileReadsALastLineWithoutALineEnd()
+{
+  QString text = "ADD 1,0\nADD 2,-1";
+  QTextStream stream( &text );
+  SIG_Program program;
+
+  program.readFromFile( stream );
+
+  QCOMPARE( lineTexts( program ), expectedTexts( 1, 2 ) );
+}
+
 void SIGEL_Program::TST_SIG_Program::exportProgramWritesTheFileTextAndImportProgramReadsIt()
 {
   QTemporaryDir folder;
