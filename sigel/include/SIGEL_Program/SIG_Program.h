@@ -221,19 +221,6 @@ class SIG_Program
    void insertLine(long no, SIGEL_Program::SIG_ProgramLine const &line);
 
 /**
- * This constructor creates a program that contains randomly generated program lines. This constructor
- * needs a randomizer because a program does not have an own randomizer. All parameters are simulated
- * by fixed values, e.g. the length is always set to 15. This constructor should only be used for test
- * purposes.
- * @pre
- * A randomizer must exist and must be initialized.
- * @post
- * A randomly generated program will exist.
- */
-   public:
-   SIG_Program(int length, int nop, SIGEL_Tools::SIG_Randomizer &randomizer);
-
-/**
   * This function generates a random program using the language and GP definitions.
   * WARNING: An old program will be deleted.
   * @post
