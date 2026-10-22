@@ -225,8 +225,10 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	                                 gpParameter.getInstructionProbabilities(),
 	                                 historyInfo );
 
-	if( historyInfo > 0 ) crossoverInd1->addLengthIncreasedInfo( actTime, historyInfo );
-	if( historyInfo < 0 ) crossoverInd1->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
+	if( historyInfo > 0 )
+		crossoverInd1->addLengthIncreasedInfo( actTime, historyInfo );
+	if( historyInfo < 0 )
+		crossoverInd1->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
 
 	newProgram2.clampLengthToLimits( minLength,
 	                                 maxLength,
@@ -235,8 +237,10 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	                                 gpParameter.getInstructionProbabilities(),
 	                                 historyInfo );
 
-	if( historyInfo > 0 ) crossoverInd2->addLengthIncreasedInfo( actTime, historyInfo );
-	if( historyInfo < 0 ) crossoverInd2->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
+	if( historyInfo > 0 )
+		crossoverInd2->addLengthIncreasedInfo( actTime, historyInfo );
+	if( historyInfo < 0 )
+		crossoverInd2->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
 
 	crossoverInd1->addCrossOverInfo( winner1.getName(),
 	                                 winner2.getName(),
@@ -376,7 +380,8 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 				{
 					// Operand 1 will be varied:
 					op1 = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
-					if( randomizer.getRandomInt( 2 ) == 1 ) op1 = (-1) * op1;
+					if( randomizer.getRandomInt( 2 ) == 1 )
+						op1 = (-1) * op1;
 					op2 = newProgram.getLine( mutPoint ).getInstructionElement( 1 );
 				}
 				else
@@ -384,7 +389,8 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 					// Operand 2 will be varied:
 					op1 = newProgram.getLine( mutPoint ).getInstructionElement( 0 );
 					op2 = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
-					if( randomizer.getRandomInt( 2 ) == 1 ) op2 = (-1) * op2;
+					if( randomizer.getRandomInt( 2 ) == 1 )
+						op2 = (-1) * op2;
 				}
 			}
 			else
@@ -393,7 +399,8 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 				{
 					// The current program line has only one operand that can be changed:
 					op1 = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
-					if( randomizer.getRandomInt( 2 ) == 1 ) op1 = (-1) * op1;
+					if( randomizer.getRandomInt( 2 ) == 1 )
+						op1 = (-1) * op1;
 				}
 				else
 				{
@@ -507,8 +514,10 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 	QDateTime actTime = QDateTime::currentDateTime();
 
-	if( historyInfo > 0 ) mutatedInd->addLengthIncreasedInfo( actTime, historyInfo );
-	if( historyInfo < 0 ) mutatedInd->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
+	if( historyInfo > 0 )
+		mutatedInd->addLengthIncreasedInfo( actTime, historyInfo );
+	if( historyInfo < 0 )
+		mutatedInd->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
 
 	mutatedInd->addMutationInfo( winner.getName(), actTime, mutPoint, winnerFitness );
 
@@ -546,8 +555,10 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::reproduction( SIGEL_GP::
 
 	QDateTime actTime = QDateTime::currentDateTime();
 
-	if( historyInfo > 0 ) reproducedInd->addLengthIncreasedInfo( actTime, historyInfo );
-	if( historyInfo < 0 ) reproducedInd->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
+	if( historyInfo > 0 )
+		reproducedInd->addLengthIncreasedInfo( actTime, historyInfo );
+	if( historyInfo < 0 )
+		reproducedInd->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
 
 	reproducedInd->addReproductionInfo( winner.getName(), actTime );
 
