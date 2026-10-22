@@ -85,14 +85,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	}
 
 #ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "<CrossOver> Info: ProgramLength = " << minLength;
-
-	if( maxLength==0 )
-	{	SIGEL_Tools::SIG_IO::cerr << " - no limit" << Qt::endl;
-	}
-	else
-	{	SIGEL_Tools::SIG_IO::cerr << " - " << maxLength << Qt::endl;
-	}
+	SIGEL_Tools::SIG_IO::cerr << "Crossover with minimum length " << minLength << " and maximum length " << maxLength << " (0: no maximum)." << Qt::endl;
 #endif
 
 	// check new program lengths if min. program length was requested
@@ -111,15 +104,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 		}
 
 #ifdef SIG_DEBUG
-
-		SIGEL_Tools::SIG_IO::cerr << "-> CrossOver points have been set to "
-		                          << crossPoint1
-		                          << " and "
-		                          << crossPoint2
-		                          << "\nThe resulting legths are: "
-		                          << crossPoint1 + winnerProgram2.getProgramLength() - crossPoint2
-		                          << " and "
-		                          << crossPoint2 + winnerProgram1.getProgramLength() - crossPoint1 << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Crossover points moved to the middle: " << crossPoint1 << " and " << crossPoint2 << "; the children get " << crossPoint1 + winnerProgram2.getProgramLength() - crossPoint2 << " and " << crossPoint2 + winnerProgram1.getProgramLength() - crossPoint1 << " lines." << Qt::endl;
 #endif
 	}
 
@@ -225,8 +210,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	}
 
 #ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "-> new program (1) length = " << newProgram1.getProgramLength() << Qt::endl;
-	SIGEL_Tools::SIG_IO::cerr << "-> new program (2) length = " << newProgram2.getProgramLength() << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "Crossover children have " << newProgram1.getProgramLength() << " and " << newProgram2.getProgramLength() << " lines." << Qt::endl;
 #endif
 
 	QDateTime actTime = QDateTime::currentDateTime();
@@ -297,12 +281,6 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	long int   numberOfOperands     = 0;
 	int        historyInfo;
 
-#ifdef SIG_DEBUG
-
-	SIGEL_Tools::SIG_IO::cerr << "<MUTATION>" << Qt::endl;
-
-#endif            
-
 	SIG_GPIndividual *mutatedInd = new SIG_GPIndividual( SIG_GPParameter(),
 	                                                     winner.getHistory(),
 	                                                     newName,
@@ -360,22 +338,11 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 	if( generalMutationType == 0 )
 	{
-#ifdef SIG_DEBUG
-
-		SIGEL_Tools::SIG_IO::cerr << "<TYPE 0>" << Qt::endl;
-		SIGEL_Tools::SIG_IO::cerr << "line to mutate: [";
-		newProgram.getLine( mutPoint ).print();
-		SIGEL_Tools::SIG_IO::cerr << "]" << Qt::endl;
-
-#endif
-
 		specializedMutation  = randomizer.getRandomInt( 3 );  // 0: Replace an existing program line by a new one
 		                                                      // 1: Change one of the operands
 		                                                      // 2: Change the instruction 
 #ifdef SIG_DEBUG
-
-		SIGEL_Tools::SIG_IO::cerr << "<SUBTYPE " << specializedMutation << ">" << Qt::endl;
-
+		SIGEL_Tools::SIG_IO::cerr << "Mutation changes line " << mutPoint << ", kind " << specializedMutation << " (0: new line, 1: operand, 2: instruction)." << Qt::endl;
 #endif
 
 		switch( specializedMutation )
@@ -504,11 +471,8 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 		}
 
 #ifdef SIG_DEBUG
-
-		SIGEL_Tools::SIG_IO::cerr << "result: [";
+		SIGEL_Tools::SIG_IO::cerr << "Mutation result: ";
 		newProgram.getLine( mutPoint ).print();
-		SIGEL_Tools::SIG_IO::cerr << "]" << Qt::endl;
-
 #endif
 	}
 
@@ -517,9 +481,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 		if( maxLength == 0 || newProgram.getProgramLength() + 1 <= maxLength )
 		{
 #ifdef SIG_DEBUG
-
-			SIGEL_Tools::SIG_IO::cerr << "<TYPE 1>" << Qt::endl;
-
+			SIGEL_Tools::SIG_IO::cerr << "Mutation inserts a line at " << mutPoint << "." << Qt::endl;
 #endif
 
 			SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
@@ -535,9 +497,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 		if( newProgram.getProgramLength() - 1 >= minLength )
 		{
 #ifdef SIG_DEBUG
-
-			SIGEL_Tools::SIG_IO::cerr << "<TYPE 2>" << Qt::endl;
-
+			SIGEL_Tools::SIG_IO::cerr << "Mutation deletes line " << mutPoint << "." << Qt::endl;
 #endif
 
 			newProgram.deleteLine( mutPoint );
@@ -547,9 +507,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 			if( maxLength == 0 || newProgram.getProgramLength() + 1 <= maxLength )
 			{
 #ifdef SIG_DEBUG
-
-				SIGEL_Tools::SIG_IO::cerr << "<TYPE 1>" << Qt::endl;
-
+				SIGEL_Tools::SIG_IO::cerr << "Mutation inserts a line at " << mutPoint << "." << Qt::endl;
 #endif
 
 				SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
@@ -558,12 +516,6 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 			}
 		}
 	}
-
-#ifdef SIG_DEBUG
-
-	SIGEL_Tools::SIG_IO::cerr << "\n" << Qt::endl;
-
-#endif
 
 	QDateTime actTime = QDateTime::currentDateTime();
 
@@ -595,18 +547,6 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::reproduction( SIGEL_GP::
 	long const minLength = gpParameter.getMinIndLength();
 	long const maxLength = gpParameter.getMaxIndLength();
 	int  historyInfo;
-
-#ifdef SIG_DEBUG
-
-	SIGEL_Tools::SIG_IO::cerr << "<REPRODUCTION>" << Qt::endl;
-
-	if (!reproducedInd)
-	{
-		SIGEL_Tools::SIG_IO::cerr << "reproduction: could not create a new individual." << Qt::endl;
-		exit(1);
-	};
-
-#endif
 
 	reproducedInd->getProgramVar() = winner.getProgramVar();
 
