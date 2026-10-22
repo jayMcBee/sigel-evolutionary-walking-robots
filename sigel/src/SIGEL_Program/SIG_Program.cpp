@@ -76,12 +76,6 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
 	int                             oldpos=0;
 	int                             lineCnt=0;
 
-#ifdef SIG_DEBUG
-
-	SIGEL_Tools::SIG_IO::cerr << "Reading Program: ..." << Qt::endl;
-
-#endif
-
 	lines.clear();
 
 	QString programText = file.readAll();
@@ -99,9 +93,7 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
 	}
 
 #ifdef SIG_DEBUG
-
-	SIGEL_Tools::SIG_IO::cerr << lineCnt << " LINES READ." << Qt::endl;
-
+	SIGEL_Tools::SIG_IO::cerr << "Program read with " << lineCnt << " lines." << Qt::endl;
 #endif
 }
 
@@ -205,14 +197,8 @@ void SIGEL_Program::SIG_Program::clampLengthToLimits( long minimumLength,
 		{
 			SIGEL_Program::SIG_ProgramLine newLine( randomizer, languageParameters, prob );
 
-			// If there is a problem during the evolution, try to delete the following
-			// instruction:
-
+			// A padding line is a NOP: it changes nothing and only takes the NOP's time.
 			newLine.setRobotInstruction( SIGEL_Program::NOP, 0, 0 );
-
-			// If the problem is still existing, please try to delete the line 135 (resizeElements( 0 );)
-			// within the function SIGEL_Program::SIG_ProgramLine::setRobotInstruction.
-
 			appendLine( newLine );
 		}
 
