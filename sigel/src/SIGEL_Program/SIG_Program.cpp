@@ -27,23 +27,12 @@
 #include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
-#include "stdlib.h"
-
-
 SIGEL_Program::SIG_Program& SIGEL_Program::SIG_Program::operator =(SIGEL_Program::SIG_Program &prg)
 {
 	lines.clear();
 
 	for( long i=0; i<prg.getProgramLength(); i++ )
 		appendLine( prg.getLine( i ) );
-
-#ifdef SIG_DEBUG
-	if( prg.getProgramLength() != lines.size() )
-	{
-		SIGEL_Tools::SIG_IO::cerr << "Ouch [2] !!!!" << Qt::endl;
-		exit(1);
-	};
-#endif
 
 	return *this;
 }
