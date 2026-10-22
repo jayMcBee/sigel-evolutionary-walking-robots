@@ -72,6 +72,8 @@ namespace SIGEL_GP
 
     void mutationWithEqualLimitsOnlyChangesALine();
 
+    void mutationWithMaximumZeroAddsALine();
+
     void mutationBringsAParentOutsideTheLimitsInside();
 
     void mutationLeavesTheParentAlone();

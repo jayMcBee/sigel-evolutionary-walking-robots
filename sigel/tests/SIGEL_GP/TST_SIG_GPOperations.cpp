@@ -205,6 +205,27 @@ void SIGEL_GP::TST_SIG_GPOperations::mutationWithEqualLimitsOnlyChangesALine()
   }
 }
 
+void SIGEL_GP::TST_SIG_GPOperations::mutationWithMaximumZeroAddsALine()
+{
+  SIG_GPParameter gpParameter;
+  gpParameter.setMinIndLength( 5 );
+  gpParameter.setMaxIndLength( 0 );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  QMap<QString, int> kinds;
+
+  for ( int seed = 1; seed <= seeds; seed++ )
+  {
+    SIGEL_Tools::SIG_Randomizer randomizer( seed );
+    std::unique_ptr<SIG_GPIndividual> father = parent( randomizer, 10 );
+
+    std::unique_ptr<SIG_GPIndividual> child( &SIG_GPOperations::mutation( *father, 3, "child", randomizer, gpParameter, languageParameters ) );
+
+    kinds[ mutationKind( lineTexts( father->getProgram() ), lineTexts( child->getProgram() ) ) ]++;
+  }
+
+  QVERIFY( kinds.value( "added" ) > 0 );
+}
+
 void SIGEL_GP::TST_SIG_GPOperations::mutationBringsAParentOutsideTheLimitsInside()
 {
   SIG_GPParameter gpParameter;
