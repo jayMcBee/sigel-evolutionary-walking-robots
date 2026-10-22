@@ -301,6 +301,13 @@ problem; the choice is made before any code is written.
   same time. Either two commands, start and stop, or one command with a duration operand. New
   commands change `LanguageParameters` and the experiment files.
 
+- [ ] **178. The two-point crossover copies one line too many.**
+  In `SIG_GPOperations::crossOver`, variant 3 inserts the segment of the
+  other parent up to and including `crossPoint+segLen`, but the parent's own
+  rest also starts at `crossPoint+segLen`. So the last line of each segment
+  goes into both children, and every two-point crossover makes the children
+  longer than the parents. The segments are meant to be swapped exactly.
+
 - [ ] **117. Let mutation tune operands in steps.**
   `SIG_GPOperations::mutation` only replaces an operand with a new value over
   the whole range; torque, drive number, jump distance and register number
