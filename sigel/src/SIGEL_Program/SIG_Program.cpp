@@ -205,14 +205,8 @@ void SIGEL_Program::SIG_Program::clampLengthToLimits( long minimumLength,
   if( minimumLength > 0 && prgLength < minimumLength )
     {
 #ifdef SIG_DEBUG
-
-     SIGEL_Tools::SIG_IO::cerr << "\n\n--> PROGRAM LENGTH ("
-                               << prgLength
-                               << ") TOO SHORT (minimum="
-                               << minimumLength
-                               << "): ";
-
-#endif   
+     SIGEL_Tools::SIG_IO::cerr << "Program length " << prgLength << " is below the minimum " << minimumLength << "." << Qt::endl;
+#endif
      historyInfo = minimumLength - prgLength;
 
      for( long i = 0; i < minimumLength - prgLength; i++ )
@@ -231,10 +225,7 @@ void SIGEL_Program::SIG_Program::clampLengthToLimits( long minimumLength,
        } 
 
 #ifdef SIG_DEBUG
-
-     SIGEL_Tools::SIG_IO::cerr << "Program increased to " 
-			       << getProgramLength()
-			       << " lines." << Qt::endl;
+     SIGEL_Tools::SIG_IO::cerr << "Program padded with NOPs to " << getProgramLength() << " lines." << Qt::endl;
 #endif
     }
 
@@ -243,24 +234,15 @@ void SIGEL_Program::SIG_Program::clampLengthToLimits( long minimumLength,
   if( maximumLength > 0 && prgLength > maximumLength )
     {
 #ifdef SIG_DEBUG
-
-     SIGEL_Tools::SIG_IO::cerr << "\n\n--> PROGRAM LENGTH ("
-                               << prgLength
-                               << ") TOO LONG (maximum="
-			       << maximumLength
-                               << "): ";
-
-#endif 
+     SIGEL_Tools::SIG_IO::cerr << "Program length " << prgLength << " is above the maximum " << maximumLength << "." << Qt::endl;
+#endif
      historyInfo = maximumLength - prgLength;
 
      for( long i = prgLength; i >= maximumLength; i-- )
         deleteLine( i );
 
 #ifdef SIG_DEBUG
-
-     SIGEL_Tools::SIG_IO::cerr << "Program decreased to " 
-			       << getProgramLength()
-			       << " lines." << Qt::endl;
+     SIGEL_Tools::SIG_IO::cerr << "Program truncated to " << getProgramLength() << " lines." << Qt::endl;
 #endif
     }
 }
