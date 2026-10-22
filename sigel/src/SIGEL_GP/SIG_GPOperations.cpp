@@ -116,7 +116,6 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	long const generalRecombinationType = randomizer.getRandomInt(5);
 
 	// Recombination/Crossover, Variant 1:
-	// (just guessing from the code, obviously nobody thought it was worth commenting..  -jan)
 	// Simple 1 point crossover, create two new programs
 	if( generalRecombinationType == 0 )
 	{
@@ -132,13 +131,13 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 			newProgram1.appendLine( winnerProgram2.getLine( j ) );
 		}
 
-		// the other way round:  copy first part of prog. 2
+		// copy first part of program 2
 		for (long int k = 0; k < crossPoint2; k++)
 		{
 			newProgram2.appendLine( winnerProgram2.getLine( k ) );
 		}
 
-		// you might have guessed it: append 2. part of first program
+		// append second part of program 1
 		for (long int l = crossPoint1; l < winnerProgram1.getProgramLength(); l++)
 		{
 			newProgram2.appendLine( winnerProgram1.getLine( l ) );
@@ -146,8 +145,8 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	}
 
 	// Recombination/Crossover, Variant 2:
-	// (Do *you* detect any meaningful difference ..?  The implementor seemed to be a bit confused..)
 	// Simple 1 point crossover, again creating two new programs
+	// It builds the same two children as variant 1.
 	if( generalRecombinationType == 1 )
 	{
 		for( long int i = 0; i < crossPoint2; i++ )
