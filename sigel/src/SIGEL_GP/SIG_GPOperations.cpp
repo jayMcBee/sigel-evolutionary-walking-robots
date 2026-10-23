@@ -113,11 +113,11 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 
 	// randomly select any recombination type; currently the 2-point-c/o
 	// has a chance of 3:2 to be selected !
-	long const generalRecombinationType = randomizer.getRandomInt(5);
+	bool const twoPoint = randomizer.getRandomInt( 5 ) >= 2;
 
 	// Recombination/Crossover, Variant 1:
 	// Simple 1 point crossover, create two new programs
-	if( generalRecombinationType == 0 )
+	if( !twoPoint )
 	{
 		// copy first part of program 1
 		for (long int i = 0; i < crossPoint1; i++)
@@ -145,34 +145,8 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	}
 
 	// Recombination/Crossover, Variant 2:
-	// Simple 1 point crossover, again creating two new programs
-	// It builds the same two children as variant 1.
-	if( generalRecombinationType == 1 )
-	{
-		for( long int i = 0; i < crossPoint2; i++ )
-		{
-			newProgram2.appendLine( winnerProgram2.getLine( i ) );
-		}
-
-		for( long int j = crossPoint1; j < winnerProgram1.getProgramLength(); j++ )
-		{
-			newProgram2.appendLine( winnerProgram1.getLine( j ) );
-		}
-
-		for( long int k = 0; k < crossPoint1; k++ )
-		{
-			newProgram1.appendLine( winnerProgram1.getLine( k ) );
-		}
-
-		for( long int m = crossPoint2; m < winnerProgram2.getProgramLength(); m++ )
-		{
-			newProgram1.appendLine( winnerProgram2.getLine( m ) );
-		}
-	}
-
-	// Recombination/Crossover, Variant 3:
 	// 2 point crossover preferring short sequences (max. 1/10 of program length), creates two new programs
-	if (generalRecombinationType >= 2)
+	if( twoPoint )
 	{
 		// newprog1 -- copy first part of program 1
 		for (long int i = 0; i < crossPoint1; i++)
