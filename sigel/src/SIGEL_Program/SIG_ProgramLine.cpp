@@ -28,18 +28,6 @@
 #include "stdlib.h"
 #include <qtextstream.h>
 
-SIGEL_Program::SIG_ProgramLine& SIGEL_Program::SIG_ProgramLine::operator =(SIGEL_Program::SIG_ProgramLine const & prgLine)
-{ 
-  setRobotInstructionType( prgLine.getRobotInstructionType() );
-
-  element.resize( prgLine.getNumberOfElements() );
-
-  for( int i=0;i<prgLine.getNumberOfElements();i++ )
-    setElement( i, prgLine.getElement(i) );
-       
-  return *this;
-}
-
 SIGEL_Program::SIG_ProgramLine::SIG_ProgramLine()
 {}
 

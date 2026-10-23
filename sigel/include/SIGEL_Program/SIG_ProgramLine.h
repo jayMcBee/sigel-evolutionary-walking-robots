@@ -226,7 +226,7 @@ namespace SIGEL_Program
 		 * @post
 		 * The current program line will be copied completely.
 		 */
-		SIGEL_Program::SIG_ProgramLine& operator =(SIGEL_Program::SIG_ProgramLine const & prgLine);
+		SIGEL_Program::SIG_ProgramLine &operator=( SIGEL_Program::SIG_ProgramLine const & ) = default;
 
 		/**
 		 * Sets the robot instrction type, e.g. SIGEL_Program::COPY, ...
