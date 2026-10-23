@@ -431,9 +431,7 @@ void SIGEL_GP::SIG_GPOperations::changeInstructionMutation( SIGEL_Program::SIG_P
                                                             SIGEL_Robot::SIG_LanguageParameters &languageParameters,
                                                             QList< int > &instructionProbabilities )
 {
-	int op1;
-	int op2;
-	readOperands( newProgram.getLine( mutPoint ), op1, op2 );
+	auto [op1, op2] = readOperands( newProgram.getLine( mutPoint ) );
 
 	// Create a completely new program line to take the mutated data from:
 	SIGEL_Program::SIG_ProgramLine randomLine( randomizer,
@@ -465,18 +463,15 @@ void SIGEL_GP::SIG_GPOperations::changeInstructionMutation( SIGEL_Program::SIG_P
 	newProgram.setLine( mutPoint, mutatedLine );
 }
 
-void SIGEL_GP::SIG_GPOperations::readOperands( SIGEL_Program::SIG_ProgramLine const &line,
-                                               int &op1,
-                                               int &op2 )
+std::pair<int, int> SIGEL_GP::SIG_GPOperations::readOperands( SIGEL_Program::SIG_ProgramLine const &line )
 {
-	op1 = 0;
-	op2 = 0;
 	if( line.getRobotInstructionType() == SIGEL_Program::NOP )
-		return;
+		return { 0, 0 };
 
-	op1 = line.getInstructionElement( 0 );
 	if( line.getNumberOfElements() == 2 )
-		op2 = line.getInstructionElement( 1 );
+		return { line.getInstructionElement( 0 ), line.getInstructionElement( 1 ) };
+
+	return { line.getInstructionElement( 0 ), 0 };
 }
 
 int SIGEL_GP::SIG_GPOperations::randomOperand( SIGEL_Tools::SIG_Randomizer &randomizer )
