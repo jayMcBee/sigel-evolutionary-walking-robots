@@ -29,6 +29,7 @@
 #include "SIGEL_GP/SIG_GPParameter.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 #include <qstring.h>
+#include <optional>
 #include <utility>
 
 namespace SIGEL_GP
@@ -177,8 +178,8 @@ namespace SIGEL_GP
 		static void deleteLineMutation( SIGEL_Program::SIG_Program &newProgram,
 		                                long int mutPoint );
 
-		// Get operands (op1, op2) of line; 0 for an operand the line does not have.
-		static std::pair<int, int> readOperands( SIGEL_Program::SIG_ProgramLine const &line );
+		// Get operands (op1, op2) of line; empty for an operand the line does not have.
+		static std::pair<std::optional<int>, std::optional<int>> readOperands( SIGEL_Program::SIG_ProgramLine const &line );
 
 		// A random operand over the full range, with a random sign.
 		static int randomOperand( SIGEL_Tools::SIG_Randomizer &randomizer );

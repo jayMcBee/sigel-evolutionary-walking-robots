@@ -406,47 +406,32 @@ void SIGEL_GP::SIG_GPOperations::changeInstructionMutation( SIGEL_Program::SIG_P
                                                             SIGEL_Robot::SIG_LanguageParameters &languageParameters,
                                                             QList< int > &instructionProbabilities )
 {
-	auto [op1, op2] = readOperands( newProgram.getLine( mutPoint ) );
+	auto const [oldOperand1, oldOperand2] = readOperands( newProgram.getLine( mutPoint ) );
 
 	// Create a completely new program line to take the mutated data from:
-	SIGEL_Program::SIG_ProgramLine randomLine( randomizer,
-	                                           languageParameters,
-	                                           instructionProbabilities );
+	SIGEL_Program::SIG_ProgramLine mutatedLine( randomizer,
+	                                            languageParameters,
+	                                            instructionProbabilities );
 
-	if( randomLine.getRobotInstructionType() != SIGEL_Program::NOP )
-	{
-		// The number of operands must eventually be increased for the new line,
-		// because the new instruction type requires more operands. In this case
-		// the operand(s) will be taken from the new generated line (s. above):
-		if( ( randomLine.getNumberOfElements() >= 1 ) && ( op1 == 0 ) )
-			op1 = randomLine.getInstructionElement( 0 );
+	// The new instruction keeps the operands the old line has:
+	if( oldOperand1.has_value() && mutatedLine.getNumberOfElements() >= 1 )
+		mutatedLine.setElement( 0, oldOperand1.value() );
 
-		if( ( randomLine.getNumberOfElements() == 2 ) && ( op2 == 0 ) )
-			op2 = randomLine.getInstructionElement( 1 );
-	}
-	else
-	{
-		// No further operands are required in case of a NOP instruction:
-		op1 = 0;
-		op2 = 0;
-	}
+	if( oldOperand2.has_value() && mutatedLine.getNumberOfElements() == 2 )
+		mutatedLine.setElement( 1, oldOperand2.value() );
 
-	SIGEL_Program::SIG_ProgramLine mutatedLine = newProgram.getLine( mutPoint );
-	mutatedLine.setRobotInstruction( randomLine.getRobotInstructionType(),
-	                                 op1,
-	                                 op2 );
 	newProgram.setLine( mutPoint, mutatedLine );
 }
 
-std::pair<int, int> SIGEL_GP::SIG_GPOperations::readOperands( SIGEL_Program::SIG_ProgramLine const &line )
+std::pair<std::optional<int>, std::optional<int>> SIGEL_GP::SIG_GPOperations::readOperands( SIGEL_Program::SIG_ProgramLine const &line )
 {
 	if( line.getRobotInstructionType() == SIGEL_Program::NOP )
-		return { 0, 0 };
+		return { std::nullopt, std::nullopt };
 
 	if( line.getNumberOfElements() == 2 )
 		return { line.getInstructionElement( 0 ), line.getInstructionElement( 1 ) };
 
-	return { line.getInstructionElement( 0 ), 0 };
+	return { line.getInstructionElement( 0 ), std::nullopt };
 }
 
 int SIGEL_GP::SIG_GPOperations::randomOperand( SIGEL_Tools::SIG_Randomizer &randomizer )
