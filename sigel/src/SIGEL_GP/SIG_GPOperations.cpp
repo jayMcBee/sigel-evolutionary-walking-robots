@@ -339,57 +339,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 			break;
 
 		case LineMutationType::ChangeOperand:
-			// -------------------------------------------------------------------------------
-			// Mutate a randomly chosen operand. It is important to take care about the
-			// program line type, because the number of operands is dependent on the program
-			// line instruction.
-			// -------------------------------------------------------------------------------
-			if( numberOfOperands == 2 )
-			{
-				// If the number of operands is two, select one randomly, change it randomly,
-				// and let the other operand untouched:
-				if( randomizer.getRandomInt( 2 ) == 0 )
-				{
-					// Operand 1 will be varied:
-					op1 = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
-					if( randomizer.getRandomInt( 2 ) == 1 )
-						op1 = (-1) * op1;
-					op2 = newProgram.getLine( mutPoint ).getInstructionElement( 1 );
-				}
-				else
-				{
-					// Operand 2 will be varied:
-					op1 = newProgram.getLine( mutPoint ).getInstructionElement( 0 );
-					op2 = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
-					if( randomizer.getRandomInt( 2 ) == 1 )
-						op2 = (-1) * op2;
-				}
-			}
-			else
-			{
-				if( instructionType != SIGEL_Program::NOP )
-				{
-					// The current program line has only one operand that can be changed:
-					op1 = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
-					if( randomizer.getRandomInt( 2 ) == 1 )
-						op1 = (-1) * op1;
-				}
-				else
-				{
-					// The current program line has no operands:
-					op1 = 0;
-					op2 = 0;
-				}
-			}
-
-			// Set the new program line properties (in this case the operands):
-			{
-				SIGEL_Program::SIG_ProgramLine mutatedLine = newProgram.getLine( mutPoint );
-				mutatedLine.setRobotInstruction( instructionType,
-				                                 op1,
-				                                 op2 );
-				newProgram.setLine( mutPoint, mutatedLine );
-			}
+			changeOperandMutation( newProgram, mutPoint, randomizer );
 			break;
 
 		case LineMutationType::ChangeInstruction:
@@ -504,6 +454,61 @@ void SIGEL_GP::SIG_GPOperations::replaceLineMutation( SIGEL_Program::SIG_Program
 	mutatedLine.randomRobotInstruction( languageParameters,
 	                                    randomizer,
 	                                    instructionProbabilities );
+	newProgram.setLine( mutPoint, mutatedLine );
+}
+
+void SIGEL_GP::SIG_GPOperations::changeOperandMutation( SIGEL_Program::SIG_Program &newProgram,
+                                                        long int mutPoint,
+                                                        SIGEL_Tools::SIG_Randomizer &randomizer )
+{
+	SIGEL_Program::RobotInstruction const instructionType = newProgram.getLine( mutPoint ).getRobotInstructionType();
+	long int const numberOfOperands = newProgram.getLine( mutPoint ).getNumberOfElements();
+	int op1 = 0;
+	int op2 = 0;
+
+	if( numberOfOperands == 2 )
+	{
+		// If the number of operands is two, select one randomly, change it randomly,
+		// and let the other operand untouched:
+		if( randomizer.getRandomInt( 2 ) == 0 )
+		{
+			// Operand 1 will be varied:
+			op1 = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
+			if( randomizer.getRandomInt( 2 ) == 1 )
+				op1 = (-1) * op1;
+			op2 = newProgram.getLine( mutPoint ).getInstructionElement( 1 );
+		}
+		else
+		{
+			// Operand 2 will be varied:
+			op1 = newProgram.getLine( mutPoint ).getInstructionElement( 0 );
+			op2 = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
+			if( randomizer.getRandomInt( 2 ) == 1 )
+				op2 = (-1) * op2;
+		}
+	}
+	else
+	{
+		if( instructionType != SIGEL_Program::NOP )
+		{
+			// The current program line has only one operand that can be changed:
+			op1 = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
+			if( randomizer.getRandomInt( 2 ) == 1 )
+				op1 = (-1) * op1;
+		}
+		else
+		{
+			// The current program line has no operands:
+			op1 = 0;
+			op2 = 0;
+		}
+	}
+
+	// Set the new program line properties (in this case the operands):
+	SIGEL_Program::SIG_ProgramLine mutatedLine = newProgram.getLine( mutPoint );
+	mutatedLine.setRobotInstruction( instructionType,
+	                                 op1,
+	                                 op2 );
 	newProgram.setLine( mutPoint, mutatedLine );
 }
 

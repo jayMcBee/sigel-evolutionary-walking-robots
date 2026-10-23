@@ -152,6 +152,11 @@ namespace SIGEL_GP
 		                                 SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 		                                 QList< int > &instructionProbabilities );
 
+		// Mutate a randomly chosen operand; the number of operands depends on the instruction.
+		static void changeOperandMutation( SIGEL_Program::SIG_Program &newProgram,
+		                                   long int mutPoint,
+		                                   SIGEL_Tools::SIG_Randomizer &randomizer );
+
 		// The random draws in mutation pick by position: the order of the values must not change.
 		enum class MutationType { ChangeLine, InsertLine, DeleteLine };
 
