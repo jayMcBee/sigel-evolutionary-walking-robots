@@ -157,6 +157,9 @@ namespace SIGEL_GP
 		                                   long int mutPoint,
 		                                   SIGEL_Tools::SIG_Randomizer &randomizer );
 
+		// A random operand over the full range, with a random sign.
+		static int randomOperand( SIGEL_Tools::SIG_Randomizer &randomizer );
+
 		// The random draws in mutation pick by position: the order of the values must not change.
 		enum class MutationType { ChangeLine, InsertLine, DeleteLine };
 

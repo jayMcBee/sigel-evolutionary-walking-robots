@@ -472,36 +472,19 @@ void SIGEL_GP::SIG_GPOperations::changeOperandMutation( SIGEL_Program::SIG_Progr
 		// and let the other operand untouched:
 		if( randomizer.getRandomInt( 2 ) == 0 )
 		{
-			// Operand 1 will be varied:
-			op1 = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
-			if( randomizer.getRandomInt( 2 ) == 1 )
-				op1 = (-1) * op1;
+			op1 = randomOperand( randomizer );
 			op2 = newProgram.getLine( mutPoint ).getInstructionElement( 1 );
 		}
 		else
 		{
-			// Operand 2 will be varied:
 			op1 = newProgram.getLine( mutPoint ).getInstructionElement( 0 );
-			op2 = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
-			if( randomizer.getRandomInt( 2 ) == 1 )
-				op2 = (-1) * op2;
+			op2 = randomOperand( randomizer );
 		}
 	}
-	else
+	else if( instructionType != SIGEL_Program::NOP )
 	{
-		if( instructionType != SIGEL_Program::NOP )
-		{
-			// The current program line has only one operand that can be changed:
-			op1 = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
-			if( randomizer.getRandomInt( 2 ) == 1 )
-				op1 = (-1) * op1;
-		}
-		else
-		{
-			// The current program line has no operands:
-			op1 = 0;
-			op2 = 0;
-		}
+		// The current program line has only one operand that can be changed:
+		op1 = randomOperand( randomizer );
 	}
 
 	// Set the new program line properties (in this case the operands):
@@ -510,6 +493,15 @@ void SIGEL_GP::SIG_GPOperations::changeOperandMutation( SIGEL_Program::SIG_Progr
 	                                 op1,
 	                                 op2 );
 	newProgram.setLine( mutPoint, mutatedLine );
+}
+
+int SIGEL_GP::SIG_GPOperations::randomOperand( SIGEL_Tools::SIG_Randomizer &randomizer )
+{
+	int const operand = randomizer.getRandomInt( SIGEL_Tools::SIG_Randomizer::fullRandomIntRange );
+	if( randomizer.getRandomInt( 2 ) == 1 )
+		return -operand;
+
+	return operand;
 }
 
 /*------------------------------------------Reproduction-----------------------------------------*/
