@@ -184,10 +184,8 @@ touched, because changing one changes behaviour against the reference binary.
 - [ ] **106. Review `SIGEL_MasterGUI::SIG_GPParameter` with the maintainer,**
   the GP Parameters page, method by method, deciding each change before it is
   made. Its long methods, `slotItemDoubleClicked` and `slotDeleteHost` above
-  all, have deep nesting and uneven indentation that invite bugs. Split them
-  into smaller methods; make the iterator loops C++11 range-for loops with
-  `auto`. Commented-out code and porting comments hide the logic of the
-  methods they sit in.
+  all, have deep nesting that invites bugs. Split them into smaller methods;
+  make the iterator loops C++11 range-for loops with `auto`.
   The model class of the same name, `SIGEL_GP::SIG_GPParameter`, was reviewed
   first. Still open there: `maxAge`, which the page shows and the file stores
   but nothing reads.
@@ -289,10 +287,10 @@ problem; the choice is made before any code is written.
   very long and hard to read and maintain.
 
 - [ ] **124. Find a modern replacement for pthreads.** The MetaGP thread,
-  the dynamic-client server thread and their locks use `pthread_create`,
-  `pthread_mutex_*` and `pthread_cond_*` directly. Research what should
-  replace them, for example what C++20 offers natively, before any code
-  changes. Item 122 is a fault in this code.
+  the dynamic-client server thread and their locks use `pthread_create` and
+  `pthread_mutex_*` directly. Research what should replace them, for example
+  what C++20 offers natively, before any code changes. Item 122 is a fault in
+  this code.
 
 - [ ] **116. Let drives hold a torque until the program changes it.**
   `SIG_DynaMechsCommandInterface::moveDrive` applies the torque from R0 for
@@ -392,7 +390,7 @@ problem; the choice is made before any code is written.
 - [ ] **168. Consider one description for each robot instruction.** The name
   of an instruction and its number of operands are written out for each
   instruction in `SIG_ProgramLine` (`setRobotInstruction`, `printToString`,
-  `writeToFile`, `readFromFile`, `randomRobotInstruction`), in the command
+  `writeToFile`, `readFromFile`), in the command
   list of `SIGEL_MasterGUI::SIG_LanguageParameters`, and by number of
   operands in `MT_Classifier::createDoubleTransIndi` and
   `MT_Substitute::translatedSIGProg`. A new instruction needs an edit in each
