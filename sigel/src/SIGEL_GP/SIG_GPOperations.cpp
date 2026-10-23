@@ -273,10 +273,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
                                                                   SIGEL_Robot::SIG_LanguageParameters &languageParameters)
 {
 	double     winnerFitness        = winner.getFitness();
-	int        generalMutationType  = randomizer.getRandomInt( 3 );  // 0: Variation of existing program line
-	                                                                 // 1: Add a new random program line
-	                                                                 // 2: Delete an existing program line
-	int        specializedMutation  = 0;
+	MutationType mutationType       = static_cast<MutationType>( randomizer.getRandomInt( mutationTypeCount ) );
 	long const minLength            = gpParameter.getMinIndLength();
 	long const maxLength            = gpParameter.getMaxIndLength();
 	int        op1                  = 0;
@@ -340,18 +337,17 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	// -----------------------------------------
 	// An existing program line will be mutated:
 	// -----------------------------------------
-	if( generalMutationType == 0 )
+	if( mutationType == MutationType::ChangeLine )
 	{
-		specializedMutation  = randomizer.getRandomInt( 3 );  // 0: Replace an existing program line by a new one
-		                                                      // 1: Change one of the operands
-		                                                      // 2: Change the instruction
+		LineMutationType const lineMutationType = static_cast<LineMutationType>( randomizer.getRandomInt( lineMutationTypeCount ) );
+
 #ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Mutation changes line " << mutPoint << ", kind " << specializedMutation << " (0: new line, 1: operand, 2: instruction)." << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Mutation changes line " << mutPoint << ", kind " << static_cast<int>( lineMutationType ) << " (0: new line, 1: operand, 2: instruction)." << Qt::endl;
 #endif
 
-		switch( specializedMutation )
+		switch( lineMutationType )
 		{
-		case 0:
+		case LineMutationType::ReplaceLine:
 			// -------------------------------------------------------------------------------
 			// Generate (randomly) a completely new program line by replacing the old content:
 			// -------------------------------------------------------------------------------
@@ -365,7 +361,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 			}
 			break;
 
-		case 1:
+		case LineMutationType::ChangeOperand:
 			// -------------------------------------------------------------------------------
 			// Mutate a randomly chosen operand. It is important to take care about the
 			// program line type, because the number of operands is dependent on the program
@@ -420,7 +416,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 			}
 			break;
 
-		case 2:
+		case LineMutationType::ChangeInstruction:
 			// -------------------------------------------------------------------------------
 			// Change the instruction type. It is very important to take care about the
 			// following case:
@@ -468,7 +464,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 #endif
 	}
 
-	if( generalMutationType == 1 )
+	if( mutationType == MutationType::InsertLine )
 	{
 		if( maxLength == 0 || newProgram.getProgramLength() + 1 <= maxLength )
 		{
@@ -482,11 +478,11 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 		}
 		else
 		{
-			generalMutationType = 2;
+			mutationType = MutationType::DeleteLine;
 		}
 	}
 
-	if( generalMutationType == 2 )
+	if( mutationType == MutationType::DeleteLine )
 	{
 		if( newProgram.getProgramLength() - 1 >= minLength )
 		{

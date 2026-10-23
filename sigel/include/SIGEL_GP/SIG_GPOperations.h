@@ -124,6 +124,16 @@ class SIG_GPOperations
 						  SIGEL_Tools::SIG_Randomizer& randomizer,
 						  SIGEL_GP::SIG_GPParameter& gpParameter,
 						  SIGEL_Robot::SIG_LanguageParameters &languageParameters );
+
+ private:
+  // The random draws in mutation pick by position: the order of the values must not change.
+  enum class MutationType { ChangeLine, InsertLine, DeleteLine };
+
+  // How MutationType::ChangeLine changes the line.
+  enum class LineMutationType { ReplaceLine, ChangeOperand, ChangeInstruction };
+
+  static constexpr int mutationTypeCount = static_cast<int>( MutationType::DeleteLine ) + 1;
+  static constexpr int lineMutationTypeCount = static_cast<int>( LineMutationType::ChangeInstruction ) + 1;
 };
 
 }
