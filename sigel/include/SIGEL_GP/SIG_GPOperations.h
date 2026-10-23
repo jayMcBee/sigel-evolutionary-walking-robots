@@ -125,6 +125,26 @@ namespace SIGEL_GP
 		                                                 SIGEL_Robot::SIG_LanguageParameters &languageParameters );
 
 	private:
+		// Recombination/Crossover, Variant 1:
+		// Simple 1 point crossover, create two new programs
+		static void onePointCrossOver( SIGEL_Program::SIG_Program const &winnerProgram1,
+		                               SIGEL_Program::SIG_Program const &winnerProgram2,
+		                               long int crossPoint1,
+		                               long int crossPoint2,
+		                               SIGEL_Program::SIG_Program &newProgram1,
+		                               SIGEL_Program::SIG_Program &newProgram2 );
+
+		// Recombination/Crossover, Variant 2:
+		// 2 point crossover, creates two new programs
+		static void twoPointCrossOver( SIGEL_Program::SIG_Program const &winnerProgram1,
+		                               SIGEL_Program::SIG_Program const &winnerProgram2,
+		                               long int crossPoint1,
+		                               long int crossPoint2,
+		                               long int segLen1,
+		                               long int segLen2,
+		                               SIGEL_Program::SIG_Program &newProgram1,
+		                               SIGEL_Program::SIG_Program &newProgram2 );
+
 		// The random draws in mutation pick by position: the order of the values must not change.
 		enum class MutationType { ChangeLine, InsertLine, DeleteLine };
 

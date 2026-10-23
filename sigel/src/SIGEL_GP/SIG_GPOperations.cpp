@@ -115,75 +115,10 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	// has a chance of 3:2 to be selected !
 	bool const twoPoint = randomizer.getRandomInt( 5 ) >= 2;
 
-	// Recombination/Crossover, Variant 2:
-	// 2 point crossover preferring short sequences (max. 1/10 of program length), creates two new programs
 	if( twoPoint )
-	{
-		// newprog1 -- copy first part of program 1
-		for (long int i = 0; i < crossPoint1; i++)
-		{
-			newProgram1.appendLine( winnerProgram1.getLine( i ) );
-		}
-
-		// newprog1 -- append sequence of program 2
-		for (long int j = crossPoint2; j <= crossPoint2+segLen2; j++)
-		{
-			newProgram1.appendLine( winnerProgram2.getLine( j ) );
-		}
-
-		// newprog1 -- eventually append rest of program 1
-		for (long int k = crossPoint1+segLen1; k < winnerProgram1.getProgramLength(); k++)
-		{
-			newProgram1.appendLine( winnerProgram1.getLine( k ) );
-		}
-
-		// newprog2 -- program 2, part A
-		for (long int l = 0; l < crossPoint2; l++)
-		{
-			newProgram2.appendLine( winnerProgram2.getLine( l ) );
-		}
-
-		// newprog2 -- program 1 c/o-seq.
-		for (long int m = crossPoint1; m <= crossPoint1+segLen1; m++)
-		{
-			newProgram2.appendLine( winnerProgram1.getLine( m ) );
-		}
-
-		// newprog2 -- program 2, part B
-		for (long int n = crossPoint2+segLen2; n < winnerProgram2.getProgramLength(); n++)
-		{
-			newProgram2.appendLine( winnerProgram2.getLine( n ) );
-		}
-	}
+		twoPointCrossOver( winnerProgram1, winnerProgram2, crossPoint1, crossPoint2, segLen1, segLen2, newProgram1, newProgram2 );
 	else
-	{
-		// Recombination/Crossover, Variant 1:
-		// Simple 1 point crossover, create two new programs
-
-		// copy first part of program 1
-		for (long int i = 0; i < crossPoint1; i++)
-		{
-			newProgram1.appendLine( winnerProgram1.getLine( i ) );
-		}
-
-		// append second part of program 2
-		for (long int j = crossPoint2; j < winnerProgram2.getProgramLength(); j++)
-		{
-			newProgram1.appendLine( winnerProgram2.getLine( j ) );
-		}
-
-		// copy first part of program 2
-		for (long int k = 0; k < crossPoint2; k++)
-		{
-			newProgram2.appendLine( winnerProgram2.getLine( k ) );
-		}
-
-		// append second part of program 1
-		for (long int l = crossPoint1; l < winnerProgram1.getProgramLength(); l++)
-		{
-			newProgram2.appendLine( winnerProgram1.getLine( l ) );
-		}
-	}
+		onePointCrossOver( winnerProgram1, winnerProgram2, crossPoint1, crossPoint2, newProgram1, newProgram2 );
 
 #ifdef SIG_DEBUG
 	SIGEL_Tools::SIG_IO::cerr << "Crossover children have " << newProgram1.getProgramLength() << " and " << newProgram2.getProgramLength() << " lines." << Qt::endl;
@@ -232,10 +167,88 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	                                 fitness2 );
 
 	QList< SIG_GPIndividual * > crossedInds( 2 );
-	crossedInds[ 0 ] = crossoverInd1;   // insert() into a null slot: no free
+	crossedInds[ 0 ] = crossoverInd1;
 	crossedInds[ 1 ] = crossoverInd2;
 
 	return crossedInds;
+}
+
+void SIGEL_GP::SIG_GPOperations::onePointCrossOver( SIGEL_Program::SIG_Program const &winnerProgram1,
+                                                    SIGEL_Program::SIG_Program const &winnerProgram2,
+                                                    long int crossPoint1,
+                                                    long int crossPoint2,
+                                                    SIGEL_Program::SIG_Program &newProgram1,
+                                                    SIGEL_Program::SIG_Program &newProgram2 )
+{
+	// copy first part of program 1
+	for (long int i = 0; i < crossPoint1; i++)
+	{
+		newProgram1.appendLine( winnerProgram1.getLine( i ) );
+	}
+
+	// append second part of program 2
+	for (long int j = crossPoint2; j < winnerProgram2.getProgramLength(); j++)
+	{
+		newProgram1.appendLine( winnerProgram2.getLine( j ) );
+	}
+
+	// copy first part of program 2
+	for (long int k = 0; k < crossPoint2; k++)
+	{
+		newProgram2.appendLine( winnerProgram2.getLine( k ) );
+	}
+
+	// append second part of program 1
+	for (long int l = crossPoint1; l < winnerProgram1.getProgramLength(); l++)
+	{
+		newProgram2.appendLine( winnerProgram1.getLine( l ) );
+	}
+}
+
+void SIGEL_GP::SIG_GPOperations::twoPointCrossOver( SIGEL_Program::SIG_Program const &winnerProgram1,
+                                                    SIGEL_Program::SIG_Program const &winnerProgram2,
+                                                    long int crossPoint1,
+                                                    long int crossPoint2,
+                                                    long int segLen1,
+                                                    long int segLen2,
+                                                    SIGEL_Program::SIG_Program &newProgram1,
+                                                    SIGEL_Program::SIG_Program &newProgram2 )
+{
+	// newprog1 -- copy first part of program 1
+	for (long int i = 0; i < crossPoint1; i++)
+	{
+		newProgram1.appendLine( winnerProgram1.getLine( i ) );
+	}
+
+	// newprog1 -- append sequence of program 2
+	for (long int j = crossPoint2; j <= crossPoint2+segLen2; j++)
+	{
+		newProgram1.appendLine( winnerProgram2.getLine( j ) );
+	}
+
+	// newprog1 -- eventually append rest of program 1
+	for (long int k = crossPoint1+segLen1; k < winnerProgram1.getProgramLength(); k++)
+	{
+		newProgram1.appendLine( winnerProgram1.getLine( k ) );
+	}
+
+	// newprog2 -- program 2, part A
+	for (long int l = 0; l < crossPoint2; l++)
+	{
+		newProgram2.appendLine( winnerProgram2.getLine( l ) );
+	}
+
+	// newprog2 -- program 1 c/o-seq.
+	for (long int m = crossPoint1; m <= crossPoint1+segLen1; m++)
+	{
+		newProgram2.appendLine( winnerProgram1.getLine( m ) );
+	}
+
+	// newprog2 -- program 2, part B
+	for (long int n = crossPoint2+segLen2; n < winnerProgram2.getProgramLength(); n++)
+	{
+		newProgram2.appendLine( winnerProgram2.getLine( n ) );
+	}
 }
 
 /*------------------------------------------Mutation-----------------------------------------*/
