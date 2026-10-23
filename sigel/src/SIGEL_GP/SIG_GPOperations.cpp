@@ -321,20 +321,8 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 	if( mutationType == MutationType::InsertLine )
 	{
-		if( maxLength == 0 || newProgram.getProgramLength() + 1 <= maxLength )
-		{
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "Mutation inserts a line at " << mutPoint << "." << Qt::endl;
-#endif
-
-			SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
-
-			newProgram.insertLine( mutPoint, newProgLine );
-		}
-		else
-		{
+		if( !insertLineMutation( newProgram, mutPoint, maxLength, randomizer, languageParameters, gpParameter.getInstructionProbabilities() ) )
 			mutationType = MutationType::DeleteLine;
-		}
 	}
 
 	if( mutationType == MutationType::DeleteLine )
@@ -349,16 +337,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 		}
 		else
 		{
-			if( maxLength == 0 || newProgram.getProgramLength() + 1 <= maxLength )
-			{
-#ifdef SIG_DEBUG
-				SIGEL_Tools::SIG_IO::cerr << "Mutation inserts a line at " << mutPoint << "." << Qt::endl;
-#endif
-
-				SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
-
-				newProgram.insertLine( mutPoint, newProgLine );
-			}
+			insertLineMutation( newProgram, mutPoint, maxLength, randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
 		}
 	}
 
@@ -481,6 +460,26 @@ int SIGEL_GP::SIG_GPOperations::randomOperand( SIGEL_Tools::SIG_Randomizer &rand
 		return -operand;
 
 	return operand;
+}
+
+bool SIGEL_GP::SIG_GPOperations::insertLineMutation( SIGEL_Program::SIG_Program &newProgram,
+                                                     long int mutPoint,
+                                                     long maxLength,
+                                                     SIGEL_Tools::SIG_Randomizer &randomizer,
+                                                     SIGEL_Robot::SIG_LanguageParameters &languageParameters,
+                                                     QList< int > &instructionProbabilities )
+{
+	if( maxLength != 0 && newProgram.getProgramLength() + 1 > maxLength )
+		return false;
+
+#ifdef SIG_DEBUG
+	SIGEL_Tools::SIG_IO::cerr << "Mutation inserts a line at " << mutPoint << "." << Qt::endl;
+#endif
+
+	SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageParameters, instructionProbabilities );
+
+	newProgram.insertLine( mutPoint, newProgLine );
+	return true;
 }
 
 /*------------------------------------------Reproduction-----------------------------------------*/

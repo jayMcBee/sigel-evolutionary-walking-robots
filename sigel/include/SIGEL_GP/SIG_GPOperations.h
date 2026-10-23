@@ -165,6 +165,14 @@ namespace SIGEL_GP
 		                                       SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 		                                       QList< int > &instructionProbabilities );
 
+		// Insert a new random line at mutPoint; false if that would make the program longer than maxLength (0: no maximum).
+		static bool insertLineMutation( SIGEL_Program::SIG_Program &newProgram,
+		                                long int mutPoint,
+		                                long maxLength,
+		                                SIGEL_Tools::SIG_Randomizer &randomizer,
+		                                SIGEL_Robot::SIG_LanguageParameters &languageParameters,
+		                                QList< int > &instructionProbabilities );
+
 		// Get operands (op1, op2) of line; 0 for an operand the line does not have.
 		static std::pair<int, int> readOperands( SIGEL_Program::SIG_ProgramLine const &line );
 
