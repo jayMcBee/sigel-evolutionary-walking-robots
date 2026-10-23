@@ -259,12 +259,10 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
                                                                   SIGEL_GP::SIG_GPParameter& gpParameter,
                                                                   SIGEL_Robot::SIG_LanguageParameters &languageParameters)
 {
-	double     winnerFitness        = winner.getFitness();
+	double const winnerFitness      = winner.getFitness();
 	MutationType mutationType       = static_cast<MutationType>( randomizer.getRandomInt( mutationTypeCount ) );
 	long const minLength            = gpParameter.getMinIndLength();
 	long const maxLength            = gpParameter.getMaxIndLength();
-	long int   mutPoint             = 0;
-	int        historyInfo;
 
 	SIG_GPIndividual *mutatedInd = new SIG_GPIndividual( SIG_GPParameter(),
 	                                                     winner.getHistory(),
@@ -274,6 +272,8 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 	SIGEL_Program::SIG_Program &newProgram = mutatedInd->getProgramVar();
 	newProgram                             = winner.getProgramVar();
+
+	int historyInfo;
 
 	// Check length of (winner) program if length is greater (or equal) than minLength and
 	// smaller (or equal) than maxLength:
@@ -285,7 +285,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	                                historyInfo );
 
 	// Compute randomly mutation point:
-	mutPoint          = randomizer.getRandomLong( newProgram.getProgramLength() );
+	long int const mutPoint = randomizer.getRandomLong( newProgram.getProgramLength() );
 
 	// -----------------------------------------
 	// An existing program line will be mutated:
@@ -337,7 +337,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 		}
 	}
 
-	QDateTime actTime = QDateTime::currentDateTime();
+	QDateTime const actTime = QDateTime::currentDateTime();
 
 	if( historyInfo > 0 )
 		mutatedInd->addLengthIncreasedInfo( actTime, historyInfo );
