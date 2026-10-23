@@ -86,6 +86,8 @@ namespace SIGEL_GP
 
     void crossoverUsesBothVariants();
 
+    void crossoverChildrenHaveAsManyLinesAsTheParents();
+
     void crossoverKeepsTheChildrenInsideTheLimits();
 
     void crossoverLeavesTheParentsAlone();

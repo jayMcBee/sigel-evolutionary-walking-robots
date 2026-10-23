@@ -356,8 +356,8 @@ void SIGEL_GP::TST_SIG_GPOperations::crossoverCutsALongChildAtTheEnd()
   QVERIFY( cut > 0 );
 }
 
-// The one-point variants keep the parents' total length; the two-point variant puts the last
-// line of each swapped segment into both children, so the total grows by 2.
+// A one-point first child ends with the mother's last line; a two-point one does so only when
+// both segments reach the end of their parent, and then counts as one-point.
 void SIGEL_GP::TST_SIG_GPOperations::crossoverUsesBothVariants()
 {
   SIG_GPParameter gpParameter;
@@ -366,6 +366,34 @@ void SIGEL_GP::TST_SIG_GPOperations::crossoverUsesBothVariants()
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   int onePoint = 0;
   int twoPoint = 0;
+
+  for ( int seed = 1; seed <= seeds; seed++ )
+  {
+    SIGEL_Tools::SIG_Randomizer randomizer( seed );
+    std::unique_ptr<SIG_GPIndividual> father = parent( randomizer, 10 );
+    std::unique_ptr<SIG_GPIndividual> mother = parent( randomizer, 15, "mother" );
+
+    QList<SIG_GPIndividual *> const children = SIG_GPOperations::crossOver( *father, 4, *mother, 6, "first", "second", randomizer, gpParameter, languageParameters );
+    std::unique_ptr<SIG_GPIndividual> first( children.value( 0 ) );
+    std::unique_ptr<SIG_GPIndividual> second( children.value( 1 ) );
+    QCOMPARE( children.size(), 2 );
+
+    if ( lineTexts( first->getProgram() ).last() == lineTexts( mother->getProgram() ).last() )
+      onePoint++;
+    else
+      twoPoint++;
+  }
+
+  QVERIFY( onePoint > 0 );
+  QVERIFY( twoPoint > 0 );
+}
+
+void SIGEL_GP::TST_SIG_GPOperations::crossoverChildrenHaveAsManyLinesAsTheParents()
+{
+  SIG_GPParameter gpParameter;
+  gpParameter.setMinIndLength( 1 );
+  gpParameter.setMaxIndLength( 100 );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
 
   for ( int seed = 1; seed <= seeds; seed++ )
   {
@@ -380,15 +408,8 @@ void SIGEL_GP::TST_SIG_GPOperations::crossoverUsesBothVariants()
     QCOMPARE( children.size(), 2 );
 
     long const total = first->getProgram().getProgramLength() + second->getProgram().getProgramLength();
-    QVERIFY2( total == 25 || total == 27, message.constData() );
-    if ( total == 25 )
-      onePoint++;
-    else
-      twoPoint++;
+    QVERIFY2( total == 25, message.constData() );
   }
-
-  QVERIFY( onePoint > 0 );
-  QVERIFY( twoPoint > 0 );
 }
 
 void SIGEL_GP::TST_SIG_GPOperations::crossoverKeepsTheChildrenInsideTheLimits()
