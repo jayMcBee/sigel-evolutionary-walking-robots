@@ -26,6 +26,7 @@
 #include "SIGEL_GP/SIG_GPPopulation.h"
 #include "SIGEL_Tools/SIG_IO.h"
 #include <qstringlist.h>
+#include <cmath>
 
 /*------------------------------------------Crossover-----------------------------------------*/
 QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL_GP::SIG_GPIndividual& winner1,
@@ -71,15 +72,18 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	long int crossPoint1 = randomizer.getRandomLong( winnerProgram1.getProgramLength() - 1 ) + 1;
 	long int crossPoint2 = randomizer.getRandomLong( winnerProgram2.getProgramLength() - 1 ) + 1;
 
-	// prepare length of segments to be swapped if 2-point-variant is chosen;
-	// max. 1/10 of program length, at least 1 instruction
-	long int segLen1 = randomizer.getRandomLong( (winnerProgram1.getProgramLength()/10) ) + 1;
+	// The two-point segment length is at most the cube root of the parent's length:
+	// short segments make crossover less destructive.
+	long const cubeRootOfLength1 = static_cast<long>( std::cbrt( winnerProgram1.getProgramLength() ) );
+	long const cubeRootOfLength2 = static_cast<long>( std::cbrt( winnerProgram2.getProgramLength() ) );
+
+	long int segLen1 = randomizer.getRandomLong( cubeRootOfLength1 ) + 1;
 	if ((crossPoint1+segLen1) >= winnerProgram1.getProgramLength())
 	{
 		segLen1 = winnerProgram1.getProgramLength() - crossPoint1 - 1;
 	}
 
-	long int segLen2 = randomizer.getRandomLong( (winnerProgram2.getProgramLength()/10) ) + 1;
+	long int segLen2 = randomizer.getRandomLong( cubeRootOfLength2 ) + 1;
 	if ((crossPoint2+segLen2) >= winnerProgram2.getProgramLength())
 	{
 		segLen2 = winnerProgram2.getProgramLength() - crossPoint2 - 1;
