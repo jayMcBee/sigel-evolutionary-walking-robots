@@ -254,11 +254,9 @@ class SIG_Program
  */
   
    public:
-   void clampLengthToLimits( long minimum,
-			     long maximum,
-			     SIGEL_Tools::SIG_Randomizer &randomizer, 
+   void clampLengthToLimits( SIGEL_GP::SIG_GPParameter &gpParameter,
+			     SIGEL_Tools::SIG_Randomizer &randomizer,
 			     SIGEL_Robot::SIG_LanguageParameters &languageParameters,
-			     QList< int > &prob,
 			     int &historyInfo );
    };
 

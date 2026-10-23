@@ -565,13 +565,15 @@ void SIGEL_GP::TST_SIG_GPOperations::reproductionCutsALongParentAtTheEnd()
 void SIGEL_GP::TST_SIG_GPOperations::clampLengthToLimitsLeavesAProgramInsideTheLimits()
 {
   SIG_GPParameter gpParameter;
+  gpParameter.setMinIndLength( 5 );
+  gpParameter.setMaxIndLength( 10 );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   SIGEL_Tools::SIG_Randomizer randomizer( 1 );
   SIGEL_Program::SIG_Program checked = program( randomizer, 7 );
   QStringList const lines = lineTexts( checked );
   int historyInfo = -1;
 
-  checked.clampLengthToLimits( 5, 10, randomizer, languageParameters, gpParameter.getInstructionProbabilities(), historyInfo );
+  checked.clampLengthToLimits( gpParameter, randomizer, languageParameters, historyInfo );
 
   QCOMPARE( lineTexts( checked ), lines );
   QCOMPARE( historyInfo, 0 );
@@ -580,13 +582,15 @@ void SIGEL_GP::TST_SIG_GPOperations::clampLengthToLimitsLeavesAProgramInsideTheL
 void SIGEL_GP::TST_SIG_GPOperations::clampLengthToLimitsPadsAShortProgramWithNops()
 {
   SIG_GPParameter gpParameter;
+  gpParameter.setMinIndLength( 5 );
+  gpParameter.setMaxIndLength( 10 );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   SIGEL_Tools::SIG_Randomizer randomizer( 1 );
   SIGEL_Program::SIG_Program checked = program( randomizer, 3 );
   QStringList const lines = lineTexts( checked );
   int historyInfo = 0;
 
-  checked.clampLengthToLimits( 5, 10, randomizer, languageParameters, gpParameter.getInstructionProbabilities(), historyInfo );
+  checked.clampLengthToLimits( gpParameter, randomizer, languageParameters, historyInfo );
 
   QCOMPARE( lineTexts( checked ), lines + QStringList( { nopText(), nopText() } ) );
   QCOMPARE( historyInfo, 2 );
@@ -595,13 +599,15 @@ void SIGEL_GP::TST_SIG_GPOperations::clampLengthToLimitsPadsAShortProgramWithNop
 void SIGEL_GP::TST_SIG_GPOperations::clampLengthToLimitsCutsALongProgramAtTheEnd()
 {
   SIG_GPParameter gpParameter;
+  gpParameter.setMinIndLength( 5 );
+  gpParameter.setMaxIndLength( 10 );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   SIGEL_Tools::SIG_Randomizer randomizer( 1 );
   SIGEL_Program::SIG_Program checked = program( randomizer, 12 );
   QStringList const lines = lineTexts( checked );
   int historyInfo = 0;
 
-  checked.clampLengthToLimits( 5, 10, randomizer, languageParameters, gpParameter.getInstructionProbabilities(), historyInfo );
+  checked.clampLengthToLimits( gpParameter, randomizer, languageParameters, historyInfo );
 
   QCOMPARE( lineTexts( checked ), lines.mid( 0, 10 ) );
   QCOMPARE( historyInfo, -2 );
@@ -610,13 +616,15 @@ void SIGEL_GP::TST_SIG_GPOperations::clampLengthToLimitsCutsALongProgramAtTheEnd
 void SIGEL_GP::TST_SIG_GPOperations::clampLengthToLimitsWithMaximumZeroHasNoMaximum()
 {
   SIG_GPParameter gpParameter;
+  gpParameter.setMinIndLength( 5 );
+  gpParameter.setMaxIndLength( 0 );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   SIGEL_Tools::SIG_Randomizer randomizer( 1 );
   SIGEL_Program::SIG_Program checked = program( randomizer, 50 );
   QStringList const lines = lineTexts( checked );
   int historyInfo = -1;
 
-  checked.clampLengthToLimits( 5, 0, randomizer, languageParameters, gpParameter.getInstructionProbabilities(), historyInfo );
+  checked.clampLengthToLimits( gpParameter, randomizer, languageParameters, historyInfo );
 
   QCOMPARE( lineTexts( checked ), lines );
   QCOMPARE( historyInfo, 0 );

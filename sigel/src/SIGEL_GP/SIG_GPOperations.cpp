@@ -59,7 +59,6 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	double fitness2 = winner2.getFitness();
 
 	long const minLength = gpParameter.getMinIndLength();
-	long const maxLength = gpParameter.getMaxIndLength();
 	int        historyInfo;
 
 	SIGEL_Program::SIG_Program &newProgram1 = crossoverInd1->getProgramVar();
@@ -90,7 +89,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	}
 
 #ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "Crossover with minimum length " << minLength << " and maximum length " << maxLength << " (0: no maximum)." << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "Crossover with minimum length " << minLength << " and maximum length " << gpParameter.getMaxIndLength() << " (0: no maximum)." << Qt::endl;
 #endif
 
 	// check new program lengths if min. program length was requested
@@ -130,11 +129,9 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 
 	QDateTime actTime = QDateTime::currentDateTime();
 
-	newProgram1.clampLengthToLimits( minLength,
-	                                 maxLength,
+	newProgram1.clampLengthToLimits( gpParameter,
 	                                 randomizer,
 	                                 languageParameters,
-	                                 gpParameter.getInstructionProbabilities(),
 	                                 historyInfo );
 
 	if( historyInfo > 0 )
@@ -142,11 +139,9 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	if( historyInfo < 0 )
 		crossoverInd1->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
 
-	newProgram2.clampLengthToLimits( minLength,
-	                                 maxLength,
+	newProgram2.clampLengthToLimits( gpParameter,
 	                                 randomizer,
 	                                 languageParameters,
-	                                 gpParameter.getInstructionProbabilities(),
 	                                 historyInfo );
 
 	if( historyInfo > 0 )
@@ -266,7 +261,6 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	double const winnerFitness      = winner.getFitness();
 	MutationType mutationType       = static_cast<MutationType>( randomizer.getRandomInt( mutationTypeCount ) );
 	long const minLength            = gpParameter.getMinIndLength();
-	long const maxLength            = gpParameter.getMaxIndLength();
 
 	SIG_GPIndividual *mutatedInd = new SIG_GPIndividual( SIG_GPParameter(),
 	                                                     winner.getHistory(),
@@ -281,11 +275,9 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 	// Check length of (winner) program if length is greater (or equal) than minLength and
 	// smaller (or equal) than maxLength:
-	newProgram.clampLengthToLimits( minLength,
-	                                maxLength,
+	newProgram.clampLengthToLimits( gpParameter,
 	                                randomizer,
 	                                languageParameters,
-	                                gpParameter.getInstructionProbabilities(),
 	                                historyInfo );
 
 	// Compute randomly mutation point:
@@ -493,17 +485,13 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::reproduction( SIGEL_GP::
 
 	reproducedInd->setFitness( winner.getFitness() );
 
-	long const minLength = gpParameter.getMinIndLength();
-	long const maxLength = gpParameter.getMaxIndLength();
 	int  historyInfo;
 
 	reproducedInd->getProgramVar() = winner.getProgramVar();
 
-	reproducedInd->getProgramVar().clampLengthToLimits( minLength,
-	                                                    maxLength,
+	reproducedInd->getProgramVar().clampLengthToLimits( gpParameter,
 	                                                    randomizer,
 	                                                    languageParameters,
-	                                                    gpParameter.getInstructionProbabilities(),
 	                                                    historyInfo );
 
 	QDateTime actTime = QDateTime::currentDateTime();

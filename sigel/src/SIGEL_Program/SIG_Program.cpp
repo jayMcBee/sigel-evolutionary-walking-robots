@@ -165,13 +165,13 @@ void SIGEL_Program::SIG_Program::exportProgram( QString& filename ) const
 	}
 }
 
-void SIGEL_Program::SIG_Program::clampLengthToLimits( long minimumLength,
-                                                      long maximumLength,
+void SIGEL_Program::SIG_Program::clampLengthToLimits( SIGEL_GP::SIG_GPParameter &gpParameter,
                                                       SIGEL_Tools::SIG_Randomizer &randomizer,
                                                       SIGEL_Robot::SIG_LanguageParameters &languageParameters,
-                                                      QList< int > &prob,
                                                       int &historyInfo )
 {
+	long const minimumLength = gpParameter.getMinIndLength();
+	long const maximumLength = gpParameter.getMaxIndLength();
 	long prgLength = getProgramLength();
 	historyInfo    = 0;
 
@@ -184,7 +184,7 @@ void SIGEL_Program::SIG_Program::clampLengthToLimits( long minimumLength,
 
 		for( long i = 0; i < minimumLength - prgLength; i++ )
 		{
-			SIGEL_Program::SIG_ProgramLine newLine( randomizer, languageParameters, prob );
+			SIGEL_Program::SIG_ProgramLine newLine( randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
 
 			// A padding line is a NOP: it changes nothing and only takes the NOP's time.
 			newLine.setRobotInstruction( SIGEL_Program::NOP, 0, 0 );
@@ -198,7 +198,8 @@ void SIGEL_Program::SIG_Program::clampLengthToLimits( long minimumLength,
 
 	prgLength = getProgramLength();
 
-	if( maximumLength > 0 && prgLength > maximumLength )
+	if( gpParameter.isMaxIndLengthLimited() &&
+	    prgLength > maximumLength )
 	{
 #ifdef SIG_DEBUG
 		SIGEL_Tools::SIG_IO::cerr << "Program length " << prgLength << " is above the maximum " << maximumLength << "." << Qt::endl;
