@@ -115,35 +115,6 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	// has a chance of 3:2 to be selected !
 	bool const twoPoint = randomizer.getRandomInt( 5 ) >= 2;
 
-	// Recombination/Crossover, Variant 1:
-	// Simple 1 point crossover, create two new programs
-	if( !twoPoint )
-	{
-		// copy first part of program 1
-		for (long int i = 0; i < crossPoint1; i++)
-		{
-			newProgram1.appendLine( winnerProgram1.getLine( i ) );
-		}
-
-		// append second part of program 2
-		for (long int j = crossPoint2; j < winnerProgram2.getProgramLength(); j++)
-		{
-			newProgram1.appendLine( winnerProgram2.getLine( j ) );
-		}
-
-		// copy first part of program 2
-		for (long int k = 0; k < crossPoint2; k++)
-		{
-			newProgram2.appendLine( winnerProgram2.getLine( k ) );
-		}
-
-		// append second part of program 1
-		for (long int l = crossPoint1; l < winnerProgram1.getProgramLength(); l++)
-		{
-			newProgram2.appendLine( winnerProgram1.getLine( l ) );
-		}
-	}
-
 	// Recombination/Crossover, Variant 2:
 	// 2 point crossover preferring short sequences (max. 1/10 of program length), creates two new programs
 	if( twoPoint )
@@ -182,6 +153,35 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 		for (long int n = crossPoint2+segLen2; n < winnerProgram2.getProgramLength(); n++)
 		{
 			newProgram2.appendLine( winnerProgram2.getLine( n ) );
+		}
+	}
+	else
+	{
+		// Recombination/Crossover, Variant 1:
+		// Simple 1 point crossover, create two new programs
+
+		// copy first part of program 1
+		for (long int i = 0; i < crossPoint1; i++)
+		{
+			newProgram1.appendLine( winnerProgram1.getLine( i ) );
+		}
+
+		// append second part of program 2
+		for (long int j = crossPoint2; j < winnerProgram2.getProgramLength(); j++)
+		{
+			newProgram1.appendLine( winnerProgram2.getLine( j ) );
+		}
+
+		// copy first part of program 2
+		for (long int k = 0; k < crossPoint2; k++)
+		{
+			newProgram2.appendLine( winnerProgram2.getLine( k ) );
+		}
+
+		// append second part of program 1
+		for (long int l = crossPoint1; l < winnerProgram1.getProgramLength(); l++)
+		{
+			newProgram2.appendLine( winnerProgram1.getLine( l ) );
 		}
 	}
 
