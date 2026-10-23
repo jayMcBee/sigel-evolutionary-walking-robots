@@ -302,8 +302,8 @@ problem; the choice is made before any code is written.
   commands change `LanguageParameters` and the experiment files.
 
 - [ ] **178. The two-point crossover copies one line too many.**
-  In `SIG_GPOperations::crossOver`, Variant 2 inserts the segment of the
-  other parent up to and including `crossPoint+segLen`, but the parent's own
+  `SIG_GPOperations::twoPointCrossOver` inserts the segment of the other
+  parent up to and including `crossPoint+segLen`, but the parent's own
   rest also starts at `crossPoint+segLen`. So the last line of each segment
   goes into both children, and every two-point crossover makes the children
   longer than the parents. The segments are meant to be swapped exactly.
