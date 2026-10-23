@@ -329,11 +329,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	{
 		if( newProgram.getProgramLength() - 1 >= minLength )
 		{
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "Mutation deletes line " << mutPoint << "." << Qt::endl;
-#endif
-
-			newProgram.deleteLine( mutPoint );
+			deleteLineMutation( newProgram, mutPoint );
 		}
 		else
 		{
@@ -480,6 +476,16 @@ bool SIGEL_GP::SIG_GPOperations::insertLineMutation( SIGEL_Program::SIG_Program 
 
 	newProgram.insertLine( mutPoint, newProgLine );
 	return true;
+}
+
+void SIGEL_GP::SIG_GPOperations::deleteLineMutation( SIGEL_Program::SIG_Program &newProgram,
+                                                     long int mutPoint )
+{
+#ifdef SIG_DEBUG
+	SIGEL_Tools::SIG_IO::cerr << "Mutation deletes line " << mutPoint << "." << Qt::endl;
+#endif
+
+	newProgram.deleteLine( mutPoint );
 }
 
 /*------------------------------------------Reproduction-----------------------------------------*/

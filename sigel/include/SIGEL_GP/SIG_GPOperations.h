@@ -173,6 +173,10 @@ namespace SIGEL_GP
 		                                SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 		                                QList< int > &instructionProbabilities );
 
+		// Delete the line at mutPoint.
+		static void deleteLineMutation( SIGEL_Program::SIG_Program &newProgram,
+		                                long int mutPoint );
+
 		// Get operands (op1, op2) of line; 0 for an operand the line does not have.
 		static std::pair<int, int> readOperands( SIGEL_Program::SIG_ProgramLine const &line );
 
