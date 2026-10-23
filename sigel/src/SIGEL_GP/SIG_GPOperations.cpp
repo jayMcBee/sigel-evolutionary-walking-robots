@@ -325,7 +325,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 	if( mutationType == MutationType::InsertLine )
 	{
-		if( !insertLineMutation( newProgram, mutPoint, maxLength, randomizer, languageParameters, gpParameter.getInstructionProbabilities() ) )
+		if( !insertLineMutation( newProgram, mutPoint, randomizer, gpParameter, languageParameters ) )
 			mutationType = MutationType::DeleteLine;
 	}
 
@@ -337,7 +337,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 		}
 		else
 		{
-			insertLineMutation( newProgram, mutPoint, maxLength, randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
+			insertLineMutation( newProgram, mutPoint, randomizer, gpParameter, languageParameters );
 		}
 	}
 
@@ -449,19 +449,19 @@ int SIGEL_GP::SIG_GPOperations::randomOperand( SIGEL_Tools::SIG_Randomizer &rand
 
 bool SIGEL_GP::SIG_GPOperations::insertLineMutation( SIGEL_Program::SIG_Program &newProgram,
                                                      long int mutPoint,
-                                                     long maxLength,
                                                      SIGEL_Tools::SIG_Randomizer &randomizer,
-                                                     SIGEL_Robot::SIG_LanguageParameters &languageParameters,
-                                                     QList< int > &instructionProbabilities )
+                                                     SIGEL_GP::SIG_GPParameter &gpParameter,
+                                                     SIGEL_Robot::SIG_LanguageParameters &languageParameters )
 {
-	if( maxLength != 0 && newProgram.getProgramLength() + 1 > maxLength )
+	if( gpParameter.isMaxIndLengthLimited() &&
+	    newProgram.getProgramLength() + 1 > gpParameter.getMaxIndLength() )
 		return false;
 
 #ifdef SIG_DEBUG
 	SIGEL_Tools::SIG_IO::cerr << "Mutation inserts a line at " << mutPoint << "." << Qt::endl;
 #endif
 
-	SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageParameters, instructionProbabilities );
+	SIGEL_Program::SIG_ProgramLine newProgLine( randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
 
 	newProgram.insertLine( mutPoint, newProgLine );
 	return true;

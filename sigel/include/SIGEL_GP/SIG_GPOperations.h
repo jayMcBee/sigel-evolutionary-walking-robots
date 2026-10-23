@@ -166,13 +166,12 @@ namespace SIGEL_GP
 		                                       SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 		                                       QList< int > &instructionProbabilities );
 
-		// Insert a new random line at mutPoint; false if that would make the program longer than maxLength (0: no maximum).
+		// Insert a new random line at mutPoint; false if that would make the program longer than the maximum length.
 		static bool insertLineMutation( SIGEL_Program::SIG_Program &newProgram,
 		                                long int mutPoint,
-		                                long maxLength,
 		                                SIGEL_Tools::SIG_Randomizer &randomizer,
-		                                SIGEL_Robot::SIG_LanguageParameters &languageParameters,
-		                                QList< int > &instructionProbabilities );
+		                                SIGEL_GP::SIG_GPParameter &gpParameter,
+		                                SIGEL_Robot::SIG_LanguageParameters &languageParameters );
 
 		// Delete the line at mutPoint.
 		static void deleteLineMutation( SIGEL_Program::SIG_Program &newProgram,
