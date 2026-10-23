@@ -246,14 +246,15 @@ void SIG_GPParameter::getOutOfExperiment()
 {
 	spinboxRandomSeed->setValue( theExperiment.gpParameter.getRandomSeed() );
 	spinboxMinIndLength->setValue( theExperiment.gpParameter.getMinIndLength() );
-	int maxLength = theExperiment.gpParameter.getMaxIndLength();
-	if( maxLength == 0 )
+	if( !theExperiment.gpParameter.isMaxIndLengthLimited() )
 	{
 		checkboxIgnoreMaxIndLength->setChecked( true );
 		spinboxMaxIndLength->setValue( theExperiment.gpParameter.getMinIndLength() );
 	}
 	else
-		spinboxMaxIndLength->setValue( maxLength );
+	{
+		spinboxMaxIndLength->setValue( theExperiment.gpParameter.getMaxIndLength() );
+	}
 	spinboxResEvGen->setValue( theExperiment.gpParameter.getResetEveryGeneration() );
 	spinboxMaxAge->setValue( theExperiment.gpParameter.getMaxAge() );
 

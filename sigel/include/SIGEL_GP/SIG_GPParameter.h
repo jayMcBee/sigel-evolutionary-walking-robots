@@ -390,6 +390,18 @@ namespace SIGEL_GP
  public:
  int getMaxIndLength() const;
 
+/**
+* This tells whether the length of an individual has a maximum.
+* @pre
+* none
+* @post
+* none
+* @return
+* false if the max length of an individual is 0, which means no maximum.
+*/
+ public:
+ bool isMaxIndLengthLimited() const;
+
  /**
   * This function sets the probability of reproduction of the winner of a tournament, 
  * which are used for the randomcreation of tournaments. The probability expressed as a percentage

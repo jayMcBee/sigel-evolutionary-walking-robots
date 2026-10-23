@@ -222,8 +222,7 @@ void SIGEL_Program::SIG_Program::generateRandomProgram( SIGEL_GP::SIG_GPParamete
 
 	long programLength = gpParameter.getMinIndLength();
 
-	// A maximum length of 0 means that there is no maximum.
-	if( gpParameter.getMaxIndLength() > 0 )
+	if( gpParameter.isMaxIndLengthLimited() )
 		programLength += randomizer.getRandomInt( gpParameter.getMaxIndLength() - gpParameter.getMinIndLength() + 1 );
 
 	for( long x=0; x<programLength; x++ )

@@ -90,6 +90,11 @@ int SIGEL_GP::SIG_GPParameter::getMaxIndLength() const
    return maxIndLength;
 }
 
+bool SIGEL_GP::SIG_GPParameter::isMaxIndLengthLimited() const
+{
+    return maxIndLength != 0;
+}
+
 void SIGEL_GP::SIG_GPParameter::setReproductionProb(int prob)
 {
     reproductionProb=prob;
