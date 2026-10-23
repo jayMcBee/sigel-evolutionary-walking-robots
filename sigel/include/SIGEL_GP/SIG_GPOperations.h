@@ -145,6 +145,13 @@ namespace SIGEL_GP
 		                               SIGEL_Program::SIG_Program &newProgram1,
 		                               SIGEL_Program::SIG_Program &newProgram2 );
 
+		// Generate (randomly) a completely new program line by replacing the old content:
+		static void replaceLineMutation( SIGEL_Program::SIG_Program &newProgram,
+		                                 long int mutPoint,
+		                                 SIGEL_Tools::SIG_Randomizer &randomizer,
+		                                 SIGEL_Robot::SIG_LanguageParameters &languageParameters,
+		                                 QList< int > &instructionProbabilities );
+
 		// The random draws in mutation pick by position: the order of the values must not change.
 		enum class MutationType { ChangeLine, InsertLine, DeleteLine };
 

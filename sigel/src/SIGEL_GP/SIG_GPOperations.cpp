@@ -335,16 +335,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 		switch( lineMutationType )
 		{
 		case LineMutationType::ReplaceLine:
-			// -------------------------------------------------------------------------------
-			// Generate (randomly) a completely new program line by replacing the old content:
-			// -------------------------------------------------------------------------------
-			{
-				SIGEL_Program::SIG_ProgramLine mutatedLine = newProgram.getLine( mutPoint );
-				mutatedLine.randomRobotInstruction( languageParameters,
-				                                    randomizer,
-				                                    gpParameter.getInstructionProbabilities() );
-				newProgram.setLine( mutPoint, mutatedLine );
-			}
+			replaceLineMutation( newProgram, mutPoint, randomizer, languageParameters, gpParameter.getInstructionProbabilities() );
 			break;
 
 		case LineMutationType::ChangeOperand:
@@ -501,6 +492,19 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	mutatedInd->addMutationInfo( winner.getName(), actTime, mutPoint, winnerFitness );
 
 	return *mutatedInd;
+}
+
+void SIGEL_GP::SIG_GPOperations::replaceLineMutation( SIGEL_Program::SIG_Program &newProgram,
+                                                      long int mutPoint,
+                                                      SIGEL_Tools::SIG_Randomizer &randomizer,
+                                                      SIGEL_Robot::SIG_LanguageParameters &languageParameters,
+                                                      QList< int > &instructionProbabilities )
+{
+	SIGEL_Program::SIG_ProgramLine mutatedLine = newProgram.getLine( mutPoint );
+	mutatedLine.randomRobotInstruction( languageParameters,
+	                                    randomizer,
+	                                    instructionProbabilities );
+	newProgram.setLine( mutPoint, mutatedLine );
 }
 
 /*------------------------------------------Reproduction-----------------------------------------*/
