@@ -326,8 +326,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 			// Generate (randomly) a completely new program line by replacing the old content:
 			// -------------------------------------------------------------------------------
 			{
-				SIGEL_Program::SIG_ProgramLine mutatedLine;
-				mutatedLine = newProgram.getLine( mutPoint );
+				SIGEL_Program::SIG_ProgramLine mutatedLine = newProgram.getLine( mutPoint );
 				mutatedLine.randomRobotInstruction( languageParameters,
 				                                    randomizer,
 				                                    gpParameter.getInstructionProbabilities() );
@@ -381,8 +380,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 
 			// Set the new program line properties (in this case the operands):
 			{
-				SIGEL_Program::SIG_ProgramLine mutatedLine;
-				mutatedLine = newProgram.getLine( mutPoint );
+				SIGEL_Program::SIG_ProgramLine mutatedLine = newProgram.getLine( mutPoint );
 				mutatedLine.setRobotInstruction( instructionType,
 				                                 op1,
 				                                 op2 );
@@ -422,8 +420,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 			}
 
 			{
-				SIGEL_Program::SIG_ProgramLine mutatedLine;
-				mutatedLine = newProgram.getLine( mutPoint );
+				SIGEL_Program::SIG_ProgramLine mutatedLine = newProgram.getLine( mutPoint );
 				mutatedLine.setRobotInstruction( randomLine.getRobotInstructionType(),
 				                                 op1,
 				                                 op2 );
