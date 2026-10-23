@@ -790,11 +790,10 @@ void SIGEL_GP::SIG_GPManager::run()
 			return;
 		}
 
-		// Every "resetGeneration" generations all fitness values are set to -1 so that evalNewIndis()
-		// recomputes them. If the fitness function supports it, this allows a different target every "resetGeneration" generations
-		// Do not divide by zero
-		if ( currentExperiment.gpParameter.getResetEveryGeneration() != 0
-		     && (currentExperiment.population.getPoolGeneration() % currentExperiment.gpParameter.getResetEveryGeneration()) == 0)
+		// Every fitnessResetInterval generations all fitness values are set to -1 so that evalNewIndis()
+		// recomputes them. If the fitness function supports it, this allows a different target every fitnessResetInterval generations
+		if ( currentExperiment.gpParameter.getFitnessResetInterval() != 0
+		     && (currentExperiment.population.getPoolGeneration() % currentExperiment.gpParameter.getFitnessResetInterval()) == 0)
 		{
 			currentExperiment.population.resetAllFitnessValues();
 		}

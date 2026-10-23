@@ -41,7 +41,7 @@ SIGEL_GP::SIG_GPPVMData::SIG_GPPVMData(SIGEL_Robot::SIG_Robot& robot,
   fitnessName(fitnessName),
   visualize(visualize),
   actGeneration(0),
-  resetEveryGeneration(0),
+  fitnessResetInterval(0),
   experimentName(),
   individualName(),
   individualFitness(0)
@@ -127,7 +127,7 @@ void SIGEL_GP::SIG_GPPVMData::loadPVMDataTransfer(QTextStream & file,
   actGeneration = bufferString.toInt();
   bufferString = settingsStream.readLine(); // RESETEVERYGENERATION
   bufferString = settingsStream.readLine();
-  resetEveryGeneration = bufferString.toInt();
+  fitnessResetInterval = bufferString.toInt();
   bufferString = settingsStream.readLine(); //VISUALIZE
   bufferString = settingsStream.readLine();
   int visuInt = bufferString.toInt();
@@ -165,7 +165,7 @@ void SIGEL_GP::SIG_GPPVMData::savePVMDataTransfer(QTextStream & file,
   file << "ACTUALGENERATION\n";
   file << actGeneration << "\n";
   file << "RESETEVERYGENERATION\n";
-  file << resetEveryGeneration << "\n";
+  file << fitnessResetInterval << "\n";
   file << "VISUALIZE\n";
   if (visualize)
     file << 1 << "\n";

@@ -134,7 +134,7 @@ void SIG_GPParameter::putIntoExperiment()
 		theExperiment.gpParameter.setMaxIndLength( 0 );
 	else
 		theExperiment.gpParameter.setMaxIndLength( spinboxMaxIndLength->value() );
-	theExperiment.gpParameter.setResetEveryGeneration( spinboxResEvGen->value() );
+	theExperiment.gpParameter.setFitnessResetInterval( spinboxResEvGen->value() );
 	theExperiment.gpParameter.setMaxAge( spinboxMaxAge->value() );
 
 	// put the probabilities into the experiment
@@ -255,7 +255,7 @@ void SIG_GPParameter::getOutOfExperiment()
 	{
 		spinboxMaxIndLength->setValue( theExperiment.gpParameter.getMaxIndLength() );
 	}
-	spinboxResEvGen->setValue( theExperiment.gpParameter.getResetEveryGeneration() );
+	spinboxResEvGen->setValue( theExperiment.gpParameter.getFitnessResetInterval() );
 	spinboxMaxAge->setValue( theExperiment.gpParameter.getMaxAge() );
 
 	sliderCrossover->setValue( theExperiment.gpParameter.getXoverProb() );

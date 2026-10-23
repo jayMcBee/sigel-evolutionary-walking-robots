@@ -28,7 +28,7 @@ SIGEL_GP::SIG_GPParameter::SIG_GPParameter()
 : randomSeed(0),
   minIndLength(5),
   maxIndLength(1024),
-  resEvGen(0),
+  fitnessResetInterval(0),
   reproductionProb(50),
   xoverProb(300),
   mutationProb(650),
@@ -370,7 +370,7 @@ void SIGEL_GP::SIG_GPParameter::readFromFile(QTextStream & file)
 
     if ( s == "RESEVGEN") {
       s = file.readLine();
-      setResetEveryGeneration(s.toInt());
+      setFitnessResetInterval(s.toInt());
     }
 
    if ( s == "REPRODUCTIONPROB") {
@@ -587,7 +587,7 @@ void SIGEL_GP::SIG_GPParameter::writeToFile(QTextStream & file)
   file << "MAXINDLENGTH\n";
   file << maxIndLength << "\n";
   file << "RESEVGEN\n";
-  file << resEvGen << "\n";
+  file << fitnessResetInterval << "\n";
   file << "REPRODUCTIONPROB\n";
   file << reproductionProb << "\n";
   file << "XOVERPROB\n";

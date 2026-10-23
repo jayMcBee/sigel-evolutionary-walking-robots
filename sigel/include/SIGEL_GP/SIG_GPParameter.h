@@ -149,7 +149,7 @@ namespace SIGEL_GP
    * The effect of this reseting is a new computation of the fitness value. A value of 0 disables
    * the reseting.
    */
-   int resEvGen;
+   int fitnessResetInterval;
 
   /**
    * The probability of selecting reproduction for a genetic operation.
@@ -790,8 +790,8 @@ namespace SIGEL_GP
   void setTimeOutMinutes( int newValue );
 
   public:
-  void setResetEveryGeneration(int newResEvGen) { resEvGen = newResEvGen; }
-  int getResetEveryGeneration() { return resEvGen; }
+  void setFitnessResetInterval(int newFitnessResetInterval) { fitnessResetInterval = newFitnessResetInterval; }
+  int getFitnessResetInterval() { return fitnessResetInterval; }
 };
 
 }
