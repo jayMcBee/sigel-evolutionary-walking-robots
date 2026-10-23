@@ -157,6 +157,18 @@ namespace SIGEL_GP
 		                                   long int mutPoint,
 		                                   SIGEL_Tools::SIG_Randomizer &randomizer );
 
+		// Change the instruction type; an operand that is 0 is taken from a new random line.
+		static void changeInstructionMutation( SIGEL_Program::SIG_Program &newProgram,
+		                                       long int mutPoint,
+		                                       SIGEL_Tools::SIG_Randomizer &randomizer,
+		                                       SIGEL_Robot::SIG_LanguageParameters &languageParameters,
+		                                       QList< int > &instructionProbabilities );
+
+		// Get operands (op1, op2) of line; 0 for an operand the line does not have.
+		static void readOperands( SIGEL_Program::SIG_ProgramLine const &line,
+		                          int &op1,
+		                          int &op2 );
+
 		// A random operand over the full range, with a random sign.
 		static int randomOperand( SIGEL_Tools::SIG_Randomizer &randomizer );
 
