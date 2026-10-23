@@ -227,7 +227,7 @@ void SIGEL_GP::SIG_GPOperations::twoPointCrossOver( SIGEL_Program::SIG_Program c
 	}
 
 	// newprog1 -- eventually append rest of program 1
-	for (long int k = crossPoint1+segLen1; k < winnerProgram1.getProgramLength(); k++)
+	for (long int k = crossPoint1+segLen1+1; k < winnerProgram1.getProgramLength(); k++)
 	{
 		newProgram1.appendLine( winnerProgram1.getLine( k ) );
 	}
@@ -245,7 +245,7 @@ void SIGEL_GP::SIG_GPOperations::twoPointCrossOver( SIGEL_Program::SIG_Program c
 	}
 
 	// newprog2 -- program 2, part B
-	for (long int n = crossPoint2+segLen2; n < winnerProgram2.getProgramLength(); n++)
+	for (long int n = crossPoint2+segLen2+1; n < winnerProgram2.getProgramLength(); n++)
 	{
 		newProgram2.appendLine( winnerProgram2.getLine( n ) );
 	}
