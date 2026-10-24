@@ -159,7 +159,7 @@ namespace SIGEL_GP
 		                                   long int mutPoint,
 		                                   SIGEL_Tools::SIG_Randomizer &randomizer );
 
-		// Change the instruction type; an operand that is 0 is taken from a new random line.
+		// Change the instruction type; the new line keeps the operands of the old line, also an operand of 0.
 		static void changeInstructionMutation( SIGEL_Program::SIG_Program &newProgram,
 		                                       long int mutPoint,
 		                                       SIGEL_Tools::SIG_Randomizer &randomizer,

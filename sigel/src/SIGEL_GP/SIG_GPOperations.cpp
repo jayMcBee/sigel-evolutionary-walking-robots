@@ -274,7 +274,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 	int historyInfo;
 
 	// Check length of (winner) program if length is greater (or equal) than minLength and
-	// smaller (or equal) than maxLength:
+	// smaller (or equal) than the maximum length:
 	newProgram.clampLengthToLimits( gpParameter,
 	                                randomizer,
 	                                languageParameters,
