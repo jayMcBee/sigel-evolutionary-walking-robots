@@ -18,6 +18,26 @@ export PVM_ROOT PVM_ARCH
 PVM_RSH=${PVM_RSH:-/usr/bin/ssh}
 export PVM_RSH
 
+# PVM gives the other hosts the address of this host's name. Debian and Ubuntu
+# map that name to 127.0.1.1, which the other hosts cannot reach; a host file
+# entry with ip= gives PVM the address of the default route instead.
+# 1.1.1.1 only selects that route; no packet is sent. A PVMHOSTFILE that is
+# already set is kept.
+HOST_FILE=
+if [ -z "$PVMHOSTFILE" ] && getent ahostsv4 "$(hostname)" | head -n 1 | grep -q '^127\.'; then
+  MASTER_ADDRESS=$(ip -4 route get 1.1.1.1 2>/dev/null | awk '{ for (i = 1; i < NF; i++) if ($i == "src") print $(i + 1) }')
+  if [ -z "$MASTER_ADDRESS" ]; then
+    echo "sigelLauncher: $(hostname) maps to a loopback address and there is no default route, so other hosts cannot reach this master." >&2
+    echo "sigelLauncher: to use other hosts, set PVMHOSTFILE to a file with the line \"$(hostname) ip=<network address>\"." >&2
+  else
+    HOST_FILE=$(mktemp) || exit 1
+    echo "$(hostname) ip=$MASTER_ADDRESS" > "$HOST_FILE" || exit 1
+    PVMHOSTFILE=$HOST_FILE
+    export PVMHOSTFILE
+    echo "sigelLauncher: other hosts reach this master at $MASTER_ADDRESS."
+  fi
+fi
+
 # An experiment's slave directory of "." means PVM's own search path.
 mkdir -p "$PVM_ROOT/bin/$PVM_ARCH"
 ln -sf "$SIGEL_ROOT/sigel_slave" "$PVM_ROOT/bin/$PVM_ARCH/sigel_slave"
@@ -26,3 +46,8 @@ PATH=$PVM_ROOT/bin/$PVM_ARCH:$PVM_ROOT/lib:$PATH
 export PATH
 cd "$SIGEL_ROOT" || exit 1
 ./sigel "$@"
+SIGEL_STATUS=$?
+if [ -n "$HOST_FILE" ]; then
+  rm "$HOST_FILE"
+fi
+exit $SIGEL_STATUS

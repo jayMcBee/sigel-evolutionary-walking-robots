@@ -349,14 +349,6 @@ problem; the choice is made before any code is written.
   picture the master cannot read stops the run with an error. The `.exp`
   keeps the path; its format does not change.
 
-- [ ] **172. The master is found on a host whose name maps to 127.0.1.1.**
-  Debian and Ubuntu map the host's own name to 127.0.1.1 in `/etc/hosts`.
-  PVM on the master then gives the other hosts 127.0.1.1 as the master's
-  address, and they cannot reach it. Today GETTING_STARTED section 2.2 tells
-  the user to edit `/etc/hosts`, which needs root and changes the system for
-  every program. The x86 machine got around it without root by giving PVM the
-  master's network address in a host file (`PVMHOSTFILE` with `ip=`).
-
 ---
 
 ## 7 · The robot language

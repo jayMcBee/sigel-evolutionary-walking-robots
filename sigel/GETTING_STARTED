@@ -97,19 +97,24 @@ The master starts PVM on the other hosts through a remote shell. On the master:
 
   ssh <host> 'echo $SIGEL_ROOT $PVM_ROOT'
 
-- Check the name of the master. This must print its network address:
+- Check the address that "sigelLauncher" prints at its start. Debian and Ubuntu map the
+  name of the master to 127.0.1.1, which the other hosts cannot reach. In that case
+  "sigelLauncher" gives PVM the address of the default route in a host file and prints
+  it, so "/etc/hosts" needs no change. If the other hosts are on a different network,
+  for example behind a second network card or with a VPN on, give PVM the right address
+  of the master in a host file of your own:
 
-  getent ahostsv4 <host name of the master>
-
-  If it prints 127.0.1.1, replace 127.0.1.1 in the file "/etc/hosts" with the network
-  address of the master.
+  echo "<host name of the master> ip=<network address of the master>" > ~/pvmhosts
+  export PVMHOSTFILE=~/pvmhosts
 
 2.3 The sigelLauncher script
 
 The script sets the environment variables that SIGEL needs on the master and starts
-"sigel" with the arguments it was given. It takes the directory it is started in as
-SIGEL_ROOT. To start it from another directory, for example from cron, set SIGEL_ROOT
-in the script to the full path of "sigelApp". A crontab entry can then be:
+"sigel" with the arguments it was given. If the name of the master maps to 127.0.1.1,
+it also writes the PVM host file of section 2.2 and removes it when "sigel" ends. It
+takes the directory it is started in as SIGEL_ROOT. To start it from another directory,
+for example from cron, set SIGEL_ROOT in the script to the full path of "sigelApp". A
+crontab entry can then be:
 
 00      21      20      8       *       /home/user/sigelApp/sigelLauncher -evolve insect.exp
 
