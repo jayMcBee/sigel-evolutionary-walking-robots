@@ -35,24 +35,21 @@
 enum { kSigelMasterRegPort = 6789 };
 
 int main (int argc, char *argv[])
-{ struct sockaddr_in   sad;
-  struct hostent      *masterHost;
-  struct protoent     *tcpProtocol;
+{ struct addrinfo      hints,
+                      *masterAddresses,
+                      *address;
   int                  masterSocket,
+                       lookupResult,
                        msg;
   char                 locHostName[256],
                        sigHostName[256],
+                       masterPort[8],
                        registration[512];
 
   if ( gethostname(locHostName, 255) )
   { fprintf(stderr, "ERR:   gethostname() failed..\n\n");
     exit(1);
   }
-
-  /* init sockaddr struct: using Internet family, port kSigelMasterRegPort */
-  memset((char *)&sad, 0, sizeof(struct sockaddr_in));
-  sad.sin_family = AF_INET;
-  sad.sin_port = htons(kSigelMasterRegPort);
 
   /* now get hostname where the sigel master is running */
   if (argc <= 2)
@@ -67,30 +64,37 @@ int main (int argc, char *argv[])
 
   strncpy(sigHostName, argv[1], 255);
 
-  /* make IP-Address with hostname */
-  masterHost = gethostbyname(sigHostName);
-  if (masterHost == NULL)
-  { fprintf(stderr, "ERR:   invalid host: %s\n", sigHostName);
+  /* the master's IPv4 and IPv6 addresses, or the address given */
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+  snprintf(masterPort, sizeof(masterPort), "%d", kSigelMasterRegPort);
+
+  lookupResult = getaddrinfo(sigHostName, masterPort, &hints, &masterAddresses);
+  if (lookupResult != 0)
+  { fprintf(stderr, "ERR:   invalid host: %s (%s)\n", sigHostName, gai_strerror(lookupResult));
     exit(1);
   }
 
-  memcpy(&sad.sin_addr, masterHost->h_addr, masterHost->h_length);
+  /* connect to the first address that answers */
+  masterSocket = -1;
+  for (address = masterAddresses; address != NULL; address = address->ai_next)
+  { masterSocket = socket(address->ai_family, address->ai_socktype, address->ai_protocol);
+    if (masterSocket < 0)
+    { continue;
+    }
 
-  /* map TCP protocol number */
-  tcpProtocol = getprotobyname("tcp");
-  if (tcpProtocol == NULL)
-  { fprintf(stderr, "ERR:   Can't map 'tcp' to a protocol number\n");
-    exit(1);
+    if (connect(masterSocket, address->ai_addr, address->ai_addrlen) == 0)
+    { break;
+    }
+
+    close(masterSocket);
+    masterSocket = -1;
   }
 
-  /* finally create the socket */
-  masterSocket = socket(PF_INET, SOCK_STREAM, tcpProtocol->p_proto);
+  freeaddrinfo(masterAddresses);
+
   if (masterSocket < 0)
-  {  fprintf(stderr, "ERR:   Can't create socket\n");
-     exit(1);
-  }
-
-  if (connect(masterSocket, (struct sockaddr *)&sad, sizeof(sad)) < 0)
   {  fprintf(stderr, "ERR:  Can't connect to server\n");
      exit(1);
   }

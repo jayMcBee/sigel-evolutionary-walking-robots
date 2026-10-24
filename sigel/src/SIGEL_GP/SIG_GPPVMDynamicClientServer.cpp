@@ -59,15 +59,15 @@ void SIGEL_GP::SIG_GPPVMDynamicClientServer::run(SIG_GPFitnessTrainer *trainer)
 
 void SIGEL_GP::SIG_GPPVMDynamicClientServer::openPort()
 {
-	struct sockaddr_in  sad;
+	struct sockaddr_in6 sad;
 	struct protoent *tcpProtocol;
 
 	// Make a socket to listen to our clients;
 	// init sockaddr struct: using Internet family, port kSigelMasterRegPort
-	memset(&sad, 0, sizeof(struct sockaddr_in));
-	sad.sin_family = AF_INET;
-	sad.sin_port = htons(kSigelMasterRegPort);
-	sad.sin_addr.s_addr = INADDR_ANY;
+	memset(&sad, 0, sizeof(struct sockaddr_in6));
+	sad.sin6_family = AF_INET6;
+	sad.sin6_port = htons(kSigelMasterRegPort);
+	sad.sin6_addr = in6addr_any;
 
 	// map TCP protocol number
 	if ((tcpProtocol = getprotobyname("tcp")) == nullptr)
@@ -77,7 +77,7 @@ void SIGEL_GP::SIG_GPPVMDynamicClientServer::openPort()
 	}
 
 	// finally create the socket
-	listenSocket = socket(PF_INET, SOCK_STREAM, tcpProtocol->p_proto);
+	listenSocket = socket(PF_INET6, SOCK_STREAM, tcpProtocol->p_proto);
 	if (listenSocket < 0)
 	{
 		fprintf(stderr, "ERR:   Can't create socket: %s\n", strerror(errno));
@@ -89,6 +89,14 @@ void SIGEL_GP::SIG_GPPVMDynamicClientServer::openPort()
 	if ( setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, &reuseAddress, sizeof(reuseAddress)) < 0 )
 	{
 		fprintf(stderr, "ERR:   Can't set SO_REUSEADDR on port %d: %s\n", kSigelMasterRegPort, strerror(errno));
+		exit(1);
+	}
+
+	// With it off, the socket takes IPv4 clients too; some systems set it on by default.
+	int const ipv6Only = 0;
+	if ( setsockopt(listenSocket, IPPROTO_IPV6, IPV6_V6ONLY, &ipv6Only, sizeof(ipv6Only)) < 0 )
+	{
+		fprintf(stderr, "ERR:   Can't clear IPV6_V6ONLY on port %d: %s\n", kSigelMasterRegPort, strerror(errno));
 		exit(1);
 	}
 

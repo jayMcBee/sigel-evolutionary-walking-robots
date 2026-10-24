@@ -349,15 +349,6 @@ problem; the choice is made before any code is written.
   picture the master cannot read stops the run with an error. The `.exp`
   keeps the path; its format does not change.
 
-- [ ] **170. A dynamic client finds the master also by an IPv6 name.**
-  `manage_dyn_slave` looks up the master's name with `gethostbyname`, which
-  gives IPv4 addresses only. Where the name resolves only to IPv6,
-  `sigelDynClient <master name>` stops with "invalid host", and only the
-  master's IPv4 address works. The master's registration socket in
-  `SIG_GPPVMDynamicClientServer` also takes IPv4 only. Both sides need IPv6:
-  the master listens on both address families, and the client looks up the
-  name with `getaddrinfo` and tries each address it gives.
-
 - [ ] **172. The master is found on a host whose name maps to 127.0.1.1.**
   Debian and Ubuntu map the host's own name to 127.0.1.1 in `/etc/hosts`.
   PVM on the master then gives the other hosts 127.0.1.1 as the master's
