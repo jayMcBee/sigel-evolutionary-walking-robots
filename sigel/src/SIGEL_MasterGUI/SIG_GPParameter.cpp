@@ -131,7 +131,7 @@ void SIG_GPParameter::putIntoExperiment()
 	theExperiment.population.getRandomizerPointer()->setNewSeed( spinboxRandomSeed->value() );
 	theExperiment.gpParameter.setMinIndLength( spinboxMinIndLength->value() );
 	if( checkboxIgnoreMaxIndLength->isChecked() )
-		theExperiment.gpParameter.setMaxIndLength( 0 );
+		theExperiment.gpParameter.setMaxIndLength( SIGEL_GP::SIG_GPParameter::unlimitedMaxIndLength );
 	else
 		theExperiment.gpParameter.setMaxIndLength( spinboxMaxIndLength->value() );
 	theExperiment.gpParameter.setFitnessResetInterval( spinboxResEvGen->value() );

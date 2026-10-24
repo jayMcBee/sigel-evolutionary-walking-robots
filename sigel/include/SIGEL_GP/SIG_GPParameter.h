@@ -402,6 +402,9 @@ namespace SIGEL_GP
  public:
  bool isMaxIndLengthLimited() const;
 
+ // Saved experiment files store this value for "no maximum length".
+ static constexpr int unlimitedMaxIndLength = 0;
+
  /**
   * This function sets the probability of reproduction of the winner of a tournament, 
  * which are used for the randomcreation of tournaments. The probability expressed as a percentage
