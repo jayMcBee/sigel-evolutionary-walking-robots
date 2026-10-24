@@ -911,6 +911,32 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-24 — DONE: ITEM 152, A GEOMETRY FILE WITH `USE` DIRECTLY AFTER A `}` IS REFUSED AT IMPORT.**
+
+- **Cause, in CyberVRML97:** the grammar's `NodeEnd : '}' | '}' ','` makes
+  the parser read one token past a `}` before it closes the node, and the
+  lexer adds a `USE` the moment it reads it (`vrml.l`). So a `USE` that
+  directly follows a `}` lands inside the node that the `}` closes. Where
+  that node is the one the `USE` names, it contains itself, and
+  `Node::createInstanceNode` aborts on `assert(instanceNode)`. Elsewhere
+  the copy sits in the wrong node and the geometry is silently wrong.
+  `USE` anywhere else loads correctly, and a comma after the `}` lets the
+  parser close the node first.
+- **Changed:** `SIG_Body::load` reads the file before cv97 does and throws
+  the new `SIG_GeometryFileError` for such a `USE`, with the file and the
+  line, and the advice to put a comma after the `}`. Comments and strings
+  are skipped. The check runs before the geometry is created, so the body
+  keeps none. Robot > Import already shows any `SIG_Exception` as "Robot
+  Import Error" and clears the robot; `coredrive` prints it. Neither
+  changed.
+- **Not changed, by decision:** cv97 itself. The defect was found by
+  reading the code, not in use, and no shipped robot has `DEF` or `USE`.
+- **Nothing else changes:** the `.wrl` is read only at import; an `.exp`
+  carries the geometry itself.
+- **Tested:** `TST_SIG_Body`, three tests. On the desktop, importing a copy
+  of `twoBases` whose `base.wrl` ends in `} USE BASE` showed the message
+  instead of aborting.
+
 **2026-10-06 — THE CHECK PROGRAM `sigel_eval` IS NOW `coredrive`.**
 
 - The old name read like one of SIGEL's own programs. `coredrive` drives

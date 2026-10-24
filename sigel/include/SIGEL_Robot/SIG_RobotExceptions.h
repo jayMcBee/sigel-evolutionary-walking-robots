@@ -51,6 +51,19 @@ namespace SIGEL_Robot {
                         { }
         };
 
+        class SIG_GeometryFileError : public SIG_Exception {
+        public:
+                SIG_GeometryFileError (QString file,
+                                       int line,
+                                       QString geometryFile,
+                                       int geometryLine,
+                                       QString message)
+                        : SIG_Exception (file, line,
+                                         "Geometry file \"" + geometryFile + "\", line " +
+                                         QString::number (geometryLine) + ": " + message)
+                        { }
+        };
+
         class SIG_InitialLocationError : public SIG_Exception {
         public:
                 SIG_InitialLocationError (QString file,

@@ -166,13 +166,6 @@ touched, because changing one changes behaviour against the reference binary.
   - **Open:** the smallest step and its decimals. The shipped experiments use
     0.01 and 0.002; 0.0001 with 4 decimals would keep both.
 
-- [ ] **152. A geometry file with `DEF` and `USE` aborts SIGEL.** A VRML
-  file may give a shape a name with `DEF` and place it again with `USE`.
-  `SIG_Body` loads the file with the `cv97` library, and the library stops
-  the program with a failed assertion in `Node::createInstanceNode`. The
-  import of such a robot closes SIGEL with no message. Handle it gracefully:
-  the robot is loaded, or the user gets a message that names the file.
-
 ---
 
 ## 4 · The interface

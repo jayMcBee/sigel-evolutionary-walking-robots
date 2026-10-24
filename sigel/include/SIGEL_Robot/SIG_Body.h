@@ -73,6 +73,9 @@ namespace SIGEL_Robot
                  * The load-method loads the VRML file given in the constructor
                  * into memory using CyberVRML '97 and, assuming it finds a polygon soup,
                  * detects the incidences and contructs a Polyhedron object.
+                 *
+                 * Throws SIG_GeometryFileError for a USE directly after a "}",
+                 * which CyberVRML97 puts into the node that the "}" closes.
                  */
                 void load ();
                 
