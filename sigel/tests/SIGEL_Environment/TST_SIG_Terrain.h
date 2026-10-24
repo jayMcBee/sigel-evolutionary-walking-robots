@@ -41,6 +41,12 @@ namespace SIGEL_Environment
     void everyPresetParses();
 
     void presetFunctionPutsTheCentreInPlaceOfCxAndCz();
+
+    void writeToFileThenReadFromFileGivesTheSameTerrain();
+
+    void readFromFileThrowsWhenAHeightIsMissing();
+
+    void readFromFileThrowsWhenTheTextEndsInsideAHeight();
   };
 
 }

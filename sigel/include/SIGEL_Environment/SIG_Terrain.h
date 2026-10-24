@@ -26,6 +26,7 @@
 
 #include <QList>
 #include <QString>
+#include <QTextStream>
 
 namespace SIGEL_Environment
 {
@@ -79,6 +80,12 @@ namespace SIGEL_Environment
 
     /** True if every height is 0. */
     bool isFlat() const;
+
+    /** Writes the dimensions, then the heights, one line for each z, then the line TerrainComplete. */
+    void writeToFile( QTextStream &file ) const;
+
+    /** Reads what writeToFile wrote. Throws a SIG_Exception if the text is not a whole terrain. */
+    void readFromFile( QTextStream &file );
 
   private:
 

@@ -24,6 +24,7 @@
 #include "SIGEL_Environment/TST_SIG_Terrain.h"
 
 #include "SIGEL_Environment/SIG_Terrain.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 
 #include <QtTest>
 
@@ -41,4 +42,52 @@ void SIGEL_Environment::TST_SIG_Terrain::presetFunctionPutsTheCentreInPlaceOfCxA
   SIG_TerrainPreset const preset = { "Test", "(x-cx)*(z-cz)" };
 
   QCOMPARE( SIG_Terrain::presetFunction( preset, 50, 30 ), QString( "(x-24.5)*(z-14.5)" ) );
+}
+
+void SIGEL_Environment::TST_SIG_Terrain::writeToFileThenReadFromFileGivesTheSameTerrain()
+{
+  SIG_Terrain written;
+  QVERIFY( written.setFromFunction( "sin(x)*cos(z)/3", 5, 3 ) );
+
+  QString text;
+  QTextStream out( &text );
+  written.writeToFile( out );
+
+  QTextStream in( &text, QIODevice::ReadOnly );
+  SIG_Terrain read;
+  read.readFromFile( in );
+
+  QCOMPARE( read.getDimensionX(), 5 );
+  QCOMPARE( read.getDimensionZ(), 3 );
+
+  // Exactly the same doubles, not only close ones.
+  for ( int z = 0; z < 3; ++z )
+    for ( int x = 0; x < 5; ++x )
+      QVERIFY( read.getHeight( x, z ) == written.getHeight( x, z ) );
+}
+
+void SIGEL_Environment::TST_SIG_Terrain::readFromFileThrowsWhenAHeightIsMissing()
+{
+  QString text = "2 2\n1 2\n3\n";
+  QTextStream in( &text, QIODevice::ReadOnly );
+  SIG_Terrain terrain;
+
+  QVERIFY_THROWS_EXCEPTION( SIGEL_Tools::SIG_Exception, terrain.readFromFile( in ) );
+}
+
+void SIGEL_Environment::TST_SIG_Terrain::readFromFileThrowsWhenTheTextEndsInsideAHeight()
+{
+  SIG_Terrain written;
+  QVERIFY( written.setFromFunction( "1/3", 1, 1 ) );
+
+  QString text;
+  QTextStream out( &text );
+  written.writeToFile( out );
+
+  // "0.33333333333333331" cut to "0.333" is still a number.
+  QString cut = text.left( text.indexOf( "0.333" ) + 5 );
+  QTextStream in( &cut, QIODevice::ReadOnly );
+  SIG_Terrain terrain;
+
+  QVERIFY_THROWS_EXCEPTION( SIGEL_Tools::SIG_Exception, terrain.readFromFile( in ) );
 }
