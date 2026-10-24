@@ -712,13 +712,11 @@ void SIG_GPParameter::slotCrossoverChanged( int newCrossoverValue )
 	lcdnumberReproduction->display( qRound( (1000 - crossoverValue - mutationValue) / 10 ) );
 }
 
-void SIG_GPParameter::slotTourPerGenChanged( int newParmTPG )
+void SIG_GPParameter::slotTourPerGenChanged( int )
 {
-	double   tpg;
-
 	// display the *Real* value used in SIG_GPManager later on to call
 	// CreateTours() and thus the *actual* number of Tournament per generation
-	tpg = (sliderTournamentsPerGeneration->value() / 1000.0) * theExperiment.population.getSize();
+	double const tpg = (sliderTournamentsPerGeneration->value() / 1000.0) * theExperiment.population.getSize();
 	lcdnumberTournamentsPerGeneration->display( static_cast<int>( tpg ) );
 }
 
