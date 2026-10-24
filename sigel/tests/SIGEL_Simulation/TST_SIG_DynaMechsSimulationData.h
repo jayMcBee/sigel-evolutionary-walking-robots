@@ -86,6 +86,8 @@ namespace SIGEL_Simulation
 
     void pictureFileNeedsNoFinalNewline();
 
+    void setTerrainGivesTheFloorWithoutReadingThePictureFile();
+
   private:
 
     /** The height that DynaMechs holds at one grid point after loadTerrain. */

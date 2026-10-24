@@ -159,6 +159,20 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::pictureFileThatDoesNotEx
   QCOMPARE( loadedHeight( environment, 3, 3 ), 0.0 );
 }
 
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::setTerrainGivesTheFloorWithoutReadingThePictureFile()
+{
+  SIGEL_Environment::SIG_Terrain terrain;
+  QVERIFY( terrain.setFromFunction( "0.5*x-10*z", 4, 4 ) );
+
+  // A slave gets the floor this way; the picture file is on the master only.
+  SIGEL_Environment::SIG_Environment environment;
+  environment.setFloorPictureFile( "/this/picture/does/not/exist.pgm" );
+  environment.setFloorFuncSelected( false );
+  environment.setTerrain( terrain );
+
+  QCOMPARE( loadedHeight( environment, 3, 3 ), -28.5 );
+}
+
 void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadTerrainNeedsNoSigelRoot()
 {
   const QByteArray sigelRoot = qgetenv( "SIGEL_ROOT" );

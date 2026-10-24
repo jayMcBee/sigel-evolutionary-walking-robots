@@ -28,6 +28,8 @@
 #include <qtextstream.h>
 #include <qstring.h>
 
+#include <optional>
+
 namespace SIGEL_Environment
 {
 
@@ -336,8 +338,17 @@ class SIG_Environment {
    */
   double getFrictionCoeff_u_k() const;
 
-  /** Makes the terrain of the selected floor function or picture file, or a flat one if that fails. */
+  /** The terrain given by setTerrain; without one, the terrain of the selected floor function or picture file, or a flat one if that fails. */
   SIG_Terrain getTerrain() const;
+
+  /** Makes getTerrain return newTerrain. A slave gets its floor from the master this way. */
+  void setTerrain(SIG_Terrain const &newTerrain);
+
+  /**
+   * Makes the terrain of the selected floor function or picture file into terrain.
+   * Returns false if the picture file is missing or not a P2 PGM file; a function that cannot be parsed gives a flat terrain.
+   */
+  bool makeTerrain(SIG_Terrain &terrain) const;
 
   /** This is the set method for the variable autosaveIntervalGenerations. */
   void setAutosaveIntervalGenerations(int newAutosaveIntervalGenerations);
@@ -399,6 +410,9 @@ class SIG_Environment {
 
   /** 0 disables autosave. */
   int autosaveIntervalGenerations;
+
+  /** The terrain of setTerrain, which getTerrain returns instead of making one. */
+  std::optional<SIG_Terrain> givenTerrain;
 };
 
 }

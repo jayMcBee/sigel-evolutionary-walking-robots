@@ -27,6 +27,7 @@
 #include <qtextstream.h>
 #include <pvm3.h>
 
+#include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_IO.h"
 #include "SIG_SourceHash.h"
 
@@ -91,7 +92,15 @@ QString SIGEL_GP::SIG_GPPVMData::cutAfterFiveHashes(QTextStream& source)
   QString resultString;
 
   while ( (bufferString = source.readLine()) != fiveHashes )
-    resultString += ( bufferString + "\n" );
+    {
+      // A message from a master of another build can have fewer blocks.
+      if ( bufferString.isNull() )
+        {
+          throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The message from the master ends before its last block. Are the master and this slave the same build?" );
+        }
+
+      resultString += ( bufferString + "\n" );
+    }
 
   return resultString;
 }
@@ -103,18 +112,22 @@ void SIGEL_GP::SIG_GPPVMData::loadPVMDataTransfer(QTextStream & file,
 
   QString simParString = cutAfterFiveHashes( file );
   QString environmentString = cutAfterFiveHashes( file );
+  QString terrainString = cutAfterFiveHashes( file );
   QString programString = cutAfterFiveHashes( file );
   QString robotString = cutAfterFiveHashes( file );
   QString settingsString = cutAfterFiveHashes( file );
 
   QTextStream simParStream( &simParString, QIODeviceBase::ReadOnly );
   QTextStream environmentStream( &environmentString, QIODeviceBase::ReadOnly );
+  QTextStream terrainStream( &terrainString, QIODeviceBase::ReadOnly );
   QTextStream programStream( &programString, QIODeviceBase::ReadOnly );
   QTextStream robotStream( &robotString, QIODeviceBase::ReadOnly );
   QTextStream settingsStream( &settingsString, QIODeviceBase::ReadOnly );
 
   simulationParameter.readFromFile( simParStream );
   environment.readFromFile( environmentStream );
+  terrain.readFromFile( terrainStream );
+  environment.setTerrain( terrain );
   program.readFromFile( programStream );
   robot.readFromFileTransfer( robotStream );
 
@@ -156,6 +169,8 @@ void SIGEL_GP::SIG_GPPVMData::savePVMDataTransfer(QTextStream & file,
   file << fiveHashesLine;
   environment.writeToFile(file);
   file << fiveHashesLine;
+  terrain.writeToFile(file);
+  file << fiveHashesLine;
   program.writeToFile(file);
   file << fiveHashesLine;
   robot.writeToFileTransfer(file);
@@ -178,6 +193,11 @@ void SIGEL_GP::SIG_GPPVMData::savePVMDataTransfer(QTextStream & file,
   file << "INDIVIDUALFITNESS\n";
   file << individualFitness << "\n";
   file << fiveHashesLine;
+}
+
+void SIGEL_GP::SIG_GPPVMData::setTerrain(SIGEL_Environment::SIG_Terrain const &newTerrain)
+{
+  terrain = newTerrain;
 }
 
 void SIGEL_GP::SIG_GPPVMData::setVisualize(bool visu)

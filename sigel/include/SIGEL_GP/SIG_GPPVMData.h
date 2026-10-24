@@ -35,8 +35,8 @@ namespace SIGEL_GP
 
   /**
    * Encodes and decodes what the master sends a slave over PVM: the
-   * simulation parameters, the environment, the program, the robot and the
-   * settings of the job. The master and sigel_slave both use it.
+   * simulation parameters, the environment, the floor, the program, the robot
+   * and the settings of the job. The master and sigel_slave both use it.
    */
 
   class SIG_GPPVMData {
@@ -54,16 +54,19 @@ namespace SIGEL_GP
    /** The MD5 over SIGEL's source that this program was built from. A slave sends it with its fitness. */
     static QByteArray sourceHash();
 
-   /** Reads the lines up to the next "#####" line, which ends a block of the message. */
+   /** Reads the lines up to the next "#####" line, which ends a block of the message. Throws a SIG_Exception if the message ends first. */
     QString cutAfterFiveHashes(QTextStream& source);
 
-    /** Reads a received message into the robot, the environment, the simulation parameters, the settings and program. */
+    /** Reads a received message into the robot, the environment and its floor, the simulation parameters, the settings and program. */
     void loadPVMDataTransfer(QTextStream & file,
   						    SIGEL_Program::SIG_Program & program);
 
     /** Writes the message for a slave, with program as its program. */
     void savePVMDataTransfer(QTextStream & file,
   						    SIGEL_Program::SIG_Program const &program);
+
+    /** The floor the message carries; the master sets it before the first savePVMDataTransfer. */
+    void setTerrain(SIGEL_Environment::SIG_Terrain const &newTerrain);
 
     void setVisualize(bool visu);
     bool getVisualize();
@@ -86,6 +89,9 @@ namespace SIGEL_GP
     SIGEL_Robot::SIG_Robot& robot;
     SIGEL_Environment::SIG_Environment& environment;
     SIGEL_Simulation::SIG_SimulationParameters& simulationParameter;
+
+    /** Sent, so that a slave does not read the floor picture itself. */
+    SIGEL_Environment::SIG_Terrain terrain;
 
     /** The id of the fitness function, as experiment files store it. */
     QString fitnessName;

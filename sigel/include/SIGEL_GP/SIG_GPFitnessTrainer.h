@@ -133,6 +133,9 @@ namespace SIGEL_GP
 		/** Adds a dynamic PVM host that runs up to maxSlaves slaves at the same time. It is not saved to the experiment file. */
 		void addDynHost(QString newHost, int maxSlaves);
 
+		/** Makes the floor that the slaves get during the next run. Throws a SIG_Exception if the floor picture cannot be read. */
+		void prepareTerrain();
+
 		/** True once PVM can no longer be reached. This class only sets it; SIG_GPManager reads and clears it. */
 		bool pvmLost;
 

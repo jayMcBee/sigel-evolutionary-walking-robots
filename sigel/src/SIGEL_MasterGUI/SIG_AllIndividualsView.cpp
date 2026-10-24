@@ -350,6 +350,7 @@ namespace SIGEL_MasterGUI
 					pvmData.setExperimentName( guiExperiment.getName() );
 					pvmData.setIndividualName( theGPIndividual->getName() );
 					pvmData.setIndividualFitness( theGPIndividual->getFitness() );
+					pvmData.setTerrain( theExperiment.environment.getTerrain() );
 
 					QString pvmDataString;
 					QTextStream pvmDataStream( &pvmDataString, QIODevice::ReadWrite );

@@ -743,6 +743,7 @@ void SIGEL_GP::SIG_GPManager::start()
 	if (trainer)
 	{
 		trainer->pvmLost = false;
+		trainer->prepareTerrain();
 	}
 
 	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == CLASSIFIER_SUBST)

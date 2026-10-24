@@ -346,6 +346,14 @@ void SIG_GUIGPExperiment::slotStartEvolution()
   // First: the test and SIG_GUIGPManager's constructor read these values.
   putAllIntoExperiment();
 
+  // Checked here, because an error from start() ends the program.
+  SIGEL_Environment::SIG_Terrain terrain;
+  if( !gpExperiment.environment.makeTerrain( terrain ) )
+    {
+      QMessageBox::warning( experimentListView, "Can't Start Evolution", "The floor picture " + gpExperiment.environment.getFloorPictureFile() + " cannot be read as a P2 PGM file." );
+      return;
+    }
+
   if( (gpExperiment.robot.getBodies().size() != 0) && (gpExperiment.population.getSize() >= 4) && SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( gpExperiment.gpParameter.getFitnessName() ) )
     {
       delete guiGPManager;

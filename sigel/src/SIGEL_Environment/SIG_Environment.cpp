@@ -363,16 +363,30 @@ namespace SIGEL_Environment {
   }
 
 	SIG_Terrain SIG_Environment::getTerrain() const {
+		if (givenTerrain)
+			return *givenTerrain;
+
 		SIG_Terrain terrain;
 
-		if (floorFuncSelected && terrain.setFromFunction( floorFunction, floorDimensionX, floorDimensionZ ))
-			return terrain;
-
-		if (!floorFuncSelected && terrain.setFromPictureFile( floorPictureFile ))
+		if (makeTerrain( terrain ))
 			return terrain;
 
 		terrain.setFlat( floorDimensionX, floorDimensionZ );
 		return terrain;
+	}
+
+	void SIG_Environment::setTerrain(SIG_Terrain const &newTerrain) {
+		givenTerrain = newTerrain;
+	}
+
+	bool SIG_Environment::makeTerrain(SIG_Terrain &terrain) const {
+		if (!floorFuncSelected)
+			return terrain.setFromPictureFile( floorPictureFile );
+
+		if (!terrain.setFromFunction( floorFunction, floorDimensionX, floorDimensionZ ))
+			terrain.setFlat( floorDimensionX, floorDimensionZ );
+
+		return true;
 	}
 
 	int SIG_Environment::getTexAlpha() const {

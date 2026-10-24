@@ -27,6 +27,7 @@
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 
+#include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
 SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment& exp)
@@ -126,6 +127,16 @@ void SIGEL_GP::SIG_GPFitnessTrainer::addDynHost(QString newHost, int maxSlaves) 
   freshDynHosts.append(newPVMHost);
 
   pthread_mutex_unlock( &dynHostsMutex );
+}
+
+// Read once for each run: a picture that changes during the run cannot change the floor.
+void SIGEL_GP::SIG_GPFitnessTrainer::prepareTerrain() {
+  SIGEL_Environment::SIG_Terrain terrain;
+  if (!exp.environment.makeTerrain( terrain )) {
+    throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The floor picture " + exp.environment.getFloorPictureFile() + " cannot be read as a P2 PGM file." );
+  }
+
+  PVMData.setTerrain( terrain );
 }
 
 int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind) {

@@ -338,17 +338,6 @@ problem; the choice is made before any code is written.
   normalised positions, or methods in `SIG_GPFitnessFunction`. The fitness
   values must stay identical.
 
-- [ ] **169. The master sends the floor picture to the slave.**
-  The job carries only the path of the floor picture, and each slave opens
-  that path on its own host. `SIG_Environment::getTerrain` falls back to a
-  flat floor when `SIG_Terrain::setFromPictureFile` fails, and the slave
-  only prints a warning. The master is not told and records the fitness on
-  the flat floor. An absolute picture path that exists on one host only made
-  a run evolve for the wrong floor this way. `SIG_GPPVMData::savePVMDataTransfer`
-  sends the picture's contents instead, so the slave opens no file. A
-  picture the master cannot read stops the run with an error. The `.exp`
-  keeps the path; its format does not change.
-
 ---
 
 ## 7 · The robot language
