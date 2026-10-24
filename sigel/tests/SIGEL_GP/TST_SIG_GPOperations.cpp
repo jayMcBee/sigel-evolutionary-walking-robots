@@ -33,6 +33,7 @@
 
 #include <QMap>
 #include <QtTest>
+#include <algorithm>
 
 void SIGEL_GP::TST_SIG_GPOperations::mutationKeepsTheLengthInsideTheLimits()
 {
@@ -139,6 +140,53 @@ void SIGEL_GP::TST_SIG_GPOperations::mutationChangesAnOperandOrTheInstruction()
 
   QVERIFY( operandChanged > 0 );
   QVERIFY( instructionChanged > 0 );
+}
+
+// A new instruction keeps the old line's operands, also an operand of 0. A new random line
+// seldom has 0 in every operand.
+void SIGEL_GP::TST_SIG_GPOperations::mutationChangingTheInstructionKeepsAnOperandOfZero()
+{
+  SIG_GPParameter gpParameter;
+  gpParameter.setMinIndLength( 8 );
+  gpParameter.setMaxIndLength( 8 );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  int keptZero = 0;
+
+  for ( int seed = 1; seed <= seeds; seed++ )
+  {
+    SIGEL_Tools::SIG_Randomizer randomizer( seed );
+    std::unique_ptr<SIG_GPIndividual> father = parent( randomizer, 8 );
+    SIGEL_Program::SIG_Program &fatherProgram = father->getProgramVar();
+
+    for ( long i = 0; i < 8; i++ )
+    {
+      SIGEL_Program::SIG_ProgramLine line = fatherProgram.getLine( i );
+      line.setRobotInstruction( line.getRobotInstructionType(), 0, 0 );
+      fatherProgram.setLine( i, line );
+    }
+
+    std::unique_ptr<SIG_GPIndividual> child( &SIG_GPOperations::mutation( *father, 3, "child", randomizer, gpParameter, languageParameters ) );
+
+    for ( long i = 0; i < 8; i++ )
+    {
+      SIGEL_Program::SIG_ProgramLine const &before = father->getProgram().getLine( i );
+      SIGEL_Program::SIG_ProgramLine const &after = child->getProgram().getLine( i );
+      int const shared = std::min( before.getNumberOfElements(), after.getNumberOfElements() );
+      if ( before.getRobotInstructionType() == after.getRobotInstructionType() || shared == 0 )
+        continue;
+
+      bool allZero = true;
+      for ( int j = 0; j < shared; j++ )
+      {
+        if ( after.getInstructionElement( j ) != 0 )
+          allZero = false;
+      }
+      if ( allZero )
+        keptZero++;
+    }
+  }
+
+  QVERIFY( keptZero > 0 );
 }
 
 void SIGEL_GP::TST_SIG_GPOperations::mutationAtTheMaximumDoesNotAddALine()

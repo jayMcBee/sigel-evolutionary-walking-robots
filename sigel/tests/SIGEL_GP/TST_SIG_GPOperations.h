@@ -66,6 +66,8 @@ namespace SIGEL_GP
 
     void mutationChangesAnOperandOrTheInstruction();
 
+    void mutationChangingTheInstructionKeepsAnOperandOfZero();
+
     void mutationAtTheMaximumDoesNotAddALine();
 
     void mutationAtTheMinimumDoesNotDeleteALine();
