@@ -799,7 +799,6 @@ void SIGEL_Robot::TST_SIG_Body::loadAppliesNestedTransformsInnermostFirst()
 
 void SIGEL_Robot::TST_SIG_Body::loadDoesNothingWhenTheBodyHasAGeometry()
 {
-  // Pins the current behaviour: load's to-do says this should throw.
   QTemporaryDir folder;
   QString fileName = writeVRMLFile( folder, triangleShape() );
   SIG_Robot robot;

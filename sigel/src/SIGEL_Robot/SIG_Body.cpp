@@ -244,9 +244,9 @@ namespace SIGEL_Robot
 
 	void SIG_Body::load()
 	{
-		// If there is already a geometry, don't create another!
-		// To Do: Replace the simple return with an exception.
-		if (geometry) return;
+		// A geometry given by setGeometry takes precedence over the file.
+		if (geometry)
+			return;
 
 		// Before the geometry is created: a body that throws here stays without one.
 		QFile vrmlFile (getGeometryFile ());
