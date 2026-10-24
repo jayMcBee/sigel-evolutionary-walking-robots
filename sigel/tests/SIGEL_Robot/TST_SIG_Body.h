@@ -38,9 +38,62 @@ namespace SIGEL_Robot
 
   private slots:
 
+    void constructorStoresTheNameAndLeavesTheBodyWithoutGeometry();
+    void getGeometryFilePrependsTheDirectoryVerbatimToARelativeName();
+    void getGeometryFileReturnsAnAbsoluteNameWithoutTheDirectory();
+    void getGeometryFileOfAnEmptyNameIsTheDirectory();
+    void setGeometryGivesTheBodyThatGeometry();
+    void setGeometryPinsThatItReplacesTheGeometryWithoutFreeingTheOldOne();
+    void writeToFileTransferWritesNForABodyWithoutGeometry();
+    void writeToFileTransferWritesYAndThenTheGeometry();
+    void unstreamingConstructorReadsWhatWriteToFileTransferWroteAndStopsAfterIt();
+    void unstreamingConstructorReadsABodyWithoutGeometryAndStopsAfterIt();
+    void unstreamingConstructorReadsAFlagOtherThanYAsNoGeometry();
+    void unstreamingConstructorThrowsForAYFollowedByAMalformedGeometry();
+    void unstreamingConstructorReadsAnEndedStreamAsABodyWithoutNameOrGeometry();
+    void unstreamingConstructorPinsThatADirectoryWithASpaceDoesNotRoundTrip();
+
+    void createRotationMatrixPinsTheCurrentSignOfTheSineTerms();
+    void createRotationMatrixTurnsHalfwayAboutAnOffAxisDirection();
+
+    void loadReadsTheVerticesAndFacesOfAnIndexedFaceSet();
+    void loadKeepsOnlyTheUsedCoordinatesInFirstUseOrderAndMergesEqualOnes();
+    void loadEndsAFaceAtANegativeIndexAndAtTheEndOfTheIndices();
+    void loadSkipsIndicesBeyondTheCoordinates();
+    void loadMakesNoFaceOfAnIndexRunWithoutVertices();
+    void loadIgnoresShapesWithoutAnIndexedFaceSetWithCoordinates();
+    void loadWalksIntoNestedGroups();
+    void loadPinsThatItDropsTheFacesInGroupingNodesOtherThanGroupAndTransform();
+    void loadAppliesTheTransformTranslationToEachOfItsChildren();
+    void loadAppliesATransformOnlyWithinItsOwnChildren();
+    void loadAppliesTheTransformScaleToTheVertices();
+    void loadAppliesTheTransformRotationAsCreateRotationMatrixDefinesIt();
+    void loadScalesBeforeRotating();
+    void loadScalesAboutTheTransformCenter();
+    void loadRotatesAboutTheTransformCenterBeforeTranslating();
+    void loadScalesAlongTheTransformScaleOrientation();
+    void loadRotatesAfterScalingAlongTheScaleOrientation();
+    void loadScalesAlongTheScaleOrientationAboutTheTransformCenter();
+    void loadPinsTheCurrentNumbersOfAScaleAlongAnEighthTurnedScaleOrientation();
+    void loadAppliesNestedTransformsInnermostFirst();
+    void loadDoesNothingWhenTheBodyHasAGeometry();
+    void loadReadsTheFileRelativeToTheDirectory();
+    void loadReadsAFileWithANonAsciiName();
+    void loadOfAMissingFileGivesAnEmptyGeometry();
+    void loadOfAFileThatIsNotVRMLGivesAnEmptyGeometry();
+    void readVRMLNodeAppliesTheGivenTransformation();
+
     void loadReadsTheFaceSetsOfAFileWithUse();
     void loadRefusesAUseDirectlyAfterANodeEnd();
+    void loadRefusesAUseDirectlyAfterANodeEndInTheFileRelativeToTheDirectory();
+    void loadRefusesAUseThatWhitespaceOtherThanASpaceSeparatesFromANodeEnd();
+    void loadReportsTheLineOfTheUseCountingLinesInStringsAndComments();
+    void loadReportsTheLineOfTheFirstRefusedUse();
     void loadIgnoresUseInCommentsAndStrings();
+    void loadReadsAFileThatEndsInACommentWithoutANewline();
+    void loadAcceptsAUseThatAFieldNameSeparatesFromANodeEnd();
+    void loadAcceptsAUseThatAStringSeparatesFromANodeEnd();
+    void loadAcceptsAWordOtherThanUseDirectlyAfterANodeEnd();
   };
 
 }
