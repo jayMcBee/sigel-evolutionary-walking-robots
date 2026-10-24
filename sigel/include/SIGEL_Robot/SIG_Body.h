@@ -102,14 +102,8 @@ namespace SIGEL_Robot
                 void readVRMLNode(Node *node, NEWMAT::Matrix transformation);
 
                 /**
-                 * Setting the geometry.
-                 *
-                 * In normal operation, this should not be used. Generally,
-                 * the geometry information will be loaded by SIG_Body
-                 * itself from a DXF file.
-                 *
-                 * The body takes ownership of geo and frees the geometry
-                 * it replaces.
+                 * Sets the geometry, which the body then owns; frees the one it
+                 * replaces.
                  */
                 void setGeometry (SIG_Geometry *geo);
                 
