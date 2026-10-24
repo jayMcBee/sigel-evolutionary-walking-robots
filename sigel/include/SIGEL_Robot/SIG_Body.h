@@ -104,6 +104,9 @@ namespace SIGEL_Robot
                  * In normal operation, this should not be used. Generally,
                  * the geometry information will be loaded by SIG_Body
                  * itself from a DXF file.
+                 *
+                 * The body takes ownership of geo and frees the geometry
+                 * it replaces.
                  */
                 void setGeometry (SIG_Geometry *geo);
                 

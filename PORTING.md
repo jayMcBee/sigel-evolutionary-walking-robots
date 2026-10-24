@@ -911,6 +911,27 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-24 — DONE: `SIG_Body::setGeometry` FREES THE GEOMETRY IT REPLACES.**
+
+- **Cause:** `setGeometry` overwrote the pointer and leaked the old
+  geometry. A robot file that gives one body two `surface` blocks reached it:
+  `SIG_RobotCompilerObjects::surfaceFind` makes a new geometry per block and
+  `surfaceFinish` hands each to the body.
+- **Changed:** `setGeometry` deletes the old geometry, except when it gets
+  the one it already holds. The body owns what it is given; every caller
+  already gave it a new geometry and kept no copy. `SIG_Body.h` says so.
+- **Tested:** `TST_SIG_Body`. The test that pinned the leak is now
+  `setGeometryFreesTheGeometryItReplaces`, which failed before the fix; it
+  sees the free through a sized `operator delete` that the test program
+  replaces and that only records one pointer. The new
+  `setGeometryOfTheGeometryItHoldsKeepsIt` guards the same geometry. Cost
+  of the replacement: in build-asan, AddressSanitizer's
+  new-delete-type-mismatch check is off for the whole test program, as
+  every sized delete passes through it. Keeping that check would mean
+  replacing `operator new` as well.
+- **Still open, for later sessions:** `SIG_Body` is copyable with an owning
+  raw pointer, and the `setGeometry` doc still says "DXF file".
+
 **2026-10-24 — DONE: ITEM 152, A GEOMETRY FILE WITH `USE` DIRECTLY AFTER A `}` IS REFUSED AT IMPORT.**
 
 - **Cause, in CyberVRML97:** the grammar's `NodeEnd : '}' | '}' ','` makes

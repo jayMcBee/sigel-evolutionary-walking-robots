@@ -276,6 +276,10 @@ namespace SIGEL_Robot
 
         void SIG_Body::setGeometry (SIG_Geometry *geo)
         {
+                // The same geometry again must not be freed while the body keeps it.
+                if (geo == geometry)
+                        return;
+                delete geometry;
                 geometry = geo;
         }
 

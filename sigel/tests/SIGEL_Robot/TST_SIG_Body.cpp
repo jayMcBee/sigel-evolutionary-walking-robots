@@ -35,8 +35,57 @@
 #include <QTextStream>
 #include <QtTest>
 
+#include <atomic>
 #include <cmath>
+#include <cstddef>
 #include <memory>
+#include <new>
+
+namespace {
+
+  // The one pointer whose freeing the operator delete below records, or nullptr.
+  // Atomic, as any thread's delete reads them.
+  std::atomic< const void * > watchedPointer = nullptr;
+  std::atomic< bool > watchedPointerFreed = false;
+
+  // Watches one pointer for the life of the object.
+  class FreeWatch
+  {
+  public:
+    explicit FreeWatch( const void *pointer )
+    {
+      watchedPointer = pointer;
+      watchedPointerFreed = false;
+    }
+    ~FreeWatch()
+    {
+      watchedPointer = nullptr;
+    }
+    FreeWatch( const FreeWatch & ) = delete;
+    FreeWatch &operator=( const FreeWatch & ) = delete;
+    bool freed() const
+    {
+      return watchedPointerFreed;
+    }
+  };
+
+}
+
+// Replaces, for the whole test program, the sized form that a delete of a
+// complete type such as SIG_Geometry calls since C++14. It only records the
+// watched pointer and leaves the freeing to the default unsized form, which
+// therefore stays as it is, though GCC warns that it should be replaced too.
+// In build-asan this turns off AddressSanitizer's new-delete-type-mismatch
+// check for the whole test program, as every sized delete passes through here.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsized-deallocation"
+void operator delete( void *pointer, std::size_t ) noexcept
+{
+  if ( pointer && pointer == watchedPointer )
+    watchedPointerFreed = true;
+  ::operator delete( pointer );
+}
+#pragma GCC diagnostic pop
 
 namespace {
 
@@ -251,18 +300,46 @@ void SIGEL_Robot::TST_SIG_Body::setGeometryGivesTheBodyThatGeometry()
   QCOMPARE( body.getGeometry(), geometry );
 }
 
-void SIGEL_Robot::TST_SIG_Body::setGeometryPinsThatItReplacesTheGeometryWithoutFreeingTheOldOne()
+void SIGEL_Robot::TST_SIG_Body::setGeometryFreesTheGeometryItReplaces()
 {
   SIG_Robot robot;
   SIG_Body body( &robot, "arm.wrl", "parts/" );
-  // The test frees first, which the body no longer holds; the body frees second.
-  std::unique_ptr< SIG_Geometry > first( new SIG_Geometry() );
+  SIG_Geometry *first = new SIG_Geometry();
   SIG_Geometry *second = new SIG_Geometry();
-  body.setGeometry( first.get() );
+  body.setGeometry( first );
+  bool freed;
 
-  body.setGeometry( second );
+  {
+    FreeWatch watch( first );
+    body.setGeometry( second );
+    freed = watch.freed();
+  }
+  // Left to the test only if the body did not free it, so a failure leaks nothing.
+  if ( !freed )
+    delete first;
 
+  QVERIFY( freed );
   QCOMPARE( body.getGeometry(), second );
+}
+
+void SIGEL_Robot::TST_SIG_Body::setGeometryOfTheGeometryItHoldsKeepsIt()
+{
+  SIG_Robot robot;
+  SIG_Body body( &robot, "arm.wrl", "parts/" );
+  SIG_Geometry *geometry = new SIG_Geometry();
+  new SIG_Polygon( geometry );
+  body.setGeometry( geometry );
+  bool freed;
+
+  {
+    FreeWatch watch( geometry );
+    body.setGeometry( geometry );
+    freed = watch.freed();
+  }
+
+  QVERIFY( !freed );
+  QCOMPARE( body.getGeometry(), geometry );
+  QCOMPARE( body.getGeometry()->getNumPolygons(), 1 );
 }
 
 void SIGEL_Robot::TST_SIG_Body::writeToFileTransferWritesNForABodyWithoutGeometry()

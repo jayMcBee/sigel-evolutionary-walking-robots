@@ -43,7 +43,8 @@ namespace SIGEL_Robot
     void getGeometryFileReturnsAnAbsoluteNameWithoutTheDirectory();
     void getGeometryFileOfAnEmptyNameIsTheDirectory();
     void setGeometryGivesTheBodyThatGeometry();
-    void setGeometryPinsThatItReplacesTheGeometryWithoutFreeingTheOldOne();
+    void setGeometryFreesTheGeometryItReplaces();
+    void setGeometryOfTheGeometryItHoldsKeepsIt();
     void writeToFileTransferWritesNForABodyWithoutGeometry();
     void writeToFileTransferWritesYAndThenTheGeometry();
     void unstreamingConstructorReadsWhatWriteToFileTransferWroteAndStopsAfterIt();
