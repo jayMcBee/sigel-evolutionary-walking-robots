@@ -66,6 +66,12 @@ namespace SIGEL_Robot
                  * Destructor.
                  */
                 ~SIG_Body ();
+                /**
+                 * Not copyable: the body owns its geometry, and a copy
+                 * would delete it a second time.
+                 */
+                SIG_Body (SIG_Body const &) = delete;
+                SIG_Body & operator= (SIG_Body const &) = delete;
 
                 /**
                  * Loads the geometry from the VRML file.

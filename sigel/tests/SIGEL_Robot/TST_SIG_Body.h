@@ -39,6 +39,8 @@ namespace SIGEL_Robot
   private slots:
 
     void constructorStoresTheNameAndLeavesTheBodyWithoutGeometry();
+    void bodyCannotBeCopyConstructed();
+    void bodyCannotBeCopyAssigned();
     void getGeometryFilePrependsTheDirectoryVerbatimToARelativeName();
     void getGeometryFileReturnsAnAbsoluteNameWithoutTheDirectory();
     void getGeometryFileOfAnEmptyNameIsTheDirectory();

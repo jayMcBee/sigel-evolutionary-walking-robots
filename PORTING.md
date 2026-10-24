@@ -911,6 +911,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-24 — DONE: `SIG_Body` CANNOT BE COPIED.**
+
+- **Cause:** `SIG_Body` owns its geometry as a raw pointer and deletes it
+  in its destructor, but the compiler-generated copy constructor and copy
+  assignment copied the pointer. A copy would delete the geometry twice;
+  an assignment would also leak the target's own geometry.
+- **Changed:** both are deleted in `SIG_Body.h`. Nothing copied a body:
+  `SIG_Robot` holds them as `SIG_Body *`, and every program, driver and the
+  tests still build. No behaviour changes.
+- **Tested:** `TST_SIG_Body`, `bodyCannotBeCopyConstructed` and
+  `bodyCannotBeCopyAssigned`, which check the type traits at run time and
+  failed before the change.
+
 **2026-10-24 — DONE: `SIG_Body::setGeometry` FREES THE GEOMETRY IT REPLACES.**
 
 - **Cause:** `setGeometry` overwrote the pointer and leaked the old

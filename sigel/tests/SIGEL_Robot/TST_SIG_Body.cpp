@@ -40,6 +40,7 @@
 #include <cstddef>
 #include <memory>
 #include <new>
+#include <type_traits>
 
 namespace {
 
@@ -259,6 +260,19 @@ void SIGEL_Robot::TST_SIG_Body::constructorStoresTheNameAndLeavesTheBodyWithoutG
 
   QCOMPARE( body.getName(), QString( "arm.wrl" ) );
   QCOMPARE( body.getGeometry(), nullptr );
+}
+
+void SIGEL_Robot::TST_SIG_Body::bodyCannotBeCopyConstructed()
+{
+  // The body owns its geometry, so a copy would delete it a second time.
+  QVERIFY( !std::is_copy_constructible_v< SIG_Body > );
+}
+
+void SIGEL_Robot::TST_SIG_Body::bodyCannotBeCopyAssigned()
+{
+  // The body owns its geometry, so an assignment would leak the target's and
+  // delete the source's a second time.
+  QVERIFY( !std::is_copy_assignable_v< SIG_Body > );
 }
 
 void SIGEL_Robot::TST_SIG_Body::getGeometryFilePrependsTheDirectoryVerbatimToARelativeName()
