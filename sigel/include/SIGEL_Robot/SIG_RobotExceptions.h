@@ -62,6 +62,14 @@ namespace SIGEL_Robot {
                                          "Geometry file \"" + geometryFile + "\", line " +
                                          QString::number (geometryLine) + ": " + message)
                         { }
+
+                SIG_GeometryFileError (QString file,
+                                       int line,
+                                       QString geometryFile,
+                                       QString message)
+                        : SIG_Exception (file, line,
+                                         "Geometry file \"" + geometryFile + "\": " + message)
+                        { }
         };
 
         class SIG_InitialLocationError : public SIG_Exception {

@@ -77,8 +77,7 @@ namespace SIGEL_Robot
                  * Loads the geometry from the VRML file into a new SIG_Geometry.
                  * Does nothing if the body already has one.
                  *
-                 * Throws SIG_GeometryFileError for some files it cannot load; a
-                 * missing or unparsable file gives an empty geometry.
+                 * Throws SIG_GeometryFileError if the file cannot be loaded.
                  */
                 void load ();
                 

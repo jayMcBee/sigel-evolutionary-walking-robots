@@ -840,32 +840,46 @@ void SIGEL_Robot::TST_SIG_Body::loadReadsAFileWithANonAsciiName()
   QCOMPARE( body.getGeometry()->getNumPolygons(), 1 );
 }
 
-void SIGEL_Robot::TST_SIG_Body::loadOfAMissingFileGivesAnEmptyGeometry()
+void SIGEL_Robot::TST_SIG_Body::loadRefusesAMissingFile()
 {
-  // Pins the current behaviour: a missing file is not reported.
   QTemporaryDir folder;
   SIG_Robot robot;
   SIG_Body body( &robot, "missing.wrl", folder.path() + "/" );
 
-  QCOMPARE( thrownByLoad( body ), QString() );
+  QString thrown = thrownByLoad( body );
 
-  QVERIFY( body.getGeometry() );
-  QCOMPARE( body.getGeometry()->getNumPolygons(), 0 );
-  QCOMPARE( body.getGeometry()->getNumVertices(), 0 );
+  QVERIFY2( thrown.startsWith( "Geometry file \"" + folder.filePath( "missing.wrl" ) + "\": " ), qPrintable( thrown ) );
+  QVERIFY2( thrown.contains( "cannot be read" ), qPrintable( thrown ) );
+  QCOMPARE( body.getGeometry(), nullptr );
 }
 
-void SIGEL_Robot::TST_SIG_Body::loadOfAFileThatIsNotVRMLGivesAnEmptyGeometry()
+void SIGEL_Robot::TST_SIG_Body::loadRefusesAFileThatIsNotVRML()
 {
-  // Pins the current behaviour: CyberVRML97's parse error is not reported.
   QTemporaryDir folder;
   QString fileName = writeFile( folder, "This is not a VRML file.\n" );
   SIG_Robot robot;
   SIG_Body body( &robot, fileName, "" );
 
-  QCOMPARE( thrownByLoad( body ), QString() );
+  QString thrown = thrownByLoad( body );
 
-  QVERIFY( body.getGeometry() );
-  QCOMPARE( body.getGeometry()->getNumPolygons(), 0 );
+  QVERIFY2( thrown.startsWith( "Geometry file \"" + fileName + "\", line 1: " ), qPrintable( thrown ) );
+  QVERIFY2( thrown.contains( "syntax error" ), qPrintable( thrown ) );
+  QCOMPARE( body.getGeometry(), nullptr );
+}
+
+void SIGEL_Robot::TST_SIG_Body::loadRefusesAFileWithASyntaxErrorAfterValidShapes()
+{
+  // The shapes before the error must not reach the body as a partial geometry.
+  QTemporaryDir folder;
+  QString fileName = writeVRMLFile( folder, triangleShape() + "Group { children [ }\n" );
+  SIG_Robot robot;
+  SIG_Body body( &robot, fileName, "" );
+
+  QString thrown = thrownByLoad( body );
+
+  QVERIFY2( thrown.startsWith( "Geometry file \"" + fileName + "\", line 4: " ), qPrintable( thrown ) );
+  QVERIFY2( thrown.contains( "syntax error" ), qPrintable( thrown ) );
+  QCOMPARE( body.getGeometry(), nullptr );
 }
 
 void SIGEL_Robot::TST_SIG_Body::readVRMLNodeAppliesTheGivenTransformation()
@@ -1060,23 +1074,22 @@ void SIGEL_Robot::TST_SIG_Body::loadAcceptsAUseThatAFieldNameSeparatesFromANodeE
 void SIGEL_Robot::TST_SIG_Body::loadAcceptsAUseThatAStringSeparatesFromANodeEnd()
 {
   // Not valid VRML, which has no string directly before a USE: it only shows
-  // that a string ends what follows a "}". Nothing is DEFed, so CyberVRML97
-  // finds no node to copy.
+  // that a string ends what follows a "}", so the USE check lets it through.
   QTemporaryDir folder;
   QString fileName = writeVRMLFile( folder, "Group { } \"x\" USE S\n" );
   SIG_Robot robot;
   SIG_Body body( &robot, fileName, "" );
 
-  QCOMPARE( thrownByLoad( body ), QString() );
+  QString thrown = thrownByLoad( body );
 
-  QVERIFY( body.getGeometry() );
+  QVERIFY2( !thrown.contains( "USE directly after" ), qPrintable( thrown ) );
 }
 
 void SIGEL_Robot::TST_SIG_Body::loadAcceptsAWordOtherThanUseDirectlyAfterANodeEnd()
 {
   // Not valid VRML, as these are no node types: CyberVRML97 lexes each as one
-  // name, the USE keyword being case-sensitive (vrml.l), stops at a parse error
-  // and nothing reaches a USE.
+  // name, the USE keyword being case-sensitive (vrml.l), so the USE check lets
+  // them through.
   const QStringList names = { "USEFUL", "USE1", "USE_FUL", "USE-FUL", "USE+FUL", "use", "Use" };
   for ( const QString &name : names ) {
     QTemporaryDir folder;
@@ -1086,7 +1099,6 @@ void SIGEL_Robot::TST_SIG_Body::loadAcceptsAWordOtherThanUseDirectlyAfterANodeEn
 
     const QString thrown = thrownByLoad( body );
 
-    QVERIFY2( thrown.isEmpty(), qPrintable( name + ": " + thrown ) );
-    QVERIFY2( body.getGeometry(), qPrintable( name ) );
+    QVERIFY2( !thrown.contains( "USE directly after" ), qPrintable( name + ": " + thrown ) );
   }
 }

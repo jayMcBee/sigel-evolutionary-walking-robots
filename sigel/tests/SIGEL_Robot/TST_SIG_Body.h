@@ -82,8 +82,9 @@ namespace SIGEL_Robot
     void loadDoesNothingWhenTheBodyHasAGeometry();
     void loadReadsTheFileRelativeToTheDirectory();
     void loadReadsAFileWithANonAsciiName();
-    void loadOfAMissingFileGivesAnEmptyGeometry();
-    void loadOfAFileThatIsNotVRMLGivesAnEmptyGeometry();
+    void loadRefusesAMissingFile();
+    void loadRefusesAFileThatIsNotVRML();
+    void loadRefusesAFileWithASyntaxErrorAfterValidShapes();
     void readVRMLNodeAppliesTheGivenTransformation();
 
     void loadReadsTheFaceSetsOfAFileWithUse();

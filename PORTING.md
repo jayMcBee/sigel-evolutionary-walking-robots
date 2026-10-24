@@ -911,6 +911,26 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-24 — DONE: A MISSING OR UNPARSABLE GEOMETRY FILE IS REFUSED AT IMPORT.**
+
+- **Cause:** `SIG_Body::load` never checked CyberVRML97's result. A missing
+  file gave an empty geometry, with only cv97's "Cannot open data file" on
+  stderr; a syntax error gave the shapes parsed before it, so the body was
+  silently empty or incomplete.
+- **Changed:** `load` throws `SIG_GeometryFileError` when the file cannot
+  be read ("Geometry file "…": cannot be read.") and when cv97's
+  `isOK()` is false after the parse, with cv97's line and token ("…, line
+  12: syntax error at "…"."). Both run before the geometry is created, so
+  the body keeps none. `SIG_GeometryFileError` has a constructor without a
+  line for the first. A valid file without faces still gives an empty
+  geometry: that is not a failed load. Robot > Import shows the message
+  and `coredrive` prints it, as for the USE check.
+- **Tested:** `TST_SIG_Body`. The two tests that pinned the silent empty
+  geometry are now `loadRefusesAMissingFile` and
+  `loadRefusesAFileThatIsNotVRML`; `loadRefusesAFileWithASyntaxErrorAfterValidShapes`
+  is new. All three failed before the change. The two USE tests that feed
+  invalid VRML now check only that the USE check lets the file through.
+
 **2026-10-24 — DONE: `SIG_Body` CANNOT BE COPIED.**
 
 - **Cause:** `SIG_Body` owns its geometry as a raw pointer and deletes it
