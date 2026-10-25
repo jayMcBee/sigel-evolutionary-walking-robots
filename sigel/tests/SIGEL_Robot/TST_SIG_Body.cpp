@@ -543,6 +543,52 @@ void SIGEL_Robot::TST_SIG_Body::unstreamingConstructorReadsADirectoryWithWhitesp
   QCOMPARE( next, QString( "Material" ) );
 }
 
+void SIGEL_Robot::TST_SIG_Body::writeToFileTransferQuotesAGeometryFileNameWithWhitespace()
+{
+  SIG_Robot robot;
+  SIG_Body body( &robot, "left\tarm.wrl", "parts/" );
+  QString text;
+  QTextStream stream( &text );
+
+  body.writeToFileTransfer( stream );
+  stream.flush();
+
+  QCOMPARE( text, QString( "Body \"left\tarm.wrl\" parts/ n\n" ) );
+}
+
+void SIGEL_Robot::TST_SIG_Body::unstreamingConstructorReadsAGeometryFileNameWithWhitespaceAndStopsAfterTheBody()
+{
+  SIG_Robot robot;
+  SIG_Geometry *geometry = new SIG_Geometry();
+  SIG_Polygon *polygon = new SIG_Polygon( geometry );
+  polygon->appendVertex( SIG_Vector( 0, 0, 0 ) );
+  polygon->appendVertex( SIG_Vector( 1, 0, 0 ) );
+  polygon->appendVertex( SIG_Vector( 0, 1, 0 ) );
+  SIG_Body written( &robot, "left\tarm.wrl", "parts/" );
+  written.setGeometry( geometry );
+  QString text;
+  QTextStream out( &text );
+  written.writeToFileTransfer( out );
+  out << "Material";
+  out.flush();
+  QTextStream in( &text );
+  QString keyword;
+  in >> keyword;
+  QString thrown;
+
+  std::unique_ptr< SIG_Body > read = unstreamedBody( robot, in, thrown );
+  QString next;
+  in >> next;
+
+  QCOMPARE( thrown, QString() );
+  QCOMPARE( read->getName(), QString( "left\tarm.wrl" ) );
+  QCOMPARE( read->getGeometryFile(), QString( "parts/left\tarm.wrl" ) );
+  QVERIFY( read->getGeometry() );
+  QCOMPARE( read->getGeometry()->getNumPolygons(), 1 );
+  QCOMPARE( read->getGeometry()->getNumVertices(), 3 );
+  QCOMPARE( next, QString( "Material" ) );
+}
+
 void SIGEL_Robot::TST_SIG_Body::createRotationMatrixPinsTheCurrentSignOfTheSineTerms()
 {
   // Pins the current behaviour: the sine terms have the opposite sign from

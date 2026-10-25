@@ -911,6 +911,23 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: `SIG_Body` QUOTES ITS GEOMETRY FILE NAME IN THE TRANSFER FORMAT.**
+
+- **Changed:** `writeToFileTransfer` writes the geometry file name with
+  `SIG_FileUtils::quotedIfContainsWhitespace`, the unstreaming constructor
+  reads it with `readWordOrQuoted`, as the directory already is. A name
+  with whitespace now survives the transfer; names without it are written
+  as before. `SIG_Link` writes and reads the same name and is still to do.
+- **Tests:** two in `TST_SIG_Body`, beside the directory ones: the writer
+  quotes a name with a tab, and the constructor reads it back and stops
+  after the body. Each failed against a broken reader or writer.
+- **Review:** no defect.
+- **Gates:** `check.sh` 877 pass, 0 fail; warnings 287 (the four files of
+  `SIG_FileUtils` are now counted by the encodings check). `fitness-check.sh`
+  passes on both builds, values identical. Dictorder unchanged; PVM both
+  PASS.
+
+
 **2026-10-25 — DONE: `SIGEL_Tools::SIG_FileUtils`, SIG_BODY'S WHITESPACE HELPERS.**
 
 - **Changed:** new `SIG_FileUtils.h`/`.cpp` in `SIGEL_Tools` with

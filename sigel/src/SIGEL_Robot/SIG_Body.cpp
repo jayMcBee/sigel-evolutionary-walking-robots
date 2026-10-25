@@ -94,7 +94,7 @@ namespace SIGEL_Robot
 	{
 		QString tmpstr;
 		// "Body" has already been read in SIG_Robot.
-		tx >> geometryFile;
+		geometryFile = SIGEL_Tools::SIG_FileUtils::readWordOrQuoted (tx);
 		directory = SIGEL_Tools::SIG_FileUtils::readWordOrQuoted (tx);
 		tx >> tmpstr;
 		if (tmpstr == "y") {
@@ -326,7 +326,7 @@ namespace SIGEL_Robot
 
 	void SIG_Body::writeToFileTransfer (QTextStream & tx)
 	{
-		tx << "Body " << geometryFile << ' ' << SIGEL_Tools::SIG_FileUtils::quotedIfContainsWhitespace (directory) << ' ';
+		tx << "Body " << SIGEL_Tools::SIG_FileUtils::quotedIfContainsWhitespace (geometryFile) << ' ' << SIGEL_Tools::SIG_FileUtils::quotedIfContainsWhitespace (directory) << ' ';
 		if (geometry) {
 			tx << "y\n";
 			geometry->writeToFileTransfer (tx);

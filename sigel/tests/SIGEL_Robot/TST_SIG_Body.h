@@ -56,6 +56,8 @@ namespace SIGEL_Robot
     void unstreamingConstructorReadsAnEndedStreamAsABodyWithoutNameOrGeometry();
     void writeToFileTransferQuotesADirectoryWithWhitespace();
     void unstreamingConstructorReadsADirectoryWithWhitespaceAndStopsAfterTheBody();
+    void writeToFileTransferQuotesAGeometryFileNameWithWhitespace();
+    void unstreamingConstructorReadsAGeometryFileNameWithWhitespaceAndStopsAfterTheBody();
 
     void createRotationMatrixPinsTheCurrentSignOfTheSineTerms();
     void createRotationMatrixTurnsHalfwayAboutAnOffAxisDirection();
