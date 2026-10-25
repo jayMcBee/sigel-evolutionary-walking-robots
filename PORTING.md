@@ -911,6 +911,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: `SIG_EnvironmentRenderer` IS INDENTED WITH TABS, WHITESPACE ONLY.**
+
+- **Changed:** the `.cpp` and the header mixed 2-space GNU style, 3- and
+  6-space blocks and stray tabs. Each line now has one tab per nesting
+  level; a continuation line has its statement's tabs, then spaces for the
+  alignment; the initializer list is one tab deeper than the constructor,
+  as in `SIG_Body.cpp`. GNU braces on their own line now stand at the level
+  of their statement. K&R braces are not moved and interior whitespace is
+  untouched: both would no longer be whitespace only. `git diff -w` is
+  empty; the line counts are unchanged.
+- **Review:** no defect. The initializer list first kept the GNU 2-space
+  offset after one tab; it now follows `SIG_Body.cpp`.
+- **Gates:** `check.sh` 872 pass, 0 fail; warnings 287. `fitness-check.sh`
+  passes on both builds, values identical. Dictorder unchanged; PVM both
+  PASS.
+
 **2026-10-25 — DONE: THE SANITIZED UNIT TESTS RUN AGAIN; CyberVRML97 IS LEFT OUT OF THE CHECK.**
 
 - **Cause:** since `TST_SIG_Body` loads VRML files through `SIG_Body::load`,
