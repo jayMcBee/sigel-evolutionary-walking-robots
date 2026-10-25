@@ -911,6 +911,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: TWO GUARDS NAMED `SIGEL_SIMULATOR_` ARE `SIGEL_SIMULATION_`, LIKE THEIR MODULE.**
+
+- **Changed:** the `#ifndef` and `#define` of `SIG_CommandInterface.h` and
+  `SIG_DynaMechsCommandInterface.h`; their `#endif` comments already said
+  `SIGEL_SIMULATION_`. Nothing tested the old names.
+- **Review:** no defect.
+- **Gates:** `check.sh` 872 pass, 0 fail; warnings 287. Fitness identical
+  on `build`, and by hand through the sanitized `coredrive`, with no
+  sanitizer report. Dictorder unchanged; PVM both PASS. Run once on the
+  three guard commits together; they touch separate files and only guards.
+
 **2026-10-25 — DONE: THE THREE HEADERS WITHOUT AN INCLUDE GUARD HAVE ONE.**
 
 - **Changed:** `SIG_InfoBox.h` and `SIG_TextView.h` get

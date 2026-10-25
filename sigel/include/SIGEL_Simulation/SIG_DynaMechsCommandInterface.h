@@ -20,8 +20,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_SIMULATOR_SIG_DYNAMECHSCOMMANDINTERFACE_H
-#define SIGEL_SIMULATOR_SIG_DYNAMECHSCOMMANDINTERFACE_H
+#ifndef SIGEL_SIMULATION_SIG_DYNAMECHSCOMMANDINTERFACE_H
+#define SIGEL_SIMULATION_SIG_DYNAMECHSCOMMANDINTERFACE_H
 
 #include <QList>
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
