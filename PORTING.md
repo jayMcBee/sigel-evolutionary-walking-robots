@@ -911,6 +911,20 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: `SIG_SimulationVisualisationWidget.h`'S COMMENTS DESCRIBE THE CODE.**
+
+- **Changed, comments only:** `getFittingDistance` said the robot fits
+  with a margin; the sphere just fits. `slotSetFrameDelay` said it acts
+  only while the simulation runs; it applies at once then, else from the
+  next start, and names its parameter. `slotStepSimulation` and
+  `slotFForwardSimulation` say they do nothing while it runs;
+  `slotSimulationProgress` that it steps up to the next movie frame while
+  recording; a typo in `frameDelay`.
+- **Review:** no defect.
+- **Gates:** `check.sh` 872 pass, 0 fail; warnings 287. `fitness-check.sh`
+  passes on both builds, values identical. Dictorder unchanged; PVM both
+  PASS.
+
 **2026-10-25 — DONE: `SIG_VisualisationWidget.h`'S COMMENTS DESCRIBE THE CODE.**
 
 - **Changed, comments only:** the constructor's said it initializes the

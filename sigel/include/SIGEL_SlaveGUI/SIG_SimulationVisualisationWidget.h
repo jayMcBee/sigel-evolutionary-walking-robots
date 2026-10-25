@@ -93,7 +93,7 @@ namespace SIGEL_SlaveGUI
 
 		/**
 		 * Returns the camera distance at which the whole robot
-		 * fits in the view, with a margin around it.
+		 * just fits in the view.
 		 */
 		double getFittingDistance() const;
 
@@ -145,21 +145,20 @@ namespace SIGEL_SlaveGUI
 		void slotStopSimulation();
 
 		/**
-		 * Effects the progress of the simulation about one timestep.
+		 * Lets the simulation progress one timestep; does nothing while it runs.
 		 */
 		void slotStepSimulation();
 
 		/**
-		 * Effects the progress of the simulation about 5 seconds.
+		 * Lets the simulation progress 5 seconds; does nothing while it runs.
 		 */
 		void slotFForwardSimulation();
 
 		/**
-		 * Sets the delay between to simulated and visualized timesteps.
+		 * Sets the delay between two simulated and visualized timesteps:
+		 * at once while the simulation runs, else from its next start.
 		 *
-		 * Has only effects when the simulation in running.
-		 *
-		 * @param frameDelay The new framedelay.
+		 * @param fframeDelay The new frame delay in ms.
 		 */
 		void slotSetFrameDelay(int fframeDelay);
 
@@ -197,7 +196,7 @@ namespace SIGEL_SlaveGUI
 		QTimer *simulationTimer;
 
 		/**
-		 * The time in ms to wait between to simulationframes.
+		 * The time in ms to wait between two simulation frames.
 		 */
 		int frameDelay;
 
@@ -291,8 +290,8 @@ namespace SIGEL_SlaveGUI
 		void slotFrameShown();
 
 		/**
-		 * Lets the simulation progress about one timestep, once the frame of
-		 * the previous step is on screen.
+		 * Lets the simulation progress one timestep, once the frame of the
+		 * previous step is on screen; while recording, up to the next movie frame.
 		 *
 		 * Updates the widget's contents.
 		 * This slot is connected to the timeout signal of the
