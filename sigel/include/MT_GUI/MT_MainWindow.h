@@ -1,3 +1,6 @@
+#ifndef MT_GUI_MT_MAINWINDOW_H
+#define MT_GUI_MT_MAINWINDOW_H
+
 #include <QMainWindow>
 #include <QCloseEvent>
 #include <QSplitter>
@@ -89,3 +92,5 @@ protected:
 	void closeEvent(QCloseEvent *e) override;
 	void showEvent(QShowEvent *e) override;
 };
+
+#endif // MT_GUI_MT_MAINWINDOW_H

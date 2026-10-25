@@ -20,6 +20,9 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+#ifndef SIGEL_MASTERGUI_SIG_INFOBOX_H
+#define SIGEL_MASTERGUI_SIG_INFOBOX_H
+
 #include <qdialog.h>
 
 namespace SIGEL_MasterGUI
@@ -32,3 +35,5 @@ class SIG_InfoBox : public QDialog
 };
 
 }
+
+#endif // SIGEL_MASTERGUI_SIG_INFOBOX_H

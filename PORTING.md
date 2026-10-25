@@ -911,6 +911,21 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: THE THREE HEADERS WITHOUT AN INCLUDE GUARD HAVE ONE.**
+
+- **Changed:** `SIG_InfoBox.h` and `SIG_TextView.h` get
+  `SIGEL_MASTERGUI_SIG_INFOBOX_H` and `SIGEL_MASTERGUI_SIG_TEXTVIEW_H` after
+  the banner; `MT_GUI/MT_MainWindow.h`, which has no banner, gets
+  `MT_GUI_MT_MAINWINDOW_H` on line 1, like the other `MT_GUI` headers, and
+  the newline its last line lacked. Each is included once per file, so
+  nothing was defined twice; the guards make them like every other header.
+- **Review:** no defect. Every guard in the tree is unique except the
+  deliberate `SIG_GPExperiment` pair (item 10).
+- **Gates:** `check.sh` 872 pass, 0 fail; warnings 287. Fitness identical
+  on `build`, and by hand through the sanitized `coredrive`, with no
+  sanitizer report. Dictorder unchanged; PVM both PASS. Run once on the
+  three guard commits together; they touch separate files and only guards.
+
 **2026-10-25 — DONE: ITEM 171, WIDENED. FOUR GUI CLASSES MOVE INTO THEIR MODULE'S NAMESPACE.**
 
 - **Changed:** `SIG_VisualisationWidget` is in `SIGEL_CommonGUI`; its
