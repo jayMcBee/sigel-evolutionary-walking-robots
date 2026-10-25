@@ -22,11 +22,11 @@
 */
 #include "SIGEL_Robot/SIG_Body.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
-#include <algorithm>
 #include <cmath>
 #include "SIGEL_Robot/SIG_GeometryIterator.h"
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include <QFile>
+#include "SIGEL_Tools/SIG_FileUtils.h"
 
 namespace {
 
@@ -77,54 +77,6 @@ namespace {
 		return 0;
 	}
 
-	bool containsWhitespace (QString const & text)
-	{
-		return std::ranges::any_of (text, [] (QChar const c)
-		{
-			return c.isSpace ();
-		});
-	}
-
-	/*
-	 * The transfer format splits on whitespace, so text with whitespace goes
-	 * in double quotes. Any other is written unchanged. Text with a double
-	 * quote in it does not survive.
-	 */
-	QString quotedWhenContainsWhitespace (QString const & text)
-	{
-		if (containsWhitespace (text))
-			return "\"" + text + "\"";
-
-		return text;
-	}
-
-	// Reads what quotedWhenContainsWhitespace wrote.
-	QString readWhitespaceDelimitedOrQuoted (QTextStream & tx)
-	{
-		QString word;
-		QChar c;
-		tx.skipWhiteSpace ();
-		tx >> c;
-		if (c == '"')
-		{
-			tx >> c;
-			while (tx.status () == QTextStream::Ok && c != '"')
-			{
-				word.append (c);
-				tx >> c;
-			}
-		}
-		else
-		{
-			while (tx.status () == QTextStream::Ok && !c.isSpace ())
-			{
-				word.append (c);
-				tx >> c;
-			}
-		}
-		return word;
-	}
-
 }
 
 namespace SIGEL_Robot
@@ -143,7 +95,7 @@ namespace SIGEL_Robot
 		QString tmpstr;
 		// "Body" has already been read in SIG_Robot.
 		tx >> geometryFile;
-		directory = readWhitespaceDelimitedOrQuoted (tx);
+		directory = SIGEL_Tools::SIG_FileUtils::readWordOrQuoted (tx);
 		tx >> tmpstr;
 		if (tmpstr == "y") {
 			geometry = new SIG_Geometry (tx);
@@ -374,7 +326,7 @@ namespace SIGEL_Robot
 
 	void SIG_Body::writeToFileTransfer (QTextStream & tx)
 	{
-		tx << "Body " << geometryFile << ' ' << quotedWhenContainsWhitespace (directory) << ' ';
+		tx << "Body " << geometryFile << ' ' << SIGEL_Tools::SIG_FileUtils::quotedIfContainsWhitespace (directory) << ' ';
 		if (geometry) {
 			tx << "y\n";
 			geometry->writeToFileTransfer (tx);

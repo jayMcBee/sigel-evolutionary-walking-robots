@@ -911,6 +911,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: `SIGEL_Tools::SIG_FileUtils`, SIG_BODY'S WHITESPACE HELPERS.**
+
+- **Changed:** new `SIG_FileUtils.h`/`.cpp` in `SIGEL_Tools` with
+  `quotedIfContainsWhitespace` and `readWordOrQuoted` (private
+  `containsWhitespace`), taken from `SIG_Body.cpp`'s anonymous namespace.
+  `SIG_Body.cpp` calls them; its three helpers and `<algorithm>` are gone.
+  Behaviour unchanged.
+- **Tests:** `TST_SIG_FileUtils`, 6 tests; each failed against at least
+  one of six deliberate breakages.
+- **Review:** no defect; the header comment on empty text and text with a
+  double quote was corrected.
+- **Gates:** `check.sh` 873 pass, 0 fail; warnings 287. `fitness-check.sh`
+  passes on both builds, values identical. Dictorder unchanged; PVM both
+  PASS.
+
+
 **2026-10-25 — DONE: `SIG_SimulationVisualisationWidget.h`'S COMMENTS DESCRIBE THE CODE.**
 
 - **Changed, comments only:** `getFittingDistance` said the robot fits

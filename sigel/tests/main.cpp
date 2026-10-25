@@ -38,6 +38,7 @@
 #include "SIGEL_Simulation/TST_SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Simulation/TST_SIG_Interpreter.h"
 #include "SIGEL_Simulation/TST_SIG_Register.h"
+#include "SIGEL_Tools/TST_SIG_FileUtils.h"
 #include "SIGEL_Tools/TST_SIG_Randomizer.h"
 
 #include <QtTest>
@@ -69,6 +70,7 @@ int main( int argc, char *argv[] ) {
   testClasses.push_back( std::make_unique<SIGEL_Simulation::TST_SIG_DynaMechsSimulationData>() );
   testClasses.push_back( std::make_unique<SIGEL_Simulation::TST_SIG_Interpreter>() );
   testClasses.push_back( std::make_unique<SIGEL_Simulation::TST_SIG_Register>() );
+  testClasses.push_back( std::make_unique<SIGEL_Tools::TST_SIG_FileUtils>() );
   testClasses.push_back( std::make_unique<SIGEL_Tools::TST_SIG_Randomizer>() );
 
   int failures = 0;
