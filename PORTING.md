@@ -911,6 +911,19 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: `SIG_VisualisationWidget` IS INDENTED WITH TABS, WHITESPACE ONLY.**
+
+- **Changed:** the `.cpp` and the header, by the rules of the
+  `SIG_EnvironmentRenderer` entry below: one tab per nesting level,
+  continuation lines with their statement's tabs and then spaces, the
+  initializer list one tab deeper than the constructor, access labels at
+  class level. `paintGL`, one level deeper than the other methods, now
+  stands with them. `git diff -w` is empty; the line counts are unchanged.
+- **Review:** no defect.
+- **Gates:** `check.sh` 872 pass, 0 fail; warnings 287. `fitness-check.sh`
+  passes on both builds, values identical. Dictorder unchanged; PVM both
+  PASS.
+
 **2026-10-25 — DONE: `SIG_VisualisationWidget`: METHODS WITHOUT A VISUALISATION RETURN EARLY.**
 
 - **Changed:** as its subclass `SIG_SimulationVisualisationWidget` did
