@@ -30,6 +30,9 @@
 
 #include <cstdlib>
 
+namespace SIGEL_MasterGUI
+{
+
 SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::WindowFlags f )
   : QDialog( parent, f )
 {
@@ -92,4 +95,6 @@ SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::Win
 	   this,
 	   SLOT( accept() ) );
   okLayout->addWidget( okPushButton );
+}
+
 }

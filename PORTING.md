@@ -911,6 +911,27 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: ITEM 171, WIDENED. FOUR GUI CLASSES MOVE INTO THEIR MODULE'S NAMESPACE.**
+
+- **Changed:** `SIG_VisualisationWidget` is in `SIGEL_CommonGUI`; its
+  subclass `SIG_SimulationVisualisationWidget` in `SIGEL_SlaveGUI`;
+  `SIG_InfoBox` and `SIG_TextView` in `SIGEL_MasterGUI`. Every SIGEL class
+  outside MetaGP and the `*Base` form classes now sits in the namespace of
+  its module. `SIG_SimulationWidgetBase.ui` names the custom widget
+  qualified in both places, the `<customwidget>` and the `<widget
+  class=...>`; uic takes the class for the member from the second. Code at
+  column 0 is wrapped without re-indenting, as `SIG_MainWindow.cpp` is. The
+  callers already sit in the matching namespace and are unchanged.
+- **Left as is, by decision:** the 12 `*Base` classes, which wrap the global
+  `Ui::` classes of their forms.
+- **Review:** no defect. No string-based connect, class-name lookup or
+  baseline names these classes. `SIG_InfoBox.h` and `SIG_TextView.h` have no
+  include guard, as before.
+- **Gates:** `check.sh` 872 pass, 0 fail; warnings 287. Fitness identical on
+  `build`, and by hand through the sanitized `coredrive`, with no sanitizer
+  report; the sanitized unit tests still abort in cv97, as in the entry
+  below. Dictorder unchanged; PVM both PASS.
+
 **2026-10-25 — DONE: `gui behaviour` NO LONGER DEPENDS ON WHERE THE REPO IS CHECKED OUT.**
 
 - **Cause:** `check.sh` replaces the repo's physical path with `<REPOROOT>`,

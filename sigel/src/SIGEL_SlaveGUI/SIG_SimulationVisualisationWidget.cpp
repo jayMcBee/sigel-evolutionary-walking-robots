@@ -37,6 +37,9 @@
 #include <QtMath>
 #include <cmath>
 
+namespace SIGEL_SlaveGUI
+{
+
 SIG_SimulationVisualisationWidget::SIG_SimulationVisualisationWidget( QWidget *parent,
                                                                       char const *name,
                                                                       Qt::WindowFlags f )
@@ -692,4 +695,6 @@ void SIG_SimulationVisualisationWidget::paintGL()
 		emit signalPosition( static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation* >( visualisation )->getRobotCentre() );
 	else
 		emit signalPosition( visualisation->viewSettings.lookPoint );
+}
+
 }

@@ -24,6 +24,9 @@
 #include "SIGEL_MasterGUI/SIG_TextView.h"
 #include <qtimer.h>
 
+namespace SIGEL_MasterGUI
+{
+
 SIG_TextView::SIG_TextView( QWidget *parent, const char *name )
   : QTextBrowser( parent ), oldY(0), scrollDown( true ), scroll( true )
 {
@@ -105,4 +108,6 @@ bool SIG_TextView::viewportEvent( QEvent *e )
       break;
     }
   return QTextBrowser::viewportEvent( e );
+}
+
 }

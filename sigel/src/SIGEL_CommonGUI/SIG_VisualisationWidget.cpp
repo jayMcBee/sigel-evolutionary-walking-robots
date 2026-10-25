@@ -28,6 +28,8 @@
 #include <cmath>
 #include <numbers>
 
+namespace SIGEL_CommonGUI
+{
 
   SIG_VisualisationWidget::SIG_VisualisationWidget( QWidget *parent,
 						    char const *name,
@@ -279,3 +281,5 @@
       else
 	glClear(GL_COLOR_BUFFER_BIT);
     }
+
+}

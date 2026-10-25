@@ -35,6 +35,9 @@
 #include "SIGEL_Simulation/SIG_SimulationParameters.h"
 #include "SIGEL_Program/SIG_Program.h"
 
+namespace SIGEL_SlaveGUI
+{
+
   /**
    * This widget finally contains the OpenGL framebuffers in which
    * is rendered by the SIG_SimulationVisualisation object that should
@@ -44,7 +47,7 @@
    * like controlling the simulation or setting the delay between two
    * frames.
    */
-  class SIG_SimulationVisualisationWidget : public SIG_VisualisationWidget
+  class SIG_SimulationVisualisationWidget : public SIGEL_CommonGUI::SIG_VisualisationWidget
     {
       Q_OBJECT
 
@@ -311,5 +314,7 @@
 
       void signalGridColorChanged( QColor );
     };
+
+}
 
 #endif // SIGEL_SLAVEGUI_SIG_SIMULATIONVISUALISATIONWIDGET_H

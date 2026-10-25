@@ -30,6 +30,9 @@
 #include "SIGEL_Visualisation/SIG_Visualisation.h"
 #include "SIGEL_CommonGUI/SIG_FloatingTextLabel.h"
 
+namespace SIGEL_CommonGUI
+{
+
   /**
    * This is the superclass of all widget-classes that should
    * be used to integrate the OpenGL-Visualisation-classes
@@ -270,5 +273,7 @@
 
       int showAncorPointsState;
     };
+
+}
 
 #endif // SIGEL_COMMONGUI_SIG_VISUALISATIONWIDGET_H

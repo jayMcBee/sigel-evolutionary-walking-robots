@@ -23,6 +23,9 @@
 #include <QTextBrowser>
 #include <QMouseEvent>
 
+namespace SIGEL_MasterGUI
+{
+
 class SIG_TextView : public QTextBrowser
 {
   Q_OBJECT
@@ -56,3 +59,5 @@ class SIG_TextView : public QTextBrowser
  private slots:
   void updateScroll();
 };
+
+}
