@@ -911,6 +911,16 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: `SIG_SimulationVisualisationWidget.h` IS INDENTED WITH TABS, WHITESPACE ONLY.**
+
+- **Changed:** the header, by the rules of the `SIG_VisualisationWidget`
+  entry below; its `.cpp` got the same in `2676099`. `git diff -w` is
+  empty; the line count is unchanged.
+- **Review:** no defect.
+- **Gates:** `check.sh` 872 pass, 0 fail; warnings 287. `fitness-check.sh`
+  passes on both builds, values identical. Dictorder unchanged; PVM both
+  PASS.
+
 **2026-10-25 — DONE: `SIG_Renderer`'S DESTRUCTOR IS VIRTUAL.**
 
 - **Changed:** `SIG_Renderer` has pure virtual functions and had a

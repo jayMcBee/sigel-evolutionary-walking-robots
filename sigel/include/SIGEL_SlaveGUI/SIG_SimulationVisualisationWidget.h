@@ -38,282 +38,282 @@
 namespace SIGEL_SlaveGUI
 {
 
-  /**
-   * This widget finally contains the OpenGL framebuffers in which
-   * is rendered by the SIG_SimulationVisualisation object that should
-   * be referenced by the inherited pointer visualisation.
-   *
-   * It offers interfaces to the simulation relevant settings and functions
-   * like controlling the simulation or setting the delay between two
-   * frames.
-   */
-  class SIG_SimulationVisualisationWidget : public SIGEL_CommonGUI::SIG_VisualisationWidget
-    {
-      Q_OBJECT
-
-    public:
-
-      /**
-       * The constructor of the SIG_SimulationVisualisationWidget.
-       *
-       * @param parent Pointer to this widget's parent.
-       * @param name This widget's name.
-       * @param f The widget flag of this widget.
-       */
-      SIG_SimulationVisualisationWidget( QWidget *parent=nullptr,
-					 char const *name=nullptr,
-					 Qt::WindowFlags f = Qt::WindowFlags() );
-
-      /**
-       * Deletes the possibly existing SIG_SimulationVisualisation object
-       * to which the inherited pointer visualisation points and creates
-       * a new one with the supplied arguments.
-       *
-       * @param rrobot The robot that should take part in the simulation.
-       * @param eenvironment The environment that should take part in the simulation.
-       * @param ssimulationParameters The parameters of the simulation.
-       * @param pprogram The program that should control the robot in the simulation.
-       */
-      void visualizeThis(SIGEL_Robot::SIG_Robot const &rrobot,
-			 SIGEL_Environment::SIG_Environment const &eenvironment,
-			 SIGEL_Simulation::SIG_SimulationParameters const &ssimulationParameters,
-			 SIGEL_Program::SIG_Program const &pprogram);
-
-      /**
-       * Is true if the simulation is in running state.
-       */
-      bool simulationRunning() const { return simulationTimer->isActive(); }
-
-      void resetRecorder();
-
-      /**
-       * Sets what recorded movie frames can show about the simulation.
-       */
-      void setStaticRunInfo( SIGEL_SlaveGUI::SIG_MovieStaticRunInfo const &staticRunInfo );
-
-      /**
-       * Returns the camera distance at which the whole robot
-       * fits in the view, with a margin around it.
-       */
-      double getFittingDistance() const;
-
-      /**
-       * Returns false when there is no visualisation or it could not
-       * set up shadow mapping.
-       */
-      bool canShowShadows() const;
-
-      QColor getPlaneColor() const { return planeColor; }
-
-      QColor getGridColor() const { return gridColor; }
-
-      /**
-       * Stops the running simulation while a modal dialog is open.
-       * Does nothing if the simulation is not running.
-       */
-      void pauseForDialog();
-
-      /**
-       * Starts the simulation again if pauseForDialog stopped it.
-       */
-      void resumeAfterDialog();
-
-    public slots:
-
-      void setShowAncorPoints( int state ) override;
-
-      void choosePlaneColor();
-
-      void chooseGridColor();
-
-      void setShowPlane( int state );
-
-      void setShowGrid( int state );
-
-      void setShowRobotPath( int state );
-
-      void setShowShadows( bool show );
-
-      /**
-       * Toggles between playing and pause state of the simulation.
-       */
-      void slotStartSimulation();
-
-      /**
-       * Deletes the actual simulation run and creates a new one.
-       */
-      void slotStopSimulation();
+	/**
+	 * This widget finally contains the OpenGL framebuffers in which
+	 * is rendered by the SIG_SimulationVisualisation object that should
+	 * be referenced by the inherited pointer visualisation.
+	 *
+	 * It offers interfaces to the simulation relevant settings and functions
+	 * like controlling the simulation or setting the delay between two
+	 * frames.
+	 */
+	class SIG_SimulationVisualisationWidget : public SIGEL_CommonGUI::SIG_VisualisationWidget
+	{
+		Q_OBJECT
+
+	public:
+
+		/**
+		 * The constructor of the SIG_SimulationVisualisationWidget.
+		 *
+		 * @param parent Pointer to this widget's parent.
+		 * @param name This widget's name.
+		 * @param f The widget flag of this widget.
+		 */
+		SIG_SimulationVisualisationWidget( QWidget *parent=nullptr,
+		                                   char const *name=nullptr,
+		                                   Qt::WindowFlags f = Qt::WindowFlags() );
+
+		/**
+		 * Deletes the possibly existing SIG_SimulationVisualisation object
+		 * to which the inherited pointer visualisation points and creates
+		 * a new one with the supplied arguments.
+		 *
+		 * @param rrobot The robot that should take part in the simulation.
+		 * @param eenvironment The environment that should take part in the simulation.
+		 * @param ssimulationParameters The parameters of the simulation.
+		 * @param pprogram The program that should control the robot in the simulation.
+		 */
+		void visualizeThis(SIGEL_Robot::SIG_Robot const &rrobot,
+		                   SIGEL_Environment::SIG_Environment const &eenvironment,
+		                   SIGEL_Simulation::SIG_SimulationParameters const &ssimulationParameters,
+		                   SIGEL_Program::SIG_Program const &pprogram);
+
+		/**
+		 * Is true if the simulation is in running state.
+		 */
+		bool simulationRunning() const { return simulationTimer->isActive(); }
+
+		void resetRecorder();
+
+		/**
+		 * Sets what recorded movie frames can show about the simulation.
+		 */
+		void setStaticRunInfo( SIGEL_SlaveGUI::SIG_MovieStaticRunInfo const &staticRunInfo );
+
+		/**
+		 * Returns the camera distance at which the whole robot
+		 * fits in the view, with a margin around it.
+		 */
+		double getFittingDistance() const;
+
+		/**
+		 * Returns false when there is no visualisation or it could not
+		 * set up shadow mapping.
+		 */
+		bool canShowShadows() const;
+
+		QColor getPlaneColor() const { return planeColor; }
+
+		QColor getGridColor() const { return gridColor; }
+
+		/**
+		 * Stops the running simulation while a modal dialog is open.
+		 * Does nothing if the simulation is not running.
+		 */
+		void pauseForDialog();
+
+		/**
+		 * Starts the simulation again if pauseForDialog stopped it.
+		 */
+		void resumeAfterDialog();
+
+	public slots:
+
+		void setShowAncorPoints( int state ) override;
+
+		void choosePlaneColor();
+
+		void chooseGridColor();
+
+		void setShowPlane( int state );
+
+		void setShowGrid( int state );
+
+		void setShowRobotPath( int state );
+
+		void setShowShadows( bool show );
+
+		/**
+		 * Toggles between playing and pause state of the simulation.
+		 */
+		void slotStartSimulation();
+
+		/**
+		 * Deletes the actual simulation run and creates a new one.
+		 */
+		void slotStopSimulation();
 
-      /**
-       * Effects the progress of the simulation about one timestep.
-       */
-      void slotStepSimulation();
+		/**
+		 * Effects the progress of the simulation about one timestep.
+		 */
+		void slotStepSimulation();
 
-      /**
-       * Effects the progress of the simulation about 5 seconds.
-       */
-      void slotFForwardSimulation();
+		/**
+		 * Effects the progress of the simulation about 5 seconds.
+		 */
+		void slotFForwardSimulation();
 
-      /**
-       * Sets the delay between to simulated and visualized timesteps.
-       *
-       * Has only effects when the simulation in running.
-       *
-       * @param frameDelay The new framedelay.
-       */
-      void slotSetFrameDelay(int fframeDelay);
+		/**
+		 * Sets the delay between to simulated and visualized timesteps.
+		 *
+		 * Has only effects when the simulation in running.
+		 *
+		 * @param frameDelay The new framedelay.
+		 */
+		void slotSetFrameDelay(int fframeDelay);
 
-      void slotSetTraceRobot( bool newValue );
+		void slotSetTraceRobot( bool newValue );
 
-      void slotNavigateForward();
+		void slotNavigateForward();
 
-      void slotNavigateBackward();
+		void slotNavigateBackward();
 
-      void slotNavigateRight();
+		void slotNavigateRight();
 
-      void slotNavigateLeft();
+		void slotNavigateLeft();
 
-      void slotNavigateDown();
+		void slotNavigateDown();
 
-      void slotNavigateUp();
+		void slotNavigateUp();
 
-      void slotNavigateCenter();
+		void slotNavigateCenter();
 
-      /**
-       * Used to alter the movie settings.
-       */
-      void slotAlterMovieSettingsClicked();
+		/**
+		 * Used to alter the movie settings.
+		 */
+		void slotAlterMovieSettingsClicked();
 
-    private:
+	private:
 
-      /**
-       * Hands the frames written since the last Reset to the movie encoder.
-       */
-      void reportAndEncodeRecording();
+		/**
+		 * Hands the frames written since the last Reset to the movie encoder.
+		 */
+		void reportAndEncodeRecording();
 
-      /**
-       * The timer that controls the progress of the simulation.
-       */
-      QTimer *simulationTimer;
-
-      /**
-       * The time in ms to wait between to simulationframes.
-       */
-      int frameDelay;
-
-      /**
-       * True while a modal dialog holds the simulation paused.
-       */
-      bool pausedForDialog;
+		/**
+		 * The timer that controls the progress of the simulation.
+		 */
+		QTimer *simulationTimer;
+
+		/**
+		 * The time in ms to wait between to simulationframes.
+		 */
+		int frameDelay;
+
+		/**
+		 * True while a modal dialog holds the simulation paused.
+		 */
+		bool pausedForDialog;
 
-      /**
-       * False from one Play step until that step's frame is on screen.
-       */
-      bool frameShown;
+		/**
+		 * False from one Play step until that step's frame is on screen.
+		 */
+		bool frameShown;
 
-      /**
-       * The number of timesteps that equal 5 seconds.
-       */
-      int noOfFFSteps;
+		/**
+		 * The number of timesteps that equal 5 seconds.
+		 */
+		int noOfFFSteps;
 
-      bool traceRobot;
+		bool traceRobot;
 
-      /**
-       * How slowly the look point follows the robot, in simulation seconds.
-       */
-      static constexpr double horizontalFollowTime = 0.75;
-      static constexpr double verticalFollowTime = 2.5;
+		/**
+		 * How slowly the look point follows the robot, in simulation seconds.
+		 */
+		static constexpr double horizontalFollowTime = 0.75;
+		static constexpr double verticalFollowTime = 2.5;
 
-      QColor planeColor;
+		QColor planeColor;
 
-      QColor gridColor;
+		QColor gridColor;
 
-      SIGEL_SlaveGUI::SIG_MovieRecorder movieRecorder;
+		SIGEL_SlaveGUI::SIG_MovieRecorder movieRecorder;
 
-      SIGEL_SlaveGUI::SIG_MovieEncoder movieEncoder;
+		SIGEL_SlaveGUI::SIG_MovieEncoder movieEncoder;
 
-      void paintGL() override;
+		void paintGL() override;
 
-      /**
-       * Let the simulation progress about the supplied
-       * number of timesteps.
-       *
-       * @param noOfSteps The number of timesteps to progress.
-       */
-      void makeTimeSteps(int noOfSteps);
+		/**
+		 * Let the simulation progress about the supplied
+		 * number of timesteps.
+		 *
+		 * @param noOfSteps The number of timesteps to progress.
+		 */
+		void makeTimeSteps(int noOfSteps);
 
-      /**
-       * Moves the look point a part of the way to the robot's centre.
-       * The part grows with the elapsed simulation time.
-       */
-      void moveLookPointTowardsRobot( SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation, double elapsedSeconds );
+		/**
+		 * Moves the look point a part of the way to the robot's centre.
+		 * The part grows with the elapsed simulation time.
+		 */
+		void moveLookPointTowardsRobot( SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation, double elapsedSeconds );
 
-      void recordFrame( SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation, double seconds );
+		void recordFrame( SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation, double seconds );
 
-      /**
-       * The actual robot to simulate.
-       */
-      SIGEL_Robot::SIG_Robot const *robot;
+		/**
+		 * The actual robot to simulate.
+		 */
+		SIGEL_Robot::SIG_Robot const *robot;
 
-      /**
-       * The actual environment to simulate.
-       */
-      SIGEL_Environment::SIG_Environment const *environment;
+		/**
+		 * The actual environment to simulate.
+		 */
+		SIGEL_Environment::SIG_Environment const *environment;
 
-      /**
-       * The actual parameters of the simulation.
-       */
-      SIGEL_Simulation::SIG_SimulationParameters const *simulationParameters;
+		/**
+		 * The actual parameters of the simulation.
+		 */
+		SIGEL_Simulation::SIG_SimulationParameters const *simulationParameters;
 
-      /**
-       * The actual program to control the robot in the simulation.
-       */
-      SIGEL_Program::SIG_Program const *program;
+		/**
+		 * The actual program to control the robot in the simulation.
+		 */
+		SIGEL_Program::SIG_Program const *program;
 
-      /**
-       * The robot centre at the start of the simulation.
-       */
-      SIG_Vector startRobotCentre;
+		/**
+		 * The robot centre at the start of the simulation.
+		 */
+		SIG_Vector startRobotCentre;
 
-      /**
-       * The robot centre at the last look point update, and the robot's smoothed velocity.
-       * The look point aims ahead by the follow lag, so a steadily moving robot stays centred.
-       */
-      SIG_Vector lastRobotCentre;
-      SIG_Vector smoothedVelocity;
+		/**
+		 * The robot centre at the last look point update, and the robot's smoothed velocity.
+		 * The look point aims ahead by the follow lag, so a steadily moving robot stays centred.
+		 */
+		SIG_Vector lastRobotCentre;
+		SIG_Vector smoothedVelocity;
 
-    private slots:
+	private slots:
 
-      /**
-       * Marks the last step's frame as on screen, so Play may step again.
-       * This slot is connected to the frameSwapped signal.
-       */
-      void slotFrameShown();
+		/**
+		 * Marks the last step's frame as on screen, so Play may step again.
+		 * This slot is connected to the frameSwapped signal.
+		 */
+		void slotFrameShown();
 
-      /**
-       * Lets the simulation progress about one timestep, once the frame of
-       * the previous step is on screen.
-       *
-       * Updates the widget's contents.
-       * This slot is connected to the timeout signal of the
-       * simulationTimer.
-       */
-      void slotSimulationProgress();
+		/**
+		 * Lets the simulation progress about one timestep, once the frame of
+		 * the previous step is on screen.
+		 *
+		 * Updates the widget's contents.
+		 * This slot is connected to the timeout signal of the
+		 * simulationTimer.
+		 */
+		void slotSimulationProgress();
 
-    signals:
+	signals:
 
-      void signalSimulationProgress( double simulationSeconds );
+		void signalSimulationProgress( double simulationSeconds );
 
-      void signalPosition( SIG_Vector position );
+		void signalPosition( SIG_Vector position );
 
-      void signalSimulationAbort();
+		void signalSimulationAbort();
 
-      void signalRecordingAllowed( bool );
+		void signalRecordingAllowed( bool );
 
-      void signalPlaneColorChanged( QColor );
+		void signalPlaneColorChanged( QColor );
 
-      void signalGridColorChanged( QColor );
-    };
+		void signalGridColorChanged( QColor );
+	};
 
 }
 
