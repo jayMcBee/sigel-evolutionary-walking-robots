@@ -87,6 +87,12 @@ Paths are relative to `sigel/`, the source tree.
   very long. Behaviour belongs to a class. Decide which class each function
   belongs to, and give the long one a name that says what it does.
 
+- [ ] **170. Rewrite `lineOfUseAfterNodeEnd` in `SIG_Body.cpp` readably.**
+  It is one loop with six branches, K&R braces and a name-character test
+  written out twice. Split it into a small scanner with one helper each for
+  comments, strings and names, and give it a short comment that states the
+  contract. The behaviour stays the same; the item-152 tests cover it.
+
 ---
 
 ## 3 · Defects preserved by the port
@@ -165,6 +171,13 @@ touched, because changing one changes behaviour against the reference binary.
     smallest value above 0.
   - **Open:** the smallest step and its decimals. The shipped experiments use
     0.01 and 0.002; 0.0001 with 4 decimals would keep both.
+
+- [ ] **169. `SIG_Body::readVRMLNode` drops the faces in Anchor, Billboard,
+  Collision, Switch and LOD.** It descends only into Group and Transform. No
+  shipped robot uses these nodes. Fix it in the most pragmatic, minimal way
+  that covers them, and replace the test
+  `loadPinsThatItDropsTheFacesInGroupingNodesOtherThanGroupAndTransform` with
+  one for the fix.
 
 ---
 
