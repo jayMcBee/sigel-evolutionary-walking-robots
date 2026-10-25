@@ -911,6 +911,23 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: `gui behaviour` NO LONGER DEPENDS ON WHERE THE REPO IS CHECKED OUT.**
+
+- **Cause:** `check.sh` replaces the repo's physical path with `<REPOROOT>`,
+  but `guidrive` pads a tree cell to 22 characters. The baseline was
+  recorded under a path of at least 22 characters; under the 15-character
+  `/home/jan/sigel` the Hosts list's slave directory became `<REPOROOT>`
+  plus seven spaces, and the check failed.
+- **Changed:** after the replacement, the awk in `check.sh` drops the spaces
+  between `<REPOROOT>` and the next `|`. Only padding before a cell border
+  goes; text after the path, or a space inside a line, is untouched. The
+  baseline is unchanged.
+- **Review:** no defect. Run with gawk, mawk, busybox awk and nawk, under
+  paths of 15, 17 (with spaces), 22 and 32 characters: every run gives the
+  baseline's four `<REPOROOT>` lines.
+- **Gates:** `check.sh` 872 pass, 0 fail; warnings 287. povray has to be
+  installed, or `gui behaviour` fails by design.
+
 **2026-10-25 — DONE: `dialogParent()` MOVES FROM `SIGEL_Tools` TO `SIGEL_CommonGUI`.**
 
 - **Changed:** `SIGEL_Tools/SIG_DialogParent.h` is

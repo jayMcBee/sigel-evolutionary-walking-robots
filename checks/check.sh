@@ -378,10 +378,14 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
        && guidrive_run openfocus /tmp/bq.$$ \
        && guidrive_run povexport /tmp/bpx.$$; then
         # The GUI shows a slave directory by its physical path; strip the repo's.
+        # A table cell pads its text to 22 characters, so a short repo path
+        # leaves spaces before the next "|"; drop them too, or the result
+        # would depend on where the repo is checked out.
         cat /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
             /tmp/br.$$ /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ /tmp/bpx.$$ \
             | awk -v r="$(cd "$ROOT" && pwd -P)" '{ while ((i = index($0, r)) > 0)
-                  $0 = substr($0, 1, i - 1) "<REPOROOT>" substr($0, i + length(r)); print }' \
+                  $0 = substr($0, 1, i - 1) "<REPOROOT>" substr($0, i + length(r))
+                  gsub(/<REPOROOT> +[|]/, "<REPOROOT>|"); print }' \
             > /tmp/ball.$$
         # THE RUNTIME-CONNECT CHECK AND ITS POSITIVE CONTROL.
         #
