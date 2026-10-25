@@ -911,6 +911,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-24 — DONE: A BODY WHOSE DIRECTORY HAS WHITESPACE SURVIVES THE TRANSFER FORMAT.**
+
+- **Cause:** the directory is the folder of the imported robot file, and
+  `SIG_Body::writeToFileTransfer` wrote it unquoted. The unstreaming
+  constructor read it up to the first space, took the rest for the
+  geometry flag, lost the geometry and left the stream out of step. A
+  robot imported from a folder such as `My Robots/` broke every `.exp`
+  save and every transfer to a slave.
+- **Changed:** a directory with whitespace is written in double quotes;
+  any other exactly as before, so existing files, the baselines and
+  SIGEL 1.3, which could not read such a directory either, are unaffected.
+  The reader takes both forms. A directory with a double quote in it is
+  not supported. Geometry file names with whitespace, which `SIG_Link`
+  also writes, are a separate question and not changed.
+- **Tested:** `TST_SIG_Body`. The test that pinned the broken round trip
+  is now `unstreamingConstructorReadsADirectoryWithWhitespaceAndStopsAfterTheBody`;
+  `writeToFileTransferQuotesADirectoryWithWhitespace` is new. Both failed
+  before the change.
+
 **2026-10-24 — DONE: A MISSING OR UNPARSABLE GEOMETRY FILE IS REFUSED AT IMPORT.**
 
 - **Cause:** `SIG_Body::load` never checked CyberVRML97's result. A missing

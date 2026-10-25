@@ -397,8 +397,7 @@ void SIGEL_Robot::TST_SIG_Body::unstreamingConstructorReadsWhatWriteToFileTransf
   SIG_Body source( &robot, writeVRMLFile( folder, faceSetShape( "0 0 0, 1 0 0, 1 1 0, 0.5 2 -3", "0, 1, 2, -1, 2, 3, 0" ) ), "" );
   QCOMPARE( thrownByLoad( source ), QString() );
   QVERIFY( source.getGeometry() );
-  // Not the temporary folder, whose path may contain whitespace, on which the transfer
-  // format splits (see unstreamingConstructorPinsThatADirectoryWithASpaceDoesNotRoundTrip).
+  // A fixed directory, so the expected path does not depend on the temporary folder.
   SIG_Body written( &robot, "arm.wrl", "parts/" );
   written.setGeometry( new SIG_Geometry( source.getGeometry() ) );
   QString text;
@@ -497,16 +496,33 @@ void SIGEL_Robot::TST_SIG_Body::unstreamingConstructorReadsAnEndedStreamAsABodyW
   QCOMPARE( body->getGeometry(), nullptr );
 }
 
-void SIGEL_Robot::TST_SIG_Body::unstreamingConstructorPinsThatADirectoryWithASpaceDoesNotRoundTrip()
+void SIGEL_Robot::TST_SIG_Body::writeToFileTransferQuotesADirectoryWithWhitespace()
 {
-  // Pins the current behaviour: writeToFileTransfer writes the directory
-  // unquoted and the unstreaming constructor reads it up to the space, so the
-  // rest of it is taken for the geometry flag.
   SIG_Robot robot;
-  SIG_Body written( &robot, "arm.wrl", "my parts/" );
+  SIG_Body body( &robot, "arm.wrl", "my parts\t2/" );
+  QString text;
+  QTextStream stream( &text );
+
+  body.writeToFileTransfer( stream );
+  stream.flush();
+
+  QCOMPARE( text, QString( "Body arm.wrl \"my parts\t2/\" n\n" ) );
+}
+
+void SIGEL_Robot::TST_SIG_Body::unstreamingConstructorReadsADirectoryWithWhitespaceAndStopsAfterTheBody()
+{
+  SIG_Robot robot;
+  SIG_Geometry *geometry = new SIG_Geometry();
+  SIG_Polygon *polygon = new SIG_Polygon( geometry );
+  polygon->appendVertex( SIG_Vector( 0, 0, 0 ) );
+  polygon->appendVertex( SIG_Vector( 1, 0, 0 ) );
+  polygon->appendVertex( SIG_Vector( 0, 1, 0 ) );
+  SIG_Body written( &robot, "arm.wrl", "my parts\t2/" );
+  written.setGeometry( geometry );
   QString text;
   QTextStream out( &text );
   written.writeToFileTransfer( out );
+  out << "Material";
   out.flush();
   QTextStream in( &text );
   QString keyword;
@@ -520,9 +536,11 @@ void SIGEL_Robot::TST_SIG_Body::unstreamingConstructorPinsThatADirectoryWithASpa
 
   QCOMPARE( thrown, QString() );
   QCOMPARE( read->getName(), QString( "arm.wrl" ) );
-  QCOMPARE( read->getGeometryFile(), QString( "myarm.wrl" ) );
-  QCOMPARE( read->getGeometry(), nullptr );
-  QCOMPARE( next, QString( "n" ) );
+  QCOMPARE( read->getGeometryFile(), QString( "my parts\t2/arm.wrl" ) );
+  QVERIFY( read->getGeometry() );
+  QCOMPARE( read->getGeometry()->getNumPolygons(), 1 );
+  QCOMPARE( read->getGeometry()->getNumVertices(), 3 );
+  QCOMPARE( next, QString( "Material" ) );
 }
 
 void SIGEL_Robot::TST_SIG_Body::createRotationMatrixPinsTheCurrentSignOfTheSineTerms()
