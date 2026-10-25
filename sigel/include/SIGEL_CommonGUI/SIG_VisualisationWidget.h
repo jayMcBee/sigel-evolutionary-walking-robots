@@ -57,8 +57,8 @@ namespace SIGEL_CommonGUI
 		/**
 		 * The constructor of the SIG_VisualisationWidget.
 		 *
-		 * Initializes the eyepoint.
-		 * MouseSensity is set to 0\. 5 at the moment.
+		 * Starts with yaw 0, pitch 30 and distance 2; setYaw, setPitch and
+		 * setDistance apply them once there is a visualisation.
 		 *
 		 * @param parent Pointer to this widget's parent.
 		 * @param name This widget's name.
@@ -69,16 +69,19 @@ namespace SIGEL_CommonGUI
 		                         Qt::WindowFlags f = Qt::WindowFlags() );
 
 		/**
-		 * The destructor of the SIG_VisualisationWidget.
+		 * Deletes the visualisation and the anchor point labels.
 		 */
 		~SIG_VisualisationWidget() override;
 
 	public slots:
 
+		/** Sets the render mode by its name; any other name keeps the current mode. */
 		virtual void setRenderMode( const QString & string );
 
+		/** Sets the ambient light to newValue / 200 in each colour. */
 		virtual void setAmbientLighting( int newValue );
 
+		/** Shows the anchor point labels for state 2 (checked) and hides them otherwise. */
 		virtual void setShowAncorPoints( int state );
 
 		/**
@@ -98,7 +101,7 @@ namespace SIGEL_CommonGUI
 		 * If automaticRefresh is true, the widget's contents are
 		 * refreshed (now according to the new eyepoint).
 		 *
-		 * @param yyaw The pitch angle is supplied in degrees between
+		 * @param ppitch The pitch angle is supplied in degrees between
 		 *             0 and 90.
 		 */
 		virtual void setPitch( double ppitch );
@@ -109,14 +112,14 @@ namespace SIGEL_CommonGUI
 		 * If automaticRefresh is true, the widget's contents are
 		 * refreshed (now according to the new eyepoint).
 		 *
-		 * @param yyaw The new distance.
+		 * @param ddistance The new distance.
 		 */ 
 		virtual void setDistance( double ddistance );
 
 	signals:
 
 		/**
-		 * This signal is emmited when the user has moved
+		 * This signal is emitted when the user has moved
 		 * the mouse.
 		 *
 		 * The supplied values are calculated by multiplying
@@ -124,20 +127,20 @@ namespace SIGEL_CommonGUI
 		 * mouse was moved across the x- respectively y-axis
 		 * while the left mouse button was pressed.
 		 * This signal should be intercepted by the widget
-		 * containing this SIG_Visualisationwidget and effect
+		 * containing this SIG_VisualisationWidget and effect
 		 * appropriate calling of the slots setYaw and setPitch.
 		 */
 		void signalMouseRotation(int, int);
 
 		/**
-		 * This signal is emmited when the user has moved the mouse.
+		 * This signal is emitted when the user has moved the mouse.
 		 *
 		 * The supplied value is calculated by multiplying
 		 * the mouseSensity with the amount of pixels the mouse
 		 * was moved across the y-axis while the right mouse button
 		 * was pressed.
 		 * This signal should be intercepted by the widget
-		 * containing this SIG_Visualisationwidget and effect
+		 * containing this SIG_VisualisationWidget and effect
 		 * appropriate calling of the slot setDistance.
 		 */
 		void signalMouseZoom(int);
@@ -145,7 +148,7 @@ namespace SIGEL_CommonGUI
 	protected:
 
 		/**
-		 * Initaliazes some OpenGL stuff.
+		 * Initializes some OpenGL stuff.
 		 *
 		 * This method is inherited from the QOpenGLWidget.
 		 * It is called automatically by the QT runtime system.
@@ -159,14 +162,14 @@ namespace SIGEL_CommonGUI
 		/**
 		 * Resizes the contents of this widget.
 		 *
-		 * This methid is inherited from the QOpenGLWidget.
+		 * This method is inherited from the QOpenGLWidget.
 		 * It is called automatically by the QT runtime system.
-		 * The OpenGL viewport is resizes. If visualisation
+		 * The OpenGL viewport is resized. If visualisation
 		 * points to a SIG_Visualisation object,
 		 * its aspect ratio is updated.
 		 *
-		 * @parameter width The widget's new width in pixels.
-		 * @parameter height The widget's new height in pixels.
+		 * @param width The widget's new width in pixels.
+		 * @param height The widget's new height in pixels.
 		 */
 		void resizeGL(int width, int height) override;
 
@@ -174,12 +177,13 @@ namespace SIGEL_CommonGUI
 		 * Refreshes the contents of this widget by initiating
 		 * the execution of appropriate OpenGL drawing commands.
 		 *
-		 * This methid is inherited from the QOpenGLWidget.
+		 * This method is inherited from the QOpenGLWidget.
 		 * It is called automatically by the QT runtime system.
 		 * In some cases it is also called by other methods
 		 * (when changing the eyepoint while automaticRefresh
 		 * being true). This is only done indirectly by calling
-		 * the method update.
+		 * the method update. Without a visualisation it only clears the view;
+		 * with the anchor points shown it also places their labels.
 		 */
 		void paintGL() override;
 
@@ -192,6 +196,7 @@ namespace SIGEL_CommonGUI
 		 */
 		virtual void updateEyePoint();
 
+		/** Makes one label per floating text of the visualisation, replacing the old ones. */
 		void initFloatingTextWidgets();
 
 		/**
@@ -251,8 +256,7 @@ namespace SIGEL_CommonGUI
 		int mouseYPos;
 
 		/**
-		 * If true, changing of the eyepoint effects refreshing
-		 * this widget.
+		 * If true, changing a view setting refreshes this widget.
 		 */
 		bool automaticRefresh;
 
@@ -267,10 +271,12 @@ namespace SIGEL_CommonGUI
 		/** Samples per pixel that the view asks for. */
 		static constexpr int multisamplingSamples = 4;
 
+		/** The anchor point labels, one per floating text. */
 		QList< SIGEL_CommonGUI::SIG_FloatingTextLabel * > floatingTextWidgets;
 
 		QSize floatingTextsSize;
 
+		/** The state of the anchor point check box; 2 shows the labels. */
 		int showAncorPointsState;
 	};
 

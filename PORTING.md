@@ -911,6 +911,24 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: `SIG_VisualisationWidget.h`'S COMMENTS DESCRIBE THE CODE.**
+
+- **Changed, comments only:** the constructor's said it initializes the
+  eye point and garbled the mouse sensitivity; it states the start values
+  and that `setYaw`, `setPitch` and `setDistance` apply them. The
+  destructor's says what it deletes. `setRenderMode`, `setAmbientLighting`,
+  `setShowAncorPoints`, `initFloatingTextWidgets`, `floatingTextWidgets` and
+  `showAncorPointsState` have a one-line comment; `paintGL`'s says what it
+  does without a visualisation. `setPitch` and `setDistance` name their
+  parameters, `resizeGL` uses `@param`; `automaticRefresh` covers every
+  view setting; typos.
+- **Review:** the first wording said the eye point follows by itself once
+  there is a visualisation; it does not, and the comment says what does.
+  Three wordings are tighter after the review.
+- **Gates:** `check.sh` 872 pass, 0 fail; warnings 287. `fitness-check.sh`
+  passes on both builds, values identical. Dictorder unchanged; PVM both
+  PASS.
+
 **2026-10-25 — DONE: `SIG_SimulationVisualisationWidget.h` IS INDENTED WITH TABS, WHITESPACE ONLY.**
 
 - **Changed:** the header, by the rules of the `SIG_VisualisationWidget`
