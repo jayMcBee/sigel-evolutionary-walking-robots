@@ -929,8 +929,8 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   include guard, as before.
 - **Gates:** `check.sh` 872 pass, 0 fail; warnings 287. Fitness identical on
   `build`, and by hand through the sanitized `coredrive`, with no sanitizer
-  report; the sanitized unit tests still abort in cv97, as in the entry
-  below. Dictorder unchanged; PVM both PASS.
+  report; the sanitized unit tests still abort in cv97, as in the
+  `dialogParent()` entry. Dictorder unchanged; PVM both PASS.
 
 **2026-10-25 — DONE: `gui behaviour` NO LONGER DEPENDS ON WHERE THE REPO IS CHECKED OUT.**
 
