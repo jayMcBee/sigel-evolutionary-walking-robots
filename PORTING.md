@@ -911,6 +911,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: `SIG_VisualisationWidget`: METHODS WITHOUT A VISUALISATION RETURN EARLY.**
+
+- **Changed:** as its subclass `SIG_SimulationVisualisationWidget` did
+  (`7608803`, `f355e1e`), `setRenderMode`, `setAmbientLighting`,
+  `updateEyePoint`, `initFloatingTextWidgets`, `resizeGL` and `paintGL` no
+  longer nest their body in `if (visualisation)`: they return when there is
+  none. `paintGL` clears and returns without one, and returns before the
+  anchor labels unless they are shown, three levels less deep. In
+  `setShowAncorPoints` the two `if`s whose body is a two-line `for` have
+  braces. The behaviour is the same: each nested block was the last
+  statement of its method.
+- **Review:** no defect; no `if (visualisation)` is left in the file.
+- **Gates:** `check.sh` 872 pass, 0 fail; warnings 287. `fitness-check.sh`
+  passes on both builds, values identical. Dictorder unchanged; PVM both
+  PASS.
+
 **2026-10-25 — DONE: `SIG_EnvironmentRenderer` IS INDENTED WITH TABS, WHITESPACE ONLY.**
 
 - **Changed:** the `.cpp` and the header mixed 2-space GNU style, 3- and

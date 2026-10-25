@@ -67,48 +67,52 @@ namespace SIGEL_CommonGUI
 
   void SIG_VisualisationWidget::setRenderMode( const QString & string )
   {
-    if (visualisation)
-      {
-	if (string == "Wireframe")
-	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::wireFrame;
-	else if (string == "Hidden lines")
-	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::hiddenLine;
-	else if (string == "Flat shaded")
-	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::flatShaded;
-	else if (string == "Gouraud shaded")
-	  visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::gouraudShaded;
-	if (automaticRefresh)
-	  update();
-      };
+    if (!visualisation)
+      return;
+
+    if (string == "Wireframe")
+      visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::wireFrame;
+    else if (string == "Hidden lines")
+      visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::hiddenLine;
+    else if (string == "Flat shaded")
+      visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::flatShaded;
+    else if (string == "Gouraud shaded")
+      visualisation->viewSettings.renderMode = SIGEL_Visualisation::SIG_ViewSettings::gouraudShaded;
+    if (automaticRefresh)
+      update();
   }
 
   void SIG_VisualisationWidget::setAmbientLighting( int newValue )
   {
-    if (visualisation)
-      {
-	double const ambientSceneColor = double( newValue ) / 200;
+    if (!visualisation)
+      return;
 
-	// Outside paintGL another context may be current.
-	makeCurrent();
-	visualisation->setAmbientSceneColor( ambientSceneColor,
-					     ambientSceneColor,
-					     ambientSceneColor );
-	doneCurrent();
+    double const ambientSceneColor = double( newValue ) / 200;
 
-	if (automaticRefresh)
-	  update();
-      };
+    // Outside paintGL another context may be current.
+    makeCurrent();
+    visualisation->setAmbientSceneColor( ambientSceneColor,
+                                         ambientSceneColor,
+                                         ambientSceneColor );
+    doneCurrent();
+
+    if (automaticRefresh)
+      update();
   }
 
   void SIG_VisualisationWidget::setShowAncorPoints( int state )
   {
     if ( (showAncorPointsState < 2) && (state == 2) )
-      for ( int i = 0; i < floatingTextWidgets.size(); i++ )
-	floatingTextWidgets[i]->show();
+      {
+        for ( int i = 0; i < floatingTextWidgets.size(); i++ )
+          floatingTextWidgets[i]->show();
+      }
 
     if ( (showAncorPointsState == 2) && (state < 2) )
-      for ( int i = 0; i < floatingTextWidgets.size(); i++ )
-	floatingTextWidgets[i]->hide();
+      {
+        for ( int i = 0; i < floatingTextWidgets.size(); i++ )
+          floatingTextWidgets[i]->hide();
+      }
 
     showAncorPointsState = state;
 
@@ -135,66 +139,66 @@ namespace SIGEL_CommonGUI
 
   void SIG_VisualisationWidget::updateEyePoint()
   {
-    if (visualisation)
-      {
-	double const radEyeYaw = qDegreesToRadians( yaw );
-	double const radEyePitch = qDegreesToRadians( pitch );
+    if (!visualisation)
+      return;
 
-	double const sinEyeYaw = std::sin(radEyeYaw);
-	double const cosEyeYaw = std::cos(radEyeYaw);
-	double const sinEyePitch = std::sin(radEyePitch);
-	double const cosEyePitch = std::cos(radEyePitch);
+    double const radEyeYaw = qDegreesToRadians( yaw );
+    double const radEyePitch = qDegreesToRadians( pitch );
 
-	double eyeX = sinEyeYaw * cosEyePitch * distance;
-	double eyeY = sinEyePitch * distance;
-	double eyeZ = cosEyeYaw * cosEyePitch * distance;
+    double const sinEyeYaw = std::sin(radEyeYaw);
+    double const cosEyeYaw = std::cos(radEyeYaw);
+    double const sinEyePitch = std::sin(radEyePitch);
+    double const cosEyePitch = std::cos(radEyePitch);
 
-	visualisation->viewSettings.eyePoint.set(0, eyeX);
-	visualisation->viewSettings.eyePoint.set(1, eyeY);
-	visualisation->viewSettings.eyePoint.set(2, eyeZ);
-	visualisation->viewSettings.relativeEyePoint = true;
+    double eyeX = sinEyeYaw * cosEyePitch * distance;
+    double eyeY = sinEyePitch * distance;
+    double eyeZ = cosEyeYaw * cosEyePitch * distance;
 
-	// The new eyepoint position has been calculated from
-	// its pitch, yaw and distance values.
-	// To guarantee that the line of sight is not parallel to
-	// the up-vector, the latter is recalculated.
-	double const radUpYaw = ( radEyeYaw < std::numbers::pi ) ? radEyeYaw + std::numbers::pi : radEyeYaw - std::numbers::pi;
-	double const radUpPitch = (std::numbers::pi / 2) - radEyePitch;
+    visualisation->viewSettings.eyePoint.set(0, eyeX);
+    visualisation->viewSettings.eyePoint.set(1, eyeY);
+    visualisation->viewSettings.eyePoint.set(2, eyeZ);
+    visualisation->viewSettings.relativeEyePoint = true;
 
-	double const sinUpYaw = std::sin(radUpYaw);
-	double const cosUpYaw = std::cos(radUpYaw);
-	double const sinUpPitch = std::sin(radUpPitch);
-	double const cosUpPitch = std::cos(radUpPitch);
+    // The new eyepoint position has been calculated from
+    // its pitch, yaw and distance values.
+    // To guarantee that the line of sight is not parallel to
+    // the up-vector, the latter is recalculated.
+    double const radUpYaw = ( radEyeYaw < std::numbers::pi ) ? radEyeYaw + std::numbers::pi : radEyeYaw - std::numbers::pi;
+    double const radUpPitch = (std::numbers::pi / 2) - radEyePitch;
 
-	double upX = sinUpYaw * cosUpPitch;
-	double upY = sinUpPitch;
-	double upZ = cosUpYaw * cosUpPitch;
+    double const sinUpYaw = std::sin(radUpYaw);
+    double const cosUpYaw = std::cos(radUpYaw);
+    double const sinUpPitch = std::sin(radUpPitch);
+    double const cosUpPitch = std::cos(radUpPitch);
 
-	visualisation->viewSettings.up.set(0, upX);
-	visualisation->viewSettings.up.set(1, upY);
-	visualisation->viewSettings.up.set(2, upZ);
+    double upX = sinUpYaw * cosUpPitch;
+    double upY = sinUpPitch;
+    double upZ = cosUpYaw * cosUpPitch;
 
-	if (automaticRefresh)
-	  update();
-      };
+    visualisation->viewSettings.up.set(0, upX);
+    visualisation->viewSettings.up.set(1, upY);
+    visualisation->viewSettings.up.set(2, upZ);
+
+    if (automaticRefresh)
+      update();
   }
 
   void SIG_VisualisationWidget::initFloatingTextWidgets()
   {
-    if (visualisation)
-      {
-	// Without this the previous labels would survive as children of this
-	// widget and stay on screen.
-	qDeleteAll( floatingTextWidgets );
-	floatingTextWidgets.clear();
-	floatingTextWidgets.resize( visualisation->floatingTexts.size() );
+    if (!visualisation)
+      return;
 
-	for (int i=0; i<floatingTextWidgets.size(); i++)
-	  {
-	    SIGEL_CommonGUI::SIG_FloatingTextLabel *newLabel = new SIGEL_CommonGUI::SIG_FloatingTextLabel( this );
-	    floatingTextWidgets[ i ] = newLabel;
-	    newLabel->raise();
-	  };
+    // Without this the previous labels would survive as children of this
+    // widget and stay on screen.
+    qDeleteAll( floatingTextWidgets );
+    floatingTextWidgets.clear();
+    floatingTextWidgets.resize( visualisation->floatingTexts.size() );
+
+    for (int i=0; i<floatingTextWidgets.size(); i++)
+      {
+        SIGEL_CommonGUI::SIG_FloatingTextLabel *newLabel = new SIGEL_CommonGUI::SIG_FloatingTextLabel( this );
+        floatingTextWidgets[ i ] = newLabel;
+        newLabel->raise();
       };
   }
 
@@ -232,54 +236,55 @@ namespace SIGEL_CommonGUI
 
     glViewport( 0, 0, wwidth, hheight );
 
-    if (visualisation)
-    {
-      visualisation->viewSettings.aspectRatio = static_cast<double>(width) / static_cast<double>(height);
-      visualisation->updateAspectRatio();
-    };
+    if (!visualisation)
+      return;
+
+    visualisation->viewSettings.aspectRatio = static_cast<double>(width) / static_cast<double>(height);
+    visualisation->updateAspectRatio();
   }
 
   void SIG_VisualisationWidget::paintGL()
     {
-      if (visualisation)
-	{
-	  visualisation->visualize();
+      if (!visualisation)
+        {
+          glClear(GL_COLOR_BUFFER_BIT);
+          return;
+        }
 
-	  if (showAncorPointsState == 2)
-	    {
-	      for (int i=0; i<floatingTextWidgets.size(); i++)
-		{
-		  SIGEL_Visualisation::SIG_FloatingText *floatingText = visualisation->floatingTexts[i];
-		  if (floatingText->rendered)
-		    {
-		      SIGEL_CommonGUI::SIG_FloatingTextLabel *floatingTextLabel = floatingTextWidgets[i];
+      visualisation->visualize();
 
-		      floatingTextLabel->setText( floatingText->textLabel );
-		      QSize actSize = floatingTextLabel->sizeHint();
-		      if (actSize.width() > floatingTextsSize.width())
-			floatingTextsSize = actSize;
+      if (showAncorPointsState != 2)
+        return;
 
-		      floatingTextLabel->move( floatingText->xPos,
-					       this->height() - floatingText->yPos );
-		    };
-		};
+      for (int i=0; i<floatingTextWidgets.size(); i++)
+        {
+          SIGEL_Visualisation::SIG_FloatingText *floatingText = visualisation->floatingTexts[i];
+          if (floatingText->rendered)
+            {
+              SIGEL_CommonGUI::SIG_FloatingTextLabel *floatingTextLabel = floatingTextWidgets[i];
 
-	      for (int j=0; j<floatingTextWidgets.size(); j++)
-		{
-		  SIGEL_Visualisation::SIG_FloatingText *floatingText = visualisation->floatingTexts[j];
-		  SIGEL_CommonGUI::SIG_FloatingTextLabel *floatingTextLabel = floatingTextWidgets[j];
-		  if (floatingText->rendered)
-		    {
-		      floatingTextLabel->resize( floatingTextsSize );
-		      floatingTextLabel->show();
-		    }
-		  else
-		    floatingTextLabel->hide();
-		};
-	    };
-	}
-      else
-	glClear(GL_COLOR_BUFFER_BIT);
+              floatingTextLabel->setText( floatingText->textLabel );
+              QSize actSize = floatingTextLabel->sizeHint();
+              if (actSize.width() > floatingTextsSize.width())
+                floatingTextsSize = actSize;
+
+              floatingTextLabel->move( floatingText->xPos,
+                                       this->height() - floatingText->yPos );
+            };
+        };
+
+      for (int j=0; j<floatingTextWidgets.size(); j++)
+        {
+          SIGEL_Visualisation::SIG_FloatingText *floatingText = visualisation->floatingTexts[j];
+          SIGEL_CommonGUI::SIG_FloatingTextLabel *floatingTextLabel = floatingTextWidgets[j];
+          if (floatingText->rendered)
+            {
+              floatingTextLabel->resize( floatingTextsSize );
+              floatingTextLabel->show();
+            }
+          else
+            floatingTextLabel->hide();
+        };
     }
 
 }
