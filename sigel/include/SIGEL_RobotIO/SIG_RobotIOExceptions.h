@@ -20,8 +20,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_ROBOTIO_SIG_ROBOTEXCEPTIONS_H
-#define SIGEL_ROBOTIO_SIG_ROBOTEXCEPTIONS_H
+#ifndef SIGEL_ROBOTIO_SIG_ROBOTIOEXCEPTIONS_H
+#define SIGEL_ROBOTIO_SIG_ROBOTIOEXCEPTIONS_H
 
 #include <qstring.h>
 #include "SIGEL_Tools/SIG_Exception.h"
