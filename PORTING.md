@@ -911,6 +911,35 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: THE SANITIZED UNIT TESTS RUN AGAIN; CyberVRML97 IS LEFT OUT OF THE CHECK.**
+
+- **Cause:** since `TST_SIG_Body` loads VRML files through `SIG_Body::load`,
+  cv97 tripped the sanitizers and `fitness-check.sh build-asan` aborted
+  before it checked a single SIGEL test, in every commit since. Three kinds
+  of report, all inside cv97: `JString::endsWith` reads one byte before a
+  name shorter than `_changed` (in every `SceneGraph` constructor); its
+  `Parser` never frees its lists and lexer buffers; its bison `yyparse`
+  trips UBSan's object-size check once its stacks grow. None was ever seen
+  in use. cv97 is not fixed, by decision: it is vendor code.
+- **Changed:** `fitness-check.sh` suppresses exactly those three:
+  `interceptor_via_fun:^JString::regionMatches`, `leak:^Parser::` and
+  `object-size:^yyparse`, next to the existing DynaMechs terrain leak. The
+  evaluations through `coredrive` get the ASan and UBSan suppressions too,
+  so a robot with a geometry cannot fail the gate on cv97's account.
+  Nothing in SIGEL, its tests, DynaMechs, newmat, fparser or PVM has a
+  `Parser::`, `yyparse` or `JString` name.
+- **Control:** a `new QString` leaked in `SIG_Body::load` makes the gate
+  fail, reported at `SIG_Body.cpp`; so the suppressions do not hide a SIGEL
+  leak on that path. A leak through a `static volatile` pointer was not
+  reported and is no control.
+- **Review:** no defect. The comment's first wording claimed `yyparse`
+  writes past its arrays; it is a false positive of the object-size bound
+  after the stack moves, and the comment says so. The `coredrive`
+  suppressions came from the review.
+- **Gates:** `fitness-check.sh` passes on both builds, unit tests included,
+  21 values identical. `check.sh`, dictorder and PVM do not read this
+  script and were not rerun.
+
 **2026-10-25 — DONE: `SIG_RobotIOExceptions.h`'S GUARD NAMES ITS OWN CLASS.**
 
 - **Changed:** `SIGEL_ROBOTIO_SIG_ROBOTEXCEPTIONS_H` is

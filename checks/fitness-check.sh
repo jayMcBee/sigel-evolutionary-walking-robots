@@ -38,9 +38,20 @@ export SIGEL_ROOT
 # so test the program and say when this run is skipped.
 # DynaMechs never frees a terrain it has loaded (dmEnvironment::loadTerrainData),
 # and TST_SIG_DynaMechsSimulationData loads terrains. Suppress that one function.
+# CyberVRML97, which SIG_Body::load runs, is not checked either: its Parser
+# never frees its lists and lexer buffers, its bison parser yyparse trips the
+# object-size check once its stacks grow, and JString::endsWith reads before
+# the start of a name shorter than the suffix. Only those functions are
+# suppressed, here and in the evaluations below.
 if nm -C "$ROOT/$B/coredrive" 2>/dev/null | grep -q __asan_init; then
-	echo 'leak:dmEnvironment::loadTerrainData' > "$ROOT/$B/lsan.supp"
-	leaks=$(ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=$ROOT/$B/lsan.supp make -s --no-print-directory -C "$ROOT" B="$B" test 2>&1) || {
+	printf '%s\n' 'leak:dmEnvironment::loadTerrainData' 'leak:^Parser::' \
+		> "$ROOT/$B/lsan.supp"
+	echo 'interceptor_via_fun:^JString::regionMatches' > "$ROOT/$B/asan.supp"
+	echo 'object-size:^yyparse' > "$ROOT/$B/ubsan.supp"
+	leaks=$(ASAN_OPTIONS=detect_leaks=1:suppressions=$ROOT/$B/asan.supp \
+		LSAN_OPTIONS=suppressions=$ROOT/$B/lsan.supp \
+		UBSAN_OPTIONS=suppressions=$ROOT/$B/ubsan.supp \
+		make -s --no-print-directory -C "$ROOT" B="$B" test 2>&1) || {
 		echo "make test FAILED under the sanitizers -- the build, a test or a leak:" >&2
 		echo "$leaks" >&2
 		exit 1
@@ -51,6 +62,8 @@ if nm -C "$ROOT/$B/coredrive" 2>/dev/null | grep -q __asan_init; then
 		echo "$leaks" >&2
 		exit 1
 	fi
+	export ASAN_OPTIONS="${ASAN_OPTIONS:+$ASAN_OPTIONS:}suppressions=$ROOT/$B/asan.supp"
+	export UBSAN_OPTIONS="${UBSAN_OPTIONS:+$UBSAN_OPTIONS:}suppressions=$ROOT/$B/ubsan.supp"
 else
 	echo "note: $B has no sanitizer, so the sanitized run of the unit tests was SKIPPED." >&2
 	echo "      run 'ASAN_OPTIONS=detect_leaks=0 ./checks/fitness-check.sh build-asan' for it." >&2
