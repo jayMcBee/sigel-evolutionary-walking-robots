@@ -85,7 +85,9 @@ Paths are relative to `sigel/`, the source tree.
   `rotationMatrix` and
   `phatRockingUpStylinVectorBendingAngleSwingingMasterFunction`, which is
   very long. Behaviour belongs to a class. Decide which class each function
-  belongs to, and give the long one a name that says what it does.
+  belongs to, and give the long one a name that says what it does. The
+  general math among them, such as `rotationMatrix` and `tolerantACos`,
+  goes into the helper class of item 144.
 
 - [ ] **170. Rewrite `lineOfUseAfterNodeEnd` in `SIG_Body.cpp` readably.**
   It is one loop with six branches, K&R braces and a name-character test
