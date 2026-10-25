@@ -24,7 +24,6 @@
 #define SIGEL_GP_SIG_GPEXCEPTION_H
 
 #include "SIGEL_Tools/SIG_Exception.h"
-using namespace SIGEL_Tools;	
 
 namespace SIGEL_GP
 {
@@ -40,14 +39,14 @@ namespace SIGEL_GP
 	};
 
 	
-	class SIG_GPPolPosNotValidException : public SIG_Exception{
+	class SIG_GPPolPosNotValidException : public SIGEL_Tools::SIG_Exception{
 		public: 
 			SIG_GPPolPosNotValidException (QString file,
                                         	      int line,
                                        		      QString msg);		
 	};
 	
-	class SIG_GPIndIsTooOldException : public SIG_Exception{
+	class SIG_GPIndIsTooOldException : public SIGEL_Tools::SIG_Exception{
 		public: 
 			SIG_GPIndIsTooOldException (QString file,
                                         	      int line,

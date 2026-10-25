@@ -30,8 +30,6 @@
 #include "SIGEL_Visualisation/SIG_Visualisation.h"
 #include "SIGEL_CommonGUI/SIG_FloatingTextLabel.h"
 
-using namespace SIGEL_CommonGUI;
-
   /**
    * This is the superclass of all widget-classes that should
    * be used to integrate the OpenGL-Visualisation-classes

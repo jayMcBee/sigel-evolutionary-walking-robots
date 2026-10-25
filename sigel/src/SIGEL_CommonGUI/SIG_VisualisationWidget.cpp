@@ -189,7 +189,7 @@
 
 	for (int i=0; i<floatingTextWidgets.size(); i++)
 	  {
-	    SIG_FloatingTextLabel *newLabel = new SIG_FloatingTextLabel( this );
+	    SIGEL_CommonGUI::SIG_FloatingTextLabel *newLabel = new SIGEL_CommonGUI::SIG_FloatingTextLabel( this );
 	    floatingTextWidgets[ i ] = newLabel;
 	    newLabel->raise();
 	  };
@@ -250,7 +250,7 @@
 		  SIGEL_Visualisation::SIG_FloatingText *floatingText = visualisation->floatingTexts[i];
 		  if (floatingText->rendered)
 		    {
-		      SIG_FloatingTextLabel *floatingTextLabel = floatingTextWidgets[i];
+		      SIGEL_CommonGUI::SIG_FloatingTextLabel *floatingTextLabel = floatingTextWidgets[i];
 
 		      floatingTextLabel->setText( floatingText->textLabel );
 		      QSize actSize = floatingTextLabel->sizeHint();
@@ -265,7 +265,7 @@
 	      for (int j=0; j<floatingTextWidgets.size(); j++)
 		{
 		  SIGEL_Visualisation::SIG_FloatingText *floatingText = visualisation->floatingTexts[j];
-		  SIG_FloatingTextLabel *floatingTextLabel = floatingTextWidgets[j];
+		  SIGEL_CommonGUI::SIG_FloatingTextLabel *floatingTextLabel = floatingTextWidgets[j];
 		  if (floatingText->rendered)
 		    {
 		      floatingTextLabel->resize( floatingTextsSize );

@@ -5,9 +5,7 @@
 #include "MT_Control/MT_Substitute.h"
 #include "SIGEL_GP/SIG_GPFitnessTrainer.h"
 
-using namespace SIGEL_GP;
-
-class MT_Evaluator : public MT_Substitute, public SIG_GPFitnessTrainer
+class MT_Evaluator : public MT_Substitute, public SIGEL_GP::SIG_GPFitnessTrainer
 {
 public:
 
