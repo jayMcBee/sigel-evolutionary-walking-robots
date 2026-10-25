@@ -1,5 +1,5 @@
 #include <QCoreApplication>   // QCoreApplication::exit
-#include "SIGEL_Tools/SIG_DialogParent.h"
+#include "SIGEL_CommonGUI/SIG_DialogParent.h"
 #include "SIGEL_Tools/SIG_IO.h"
 #include "MT_GUI/MT_MainWindow.h"
 #include "MT_Control/MT_Controller.h"
@@ -177,7 +177,7 @@ bool MT_Controller::switchSystem(int wantedSystem)
 
 	// if we have constructed a substituter or a gpmanager yet, we have to destroy them
 	if(gpManager || estimationState.inUse || substitution){
-		if(QMessageBox::warning(SIGEL_Tools::dialogParent(), "Switching the MetaGP System", 
+		if(QMessageBox::warning(SIGEL_CommonGUI::dialogParent(), "Switching the MetaGP System", 
 			"Switching the system requires deleting the current\n"
 			"GP system. Do you want to delete it?",
 			QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes){
@@ -226,7 +226,7 @@ bool MT_Controller::useMeta(bool state)
 							"You are about to disable the MetaGP system. What shall\n"
 							"we do with the system?",
 							QMessageBox::Ignore | QMessageBox::Discard | QMessageBox::Save,
-							SIGEL_Tools::dialogParent());
+							SIGEL_CommonGUI::dialogParent());
 			box.button(QMessageBox::Ignore)->setText("Disable");
 			box.button(QMessageBox::Discard)->setText("Remove");
 			// Qt reads & in a label as the shortcut marker and draws an underline
@@ -405,7 +405,7 @@ bool MT_Controller::readFromFile(QString fileName)
 							"Press <standard> to load the default setup or\n"
 							"press <deactivate> to disable the MetaGP system.",
 							QMessageBox::RestoreDefaults | QMessageBox::Abort,
-							SIGEL_Tools::dialogParent());
+							SIGEL_CommonGUI::dialogParent());
 			box.button(QMessageBox::RestoreDefaults)->setText("Standard");
 			box.button(QMessageBox::Abort)->setText("Deactivate");
 			box.setDefaultButton(QMessageBox::RestoreDefaults);
@@ -539,7 +539,7 @@ bool MT_Controller::saveSystem(QString sigExpName)
 	if(saveName.isEmpty()){
 		stdConf = true;
 		if(guiEnabled)
-			saveName = QFileDialog::getSaveFileName(SIGEL_Tools::dialogParent(), QString(), proposedName, "*.mexp;;*");
+			saveName = QFileDialog::getSaveFileName(SIGEL_CommonGUI::dialogParent(), QString(), proposedName, "*.mexp;;*");
 		else
 			saveName = "lastExperiment.mexp";
 

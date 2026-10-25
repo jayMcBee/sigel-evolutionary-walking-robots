@@ -24,7 +24,7 @@
 #include <QProgressDialog>
 #include <algorithm>
 #include <memory>
-#include "SIGEL_Tools/SIG_DialogParent.h"
+#include "SIGEL_CommonGUI/SIG_DialogParent.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
 
 #include<iostream>
@@ -187,7 +187,7 @@ int SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
 
 	if( qApp )
 	{
-		progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, quantity, SIGEL_Tools::dialogParent() );
+		progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, quantity, SIGEL_CommonGUI::dialogParent() );
 		progress->setWindowModality( Qt::ApplicationModal );
 		progress->setWindowTitle( "Generating" );
 	}
@@ -378,7 +378,7 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 		std::unique_ptr< QProgressDialog > progress;
 		if( qApp )
 		{
-			progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, getSize(), SIGEL_Tools::dialogParent() );
+			progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, getSize(), SIGEL_CommonGUI::dialogParent() );
 			progress->setWindowModality( Qt::ApplicationModal );
 			progress->setWindowTitle( "Loading" );
 		}

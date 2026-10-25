@@ -1,11 +1,11 @@
-#ifndef SIGEL_TOOLS_SIG_DIALOGPARENT_H
-#define SIGEL_TOOLS_SIG_DIALOGPARENT_H
+#ifndef SIGEL_COMMONGUI_SIG_DIALOGPARENT_H
+#define SIGEL_COMMONGUI_SIG_DIALOGPARENT_H
 
 #include <QApplication>
 #include <QMainWindow>
 #include <QWidget>
 
-namespace SIGEL_Tools
+namespace SIGEL_CommonGUI
 {
 
   // The window a dialog belongs to, for code that holds no window of its own.

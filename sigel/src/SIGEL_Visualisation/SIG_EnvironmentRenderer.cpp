@@ -27,11 +27,9 @@
 #include "SIGEL_Visualisation/SIG_Visualisation.h"
 
 #include "qmessagebox.h"
-#include "SIGEL_Tools/SIG_DialogParent.h"
+#include "SIGEL_CommonGUI/SIG_DialogParent.h"
 
 #include <stdlib.h>
-
-using namespace SIGEL_Tools;
 
 namespace SIGEL_Visualisation
 {
@@ -255,7 +253,7 @@ namespace SIGEL_Visualisation
 
     if (image.isNull())
       {
-	QMessageBox warn(QMessageBox::Warning, "Warning", "Could not open the texture file.\nThe floor is shown without a texture.", QMessageBox::Retry, SIGEL_Tools::dialogParent());
+	QMessageBox warn(QMessageBox::Warning, "Warning", "Could not open the texture file.\nThe floor is shown without a texture.", QMessageBox::Retry, SIGEL_CommonGUI::dialogParent());
 	warn.exec();
 
 	return false;
@@ -281,7 +279,7 @@ namespace SIGEL_Visualisation
     QString texFile = environment.getTextureFile();
 
     if ( texFile.length() == 0 ) {
-  		QMessageBox warn(QMessageBox::Warning, "Warning", "The specified texture file does not exist.\nThe floor is shown without a texture.", QMessageBox::Retry, SIGEL_Tools::dialogParent());
+  		QMessageBox warn(QMessageBox::Warning, "Warning", "The specified texture file does not exist.\nThe floor is shown without a texture.", QMessageBox::Retry, SIGEL_CommonGUI::dialogParent());
   		warn.exec();
     	return false;
     }

@@ -911,6 +911,34 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: `dialogParent()` MOVES FROM `SIGEL_Tools` TO `SIGEL_CommonGUI`.**
+
+- **Changed:** `SIGEL_Tools/SIG_DialogParent.h` is
+  `SIGEL_CommonGUI/SIG_DialogParent.h`, in `namespace SIGEL_CommonGUI`, so
+  `SIGEL_Tools` holds no widgets code. The four callers, `MT_Controller`,
+  `SIG_GPPopulation`, `SIG_GPRemoteZORCFitnessFunction` and
+  `SIG_EnvironmentRenderer`, include the new path and qualify the new
+  namespace. `SIG_EnvironmentRenderer.cpp` loses its `using namespace
+  SIGEL_Tools`: the moved header was its only source of that namespace, and
+  the file uses no name from it (`SIG_Vector` and `SIG_Matrix` are global).
+  The function is inline, so no program gains a link dependency. `SIGEL_GP`
+  and `MT_Control` still open dialogs themselves, as before; the include
+  line now says so.
+- **Review:** no defect. Nothing outside the dated entries of this file names
+  the old path or namespace.
+- **Gates:** `check.sh` 871 pass, 1 fail; warnings 287. The failure is
+  `gui behaviour`, and HEAD before this change fails identically: the Hosts
+  list pads the slave directory to 22 characters, the repo now lives at the
+  15-character `/home/jan/sigel`, and the baseline was recorded under a path
+  of at least 22, so `<REPOROOT>` is followed by padding it does not expect.
+  Fitness identical on `build`. On `build-asan`, `fitness-check.sh` aborts in
+  the unit tests before it reaches the fitness values, and HEAD aborts
+  identically: a heap-buffer-overflow in cv97's `JString::regionMatches`,
+  under `SceneGraph::SceneGraph()`, reached from `SIG_Body::load` in
+  `TST_SIG_Body::writeToFileTransferWritesYAndThenTheGeometry`. The 21
+  fitness values, run through the sanitized `coredrive` by hand, are
+  identical with no sanitizer report. Dictorder unchanged; PVM both PASS.
+
 **2026-10-24 — DONE: A BODY WHOSE DIRECTORY HAS WHITESPACE SURVIVES THE TRANSFER FORMAT.**
 
 - **Cause:** the directory is the folder of the imported robot file, and
