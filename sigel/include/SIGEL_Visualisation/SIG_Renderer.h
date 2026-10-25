@@ -53,7 +53,7 @@ namespace SIGEL_Visualisation
     /**
      * Deletes the scene objects and the floating texts, and frees the display lists.
      */
-    ~SIG_Renderer();
+    virtual ~SIG_Renderer();
     SIG_Renderer( const SIG_Renderer & ) = delete;
     SIG_Renderer &operator=( const SIG_Renderer & ) = delete;
 

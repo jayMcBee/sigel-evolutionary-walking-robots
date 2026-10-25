@@ -911,6 +911,25 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: `SIG_Renderer`'S DESTRUCTOR IS VIRTUAL.**
+
+- **Changed:** `SIG_Renderer` has pure virtual functions and had a
+  non-virtual destructor, so deleting a renderer through a `SIG_Renderer*`
+  would have skipped the subclass's destructor. Nothing does that:
+  `SIG_SimulationVisualisation` holds both renderers by value. The
+  destructor is `virtual`; `SIG_EnvironmentRenderer`'s says `override`, as
+  every overriding destructor in the tree does. `SIG_RobotRenderer`
+  declares none.
+- **Warnings:** the build's three `-Wnon-virtual-dtor` warnings, on
+  `SIG_Renderer.h` and `SIG_EnvironmentRenderer.h`, are gone. `check.sh`
+  counts with `-Wall -Wextra` only, which never reported them, so its 287
+  stand.
+- **Review:** no defect. Layout and size are unchanged, the class already
+  had a vtable; nothing copies, serialises or `typeid`s a renderer.
+- **Gates:** `check.sh` 872 pass, 0 fail; warnings 287. `fitness-check.sh`
+  passes on both builds, values identical. Dictorder unchanged; PVM both
+  PASS.
+
 **2026-10-25 — DONE: `SIG_VisualisationWidget` IS INDENTED WITH TABS, WHITESPACE ONLY.**
 
 - **Changed:** the `.cpp` and the header, by the rules of the

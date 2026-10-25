@@ -63,7 +63,7 @@ namespace SIGEL_Visualisation
 		/**
 		 * Deletes the robot path points.
 		 */
-		~SIG_EnvironmentRenderer();
+		~SIG_EnvironmentRenderer() override;
 		SIG_EnvironmentRenderer( const SIG_EnvironmentRenderer & ) = delete;
 		SIG_EnvironmentRenderer &operator=( const SIG_EnvironmentRenderer & ) = delete;
 
