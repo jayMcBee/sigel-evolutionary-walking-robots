@@ -95,6 +95,10 @@ Paths are relative to `sigel/`, the source tree.
   comments, strings and names, and give it a short comment that states the
   contract. The behaviour stays the same; the item-152 tests cover it.
 
+- [ ] **171. Put `SIG_VisualisationWidget` into `SIGEL_CommonGUI`.** It is
+  the only class of that module in the global namespace. Its subclasses
+  and users then name it qualified.
+
 ---
 
 ## 3 · Defects preserved by the port
