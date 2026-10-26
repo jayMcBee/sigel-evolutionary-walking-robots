@@ -27,57 +27,7 @@
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include <QFile>
 #include "SIGEL_Tools/SIG_FileUtils.h"
-
-namespace {
-
-	/*
-	 * CyberVRML97 runs a USE while its parser still holds the node that a
-	 * "}" just before it closes, so the USE lands inside that node. Where
-	 * the node is the one the USE names, it contains itself and
-	 * Node::createInstanceNode aborts on an assertion; elsewhere the copy
-	 * sits in the wrong place and the geometry is wrong. A comma after the
-	 * "}" lets the parser close the node first. Tokens as in vrml.l.
-	 * Returns the line of the first such USE, or 0.
-	 */
-	int lineOfUseAfterNodeEnd (QString const & vrml)
-	{
-		int line = 1;
-		bool afterNodeEnd = false;
-		qsizetype i = 0;
-		while (i < vrml.size ()) {
-			QChar const c = vrml.at (i);
-			if (c == '\n') {
-				line++;
-				i++;
-			} else if (c.isSpace ())
-				i++;
-			else if (c == '#') {
-				while (i < vrml.size () && vrml.at (i) != '\n')
-					i++;
-			} else if (c == '"') {
-				for (i++; i < vrml.size () && vrml.at (i) != '"'; i++)
-					if (vrml.at (i) == '\n')
-						line++;
-				i++;
-				afterNodeEnd = false;
-			} else if (c.isLetterOrNumber () || c == '_' || c == '-' || c == '+' || c == '.') {
-				qsizetype const start = i;
-				while (i < vrml.size ()
-				       && (vrml.at (i).isLetterOrNumber () || vrml.at (i) == '_'
-					   || vrml.at (i) == '-' || vrml.at (i) == '+' || vrml.at (i) == '.'))
-					i++;
-				if (afterNodeEnd && QStringView (vrml).mid (start, i - start) == u"USE")
-					return line;
-				afterNodeEnd = false;
-			} else {
-				afterNodeEnd = (c == '}');
-				i++;
-			}
-		}
-		return 0;
-	}
-
-}
+#include "SIGEL_Robot/SIG_VRMLGeometryReader.h"
 
 namespace SIGEL_Robot
 {
@@ -257,7 +207,7 @@ namespace SIGEL_Robot
 			throw SIG_GeometryFileError (__FILE__, __LINE__, getGeometryFile (), message);
 		}
 
-		int const useLine = lineOfUseAfterNodeEnd (QString::fromUtf8 (vrmlFile.readAll ()));
+		int const useLine = SIG_VRMLGeometryReader::lineOfUseAfterNodeEnd (QString::fromUtf8 (vrmlFile.readAll ()));
 		if (useLine)
 		{
 			QString const message = "USE directly after \"}\" is not supported. Put a comma after the \"}\".";
