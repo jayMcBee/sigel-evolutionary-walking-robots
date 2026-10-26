@@ -237,20 +237,6 @@ namespace {
     return faces;
   }
 
-  // Empty if actual is expected, else where it differs first. Compared at the
-  // call site, so a failure names the line of that call and stops the test there.
-  QString matrixMismatch( NEWMAT::Matrix actual, const double ( &expected )[ 4 ][ 4 ] )
-  {
-    if ( actual.Nrows() != 4 || actual.Ncols() != 4 )
-      return QString( "is %1x%2, expected 4x4" ).arg( actual.Nrows() ).arg( actual.Ncols() );
-    for ( int r = 0; r < 4; r++ )
-      for ( int c = 0; c < 4; c++ )
-        if ( !( std::fabs( actual( r + 1, c + 1 ) - expected[ r ][ c ] ) < epsilon ) )
-          return QString( "(%1,%2) is %3, expected %4" )
-            .arg( r + 1 ).arg( c + 1 ).arg( actual( r + 1, c + 1 ) ).arg( expected[ r ][ c ] );
-    return QString();
-  }
-
 }
 
 void SIGEL_Robot::TST_SIG_Body::constructorStoresTheNameAndLeavesTheBodyWithoutGeometry()
@@ -589,36 +575,6 @@ void SIGEL_Robot::TST_SIG_Body::unstreamingConstructorReadsAGeometryFileNameWith
   QCOMPARE( next, QString( "Material" ) );
 }
 
-void SIGEL_Robot::TST_SIG_Body::createRotationMatrixPinsTheCurrentSignOfTheSineTerms()
-{
-  // Pins the current behaviour: the sine terms have the opposite sign from
-  // rotationMatrix in IFunctions.cpp, and whether that is right is open (item 144).
-  SIG_Robot robot;
-  SIG_Body body( &robot, "arm.wrl", "parts/" );
-  const double quarter = M_PI / 2;
-  const double aboutX[ 4 ][ 4 ] = { { 1, 0, 0, 0 }, { 0, 0, 1, 0 }, { 0, -1, 0, 0 }, { 0, 0, 0, 1 } };
-  const double aboutY[ 4 ][ 4 ] = { { 0, 0, -1, 0 }, { 0, 1, 0, 0 }, { 1, 0, 0, 0 }, { 0, 0, 0, 1 } };
-  const double aboutZ[ 4 ][ 4 ] = { { 0, 1, 0, 0 }, { -1, 0, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
-
-  QCOMPARE( matrixMismatch( body.createRotationMatrix( { 1, 0, 0, float( quarter ) } ), aboutX ), QString() );
-  QCOMPARE( matrixMismatch( body.createRotationMatrix( { 0, 1, 0, float( quarter ) } ), aboutY ), QString() );
-  QCOMPARE( matrixMismatch( body.createRotationMatrix( { 0, 0, 1, float( quarter ) } ), aboutZ ), QString() );
-}
-
-void SIGEL_Robot::TST_SIG_Body::createRotationMatrixTurnsHalfwayAboutAnOffAxisDirection()
-{
-  // A half turn has no sine terms, so this holds for either sign: 2 a a^T - I.
-  // No axis component is zero, so every product of two of them counts.
-  SIG_Robot robot;
-  SIG_Body body( &robot, "arm.wrl", "parts/" );
-  const double expected[ 4 ][ 4 ] = { { -0.5392, 0.576, 0.6144, 0 },
-                                      { 0.576, -0.28, 0.768, 0 },
-                                      { 0.6144, 0.768, -0.1808, 0 },
-                                      { 0, 0, 0, 1 } };
-
-  QCOMPARE( matrixMismatch( body.createRotationMatrix( { 0.48f, 0.6f, 0.64f, float( M_PI ) } ), expected ), QString() );
-}
-
 void SIGEL_Robot::TST_SIG_Body::loadReadsTheVerticesAndFacesOfAnIndexedFaceSet()
 {
   QTemporaryDir folder;
@@ -774,7 +730,7 @@ void SIGEL_Robot::TST_SIG_Body::loadAppliesTheTransformScaleToTheVertices()
   QVERIFY2( isTheOnlyVertexNear( vertices, 2, 3, 2 ), qPrintable( toString( vertices ) ) );
 }
 
-void SIGEL_Robot::TST_SIG_Body::loadAppliesTheTransformRotationAsCreateRotationMatrixDefinesIt()
+void SIGEL_Robot::TST_SIG_Body::loadAppliesTheTransformRotationAsInverseVRMLRotationMatrixDefinesIt()
 {
   // Pins the current behaviour (item 144): a positive quarter turn about z
   // takes x to -y, where VRML 97 turns it counterclockwise to +y.
@@ -834,7 +790,7 @@ void SIGEL_Robot::TST_SIG_Body::loadRotatesAfterScalingAlongTheScaleOrientation(
 
 void SIGEL_Robot::TST_SIG_Body::loadScalesAlongTheScaleOrientationAboutTheTransformCenter()
 {
-  // The expected point holds for either sign of createRotationMatrix (item 144).
+  // The expected point holds for either sign of inverseVRMLRotationMatrix (item 144).
   // With the current sign, undoing the scaleOrientation before moving the center
   // to the origin gives (2, 4, 0).
   QList< SIG_Vector > vertices = loadedVertices( transformed( QString( "center 1 0 0 scale 2 1 1 scaleOrientation " ) + quarterTurnAboutZ,
@@ -846,7 +802,7 @@ void SIGEL_Robot::TST_SIG_Body::loadScalesAlongTheScaleOrientationAboutTheTransf
 void SIGEL_Robot::TST_SIG_Body::loadPinsTheCurrentNumbersOfAScaleAlongAnEighthTurnedScaleOrientation()
 {
   // Pins the current behaviour: the x scale acts along (1, -1, 0), the
-  // direction createRotationMatrix turns x to (item 144). Swapping the
+  // direction inverseVRMLRotationMatrix turns x to (item 144). Swapping the
   // scaleOrientation and its inverse, or the other sign, gives (1.5, 0.5, 0).
   QList< SIG_Vector > vertices = loadedVertices( transformed( "scale 2 1 1 scaleOrientation 0 0 1 0.78539816", pointShape( "1 0 0" ) ) );
 

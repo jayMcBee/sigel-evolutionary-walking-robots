@@ -27,6 +27,29 @@
 
 #include <QtTest>
 
+#include <cmath>
+
+namespace
+{
+
+	double const epsilon = 1e-5;
+
+	// Empty if actual is expected, else where it differs first. Compared at the
+	// call site, so a failure names the line of that call and stops the test there.
+	QString matrixMismatch( NEWMAT::Matrix actual, double const ( &expected )[ 4 ][ 4 ] )
+	{
+		if ( actual.Nrows() != 4 || actual.Ncols() != 4 )
+			return QString( "is %1x%2, expected 4x4" ).arg( actual.Nrows() ).arg( actual.Ncols() );
+		for ( int r = 0; r < 4; r++ )
+			for ( int c = 0; c < 4; c++ )
+				if ( !( std::fabs( actual( r + 1, c + 1 ) - expected[ r ][ c ] ) < epsilon ) )
+					return QString( "(%1,%2) is %3, expected %4" )
+						.arg( r + 1 ).arg( c + 1 ).arg( actual( r + 1, c + 1 ) ).arg( expected[ r ][ c ] );
+		return QString();
+	}
+
+}
+
 void SIGEL_Robot::TST_SIG_VRMLGeometryReader::lineOfUseAfterNodeEndGivesTheLineOfAUseDirectlyAfterANodeEnd()
 {
 	QCOMPARE( SIG_VRMLGeometryReader::lineOfUseAfterNodeEnd( "DEF S Group { }\nGroup { } USE S\n" ), 2 );
@@ -101,4 +124,30 @@ void SIGEL_Robot::TST_SIG_VRMLGeometryReader::lineOfUseAfterNodeEndGivesZeroForA
 	QStringList const names = { "USEFUL", "USE1", "USE_FUL", "USE-FUL", "USE+FUL", "use", "Use" };
 	for ( QString const &name : names )
 		QVERIFY2( SIG_VRMLGeometryReader::lineOfUseAfterNodeEnd( "Group { } " + name + " { }\n" ) == 0, qPrintable( name ) );
+}
+
+void SIGEL_Robot::TST_SIG_VRMLGeometryReader::inverseVRMLRotationMatrixPinsTheCurrentSignOfTheSineTerms()
+{
+	// Pins the current behaviour: the sine terms have the opposite sign from
+	// rotationMatrix in IFunctions.cpp, and whether that is right is open (item 144).
+	double const quarter = M_PI / 2;
+	double const aboutX[ 4 ][ 4 ] = { { 1, 0, 0, 0 }, { 0, 0, 1, 0 }, { 0, -1, 0, 0 }, { 0, 0, 0, 1 } };
+	double const aboutY[ 4 ][ 4 ] = { { 0, 0, -1, 0 }, { 0, 1, 0, 0 }, { 1, 0, 0, 0 }, { 0, 0, 0, 1 } };
+	double const aboutZ[ 4 ][ 4 ] = { { 0, 1, 0, 0 }, { -1, 0, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
+
+	QCOMPARE( matrixMismatch( SIG_VRMLGeometryReader::inverseVRMLRotationMatrix( { 1, 0, 0, float( quarter ) } ), aboutX ), QString() );
+	QCOMPARE( matrixMismatch( SIG_VRMLGeometryReader::inverseVRMLRotationMatrix( { 0, 1, 0, float( quarter ) } ), aboutY ), QString() );
+	QCOMPARE( matrixMismatch( SIG_VRMLGeometryReader::inverseVRMLRotationMatrix( { 0, 0, 1, float( quarter ) } ), aboutZ ), QString() );
+}
+
+void SIGEL_Robot::TST_SIG_VRMLGeometryReader::inverseVRMLRotationMatrixTurnsHalfwayAboutAnOffAxisDirection()
+{
+	// A half turn has no sine terms, so this holds for either sign: 2 a a^T - I.
+	// No axis component is zero, so every product of two of them counts.
+	double const expected[ 4 ][ 4 ] = { { -0.5392, 0.576, 0.6144, 0 },
+	                                    { 0.576, -0.28, 0.768, 0 },
+	                                    { 0.6144, 0.768, -0.1808, 0 },
+	                                    { 0, 0, 0, 1 } };
+
+	QCOMPARE( matrixMismatch( SIG_VRMLGeometryReader::inverseVRMLRotationMatrix( { 0.48f, 0.6f, 0.64f, float( M_PI ) } ), expected ), QString() );
 }

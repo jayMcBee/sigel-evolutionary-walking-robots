@@ -22,10 +22,10 @@
 */
 #include "SIGEL_Robot/SIG_Body.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
-#include <cmath>
 #include "SIGEL_Robot/SIG_GeometryIterator.h"
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include <QFile>
+#include <QList>
 #include "SIGEL_Tools/SIG_FileUtils.h"
 #include "SIGEL_Robot/SIG_VRMLGeometryReader.h"
 
@@ -59,33 +59,6 @@ namespace SIGEL_Robot
 		delete geometry;
 	}
 
-	NEWMAT::Matrix SIG_Body::createRotationMatrix( QList< float > rotation )
-	{
-		NEWMAT::Matrix rotationMatrix(4,4);
-		double const x = rotation[0];
-		double const y = rotation[1];
-		double const z = rotation[2];
-		double const a = rotation[3];
-
-		double const sinA = std::sin(a);
-		double const cosA = std::cos(a);
-		double const t = 1 - cosA;
-
-		rotationMatrix = 0;
-		rotationMatrix(1,1) = (t * x * x) + cosA;
-		rotationMatrix(1,2) = (t * x * y) + (sinA * z);
-		rotationMatrix(1,3) = (t * x * z) - (sinA * y);
-		rotationMatrix(2,1) = (t * x * y) - (sinA * z);
-		rotationMatrix(2,2) = (t * y * y) + cosA;
-		rotationMatrix(2,3) = (t * y * z) + (sinA * x);
-		rotationMatrix(3,1) = (t * x * z) + (sinA * y);
-		rotationMatrix(3,2) = (t * y * z) - (sinA * x);
-		rotationMatrix(3,3) = (t * z * z) + cosA;
-		rotationMatrix(4,4) = 1;
-
-		return rotationMatrix;
-	}
-
 	void SIG_Body::readVRMLNode(Node *node, NEWMAT::Matrix transformation)
 	{
 		if ( node->isGroupNode() || node->isTransformNode() ) {
@@ -107,7 +80,7 @@ namespace SIGEL_Robot
 
 				NEWMAT::Matrix rotation(4,4);
 				transformNode->getRotation( buffer.data() );
-				rotation = createRotationMatrix( buffer );
+				rotation = SIG_VRMLGeometryReader::inverseVRMLRotationMatrix( buffer );
 
 				NEWMAT::Matrix scale(4,4);
 				scale = 0;
@@ -118,7 +91,7 @@ namespace SIGEL_Robot
 
 				NEWMAT::Matrix scaleOrientation(4,4);
 				transformNode->getScaleOrientation( buffer.data() );
-				scaleOrientation = createRotationMatrix( buffer );
+				scaleOrientation = SIG_VRMLGeometryReader::inverseVRMLRotationMatrix( buffer );
 
 				NEWMAT::Matrix translation(4,4);
 				translation = identity;

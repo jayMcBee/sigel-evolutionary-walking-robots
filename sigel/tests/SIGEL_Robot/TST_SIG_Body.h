@@ -59,9 +59,6 @@ namespace SIGEL_Robot
     void writeToFileTransferQuotesAGeometryFileNameWithWhitespace();
     void unstreamingConstructorReadsAGeometryFileNameWithWhitespaceAndStopsAfterTheBody();
 
-    void createRotationMatrixPinsTheCurrentSignOfTheSineTerms();
-    void createRotationMatrixTurnsHalfwayAboutAnOffAxisDirection();
-
     void loadReadsTheVerticesAndFacesOfAnIndexedFaceSet();
     void loadKeepsOnlyTheUsedCoordinatesInFirstUseOrderAndMergesEqualOnes();
     void loadEndsAFaceAtANegativeIndexAndAtTheEndOfTheIndices();
@@ -73,7 +70,7 @@ namespace SIGEL_Robot
     void loadAppliesTheTransformTranslationToEachOfItsChildren();
     void loadAppliesATransformOnlyWithinItsOwnChildren();
     void loadAppliesTheTransformScaleToTheVertices();
-    void loadAppliesTheTransformRotationAsCreateRotationMatrixDefinesIt();
+    void loadAppliesTheTransformRotationAsInverseVRMLRotationMatrixDefinesIt();
     void loadScalesBeforeRotating();
     void loadScalesAboutTheTransformCenter();
     void loadRotatesAboutTheTransformCenterBeforeTranslating();

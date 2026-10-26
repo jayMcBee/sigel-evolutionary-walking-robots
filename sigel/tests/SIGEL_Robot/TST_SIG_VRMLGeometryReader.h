@@ -57,6 +57,10 @@ namespace SIGEL_Robot
 		void lineOfUseAfterNodeEndGivesZeroWhenAStringSeparatesAUseFromANodeEnd();
 
 		void lineOfUseAfterNodeEndGivesZeroForAWordOtherThanUseDirectlyAfterANodeEnd();
+
+		void inverseVRMLRotationMatrixPinsTheCurrentSignOfTheSineTerms();
+
+		void inverseVRMLRotationMatrixTurnsHalfwayAboutAnOffAxisDirection();
 	};
 
 }

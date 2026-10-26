@@ -24,7 +24,9 @@
 #ifndef SIGEL_ROBOT_SIG_VRMLGEOMETRYREADER_H
 #define SIGEL_ROBOT_SIG_VRMLGEOMETRYREADER_H
 
+#include <QList>
 #include <QString>
+#include <newmat.h>
 
 namespace SIGEL_Robot
 {
@@ -48,6 +50,9 @@ namespace SIGEL_Robot
 		 * "}" lets the parser close the node first. Tokens as in vrml.l.
 		 */
 		static int lineOfUseAfterNodeEnd( QString const &vrml );
+
+		/** rotation holds the axis x, y, z and then the angle, as VRML gives them. */
+		static NEWMAT::Matrix inverseVRMLRotationMatrix( QList< float > const &rotation );
 
 	private:
 

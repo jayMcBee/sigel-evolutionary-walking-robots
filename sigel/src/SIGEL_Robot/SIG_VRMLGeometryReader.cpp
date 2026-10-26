@@ -23,6 +23,8 @@
 */
 #include "SIGEL_Robot/SIG_VRMLGeometryReader.h"
 
+#include <cmath>
+
 namespace SIGEL_Robot
 {
 
@@ -68,6 +70,33 @@ namespace SIGEL_Robot
 			i++;
 		}
 		return 0;
+	}
+
+	NEWMAT::Matrix SIG_VRMLGeometryReader::inverseVRMLRotationMatrix( QList< float > const &rotation )
+	{
+		NEWMAT::Matrix rotationMatrix(4,4);
+		double const x = rotation[0];
+		double const y = rotation[1];
+		double const z = rotation[2];
+		double const a = rotation[3];
+
+		double const sinA = std::sin(a);
+		double const cosA = std::cos(a);
+		double const t = 1 - cosA;
+
+		rotationMatrix = 0;
+		rotationMatrix(1,1) = (t * x * x) + cosA;
+		rotationMatrix(1,2) = (t * x * y) + (sinA * z);
+		rotationMatrix(1,3) = (t * x * z) - (sinA * y);
+		rotationMatrix(2,1) = (t * x * y) - (sinA * z);
+		rotationMatrix(2,2) = (t * y * y) + cosA;
+		rotationMatrix(2,3) = (t * y * z) + (sinA * x);
+		rotationMatrix(3,1) = (t * x * z) + (sinA * y);
+		rotationMatrix(3,2) = (t * y * z) - (sinA * x);
+		rotationMatrix(3,3) = (t * z * z) + cosA;
+		rotationMatrix(4,4) = 1;
+
+		return rotationMatrix;
 	}
 
 	qsizetype SIG_VRMLGeometryReader::indexAfterComment( QString const &vrml, qsizetype start )

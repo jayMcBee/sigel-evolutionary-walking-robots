@@ -24,7 +24,6 @@
 #define SIGEL_ROBOT_SIG_BODY_H
 
 namespace SIGEL_Robot { class SIG_Body; }
-#include <QList>
 #include <qstring.h>
 #include <CyberVRML97.h>
 #include <newmat.h>
@@ -80,14 +79,6 @@ namespace SIGEL_Robot
                  * Throws SIG_GeometryFileError if the file cannot be loaded.
                  */
                 void load ();
-                
-                /**
-                 * Help method to create the affine transformation matrix
-                 * that rotates a point as specified in the argument vector.
-                 *
-                 * @param rotation The rotation given in VRML notation.
-                 */
-                NEWMAT::Matrix createRotationMatrix( QList< float > rotation );
                 
                 /**
                  * Help method to traverse the VRML scene graph.
