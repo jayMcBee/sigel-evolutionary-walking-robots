@@ -284,7 +284,7 @@ pass=$((pass+pp)); fail=$((fail+pf))
 # double-click synthesis are not tested.
 #
 # Where a 1.3 side exists, the behaviour matches the running 1.3 binary;
-# roundtrip, metadrive, openfocus and rngseed have none. The values are the
+# roundtrip, metadrive, openfocus, rngseed and damagedopen have none. The values are the
 # port's own for twoBases.exp, and guibehaviour-baseline.txt says which fact
 # came from where. `gate' exits 1 on an out-of-range pool index after a
 # deletion, and its `nameIsASurvivor=0' line covers a stale index that stays
@@ -305,7 +305,7 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
     # SIGEL_ROOT is sigelApp/, the folder SIGEL is started from: the driver
     # loads pixmaps and terrain from it. No scenario here spawns a sigel_slave.
     #
-    # TWELVE scenarios make up the baseline, concatenated in this order:
+    # THIRTEEN scenarios make up the baseline, concatenated in this order:
     #   gate       the tree, sorting, add/delete/reset, the dialogs, the
     #              context menus, the MetaGP warning
     #   pages      the five View pages: every spin box, slider, combo,
@@ -350,6 +350,9 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
     #              sha256, the last frame in full, the include file with its
     #              triangles and cylinders counted. povray must then read the
     #              last frame; no povray fails the section.
+    #   damagedopen  File > Open on twoBases cut inside its first block. The
+    #              master's loadExperiment must refuse it; the message box text
+    #              is pinned up to the File and Line that SIG_Exception appends.
     #
     # $1 scenario, $2 outfile, $3.. extra NAME=VALUE for the child only.
     # The extras go through env, not as a prefix on the function call: a
@@ -376,13 +379,15 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
        && guidrive_run runlock /tmp/bk.$$ \
        && guidrive_run rngseed /tmp/bz.$$ \
        && guidrive_run openfocus /tmp/bq.$$ \
-       && guidrive_run povexport /tmp/bpx.$$; then
+       && guidrive_run povexport /tmp/bpx.$$ \
+       && guidrive_run damagedopen /tmp/bdo.$$; then
         # The GUI shows a slave directory by its physical path; strip the repo's.
         # A table cell pads its text to 22 characters, so a short repo path
         # leaves spaces before the next "|"; drop them too, or the result
         # would depend on where the repo is checked out.
         cat /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
             /tmp/br.$$ /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ /tmp/bpx.$$ \
+            /tmp/bdo.$$ \
             | awk -v r="$(cd "$ROOT" && pwd -P)" '{ while ((i = index($0, r)) > 0)
                   $0 = substr($0, 1, i - 1) "<REPOROOT>" substr($0, i + length(r))
                   gsub(/<REPOROOT> +[|]/, "<REPOROOT>|"); print }' \
@@ -467,7 +472,8 @@ elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
         echo "  the driver did not finish -- it exits(1) on an out-of-range pool"
         echo "  position, which is how the Qt 6 clear() regression showed up:"
         tail -6 /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ \
-             /tmp/br.$$ /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ /tmp/bpx.$$ 2>/dev/null | sed 's/^/    /'
+             /tmp/br.$$ /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ /tmp/bpx.$$ \
+             /tmp/bdo.$$ 2>/dev/null | sed 's/^/    /'
         # Stderr is most likely to say why on this path: a crash or a Qt fatal
         # lands there.
         if [ -s /tmp/berr.$$ ]; then
@@ -518,17 +524,18 @@ else
     bf=1; echo "  guidrive did not build:"; head -5 /tmp/bdb.$$ | sed 's/^/    /'
 fi
 rm -f /tmp/bo.$$ /tmp/bp.$$ /tmp/bx.$$ /tmp/bw.$$ /tmp/bg.$$ /tmp/bm.$$ /tmp/br.$$ \
-      /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ /tmp/bpx.$$ /tmp/bpr.$$ \
+      /tmp/bv.$$ /tmp/bk.$$ /tmp/bz.$$ /tmp/bq.$$ /tmp/bpx.$$ /tmp/bpr.$$ /tmp/bdo.$$ \
       /tmp/bl.$$ /tmp/bl2.$$ /tmp/ball.$$ \
       /tmp/bd.$$ /tmp/bdb.$$ /tmp/berr.$$
-# exportall, overwrite, roundtrip, dialogs, rngseed and povexport write files to TMPDIR,
-# several MB in all. They are removed here.
+# exportall, overwrite, roundtrip, dialogs, rngseed, povexport and damagedopen write
+# files to TMPDIR, several MB in all. They are removed here.
 rm -f "${TMPDIR:-/tmp}"/x11b-gpp.gpp "${TMPDIR:-/tmp}"/x11b-sip.sip \
       "${TMPDIR:-/tmp}"/x11b-lap.lap "${TMPDIR:-/tmp}"/x11b-env.env \
       "${TMPDIR:-/tmp}"/x11b-pop.pop "${TMPDIR:-/tmp}"/x11b-prg.prg \
       "${TMPDIR:-/tmp}"/x11b-ind.ind "${TMPDIR:-/tmp}"/x11b-dat.dat \
       "${TMPDIR:-/tmp}"/x11b-ow.sip "${TMPDIR:-/tmp}"/x11b-ow "${TMPDIR:-/tmp}"/x11b-ow-*.sip \
-      "${TMPDIR:-/tmp}"/c11c-lap.lap "${TMPDIR:-/tmp}"/rngseed.exp
+      "${TMPDIR:-/tmp}"/c11c-lap.lap "${TMPDIR:-/tmp}"/rngseed.exp \
+      "${TMPDIR:-/tmp}"/damaged.exp
 rm -rf "${TMPDIR:-/tmp}/povexport"
 for e in gpp sip lap env pop; do
     rm -f "${TMPDIR:-/tmp}/rt-a-$e.$e" "${TMPDIR:-/tmp}/rt-b-$e.$e" \

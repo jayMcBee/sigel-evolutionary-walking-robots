@@ -34,13 +34,13 @@
     evolution  Start and Stop  (needs PVM and a real sigel_slave)
     hold       open, start PVM, then leave the window to a person; no watchdog
   ... and pages, pagesave, exportall, roundtrip, overwrite, dialogs, metagui,
-  metadrive, runlock, rngseed, pvmcrash, openfocus.
+  metadrive, runlock, rngseed, pvmcrash, openfocus, povexport, damagedopen.
   The list above is not maintained in step with the code. The count that
   cannot go stale is
     command grep -o 'scenario == "[a-z]*"' checks/programs/guidrive.cpp \
         | sed 's/.*"\(.*\)"/\1/' | sort -u | wc -l
-  which reads 29 today. A plain -c over the same pattern gives 33, which is a
-  count of LINES rather than of matches (`grep -o | wc -l' gives 37): four
+  which reads 31 today. A plain -c over the same pattern gives 35, which is a
+  count of LINES rather than of matches (`grep -o | wc -l' gives 39): four
   names -- evolution, visualize, pvmcrash and hold -- are each tested in more
   than one condition. The old wording said "two scenarios are tested twice", which stopped
   describing the tree when pvmcrash was added.
@@ -1515,6 +1515,46 @@ static int guidriveMain(int argc, char **argv)
     prevEnabled = collectEnabled();
     printf("== SCENARIO %s ==\n", qPrintable(scenario));
     step("fresh start, no experiment");
+
+    // `damagedopen': File > Open on a copy of the experiment that ends inside
+    // its first block, so the master's SIG_GPExperiment::loadExperiment must
+    // refuse it. The message box text is printed up to the "File: ... Line:"
+    // that SIG_Exception appends, which names a source line.
+    if (scenario == "damagedopen") {
+        QFile expIn(expFile);
+        if (!expIn.open(QIODevice::ReadOnly)) { printf("!! cannot open %s\n", qPrintable(expFile)); return 1; }
+        const QByteArray whole = expIn.readAll();
+        const qsizetype firstSeparator = whole.indexOf("\n#####\n");
+        if (firstSeparator < 0) { printf("!! %s has no separator\n", qPrintable(expFile)); return 1; }
+        const QString damaged = scratch() + "/damaged.exp";
+        QFile damagedOut(damaged);
+        if (!damagedOut.open(QIODevice::WriteOnly)) { printf("!! cannot write %s\n", qPrintable(damaged)); return 1; }
+        damagedOut.write(whole.left(firstSeparator + 1));
+        damagedOut.close();
+
+        printf("\n== OPEN AN EXPERIMENT CUT SHORT IN ITS FIRST BLOCK ==\n");
+        whenModal([damaged](QWidget *m) {
+            QFileDialog *fd = qobject_cast<QFileDialog *>(m);
+            if (!fd) { printf("  !! modal is not a QFileDialog\n"); m->close(); return; }
+            acceptFileDialog(fd, damaged);
+            fflush(stdout);
+
+            // Armed only now: before, it would take the file dialog.
+            whenModal([](QWidget *box) {
+                QMessageBox *mb = qobject_cast<QMessageBox *>(box);
+                if (!mb) { printf("  !! modal is not a QMessageBox\n"); box->close(); return; }
+                const QString text = mb->text();
+                printf("  [msgbox] title=[%s] text=[%s]\n", qPrintable(mb->windowTitle()),
+                       qPrintable(text.left(text.indexOf("\nFile: "))));
+                fflush(stdout);
+                clickMsgButton(box, QMessageBox::Ok);
+            });
+        });
+        clickMenu("&File", "&Open Experiment...");
+        QTest::qWait(1500);
+        step("after opening the damaged experiment");
+        return 0;
+    }
 
     // `povexport': the slave's own window on individual 0, as sigel_slave
     // -visualize opens it. The movie dialog is set to POV through its modal,

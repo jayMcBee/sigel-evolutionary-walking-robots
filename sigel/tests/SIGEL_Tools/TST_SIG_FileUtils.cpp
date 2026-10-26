@@ -19,6 +19,7 @@
 */
 #include "SIGEL_Tools/TST_SIG_FileUtils.h"
 
+#include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_FileUtils.h"
 
 #include <QtTest>
@@ -77,4 +78,56 @@ void SIGEL_Tools::TST_SIG_FileUtils::readWordOrQuotedGivesAnEmptyWordAtTheEndOfT
 
 	QCOMPARE( SIG_FileUtils::readWordOrQuoted( stream ), QString( "last" ) );
 	QCOMPARE( SIG_FileUtils::readWordOrQuoted( stream ), QString() );
+}
+
+void SIGEL_Tools::TST_SIG_FileUtils::readLinesUpToGivesTheLinesBeforeTheEndLineAndReadsPastIt()
+{
+	QString text( "first\n#####\nsecond\nEND\nthird\nEND\nafter" );
+	QTextStream stream( &text, QIODevice::ReadOnly );
+
+	QCOMPARE( SIG_FileUtils::readLinesUpTo( stream, "END", "missing" ), QString( "first\n#####\nsecond\n" ) );
+	QCOMPARE( SIG_FileUtils::readLinesUpTo( stream, "END", "missing" ), QString( "third\n" ) );
+	QCOMPARE( stream.readLine(), QString( "after" ) );
+}
+
+void SIGEL_Tools::TST_SIG_FileUtils::readLinesUpToGivesNothingWhenTheEndLineComesFirst()
+{
+	QString text( "#####\nafter" );
+	QTextStream stream( &text, QIODevice::ReadOnly );
+
+	QCOMPARE( SIG_FileUtils::readLinesUpTo( stream, "#####", "missing" ), QString() );
+	QCOMPARE( stream.readLine(), QString( "after" ) );
+}
+
+// The writers put an empty line before each end line.
+void SIGEL_Tools::TST_SIG_FileUtils::readLinesUpToKeepsEmptyLinesBeforeTheEndLine()
+{
+	QString text( "first\n\n\n#####\n" );
+	QTextStream stream( &text, QIODevice::ReadOnly );
+
+	QCOMPARE( SIG_FileUtils::readLinesUpTo( stream, "#####", "missing" ), QString( "first\n\n\n" ) );
+}
+
+void SIGEL_Tools::TST_SIG_FileUtils::readLinesUpToEndsOnlyAtALineThatIsExactlyTheEndLine()
+{
+	QString text( "x #####\n##### \n######\n####\n#####\n" );
+	QTextStream stream( &text, QIODevice::ReadOnly );
+
+	QCOMPARE( SIG_FileUtils::readLinesUpTo( stream, "#####", "missing" ), QString( "x #####\n##### \n######\n####\n" ) );
+}
+
+void SIGEL_Tools::TST_SIG_FileUtils::readLinesUpToThrowsTheGivenMessageWhenTheTextEndsFirst()
+{
+	QString text( "first\nsecond\n" );
+	QTextStream stream( &text, QIODevice::ReadOnly );
+	QString thrown;
+
+	try {
+		SIG_FileUtils::readLinesUpTo( stream, "#####", "The text ends early." );
+	}
+	catch ( SIG_Exception const &e ) {
+		thrown = e.getMessage();
+	}
+
+	QVERIFY2( thrown.startsWith( "The text ends early.\n" ), qPrintable( thrown ) );
 }

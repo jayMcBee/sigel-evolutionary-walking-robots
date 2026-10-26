@@ -54,9 +54,6 @@ namespace SIGEL_GP
    /** The MD5 over SIGEL's source that this program was built from. A slave sends it with its fitness. */
     static QByteArray sourceHash();
 
-   /** Reads the lines up to the next "#####" line, which ends a block of the message. Throws a SIG_Exception if the message ends first. */
-    QString cutAfterFiveHashes(QTextStream& source);
-
     /** Reads a received message into the robot, the environment and its floor, the simulation parameters, the settings and program. */
     void loadPVMDataTransfer(QTextStream & file,
   						    SIGEL_Program::SIG_Program & program);

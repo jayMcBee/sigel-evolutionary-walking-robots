@@ -47,6 +47,13 @@ namespace SIGEL_Tools
 		 */
 		static QString readWordOrQuoted( QTextStream &stream );
 
+		/**
+		 * Reads the lines up to the next line that is exactly endLine, and that
+		 * line. Gives them each followed by a newline, without endLine. Throws a
+		 * SIG_Exception with missingEndMessage if the text ends first.
+		 */
+		static QString readLinesUpTo( QTextStream &stream, QString const &endLine, QString const &missingEndMessage );
+
 	private:
 
 		static bool containsWhitespace( QString const &text );

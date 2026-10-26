@@ -64,8 +64,6 @@ class SIG_GPExperiment {
   SIG_GPExperiment();
   ~SIG_GPExperiment();
 
-  QString cutAfterFiveHashes(QTextStream& source);
-
   /**
    * Reads the experiment from a text stream.
    * @param file

@@ -330,9 +330,10 @@ $(B)/coredrive: checks/programs/coredrive.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CO
 	   echo "coredrive linked the WRONG SIG_GPExperiment: constructor is $$got," \
 	        "Clean's is $$want." >&2; exit 1; }
 
-# The unit tests, with Qt Test, linked like coredrive. Each test class has a
-# Q_OBJECT header. main.cpp names the classes by hand, so `make test' stops if
-# it misses one: that class would be built and never run.
+# The unit tests, with Qt Test, linked like coredrive plus PVM, which
+# SIG_GPPVMData calls. Each test class has a Q_OBJECT header. main.cpp names
+# the classes by hand, so `make test' stops if it misses one: that class would
+# be built and never run.
 test: $(B)/sigel_tests
 	@for h in $(TEST_HDRS); do c=`basename $$h .h`; \
 	   grep -q "push_back( std::make_unique<\(.*::\)\{0,1\}$$c>() )" $(SRC)/tests/main.cpp || { \
@@ -360,9 +361,10 @@ $(OBJ)/tests/%.o: $(SRC)/tests/%.cpp $(STAMP) | $(UI_HDRS)
 	@mkdir -p $(dir $@)
 	$(SIGCXX) -MMD -MP $(TESTINC) -c $< -o $@
 
-$(B)/sigel_tests: $(TEST_OBJS) $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS)
+$(B)/sigel_tests: $(TEST_OBJS) $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS) $(PVM_LIB)
 	$(SIGCXX) $(TEST_OBJS) $(MOC_OBJS_CORE) $(CLEAN_OBJ) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
+	  $(PVM_LIB) -ltirpc \
 	  -L$(QTLIB) -lQt6Test -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
 
 # ---------------------------------------------------------------------------

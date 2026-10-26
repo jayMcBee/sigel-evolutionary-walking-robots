@@ -27,7 +27,7 @@
 #include <qtextstream.h>
 #include <pvm3.h>
 
-#include "SIGEL_Tools/SIG_Exception.h"
+#include "SIGEL_Tools/SIG_FileUtils.h"
 #include "SIGEL_Tools/SIG_IO.h"
 #include "SIG_SourceHash.h"
 
@@ -85,37 +85,20 @@ QByteArray SIGEL_GP::SIG_GPPVMData::sourceHash()
   return SIG_SOURCE_HASH;
 }
 
-QString SIGEL_GP::SIG_GPPVMData::cutAfterFiveHashes(QTextStream& source)
-{
-  QString fiveHashes( "#####" );
-  QString bufferString;
-  QString resultString;
-
-  while ( (bufferString = source.readLine()) != fiveHashes )
-    {
-      // A message from a master of another build can have fewer blocks.
-      if ( bufferString.isNull() )
-        {
-          throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The message from the master ends before its last block. Are the master and this slave the same build?" );
-        }
-
-      resultString += ( bufferString + "\n" );
-    }
-
-  return resultString;
-}
-
 void SIGEL_GP::SIG_GPPVMData::loadPVMDataTransfer(QTextStream & file,
         SIGEL_Program::SIG_Program & program)
 {
+  QString const separator( "#####" );
+  QString const missingSeparator( "The message from the master ends before its last block. Are the master and this slave the same build?" );
+
   file.setRealNumberPrecision( 50 );
 
-  QString simParString = cutAfterFiveHashes( file );
-  QString environmentString = cutAfterFiveHashes( file );
-  QString terrainString = cutAfterFiveHashes( file );
-  QString programString = cutAfterFiveHashes( file );
-  QString robotString = cutAfterFiveHashes( file );
-  QString settingsString = cutAfterFiveHashes( file );
+  QString simParString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
+  QString environmentString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
+  QString terrainString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
+  QString programString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
+  QString robotString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
+  QString settingsString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
 
   QTextStream simParStream( &simParString, QIODeviceBase::ReadOnly );
   QTextStream environmentStream( &environmentString, QIODeviceBase::ReadOnly );

@@ -19,6 +19,8 @@
 */
 #include "SIGEL_Tools/SIG_FileUtils.h"
 
+#include "SIGEL_Tools/SIG_Exception.h"
+
 #include <algorithm>
 
 namespace SIGEL_Tools
@@ -56,6 +58,20 @@ namespace SIGEL_Tools
 			}
 		}
 		return word;
+	}
+
+	QString SIG_FileUtils::readLinesUpTo( QTextStream &stream, QString const &endLine, QString const &missingEndMessage )
+	{
+		QString lines;
+		QString line;
+		while ((line = stream.readLine()) != endLine)
+		{
+			if (line.isNull())
+				throw SIG_Exception( __FILE__, __LINE__, missingEndMessage );
+
+			lines += line + "\n";
+		}
+		return lines;
 	}
 
 	bool SIG_FileUtils::containsWhitespace( QString const &text )

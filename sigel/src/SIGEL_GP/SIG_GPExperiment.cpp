@@ -26,7 +26,7 @@
 #include <qtextstream.h>
 
 #include "SIGEL_Tools/SIG_IO.h"
-#include "SIGEL_Tools/SIG_Exception.h"
+#include "SIGEL_Tools/SIG_FileUtils.h"
 
 #include <pvm3.h>
 
@@ -49,27 +49,15 @@ SIGEL_GP::SIG_GPExperiment::~SIG_GPExperiment()
 	experimentHistory.clear();
 }
 
-QString SIGEL_GP::SIG_GPExperiment::cutAfterFiveHashes(QTextStream& source)
-{
-  QString fiveHashes( "#####" );
-  QString bufferString;
-  QString resultString;
-
-  while ( (bufferString = source.readLine()) != fiveHashes ) {
-    if ( bufferString.isNull() )   // the end of the file
-      throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The file ends before a '#####' separator. It is not a complete experiment file." );
-    resultString += ( bufferString + "\n" );
-  }
-
-  return resultString;
-}
-
 void SIGEL_GP::SIG_GPExperiment::loadExperiment(QTextStream & file)
 {
+  QString const separator( "#####" );
+  QString const missingSeparator( "The file ends before a '#####' separator. It is not a complete experiment file." );
+
   QString simParString;
 
   // check if there's a file for the meta-system to be loaded
-  QString metaFileString = cutAfterFiveHashes( file );
+  QString metaFileString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
 
   QTextStream metaFileStream( &metaFileString, QIODeviceBase::ReadOnly );
 
@@ -79,14 +67,14 @@ void SIGEL_GP::SIG_GPExperiment::loadExperiment(QTextStream & file)
 		mtController->readFromFile( tmpFileString.mid(index+8) );
 	}
 
-	simParString = cutAfterFiveHashes( file );
+	simParString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
   } else
 	simParString = metaFileString;
-  QString environmentString = cutAfterFiveHashes( file );
-  QString gpParameterString = cutAfterFiveHashes( file );
-  QString populationString = cutAfterFiveHashes( file );
-  QString robotString = cutAfterFiveHashes( file );
-  QString experimentHistoryString = cutAfterFiveHashes( file );
+  QString environmentString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
+  QString gpParameterString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
+  QString populationString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
+  QString robotString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
+  QString experimentHistoryString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
 
   QTextStream simParStream( &simParString, QIODeviceBase::ReadOnly );
   QTextStream environmentStream( &environmentString, QIODeviceBase::ReadOnly );

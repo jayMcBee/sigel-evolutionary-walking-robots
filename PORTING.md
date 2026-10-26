@@ -911,6 +911,36 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-26 — DONE: `SIG_FileUtils::readLinesUpTo` REPLACES THE THREE `cutAfterFiveHashes`.**
+
+- **Changed:** `SIG_GPExperiment`, `SIG_GPExperimentClean` and
+  `SIG_GPPVMData` each had the same `cutAfterFiveHashes`. They now call
+  `SIG_FileUtils::readLinesUpTo` with `#####` and their own message; the
+  members, their declarations and the unused `SIG_Exception` includes are
+  gone. Behaviour unchanged, except that the exception's "File: ... Line:"
+  now names `SIG_FileUtils.cpp`.
+- **Build:** `sigel_tests` links PVM (`libpvm3.a`, `-ltirpc`), since
+  `SIG_GPPVMData.o` also holds the PVM send and receive.
+- **Tests, written and reviewed before the change:** five `readLinesUpTo`
+  tests in `TST_SIG_FileUtils`; new `TST_SIG_GPPVMData` (save/load round
+  trip, a message cut short) and `TST_SIG_GPExperiment` (a file cut short).
+  The critical review failed the first version (no test of another end
+  line, no test of the experiment's throw) and passed the second. Then, for
+  the clients: `TST_SIG_GPExperiment` round-trips every block of the clean
+  loader, and the new guidrive scenario `damagedopen` opens `twoBases.exp`
+  cut short in its first block through File > Open, so the master's loader
+  must refuse it; its output is in the GUI baseline. Every client test
+  passes on the old and the new code; a wrong message, a lost block,
+  swapped readers and an ignored end line each made one fail. The
+  master's `MetaInUse` branch has no check: no experiment file uses it.
+- **Review:** the code, no defect. The client tests: comments only —
+  `check.sh` and the baseline header list the new scenario, and the
+  baseline header now also names `povexport` as having no 1.3 side.
+- **Gates:** `check.sh` 879 pass, 0 fail; warnings 287. `fitness-check.sh`
+  passes on both builds, values identical. Dictorder unchanged; PVM both
+  PASS.
+
+
 **2026-10-26 — DONE: `SIG_GPPVMHost` KEEPS WHITESPACE AND NON-LATIN-1 CHARACTERS IN THE DIRECTORY.**
 
 - **Changed:** the `QString` constructor reads the quoted executable

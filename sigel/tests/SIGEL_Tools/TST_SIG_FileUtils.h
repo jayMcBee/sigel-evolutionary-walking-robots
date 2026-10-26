@@ -45,6 +45,16 @@ namespace SIGEL_Tools
 		void readWordOrQuotedReadsBackWhatQuotedIfContainsWhitespaceWrote();
 
 		void readWordOrQuotedGivesAnEmptyWordAtTheEndOfTheText();
+
+		void readLinesUpToGivesTheLinesBeforeTheEndLineAndReadsPastIt();
+
+		void readLinesUpToGivesNothingWhenTheEndLineComesFirst();
+
+		void readLinesUpToKeepsEmptyLinesBeforeTheEndLine();
+
+		void readLinesUpToEndsOnlyAtALineThatIsExactlyTheEndLine();
+
+		void readLinesUpToThrowsTheGivenMessageWhenTheTextEndsFirst();
 	};
 
 }

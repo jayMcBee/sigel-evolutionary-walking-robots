@@ -37,7 +37,7 @@
 #     agree with 1.3; the ORDER does not, by decision 2026-09-28: they are
 #     standard buttons now, and Qt places them by role.
 #
-# Every scenario here is compared with SIGEL 1.3 EXCEPT four, which have no
+# Every scenario here is compared with SIGEL 1.3 EXCEPT six, which have no
 # 1.3 side and say so here:
 #   roundtrip   export, import, export on ONE machine. It needs no 1.3
 #               reference and has none; it checks the port against itself.
@@ -47,6 +47,9 @@
 #               never had the fault, so there is nothing to compare.
 #   rngseed     the randomiser DOES agree with 1.3 -- PORTING.md, section 10 --
 #               but this scenario's own lines are the port's measurement.
+#   povexport   the port's own POV-Ray export; povray, not 1.3, judges it.
+#   damagedopen the port's own message for a file cut short. 1.3 hung on such
+#               a file, so there is nothing to compare.
 #
 # QTEST IS NOT A MOUSE, and it applies to every section below. QTest posts
 # QMouseEvent, QKeyEvent and QContextMenuEvent through QApplication::notify, so
@@ -2913,3 +2916,25 @@ files=34
     }
   #end
   
+# damagedopen: File > Open on twoBases cut short in its first block; the master's loader refuses it.
+== SCENARIO damagedopen ==
+
+== STEP 1: fresh start, no experiment ==
+  [title] SIGEL 1.5 (built <DATE>)
+  [tree] header=[Experiments] topLevel=0
+  [page] count=1 current=QLabel objectName=[baseWidget]
+  [action changes] none
+
+== OPEN AN EXPERIMENT CUT SHORT IN ITS FIRST BLOCK ==
+  [modal] class=QFileDialog title=[Open Experiments]
+  [modal] class=QMessageBox title=[File could not be loaded]
+  [msgbox] title=[File could not be loaded] text=[The file damaged.exp could not be loaded:
+
+The file ends before a '#####' separator. It is not a complete experiment file.]
+  [answering] OK
+
+== STEP 2: after opening the damaged experiment ==
+  [title] SIGEL 1.5 (built <DATE>)
+  [tree] header=[Experiments] topLevel=0
+  [page] count=1 current=QLabel objectName=[baseWidget]
+  [action changes] none
