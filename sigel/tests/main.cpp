@@ -27,6 +27,7 @@
 #include "SIGEL_GP/TST_SIG_GPOperations.h"
 #include "SIGEL_GP/TST_SIG_GPParameter.h"
 #include "SIGEL_GP/TST_SIG_GPPopulation.h"
+#include "SIGEL_GP/TST_SIG_GPPVMHost.h"
 #include "SIGEL_Program/TST_SIG_Program.h"
 #include "SIGEL_Program/TST_SIG_ProgramLine.h"
 #include "SIGEL_Robot/TST_SIG_Body.h"
@@ -59,6 +60,7 @@ int main( int argc, char *argv[] ) {
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPOperations>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPParameter>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPPopulation>() );
+  testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPPVMHost>() );
   testClasses.push_back( std::make_unique<SIGEL_Program::TST_SIG_Program>() );
   testClasses.push_back( std::make_unique<SIGEL_Program::TST_SIG_ProgramLine>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Body>() );

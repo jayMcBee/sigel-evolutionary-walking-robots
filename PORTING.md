@@ -911,6 +911,28 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-26 — DONE: `SIG_GPPVMHost` KEEPS WHITESPACE AND NON-LATIN-1 CHARACTERS IN THE DIRECTORY.**
+
+- **Changed:** the `QString` constructor reads the quoted executable
+  directory with `SIG_FileUtils::readWordOrQuoted` instead of its
+  `readCharQt2` loop, which dropped whitespace inside the quotes and turned
+  characters outside Latin-1 into NULs. `print()` is unchanged, so host
+  lines and baselines stay byte-identical. A line without a closing quote
+  now ends the read instead of looping forever.
+- **Tests, written and reviewed before the change:** new `TST_SIG_GPPVMHost`.
+  `print` writes the fields with the directory quoted; a data-driven round
+  trip (enabled, disabled, the default directory `.` as in the baselines,
+  a directory with a space); a hand-written line with a space and a tab; a
+  directory with characters outside Latin-1. Against the old code three
+  failed (the space row, whitespace, non-Latin-1). The critical test review
+  failed the first version (an `enabled` check that could not fail, a
+  Latin-1-only character) and passed the second.
+- **Review of the code:** no defect.
+- **Gates:** `check.sh` 877 pass, 0 fail; warnings 287. `fitness-check.sh`
+  passes on both builds, values identical. Dictorder unchanged; PVM both
+  PASS.
+
+
 **2026-10-25 — DONE: `SIG_Link` QUOTES ITS BODY NAME IN THE TRANSFER FORMAT.**
 
 - **Changed:** `writeToFileTransfer` writes the body name (the body's

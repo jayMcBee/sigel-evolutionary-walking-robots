@@ -22,6 +22,8 @@
 */
 #include "SIGEL_GP/SIG_GPPVMHost.h"
 
+#include "SIGEL_Tools/SIG_FileUtils.h"
+
 #include <qtextstream.h>
 
 namespace SIGEL_GP
@@ -44,38 +46,18 @@ namespace SIGEL_GP
       executableDir( executableDir )
   { }
 
-  // Skipping whitespace on every read drops spaces inside a quoted path
-  // (/tmp/with space -> /tmp/withspace). A preserved defect, not an oversight.
-  static void readCharQt2( QTextStream &stream, char &c )
-  {
-    stream.skipWhiteSpace();
-    stream >> c;
-  }
-
   SIG_GPPVMHost::SIG_GPPVMHost( QString input )
   {
     QTextStream inputStream( &input, QIODeviceBase::ReadOnly );
 
     int enabledInt = 0;
 
-    char buffer = 0;
-
     inputStream >> name
 		>> maxSlaves
 		>> enabledInt;
-    readCharQt2( inputStream, buffer );
-    readCharQt2( inputStream, buffer );
-
-    QString dirString;
-
-    while (buffer != '\"')
-      {
-	dirString.append( buffer );
-	readCharQt2( inputStream, buffer );
-      };
 
     enabled = enabledInt;
-    executableDir.setPath( dirString );
+    executableDir.setPath( SIGEL_Tools::SIG_FileUtils::readWordOrQuoted( inputStream ) );
   }
 
   QString SIG_GPPVMHost::print() const
