@@ -37,15 +37,27 @@ namespace SIGEL_Robot
 	public:
 
 		/**
+		 * The line of the first USE that only whitespace or comments separate
+		 * from a "}" before it, or 0; a USE in a string or comment does not count.
+		 *
 		 * CyberVRML97 runs a USE while its parser still holds the node that a
 		 * "}" just before it closes, so the USE lands inside that node. Where
 		 * the node is the one the USE names, it contains itself and
 		 * Node::createInstanceNode aborts on an assertion; elsewhere the copy
 		 * sits in the wrong place and the geometry is wrong. A comma after the
 		 * "}" lets the parser close the node first. Tokens as in vrml.l.
-		 * Returns the line of the first such USE, or 0.
 		 */
-		static int lineOfUseAfterNodeEnd (QString const & vrml);
+		static int lineOfUseAfterNodeEnd( QString const &vrml );
+
+	private:
+
+		static qsizetype indexAfterComment( QString const &vrml, qsizetype start );
+
+		static qsizetype indexAfterString( QString const &vrml, qsizetype start );
+
+		static qsizetype indexAfterWord( QString const &vrml, qsizetype start );
+
+		static bool isPartOfWord( QChar c );
 	};
 
 }

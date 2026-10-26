@@ -911,6 +911,31 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-26 — DONE: ITEM 170, `lineOfUseAfterNodeEnd` IS READABLE, IN `SIG_VRMLGeometryReader`.**
+
+- **Changed:** the new class `SIGEL_Robot::SIG_VRMLGeometryReader` will hold
+  the VRML code of `SIG_Body`. `lineOfUseAfterNodeEnd` moved there unchanged
+  as a public static method, so `SIG_Body.cpp` has no free function left.
+  Then it was rewritten: one flat loop that leaves each case early, with the
+  private helpers `indexAfterComment`, `indexAfterString`, `indexAfterWord` and
+  `isPartOfWord`; the test for a character of a word is written once. Its comment
+  starts with the contract. Behaviour unchanged.
+- **Tests:** the new `TST_SIG_VRMLGeometryReader` calls
+  `lineOfUseAfterNodeEnd` directly on text, 10 tests. The `TST_SIG_Body`
+  tests that only checked the scanner left; those that check what `load`
+  does stay, among them `loadReadsAShapeWhoseGeometryIsAUse`.
+- **Proof of the rewrite:** the old and the new function give the same
+  result for the 20 shipped `.wrl` files and for 2,000,000 random texts,
+  63,232 of which have a USE that the function reports.
+- **Review:** behaviour equivalent for every input. After it, the comment
+  got its contract sentence, and two comments that only repeated their
+  names were dropped.
+- **Test runner:** the summary line gives the number of test functions,
+  counted by Qt Test's own rule.
+- **Gates:** `check.sh` 888 pass, 0 fail; warnings 287. Unit tests: 23
+  test classes, 361 test functions, 0 failures.
+
+
 **2026-10-26 — DONE: `SIG_FileUtils::readLinesUpTo` REPLACES THE THREE `cutAfterFiveHashes`.**
 
 - **Changed:** `SIG_GPExperiment`, `SIG_GPExperimentClean` and

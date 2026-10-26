@@ -89,12 +89,6 @@ Paths are relative to `sigel/`, the source tree.
   general math among them, such as `rotationMatrix` and `tolerantACos`,
   goes into the helper class of item 144.
 
-- [ ] **170. Rewrite `lineOfUseAfterNodeEnd` in `SIG_Body.cpp` readably.**
-  It is one loop with six branches, K&R braces and a name-character test
-  written out twice. Split it into a small scanner with one helper each for
-  comments, strings and names, and give it a short comment that states the
-  contract. The behaviour stays the same; the item-152 tests cover it.
-
 ---
 
 ## 3 · Defects preserved by the port

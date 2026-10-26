@@ -26,42 +26,79 @@
 namespace SIGEL_Robot
 {
 
-	int SIG_VRMLGeometryReader::lineOfUseAfterNodeEnd (QString const & vrml)
+	int SIG_VRMLGeometryReader::lineOfUseAfterNodeEnd( QString const &vrml )
 	{
 		int line = 1;
 		bool afterNodeEnd = false;
 		qsizetype i = 0;
-		while (i < vrml.size ()) {
-			QChar const c = vrml.at (i);
-			if (c == '\n') {
-				line++;
-				i++;
-			} else if (c.isSpace ())
-				i++;
-			else if (c == '#') {
-				while (i < vrml.size () && vrml.at (i) != '\n')
-					i++;
-			} else if (c == '"') {
-				for (i++; i < vrml.size () && vrml.at (i) != '"'; i++)
-					if (vrml.at (i) == '\n')
-						line++;
-				i++;
-				afterNodeEnd = false;
-			} else if (c.isLetterOrNumber () || c == '_' || c == '-' || c == '+' || c == '.') {
-				qsizetype const start = i;
-				while (i < vrml.size ()
-				       && (vrml.at (i).isLetterOrNumber () || vrml.at (i) == '_'
-					   || vrml.at (i) == '-' || vrml.at (i) == '+' || vrml.at (i) == '.'))
-					i++;
-				if (afterNodeEnd && QStringView (vrml).mid (start, i - start) == u"USE")
-					return line;
-				afterNodeEnd = false;
-			} else {
-				afterNodeEnd = (c == '}');
-				i++;
+		while (i < vrml.size())
+		{
+			QChar const c = vrml.at( i );
+			if (c == '#')
+			{
+				i = indexAfterComment( vrml, i );
+				continue;
 			}
+
+			if (c == '"')
+			{
+				qsizetype const end = indexAfterString( vrml, i );
+				line += QStringView( vrml ).mid( i, end - i ).count( u'\n' );
+				i = end;
+				afterNodeEnd = false;
+				continue;
+			}
+
+			if (isPartOfWord( c ))
+			{
+				qsizetype const end = indexAfterWord( vrml, i );
+				if (afterNodeEnd && QStringView( vrml ).mid( i, end - i ) == u"USE")
+					return line;
+
+				i = end;
+				afterNodeEnd = false;
+				continue;
+			}
+
+			if (c == '\n')
+				line++;
+			else if (!c.isSpace())
+				afterNodeEnd = (c == '}');
+
+			i++;
 		}
 		return 0;
+	}
+
+	qsizetype SIG_VRMLGeometryReader::indexAfterComment( QString const &vrml, qsizetype start )
+	{
+		qsizetype const end = vrml.indexOf( u'\n', start );
+		if (end < 0)
+			return vrml.size();
+
+		return end;
+	}
+
+	qsizetype SIG_VRMLGeometryReader::indexAfterString( QString const &vrml, qsizetype start )
+	{
+		qsizetype const end = vrml.indexOf( u'"', start + 1 );
+		if (end < 0)
+			return vrml.size();
+
+		return end + 1;
+	}
+
+	qsizetype SIG_VRMLGeometryReader::indexAfterWord( QString const &vrml, qsizetype start )
+	{
+		qsizetype end = start;
+		while (end < vrml.size() && isPartOfWord( vrml.at( end ) ))
+			end++;
+		return end;
+	}
+
+	bool SIG_VRMLGeometryReader::isPartOfWord( QChar c )
+	{
+		return c.isLetterOrNumber() || c == '_' || c == '-' || c == '+' || c == '.';
 	}
 
 }
