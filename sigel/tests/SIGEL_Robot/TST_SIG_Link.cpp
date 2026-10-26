@@ -23,10 +23,36 @@
 */
 #include "SIGEL_Robot/TST_SIG_Link.h"
 
+#include "SIGEL_Robot/SIG_Body.h"
 #include "SIGEL_Robot/SIG_Link.h"
+#include "SIGEL_Robot/SIG_Material.h"
+#include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 
+#include <QTextStream>
 #include <QtTest>
+
+#include <memory>
+
+namespace {
+
+  // The link that the unstreaming constructor reads from in; null, with what it
+  // throws in thrown, if it throws.
+  std::unique_ptr< SIGEL_Robot::SIG_Link > unstreamedLink( SIGEL_Robot::SIG_Robot &robot, QTextStream &in, QString &thrown )
+  {
+    try {
+      return std::make_unique< SIGEL_Robot::SIG_Link >( &robot, in );
+    }
+    catch ( const SIGEL_Tools::SIG_Exception &e ) {
+      thrown = e.getMessage();
+    }
+    catch ( ... ) {
+      thrown = "an exception that is not a SIG_Exception";
+    }
+    return nullptr;
+  }
+
+}
 
 // A robot file may declare a point of a link twice.
 void SIGEL_Robot::TST_SIG_Link::pointAddedTwiceKeepsTheLastValue()
@@ -56,4 +82,54 @@ void SIGEL_Robot::TST_SIG_Link::addNoCollideRegistersThePairOnBothLinksOnce()
 
   QCOMPARE( first.getNoCollides().count(), 1 );
   QCOMPARE( second.getNoCollides().count(), 1 );
+}
+
+void SIGEL_Robot::TST_SIG_Link::writeToFileTransferQuotesABodyNameWithWhitespace()
+{
+  SIG_Robot robot;
+  SIG_Body body( &robot, "left\tarm.wrl", "parts/" );
+  SIG_Material material( &robot, "steel" );
+  SIG_Link link( &robot, "arm", 0 );
+  link.setBody( &body );
+  link.setMaterial( &material );
+  QString text;
+  QTextStream stream( &text );
+
+  link.writeToFileTransfer( stream );
+  stream.flush();
+
+  QCOMPARE( text, QString( "Link arm 0 0 0 0 0 0 1 0 0 0 1 0 0 0 1 n n \"left\tarm.wrl\" steel n\n" ) );
+}
+
+void SIGEL_Robot::TST_SIG_Link::unstreamingConstructorReadsABodyNameWithWhitespaceAndStopsAfterTheLink()
+{
+  SIG_Robot robot;
+  SIG_Body *body = new SIG_Body( &robot, "left\tarm.wrl", "parts/" );
+  SIG_Material *material = new SIG_Material( &robot, "steel" );
+
+  // SIG_Robot owns the parts and frees them.
+  robot.addBody( body );
+  robot.addMaterial( material );
+  SIG_Link written( &robot, "arm", 0 );
+  written.setBody( body );
+  written.setMaterial( material );
+  QString text;
+  QTextStream out( &text );
+  written.writeToFileTransfer( out );
+  out << "Joint";
+  out.flush();
+  QTextStream in( &text );
+  QString keyword;
+  in >> keyword;
+  QString thrown;
+
+  std::unique_ptr< SIG_Link > read = unstreamedLink( robot, in, thrown );
+  QString next;
+  in >> next;
+
+  QCOMPARE( thrown, QString() );
+  QCOMPARE( read->getName(), QString( "arm" ) );
+  QCOMPARE( read->getBody(), body );
+  QCOMPARE( read->getMaterial(), material );
+  QCOMPARE( next, QString( "Joint" ) );
 }

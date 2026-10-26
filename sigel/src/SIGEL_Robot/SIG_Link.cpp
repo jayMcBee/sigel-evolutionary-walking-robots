@@ -27,6 +27,7 @@
 #include "SIGEL_Robot/SIG_RotationalJoint.h"
 #include "SIGEL_Robot/SIG_WrongKinematicsException.h"
 #include "SIGEL_Robot/IFunctions.h"
+#include "SIGEL_Tools/SIG_FileUtils.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
@@ -88,7 +89,7 @@ namespace SIGEL_Robot {
                 tx >> tmpstr;
                 mdh_visited = (tmpstr == "y");
 
-                tx >> tmpstr;
+                tmpstr = SIGEL_Tools::SIG_FileUtils::readWordOrQuoted (tx);
                 body = parent->lookupBody (tmpstr);
                 if (!body)
                         throw SIG_UnstreamingError (__FILE__, __LINE__, "link '" + name + "' names unknown body '" + tmpstr + "'");
@@ -315,7 +316,7 @@ namespace SIGEL_Robot {
                 SIG_Robot::matrixToStream (tx, initialOrientation);
                 tx << (initiated ? "y " : "n ");
                 tx << (mdh_visited ? "y " : "n ");
-                tx << body->getName () << ' '
+                tx << SIGEL_Tools::SIG_FileUtils::quotedIfContainsWhitespace (body->getName ()) << ' '
                    << material->getName () << ' ';
                 if (geometry) {
                         tx << "y\n";

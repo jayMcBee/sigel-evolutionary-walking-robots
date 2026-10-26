@@ -41,6 +41,9 @@ namespace SIGEL_Robot
     void pointAddedTwiceKeepsTheLastValue();
 
     void addNoCollideRegistersThePairOnBothLinksOnce();
+
+    void writeToFileTransferQuotesABodyNameWithWhitespace();
+    void unstreamingConstructorReadsABodyNameWithWhitespaceAndStopsAfterTheLink();
   };
 
 }

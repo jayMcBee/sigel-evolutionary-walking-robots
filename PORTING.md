@@ -911,6 +911,24 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-25 — DONE: `SIG_Link` QUOTES ITS BODY NAME IN THE TRANSFER FORMAT.**
+
+- **Changed:** `writeToFileTransfer` writes the body name (the body's
+  geometry file name) with `SIG_FileUtils::quotedIfContainsWhitespace`, the
+  unstreaming constructor reads it with `readWordOrQuoted`, as `SIG_Body`
+  does. A robot whose geometry file name has whitespace now survives the
+  transfer; names without it are written as before.
+- **Tests:** two in `TST_SIG_Link`, its first of the transfer format: the
+  writer quotes a body name with a tab, and the constructor reads it back,
+  finds that body and stops after the link. Each failed against a broken
+  reader or writer.
+- **Review:** no defect; `<QTextStream>` included and the new tests set off
+  by an empty line in the header, as suggested.
+- **Gates:** `check.sh` 877 pass, 0 fail; warnings 287. `fitness-check.sh`
+  passes on both builds, values identical. Dictorder unchanged; PVM both
+  PASS.
+
+
 **2026-10-25 — DONE: `SIG_Body` QUOTES ITS GEOMETRY FILE NAME IN THE TRANSFER FORMAT.**
 
 - **Changed:** `writeToFileTransfer` writes the geometry file name with
