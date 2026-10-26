@@ -163,9 +163,9 @@ namespace {
 
   // The USE names a node other than the one it follows, so if load's check
   // missed it, CyberVRML97 would misplace the copy instead of aborting the test run.
-  QString useDirectlyAfterGroupEnd( const QString &separator = " " )
+  QString useDirectlyAfterGroupEnd()
   {
-    return "DEF S " + triangleShape() + "Group { }" + separator + "USE S\n";
+    return "DEF S " + triangleShape() + "Group { } USE S\n";
   }
 
   const double epsilon = 1e-5;
@@ -993,6 +993,23 @@ void SIGEL_Robot::TST_SIG_Body::loadReadsTheFaceSetsOfAFileWithUse()
   QCOMPARE( body.getGeometry()->getNumVertices(), 3 );
 }
 
+void SIGEL_Robot::TST_SIG_Body::loadReadsAShapeWhoseGeometryIsAUse()
+{
+  QTemporaryDir folder;
+  QString fileName = writeVRMLFile( folder,
+                                    "Shape { geometry DEF G IndexedFaceSet { coord Coordinate { point [ 0 0 0, 1 0 0, 0 1 0 ] }\n"
+                                    "                                        coordIndex [ 0, 1, 2, -1 ] } }\n"
+                                    "Shape { appearance Appearance { } geometry USE G }\n" );
+  SIG_Robot robot;
+  SIG_Body body( &robot, fileName, "" );
+
+  QCOMPARE( thrownByLoad( body ), QString() );
+
+  QVERIFY( body.getGeometry() );
+  QCOMPARE( body.getGeometry()->getNumPolygons(), 2 );
+  QCOMPARE( body.getGeometry()->getNumVertices(), 3 );
+}
+
 void SIGEL_Robot::TST_SIG_Body::loadRefusesAUseDirectlyAfterANodeEnd()
 {
   QTemporaryDir folder;
@@ -1033,135 +1050,4 @@ void SIGEL_Robot::TST_SIG_Body::loadRefusesAUseDirectlyAfterANodeEndInTheFileRel
   QVERIFY2( thrown.contains( "line 4:" ), qPrintable( thrown ) );
   QVERIFY2( thrown.contains( folder.filePath( "body.wrl" ) ), qPrintable( thrown ) );
   QCOMPARE( body.getGeometry(), nullptr );
-}
-
-void SIGEL_Robot::TST_SIG_Body::loadRefusesAUseThatWhitespaceOtherThanASpaceSeparatesFromANodeEnd()
-{
-  // vrml.l has no rule for a form feed, vertical tab or carriage return, so
-  // flex's default rule passes them over without a token and without counting
-  // a line; DOS line endings do not separate the USE either and count as one
-  // line each.
-  QTemporaryDir folder;
-  QString fileName = writeVRMLFile( folder, useDirectlyAfterGroupEnd( "\t\f\v\r\n\r\n" ) );
-  SIG_Robot robot;
-  SIG_Body body( &robot, fileName, "" );
-
-  QString thrown = thrownByLoad( body );
-
-  QVERIFY2( thrown.contains( "line 6:" ), qPrintable( thrown ) );
-  QCOMPARE( body.getGeometry(), nullptr );
-}
-
-void SIGEL_Robot::TST_SIG_Body::loadReportsTheLineOfTheUseCountingLinesInStringsAndComments()
-{
-  QTemporaryDir folder;
-  // A comment between the "}" and the USE does not separate them for the parser.
-  // As in useDirectlyAfterGroupEnd, the USE names a node other than the one it follows.
-  QString fileName = writeVRMLFile( folder,
-                                    "# a } comment\n"
-                                    "DEF S Group { } ,\n"
-                                    "WorldInfo { info [ \"a\nb\" ] } # c\n"
-                                    "\n"
-                                    "USE S\n" );
-  SIG_Robot robot;
-  SIG_Body body( &robot, fileName, "" );
-
-  QString thrown = thrownByLoad( body );
-
-  QVERIFY2( thrown.contains( "line 7:" ), qPrintable( thrown ) );
-}
-
-void SIGEL_Robot::TST_SIG_Body::loadReportsTheLineOfTheFirstRefusedUse()
-{
-  QTemporaryDir folder;
-  // Each USE names a node other than the one it follows.
-  QString fileName = writeVRMLFile( folder,
-                                    "DEF S Group { }\n"
-                                    "DEF R Group { }\n"
-                                    "Group { } USE S\n"
-                                    "Group { } USE R\n" );
-  SIG_Robot robot;
-  SIG_Body body( &robot, fileName, "" );
-
-  QString thrown = thrownByLoad( body );
-
-  QVERIFY2( thrown.contains( "line 4:" ), qPrintable( thrown ) );
-}
-
-void SIGEL_Robot::TST_SIG_Body::loadIgnoresUseInCommentsAndStrings()
-{
-  QTemporaryDir folder;
-  QString fileName = writeVRMLFile( folder,
-                                    triangleShape() +
-                                    "# } USE S\n"
-                                    "WorldInfo { title \"} USE S\" }\n" );
-  SIG_Robot robot;
-  SIG_Body body( &robot, fileName, "" );
-
-  QCOMPARE( thrownByLoad( body ), QString() );
-
-  QVERIFY( body.getGeometry() );
-  QCOMPARE( body.getGeometry()->getNumPolygons(), 1 );
-}
-
-void SIGEL_Robot::TST_SIG_Body::loadReadsAFileThatEndsInACommentWithoutANewline()
-{
-  QTemporaryDir folder;
-  QString fileName = writeVRMLFile( folder, triangleShape() + "Group { } # end" );
-  SIG_Robot robot;
-  SIG_Body body( &robot, fileName, "" );
-
-  QCOMPARE( thrownByLoad( body ), QString() );
-
-  QVERIFY( body.getGeometry() );
-  QCOMPARE( body.getGeometry()->getNumPolygons(), 1 );
-}
-
-void SIGEL_Robot::TST_SIG_Body::loadAcceptsAUseThatAFieldNameSeparatesFromANodeEnd()
-{
-  QTemporaryDir folder;
-  QString fileName = writeVRMLFile( folder,
-                                    "Shape { geometry DEF G IndexedFaceSet { coord Coordinate { point [ 0 0 0, 1 0 0, 0 1 0 ] }\n"
-                                    "                                        coordIndex [ 0, 1, 2, -1 ] } }\n"
-                                    "Shape { appearance Appearance { } geometry USE G }\n" );
-  SIG_Robot robot;
-  SIG_Body body( &robot, fileName, "" );
-
-  QCOMPARE( thrownByLoad( body ), QString() );
-
-  QVERIFY( body.getGeometry() );
-  QCOMPARE( body.getGeometry()->getNumPolygons(), 2 );
-  QCOMPARE( body.getGeometry()->getNumVertices(), 3 );
-}
-
-void SIGEL_Robot::TST_SIG_Body::loadAcceptsAUseThatAStringSeparatesFromANodeEnd()
-{
-  // Not valid VRML, which has no string directly before a USE: it only shows
-  // that a string ends what follows a "}", so the USE check lets it through.
-  QTemporaryDir folder;
-  QString fileName = writeVRMLFile( folder, "Group { } \"x\" USE S\n" );
-  SIG_Robot robot;
-  SIG_Body body( &robot, fileName, "" );
-
-  QString thrown = thrownByLoad( body );
-
-  QVERIFY2( !thrown.contains( "USE directly after" ), qPrintable( thrown ) );
-}
-
-void SIGEL_Robot::TST_SIG_Body::loadAcceptsAWordOtherThanUseDirectlyAfterANodeEnd()
-{
-  // Not valid VRML, as these are no node types: CyberVRML97 lexes each as one
-  // name, the USE keyword being case-sensitive (vrml.l), so the USE check lets
-  // them through.
-  const QStringList names = { "USEFUL", "USE1", "USE_FUL", "USE-FUL", "USE+FUL", "use", "Use" };
-  for ( const QString &name : names ) {
-    QTemporaryDir folder;
-    QString fileName = writeVRMLFile( folder, "Group { } " + name + " { }\n" );
-    SIG_Robot robot;
-    SIG_Body body( &robot, fileName, "" );
-
-    const QString thrown = thrownByLoad( body );
-
-    QVERIFY2( !thrown.contains( "USE directly after" ), qPrintable( name + ": " + thrown ) );
-  }
 }

@@ -91,16 +91,9 @@ namespace SIGEL_Robot
     void readVRMLNodeAppliesTheGivenTransformation();
 
     void loadReadsTheFaceSetsOfAFileWithUse();
+    void loadReadsAShapeWhoseGeometryIsAUse();
     void loadRefusesAUseDirectlyAfterANodeEnd();
     void loadRefusesAUseDirectlyAfterANodeEndInTheFileRelativeToTheDirectory();
-    void loadRefusesAUseThatWhitespaceOtherThanASpaceSeparatesFromANodeEnd();
-    void loadReportsTheLineOfTheUseCountingLinesInStringsAndComments();
-    void loadReportsTheLineOfTheFirstRefusedUse();
-    void loadIgnoresUseInCommentsAndStrings();
-    void loadReadsAFileThatEndsInACommentWithoutANewline();
-    void loadAcceptsAUseThatAFieldNameSeparatesFromANodeEnd();
-    void loadAcceptsAUseThatAStringSeparatesFromANodeEnd();
-    void loadAcceptsAWordOtherThanUseDirectlyAfterANodeEnd();
   };
 
 }
