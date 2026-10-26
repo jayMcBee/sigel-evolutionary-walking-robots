@@ -33,6 +33,8 @@ namespace SIGEL_Robot
 		int line = 1;
 		bool afterNodeEnd = false;
 		qsizetype i = 0;
+
+		// The text splits into tokens as in CyberVRML97's vrml.l.
 		while (i < vrml.size())
 		{
 			QChar const c = vrml.at( i );
