@@ -21,8 +21,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_ROBOT_TST_SIG_VRMLGEOMETRYREADER_H
-#define SIGEL_ROBOT_TST_SIG_VRMLGEOMETRYREADER_H
+#ifndef SIGEL_ROBOT_TST_SIG_VRMLUTILS_H
+#define SIGEL_ROBOT_TST_SIG_VRMLUTILS_H
 
 #include <QObject>
 
@@ -30,9 +30,9 @@ namespace SIGEL_Robot
 {
 
 	/**
-	 * The unit tests of SIG_VRMLGeometryReader.
+	 * The unit tests of SIG_VRMLUtils.
 	 */
-	class TST_SIG_VRMLGeometryReader : public QObject
+	class TST_SIG_VRMLUtils : public QObject
 	{
 		Q_OBJECT
 
@@ -65,4 +65,4 @@ namespace SIGEL_Robot
 
 }
 
-#endif // SIGEL_ROBOT_TST_SIG_VRMLGEOMETRYREADER_H
+#endif // SIGEL_ROBOT_TST_SIG_VRMLUTILS_H

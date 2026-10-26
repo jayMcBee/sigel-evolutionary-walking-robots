@@ -75,7 +75,7 @@ Paths are relative to `sigel/`, the source tree.
   with static functions defines them once. The three `build...` methods of
   `SIG_DynaMechsLink` move there: they build general matrices and use no
   member of a link. The fitness rows must stay identical.
-  Review `SIG_VRMLGeometryReader::inverseVRMLRotationMatrix` with it. It
+  Review `SIG_VRMLUtils::inverseVRMLRotationMatrix` with it. It
   turns the opposite way to the VRML rotation it is given. Its sine terms
   have the opposite sign from `rotationMatrix` in `IFunctions.cpp`, so one
   is the transpose of the other; do not merge the two. Decide whether

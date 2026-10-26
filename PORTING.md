@@ -916,6 +916,8 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 - **Changed:** the new class `SIGEL_Robot::SIG_VRMLGeometryReader` holds
   generic VRML functionality. It does not take over reading a body's
   geometry: `SIG_Body::readVRMLNode` stays in `SIG_Body`.
+  Renamed to `SIG_VRMLUtils`, its tests to `TST_SIG_VRMLUtils`, so the name
+  says the same.
   `lineOfUseAfterNodeEnd` moved there unchanged
   as a public static method, so `SIG_Body.cpp` has no free function left.
   Then it was rewritten: one flat loop that leaves each case early, with the

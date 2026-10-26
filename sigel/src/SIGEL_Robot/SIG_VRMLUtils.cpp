@@ -21,14 +21,14 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_Robot/SIG_VRMLGeometryReader.h"
+#include "SIGEL_Robot/SIG_VRMLUtils.h"
 
 #include <cmath>
 
 namespace SIGEL_Robot
 {
 
-	int SIG_VRMLGeometryReader::lineOfUseAfterNodeEnd( QString const &vrml )
+	int SIG_VRMLUtils::lineOfUseAfterNodeEnd( QString const &vrml )
 	{
 		int line = 1;
 		bool afterNodeEnd = false;
@@ -74,7 +74,7 @@ namespace SIGEL_Robot
 		return 0;
 	}
 
-	NEWMAT::Matrix SIG_VRMLGeometryReader::inverseVRMLRotationMatrix( QList< float > const &rotation )
+	NEWMAT::Matrix SIG_VRMLUtils::inverseVRMLRotationMatrix( QList< float > const &rotation )
 	{
 		NEWMAT::Matrix rotationMatrix(4,4);
 		double const x = rotation[0];
@@ -101,7 +101,7 @@ namespace SIGEL_Robot
 		return rotationMatrix;
 	}
 
-	qsizetype SIG_VRMLGeometryReader::indexAfterComment( QString const &vrml, qsizetype start )
+	qsizetype SIG_VRMLUtils::indexAfterComment( QString const &vrml, qsizetype start )
 	{
 		qsizetype const end = vrml.indexOf( u'\n', start );
 		if (end < 0)
@@ -110,7 +110,7 @@ namespace SIGEL_Robot
 		return end;
 	}
 
-	qsizetype SIG_VRMLGeometryReader::indexAfterString( QString const &vrml, qsizetype start )
+	qsizetype SIG_VRMLUtils::indexAfterString( QString const &vrml, qsizetype start )
 	{
 		qsizetype const end = vrml.indexOf( u'"', start + 1 );
 		if (end < 0)
@@ -119,7 +119,7 @@ namespace SIGEL_Robot
 		return end + 1;
 	}
 
-	qsizetype SIG_VRMLGeometryReader::indexAfterWord( QString const &vrml, qsizetype start )
+	qsizetype SIG_VRMLUtils::indexAfterWord( QString const &vrml, qsizetype start )
 	{
 		qsizetype end = start;
 		while (end < vrml.size() && isPartOfWord( vrml.at( end ) ))
@@ -127,7 +127,7 @@ namespace SIGEL_Robot
 		return end;
 	}
 
-	bool SIG_VRMLGeometryReader::isPartOfWord( QChar c )
+	bool SIG_VRMLUtils::isPartOfWord( QChar c )
 	{
 		return c.isLetterOrNumber() || c == '_' || c == '-' || c == '+' || c == '.';
 	}

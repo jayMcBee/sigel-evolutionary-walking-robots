@@ -21,8 +21,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_ROBOT_SIG_VRMLGEOMETRYREADER_H
-#define SIGEL_ROBOT_SIG_VRMLGEOMETRYREADER_H
+#ifndef SIGEL_ROBOT_SIG_VRMLUTILS_H
+#define SIGEL_ROBOT_SIG_VRMLUTILS_H
 
 #include <QList>
 #include <QString>
@@ -32,9 +32,9 @@ namespace SIGEL_Robot
 {
 
 	/**
-	 * Reads the geometry of a body from a VRML file.
+	 * Generic VRML functionality.
 	 */
-	class SIG_VRMLGeometryReader
+	class SIG_VRMLUtils
 	{
 	public:
 
@@ -61,4 +61,4 @@ namespace SIGEL_Robot
 
 }
 
-#endif // SIGEL_ROBOT_SIG_VRMLGEOMETRYREADER_H
+#endif // SIGEL_ROBOT_SIG_VRMLUTILS_H

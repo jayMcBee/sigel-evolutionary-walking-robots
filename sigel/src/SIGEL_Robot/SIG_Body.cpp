@@ -27,7 +27,7 @@
 #include <QFile>
 #include <QList>
 #include "SIGEL_Tools/SIG_FileUtils.h"
-#include "SIGEL_Robot/SIG_VRMLGeometryReader.h"
+#include "SIGEL_Robot/SIG_VRMLUtils.h"
 
 namespace SIGEL_Robot
 {
@@ -80,7 +80,7 @@ namespace SIGEL_Robot
 
 				NEWMAT::Matrix rotation(4,4);
 				transformNode->getRotation( buffer.data() );
-				rotation = SIG_VRMLGeometryReader::inverseVRMLRotationMatrix( buffer );
+				rotation = SIG_VRMLUtils::inverseVRMLRotationMatrix( buffer );
 
 				NEWMAT::Matrix scale(4,4);
 				scale = 0;
@@ -91,7 +91,7 @@ namespace SIGEL_Robot
 
 				NEWMAT::Matrix scaleOrientation(4,4);
 				transformNode->getScaleOrientation( buffer.data() );
-				scaleOrientation = SIG_VRMLGeometryReader::inverseVRMLRotationMatrix( buffer );
+				scaleOrientation = SIG_VRMLUtils::inverseVRMLRotationMatrix( buffer );
 
 				NEWMAT::Matrix translation(4,4);
 				translation = identity;
@@ -180,7 +180,7 @@ namespace SIGEL_Robot
 			throw SIG_GeometryFileError (__FILE__, __LINE__, getGeometryFile (), message);
 		}
 
-		int const useLine = SIG_VRMLGeometryReader::lineOfUseAfterNodeEnd (QString::fromUtf8 (vrmlFile.readAll ()));
+		int const useLine = SIG_VRMLUtils::lineOfUseAfterNodeEnd (QString::fromUtf8 (vrmlFile.readAll ()));
 		if (useLine)
 		{
 			QString const message = "USE directly after \"}\" is not supported. Put a comma after the \"}\".";
