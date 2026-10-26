@@ -42,6 +42,8 @@ namespace SIGEL_Tools
 
 		void readWordOrQuotedReadsAQuotedValueWithItsWhitespace();
 
+		void readWordOrQuotedReadsAQuotedValueWithoutWhitespace();
+
 		void readWordOrQuotedReadsBackWhatQuotedIfContainsWhitespaceWrote();
 
 		void readWordOrQuotedGivesAnEmptyWordAtTheEndOfTheText();

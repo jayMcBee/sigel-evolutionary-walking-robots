@@ -51,14 +51,24 @@ void SIGEL_Tools::TST_SIG_FileUtils::readWordOrQuotedReadsAQuotedValueWithItsWhi
 {
 	QString text( "\"My Robots/\" y" );
 	QTextStream stream( &text, QIODevice::ReadOnly );
+	QString flag;
 
 	QCOMPARE( SIG_FileUtils::readWordOrQuoted( stream ), QString( "My Robots/" ) );
-	QCOMPARE( SIG_FileUtils::readWordOrQuoted( stream ), QString( "y" ) );
+	stream >> flag;
+	QCOMPARE( flag, QString( "y" ) );
+}
+
+void SIGEL_Tools::TST_SIG_FileUtils::readWordOrQuotedReadsAQuotedValueWithoutWhitespace()
+{
+	QString text( "\"/opt/sigel\"\n" );
+	QTextStream stream( &text, QIODevice::ReadOnly );
+
+	QCOMPARE( SIG_FileUtils::readWordOrQuoted( stream ), QString( "/opt/sigel" ) );
 }
 
 void SIGEL_Tools::TST_SIG_FileUtils::readWordOrQuotedReadsBackWhatQuotedIfContainsWhitespaceWrote()
 {
-	QStringList const values = { "plain", "with space", "with\ttab", " leading", "trailing " };
+	QStringList const values = { "plain", "with space", "with\ttab", " leading", "trailing ", QString::fromUtf8( "/home/łukasz/€ x" ) };
 
 	QString text;
 	QTextStream out( &text );
@@ -99,7 +109,7 @@ void SIGEL_Tools::TST_SIG_FileUtils::readLinesUpToGivesNothingWhenTheEndLineCome
 	QCOMPARE( stream.readLine(), QString( "after" ) );
 }
 
-// The writers put an empty line before each end line.
+// The experiment and transfer writers put a line break before each end line, which gives an empty line after a block that already ends in one.
 void SIGEL_Tools::TST_SIG_FileUtils::readLinesUpToKeepsEmptyLinesBeforeTheEndLine()
 {
 	QString text( "first\n\n\n#####\n" );
