@@ -82,11 +82,28 @@ int main( int argc, char *argv[] ) {
   testClasses.push_back( std::make_unique<SIGEL_Tools::TST_SIG_Randomizer>() );
 
   int failures = 0;
-  for ( const std::unique_ptr<QObject> &testClass : testClasses )
+  int testFunctions = 0;
+  for ( const std::unique_ptr<QObject> &testClass : testClasses ) {
     failures += QTest::qExec( testClass.get(), argc, argv );
 
+    // Qt Test runs every private slot without parameters, except the _data slots
+    // and initTestCase, cleanupTestCase, init and cleanup.
+    const QMetaObject *metaObject = testClass->metaObject();
+    for ( int i = 0; i < metaObject->methodCount(); i++ ) {
+      const QMetaMethod method = metaObject->method( i );
+      if ( method.methodType() != QMetaMethod::Slot || method.access() != QMetaMethod::Private || method.parameterCount() != 0 )
+        continue;
+
+      const QByteArray name = method.name();
+      if ( name.endsWith( "_data" ) || name == "initTestCase" || name == "cleanupTestCase" || name == "init" || name == "cleanup" )
+        continue;
+
+      testFunctions++;
+    }
+  }
+
   // Qt Test gives a total for each test class only.
-  printf( "%d test classes, %d failures\n", static_cast<int>( testClasses.size() ), failures );
+  printf( "\n%d test classes, %d test functions, %d failures\n", static_cast<int>( testClasses.size() ), testFunctions, failures );
 
   return failures == 0 ? 0 : 1;
 }
