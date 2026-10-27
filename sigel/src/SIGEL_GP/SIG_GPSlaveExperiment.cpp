@@ -49,17 +49,26 @@ SIGEL_GP::SIG_GPSlaveExperiment::~SIG_GPSlaveExperiment()
 
 void SIGEL_GP::SIG_GPSlaveExperiment::loadExperiment(QTextStream & file)
 {
+  loadBlocks( readBlock( file ), file );
+}
+
+QString SIGEL_GP::SIG_GPSlaveExperiment::readBlock( QTextStream &file )
+{
   QString const separator( "#####" );
   QString const missingSeparator( "The file ends before a '#####' separator. It is not a complete experiment file." );
 
-  QString simParString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
-  QString environmentString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
-  QString gpParameterString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
-  QString populationString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
-  QString robotString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
-  QString experimentHistoryString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
+  return SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
+}
 
-  QTextStream simParStream( &simParString, QIODeviceBase::ReadOnly );
+void SIGEL_GP::SIG_GPSlaveExperiment::loadBlocks( QString simulationParameterBlock, QTextStream &file )
+{
+  QString environmentString = readBlock( file );
+  QString gpParameterString = readBlock( file );
+  QString populationString = readBlock( file );
+  QString robotString = readBlock( file );
+  QString experimentHistoryString = readBlock( file );
+
+  QTextStream simParStream( &simulationParameterBlock, QIODeviceBase::ReadOnly );
   QTextStream environmentStream( &environmentString, QIODeviceBase::ReadOnly );
   QTextStream gpParameterStream( &gpParameterString, QIODeviceBase::ReadOnly );
   QTextStream populationStream( &populationString, QIODeviceBase::ReadOnly );

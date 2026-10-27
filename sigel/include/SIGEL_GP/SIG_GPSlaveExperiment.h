@@ -62,21 +62,21 @@ class SIG_GPSlaveExperiment {
    * Builds an empty experiment.
    */
   SIG_GPSlaveExperiment();
-  ~SIG_GPSlaveExperiment();
+  virtual ~SIG_GPSlaveExperiment();
 
   /**
    * Reads the experiment from a text stream.
    * @param file
    *  The stream that holds a saved experiment.
    */
-  void loadExperiment(QTextStream &file);
+  virtual void loadExperiment(QTextStream &file);
 
   /**
    * Writes the experiment to a text stream.
    * @param file
    *  The stream that receives the experiment.
    */
-  void saveExperiment(QTextStream & file);
+  virtual void saveExperiment(QTextStream & file);
 
   /**
    * Calculates nothing.
@@ -156,10 +156,29 @@ class SIG_GPSlaveExperiment {
   QList< SIG_GPExperimentHistoryEntry * > experimentHistory;
 
  protected:
+  /**
+   * Reads one block of a saved experiment.
+   * @param file
+   *  The stream that holds a saved experiment.
+   * @return
+   *  The lines up to the next '#####' separator.
+   */
+  static QString readBlock( QTextStream &file );
+
+  /**
+   * Reads the experiment from the block of simulation parameters and the
+   * blocks that follow it.
+   * @param simulationParameterBlock
+   *  The block that holds the simulation parameters.
+   * @param file
+   *  The stream that holds the blocks after it.
+   */
+  void loadBlocks( QString simulationParameterBlock, QTextStream &file );
+
+ private:
   void writeHistoryToFileTransfer( QTextStream &file );
   void readHistoryFromFileTransfer( QTextStream &file );
 
- private:
   /**
    * The file the experiment is saved to. It is "new" until the experiment
    * has a file.

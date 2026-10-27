@@ -911,6 +911,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-27 — DONE: `SIG_GPExperiment` LOADS AND SAVES THROUGH ITS BASE.**
+
+- **Changed:** `SIG_GPSlaveExperiment` reads a block with `readBlock` and the
+  blocks from the simulation parameters on with `loadBlocks`, both protected.
+  `SIG_GPExperiment::loadExperiment` reads only the MetaGP block, and
+  `saveExperiment` writes only it; both then hand over to the base. Load,
+  save and the destructor of the base are virtual.
+
 **2026-10-27 — DONE: `SIG_GPExperiment` DERIVES FROM `SIG_GPSlaveExperiment`.**
 
 - **Changed:** `SIG_GPExperiment` was a copy of `SIG_GPSlaveExperiment` plus

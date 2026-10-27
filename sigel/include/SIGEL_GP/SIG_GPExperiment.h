@@ -58,14 +58,14 @@ class SIG_GPExperiment : public SIG_GPSlaveExperiment {
    * @param file
    *  The stream that holds a saved experiment.
    */
-  void loadExperiment(QTextStream &file);
+  void loadExperiment(QTextStream &file) override;
 
   /**
    * Writes the experiment to a text stream.
    * @param file
    *  The stream that receives the experiment.
    */
-  void saveExperiment(QTextStream & file);
+  void saveExperiment(QTextStream & file) override;
 
   /**
    * The controller of the MetaGP system. It is destroyed before the members

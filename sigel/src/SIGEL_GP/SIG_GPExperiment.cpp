@@ -24,8 +24,6 @@
 
 #include <qtextstream.h>
 
-#include "SIGEL_Tools/SIG_FileUtils.h"
-
 SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment(QString exp)
 	: SIG_GPSlaveExperiment( exp )
 {
@@ -39,13 +37,10 @@ SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment()
 
 void SIGEL_GP::SIG_GPExperiment::loadExperiment(QTextStream & file)
 {
-  QString const separator( "#####" );
-  QString const missingSeparator( "The file ends before a '#####' separator. It is not a complete experiment file." );
-
   QString simParString;
 
   // check if there's a file for the meta-system to be loaded
-  QString metaFileString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
+  QString metaFileString = readBlock( file );
 
   QTextStream metaFileStream( &metaFileString, QIODeviceBase::ReadOnly );
 
@@ -55,52 +50,18 @@ void SIGEL_GP::SIG_GPExperiment::loadExperiment(QTextStream & file)
 		mtController->readFromFile( tmpFileString.mid(index+8) );
 	}
 
-	simParString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
+	simParString = readBlock( file );
   } else
 	simParString = metaFileString;
-  QString environmentString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
-  QString gpParameterString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
-  QString populationString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
-  QString robotString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
-  QString experimentHistoryString = SIGEL_Tools::SIG_FileUtils::readLinesUpTo( file, separator, missingSeparator );
 
-  QTextStream simParStream( &simParString, QIODeviceBase::ReadOnly );
-  QTextStream environmentStream( &environmentString, QIODeviceBase::ReadOnly );
-  QTextStream gpParameterStream( &gpParameterString, QIODeviceBase::ReadOnly );
-  QTextStream populationStream( &populationString, QIODeviceBase::ReadOnly );
-  QTextStream robotStream( &robotString, QIODeviceBase::ReadOnly );
-  QTextStream experimentHistoryStream( &experimentHistoryString, QIODeviceBase::ReadOnly );
-
-  simulationParameter.readFromFile( simParStream );
-  environment.readFromFile( environmentStream );
-  gpParameter.readFromFile( gpParameterStream );
-  population.readFromFile( populationStream );
-  robot.readFromFileTransfer( robotStream );
-  readHistoryFromFileTransfer( experimentHistoryStream );
-
-  comment = file.readAll();
+  loadBlocks( simParString, file );
 }
 
 void SIGEL_GP::SIG_GPExperiment::saveExperiment(QTextStream & file)
 {
-  QString fiveHashesLine("\n#####\n");
-
   if(mtController->IsEnabled()){
 	  mtController->writeToFile(file, experimentName, environment.getAutosaveIntervalGenerations());
   }
 
-  simulationParameter.writeToFile(file);
-  file << fiveHashesLine;
-  environment.writeToFile(file);
-  file << fiveHashesLine;
-  gpParameter.writeToFile(file);
-  file << fiveHashesLine;
-  population.savePool(file);
-  file << fiveHashesLine;
-  robot.writeToFileTransfer(file);
-  file << fiveHashesLine;
-  writeHistoryToFileTransfer(file);
-  file << fiveHashesLine;
-
-  file << comment;
+  SIG_GPSlaveExperiment::saveExperiment( file );
 }
