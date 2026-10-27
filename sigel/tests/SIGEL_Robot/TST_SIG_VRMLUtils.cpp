@@ -126,28 +126,27 @@ void SIGEL_Robot::TST_SIG_VRMLUtils::lineOfUseAfterNodeEndGivesZeroForAWordOther
 		QVERIFY2( SIG_VRMLUtils::lineOfUseAfterNodeEnd( "Group { } " + name + " { }\n" ) == 0, qPrintable( name ) );
 }
 
-void SIGEL_Robot::TST_SIG_VRMLUtils::inverseVRMLRotationMatrixPinsTheCurrentSignOfTheSineTerms()
+void SIGEL_Robot::TST_SIG_VRMLUtils::vrmlRotationMatrixTurnsByTheRightHandRule()
 {
-	// Pins the current behaviour: the sine terms have the opposite sign from
-	// rotationMatrix in IFunctions.cpp, and whether that is right is open (item 144).
+	// A quarter turn takes x to y about z, y to z about x, and z to x about y.
 	double const quarter = M_PI / 2;
-	double const aboutX[ 4 ][ 4 ] = { { 1, 0, 0, 0 }, { 0, 0, 1, 0 }, { 0, -1, 0, 0 }, { 0, 0, 0, 1 } };
-	double const aboutY[ 4 ][ 4 ] = { { 0, 0, -1, 0 }, { 0, 1, 0, 0 }, { 1, 0, 0, 0 }, { 0, 0, 0, 1 } };
-	double const aboutZ[ 4 ][ 4 ] = { { 0, 1, 0, 0 }, { -1, 0, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
+	double const aboutX[ 4 ][ 4 ] = { { 1, 0, 0, 0 }, { 0, 0, -1, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 1 } };
+	double const aboutY[ 4 ][ 4 ] = { { 0, 0, 1, 0 }, { 0, 1, 0, 0 }, { -1, 0, 0, 0 }, { 0, 0, 0, 1 } };
+	double const aboutZ[ 4 ][ 4 ] = { { 0, -1, 0, 0 }, { 1, 0, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
 
-	QCOMPARE( matrixMismatch( SIG_VRMLUtils::inverseVRMLRotationMatrix( { 1, 0, 0, float( quarter ) } ), aboutX ), QString() );
-	QCOMPARE( matrixMismatch( SIG_VRMLUtils::inverseVRMLRotationMatrix( { 0, 1, 0, float( quarter ) } ), aboutY ), QString() );
-	QCOMPARE( matrixMismatch( SIG_VRMLUtils::inverseVRMLRotationMatrix( { 0, 0, 1, float( quarter ) } ), aboutZ ), QString() );
+	QCOMPARE( matrixMismatch( SIG_VRMLUtils::vrmlRotationMatrix( { 1, 0, 0, float( quarter ) } ), aboutX ), QString() );
+	QCOMPARE( matrixMismatch( SIG_VRMLUtils::vrmlRotationMatrix( { 0, 1, 0, float( quarter ) } ), aboutY ), QString() );
+	QCOMPARE( matrixMismatch( SIG_VRMLUtils::vrmlRotationMatrix( { 0, 0, 1, float( quarter ) } ), aboutZ ), QString() );
 }
 
-void SIGEL_Robot::TST_SIG_VRMLUtils::inverseVRMLRotationMatrixTurnsHalfwayAboutAnOffAxisDirection()
+void SIGEL_Robot::TST_SIG_VRMLUtils::vrmlRotationMatrixTurnsHalfwayAboutAnOffAxisDirection()
 {
-	// A half turn has no sine terms, so this holds for either sign: 2 a a^T - I.
+	// A half turn has no sine terms: 2 a a^T - I.
 	// No axis component is zero, so every product of two of them counts.
 	double const expected[ 4 ][ 4 ] = { { -0.5392, 0.576, 0.6144, 0 },
 	                                    { 0.576, -0.28, 0.768, 0 },
 	                                    { 0.6144, 0.768, -0.1808, 0 },
 	                                    { 0, 0, 0, 1 } };
 
-	QCOMPARE( matrixMismatch( SIG_VRMLUtils::inverseVRMLRotationMatrix( { 0.48f, 0.6f, 0.64f, float( M_PI ) } ), expected ), QString() );
+	QCOMPARE( matrixMismatch( SIG_VRMLUtils::vrmlRotationMatrix( { 0.48f, 0.6f, 0.64f, float( M_PI ) } ), expected ), QString() );
 }

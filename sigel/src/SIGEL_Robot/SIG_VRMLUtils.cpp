@@ -77,7 +77,7 @@ namespace SIGEL_Robot
 		return 0;
 	}
 
-	NEWMAT::Matrix SIG_VRMLUtils::inverseVRMLRotationMatrix( QList< float > const &rotation )
+	NEWMAT::Matrix SIG_VRMLUtils::vrmlRotationMatrix( QList< float > const &rotation )
 	{
 		NEWMAT::Matrix rotationMatrix(4,4);
 		double const x = rotation[0];
@@ -91,13 +91,13 @@ namespace SIGEL_Robot
 
 		rotationMatrix = 0;
 		rotationMatrix(1,1) = (t * x * x) + cosA;
-		rotationMatrix(1,2) = (t * x * y) + (sinA * z);
-		rotationMatrix(1,3) = (t * x * z) - (sinA * y);
-		rotationMatrix(2,1) = (t * x * y) - (sinA * z);
+		rotationMatrix(1,2) = (t * x * y) - (sinA * z);
+		rotationMatrix(1,3) = (t * x * z) + (sinA * y);
+		rotationMatrix(2,1) = (t * x * y) + (sinA * z);
 		rotationMatrix(2,2) = (t * y * y) + cosA;
-		rotationMatrix(2,3) = (t * y * z) + (sinA * x);
-		rotationMatrix(3,1) = (t * x * z) + (sinA * y);
-		rotationMatrix(3,2) = (t * y * z) - (sinA * x);
+		rotationMatrix(2,3) = (t * y * z) - (sinA * x);
+		rotationMatrix(3,1) = (t * x * z) - (sinA * y);
+		rotationMatrix(3,2) = (t * y * z) + (sinA * x);
 		rotationMatrix(3,3) = (t * z * z) + cosA;
 		rotationMatrix(4,4) = 1;
 
@@ -121,7 +121,7 @@ namespace SIGEL_Robot
 
 		NEWMAT::Matrix rotation(4,4);
 		transformNode->getRotation( buffer.data() );
-		rotation = inverseVRMLRotationMatrix( buffer );
+		rotation = vrmlRotationMatrix( buffer );
 
 		NEWMAT::Matrix scale(4,4);
 		scale = 0;
@@ -132,7 +132,7 @@ namespace SIGEL_Robot
 
 		NEWMAT::Matrix scaleOrientation(4,4);
 		transformNode->getScaleOrientation( buffer.data() );
-		scaleOrientation = inverseVRMLRotationMatrix( buffer );
+		scaleOrientation = vrmlRotationMatrix( buffer );
 
 		NEWMAT::Matrix translation(4,4);
 		translation = identity;

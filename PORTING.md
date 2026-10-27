@@ -911,6 +911,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-27 — DONE: THE VRML ROTATION TURNS BY THE RIGHT-HAND RULE.**
+
+- **Changed:** `SIG_VRMLUtils::inverseVRMLRotationMatrix` built the transpose
+  of the VRML97 rotation matrix: a quarter turn about z took x to −y instead
+  of +y. It is now `vrmlRotationMatrix` and builds the VRML97 matrix.
+- **Models:** no model on this VM or on debian11 sets rotation, scaleOrientation,
+  scale, center or translation, so no model changes.
+
 **2026-10-27 — DONE: VRML LOADING AND THE TRANSFORM MATRIX MOVE INTO `SIG_VRMLUtils`.**
 
 - **Changed:** `SIG_VRMLUtils::transformNodeMatrix` builds the matrix of a

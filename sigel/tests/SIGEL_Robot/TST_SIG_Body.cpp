@@ -730,22 +730,20 @@ void SIGEL_Robot::TST_SIG_Body::loadAppliesTheTransformScaleToTheVertices()
   QVERIFY2( isTheOnlyVertexNear( vertices, 2, 3, 2 ), qPrintable( toString( vertices ) ) );
 }
 
-void SIGEL_Robot::TST_SIG_Body::loadAppliesTheTransformRotationAsInverseVRMLRotationMatrixDefinesIt()
+void SIGEL_Robot::TST_SIG_Body::loadAppliesTheTransformRotationByTheRightHandRule()
 {
-  // Pins the current behaviour (item 144): a positive quarter turn about z
-  // takes x to -y, where VRML 97 turns it counterclockwise to +y.
+  // A positive quarter turn about z takes x to y.
   QList< SIG_Vector > vertices = loadedVertices( transformed( QString( "rotation " ) + quarterTurnAboutZ, pointShape( "1 0 0" ) ) );
 
-  QVERIFY2( isTheOnlyVertexNear( vertices, 0, -1, 0 ), qPrintable( toString( vertices ) ) );
+  QVERIFY2( isTheOnlyVertexNear( vertices, 0, 1, 0 ), qPrintable( toString( vertices ) ) );
 }
 
 void SIGEL_Robot::TST_SIG_Body::loadScalesBeforeRotating()
 {
-  // The rotation takes x to -y as the rotation test pins (item 144). Rotating
-  // first gives (0, -1, 0); with the other sign the orders give (0, 2, 0) and (0, 1, 0).
+  // Rotating first gives (0, 1, 0).
   QList< SIG_Vector > vertices = loadedVertices( transformed( QString( "scale 2 1 1 rotation " ) + quarterTurnAboutZ, pointShape( "1 0 0" ) ) );
 
-  QVERIFY2( isTheOnlyVertexNear( vertices, 0, -2, 0 ), qPrintable( toString( vertices ) ) );
+  QVERIFY2( isTheOnlyVertexNear( vertices, 0, 2, 0 ), qPrintable( toString( vertices ) ) );
 }
 
 void SIGEL_Robot::TST_SIG_Body::loadScalesAboutTheTransformCenter()
@@ -757,12 +755,11 @@ void SIGEL_Robot::TST_SIG_Body::loadScalesAboutTheTransformCenter()
 
 void SIGEL_Robot::TST_SIG_Body::loadRotatesAboutTheTransformCenterBeforeTranslating()
 {
-  // The rotation takes x to -y as the rotation test pins (item 144). Rotating
-  // about the origin gives (1, -2, 0), translating first (-1, 0, 0).
+  // Rotating about the origin gives (1, 2, 0), translating first (3, 4, 0).
   QList< SIG_Vector > vertices = loadedVertices( transformed( QString( "translation 1 0 0 center 1 2 0 rotation " ) + quarterTurnAboutZ,
                                                               pointShape( "2 0 0" ) ) );
 
-  QVERIFY2( isTheOnlyVertexNear( vertices, 0, 1, 0 ), qPrintable( toString( vertices ) ) );
+  QVERIFY2( isTheOnlyVertexNear( vertices, 4, 3, 0 ), qPrintable( toString( vertices ) ) );
 }
 
 void SIGEL_Robot::TST_SIG_Body::loadScalesAlongTheTransformScaleOrientation()
@@ -790,23 +787,20 @@ void SIGEL_Robot::TST_SIG_Body::loadRotatesAfterScalingAlongTheScaleOrientation(
 
 void SIGEL_Robot::TST_SIG_Body::loadScalesAlongTheScaleOrientationAboutTheTransformCenter()
 {
-  // The expected point holds for either sign of inverseVRMLRotationMatrix (item 144).
-  // With the current sign, undoing the scaleOrientation before moving the center
-  // to the origin gives (2, 4, 0).
+  // Undoing the scaleOrientation before moving the center to the origin gives (2, 0, 0).
   QList< SIG_Vector > vertices = loadedVertices( transformed( QString( "center 1 0 0 scale 2 1 1 scaleOrientation " ) + quarterTurnAboutZ,
                                                               pointShape( "1 1 0" ) ) );
 
   QVERIFY2( isTheOnlyVertexNear( vertices, 1, 2, 0 ), qPrintable( toString( vertices ) ) );
 }
 
-void SIGEL_Robot::TST_SIG_Body::loadPinsTheCurrentNumbersOfAScaleAlongAnEighthTurnedScaleOrientation()
+void SIGEL_Robot::TST_SIG_Body::loadScalesAlongAnEighthTurnedScaleOrientation()
 {
-  // Pins the current behaviour: the x scale acts along (1, -1, 0), the
-  // direction inverseVRMLRotationMatrix turns x to (item 144). Swapping the
-  // scaleOrientation and its inverse, or the other sign, gives (1.5, 0.5, 0).
+  // The x scale acts along (1, 1, 0). Swapping the scaleOrientation and its
+  // inverse gives (1.5, -0.5, 0).
   QList< SIG_Vector > vertices = loadedVertices( transformed( "scale 2 1 1 scaleOrientation 0 0 1 0.78539816", pointShape( "1 0 0" ) ) );
 
-  QVERIFY2( isTheOnlyVertexNear( vertices, 1.5, -0.5, 0 ), qPrintable( toString( vertices ) ) );
+  QVERIFY2( isTheOnlyVertexNear( vertices, 1.5, 0.5, 0 ), qPrintable( toString( vertices ) ) );
 }
 
 void SIGEL_Robot::TST_SIG_Body::loadAppliesNestedTransformsInnermostFirst()

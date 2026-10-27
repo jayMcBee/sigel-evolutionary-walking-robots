@@ -49,9 +49,9 @@ namespace SIGEL_Robot
 		static int lineOfUseAfterNodeEnd( QString const &vrml );
 
 		/** rotation holds the axis x, y, z and then the angle, as VRML gives them. */
-		static NEWMAT::Matrix inverseVRMLRotationMatrix( QList< float > const &rotation );
+		static NEWMAT::Matrix vrmlRotationMatrix( QList< float > const &rotation );
 
-		/** The matrix of the Transform node, with inverseVRMLRotationMatrix for its two rotations. */
+		/** The matrix of the Transform node, as VRML97 defines it. */
 		static NEWMAT::Matrix transformNodeMatrix( TransformNode *transformNode );
 
 		/** Loads fileName into scene. Throws SIG_VRMLFileError if it cannot be read or parsed. */

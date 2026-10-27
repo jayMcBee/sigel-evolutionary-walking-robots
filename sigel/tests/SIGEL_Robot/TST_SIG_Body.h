@@ -70,14 +70,14 @@ namespace SIGEL_Robot
     void loadAppliesTheTransformTranslationToEachOfItsChildren();
     void loadAppliesATransformOnlyWithinItsOwnChildren();
     void loadAppliesTheTransformScaleToTheVertices();
-    void loadAppliesTheTransformRotationAsInverseVRMLRotationMatrixDefinesIt();
+    void loadAppliesTheTransformRotationByTheRightHandRule();
     void loadScalesBeforeRotating();
     void loadScalesAboutTheTransformCenter();
     void loadRotatesAboutTheTransformCenterBeforeTranslating();
     void loadScalesAlongTheTransformScaleOrientation();
     void loadRotatesAfterScalingAlongTheScaleOrientation();
     void loadScalesAlongTheScaleOrientationAboutTheTransformCenter();
-    void loadPinsTheCurrentNumbersOfAScaleAlongAnEighthTurnedScaleOrientation();
+    void loadScalesAlongAnEighthTurnedScaleOrientation();
     void loadAppliesNestedTransformsInnermostFirst();
     void loadDoesNothingWhenTheBodyHasAGeometry();
     void loadReadsTheFileRelativeToTheDirectory();
