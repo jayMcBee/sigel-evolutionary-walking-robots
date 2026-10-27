@@ -23,6 +23,7 @@
 */
 #include "SIGEL_Robot/SIG_VRMLUtils.h"
 
+#include <CyberVRML97.h>
 #include <cmath>
 
 namespace SIGEL_Robot
@@ -99,6 +100,51 @@ namespace SIGEL_Robot
 		rotationMatrix(4,4) = 1;
 
 		return rotationMatrix;
+	}
+
+	NEWMAT::Matrix SIG_VRMLUtils::transformNodeMatrix( TransformNode *transformNode )
+	{
+		QList< float > buffer(4);
+
+		NEWMAT::Matrix identity(4,4);
+		identity = 0;
+		for (int i=1; i<=4; i++)
+			identity(i,i) = 1;
+
+		NEWMAT::Matrix center(4,4);
+		center = identity;
+		transformNode->getCenter( buffer.data() );
+		for (int j=0; j<3; j++)
+			center( j+1, 4 ) = buffer[j];
+
+		NEWMAT::Matrix rotation(4,4);
+		transformNode->getRotation( buffer.data() );
+		rotation = inverseVRMLRotationMatrix( buffer );
+
+		NEWMAT::Matrix scale(4,4);
+		scale = 0;
+		scale(4,4) = 1;
+		transformNode->getScale( buffer.data() );
+		for (int k=0; k<3; k++)
+			scale( k+1, k+1 ) = buffer[k];
+
+		NEWMAT::Matrix scaleOrientation(4,4);
+		transformNode->getScaleOrientation( buffer.data() );
+		scaleOrientation = inverseVRMLRotationMatrix( buffer );
+
+		NEWMAT::Matrix translation(4,4);
+		translation = identity;
+		transformNode->getTranslation( buffer.data() );
+		for (int l=0; l<3; l++)
+			translation( l+1, 4 ) = buffer[l];
+
+		return translation
+			* center
+			* rotation
+			* scaleOrientation
+			* scale
+			* scaleOrientation.i()
+			* center.i();
 	}
 
 	qsizetype SIG_VRMLUtils::indexAfterComment( QString const &vrml, qsizetype start )

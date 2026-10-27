@@ -28,6 +28,8 @@
 #include <QString>
 #include <newmat.h>
 
+class TransformNode;
+
 namespace SIGEL_Robot
 {
 
@@ -47,6 +49,9 @@ namespace SIGEL_Robot
 
 		/** rotation holds the axis x, y, z and then the angle, as VRML gives them. */
 		static NEWMAT::Matrix inverseVRMLRotationMatrix( QList< float > const &rotation );
+
+		/** The matrix of the Transform node, with inverseVRMLRotationMatrix for its two rotations. */
+		static NEWMAT::Matrix transformNodeMatrix( TransformNode *transformNode );
 
 	private:
 

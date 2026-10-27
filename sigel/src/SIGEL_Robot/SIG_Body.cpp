@@ -62,52 +62,8 @@ namespace SIGEL_Robot
 	void SIG_Body::readVRMLNode(Node *node, NEWMAT::Matrix transformation)
 	{
 		if ( node->isGroupNode() || node->isTransformNode() ) {
-			if (node->isTransformNode()) {
-				TransformNode *transformNode = static_cast<TransformNode*> (node);
-
-				QList< float > buffer(4);
-
-				NEWMAT::Matrix identity(4,4);
-				identity = 0;
-				for (int i=1; i<=4; i++)
-					identity(i,i) = 1;
-
-				NEWMAT::Matrix center(4,4);
-				center = identity;
-				transformNode->getCenter( buffer.data() );
-				for (int j=0; j<3; j++)
-					center( j+1, 4 ) = buffer[j];
-
-				NEWMAT::Matrix rotation(4,4);
-				transformNode->getRotation( buffer.data() );
-				rotation = SIG_VRMLUtils::inverseVRMLRotationMatrix( buffer );
-
-				NEWMAT::Matrix scale(4,4);
-				scale = 0;
-				scale(4,4) = 1;
-				transformNode->getScale( buffer.data() );
-				for (int k=0; k<3; k++)
-					scale( k+1, k+1 ) = buffer[k];
-
-				NEWMAT::Matrix scaleOrientation(4,4);
-				transformNode->getScaleOrientation( buffer.data() );
-				scaleOrientation = SIG_VRMLUtils::inverseVRMLRotationMatrix( buffer );
-
-				NEWMAT::Matrix translation(4,4);
-				translation = identity;
-				transformNode->getTranslation( buffer.data() );
-				for (int l=0; l<3; l++)
-					translation( l+1, 4 ) = buffer[l];
-
-				transformation =   transformation
-					* translation
-					* center
-					* rotation
-					* scaleOrientation
-					* scale
-					* scaleOrientation.i()
-					* center.i();
-			};
+			if (node->isTransformNode())
+				transformation = transformation * SIG_VRMLUtils::transformNodeMatrix( static_cast<TransformNode*> (node) );
 
 			for (Node *child = node->getChildNodes(); child; child = child->next())
 				readVRMLNode(child, transformation);
