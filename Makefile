@@ -308,27 +308,12 @@ TITLE_OBJ := $(OBJ)/sigel/SIGEL_MasterGUI/SIG_MainWindow.o
 $(TITLE_OBJ): $(filter-out $(TITLE_OBJ),$(patsubst $(SRC)/src/%.cpp,$(OBJ)/sigel/%.o,\
   $(foreach m,$(CORE) $(GUI),$(wildcard $(SRC)/src/$(m)/*.cpp))))
 
-# SIG_GPExperiment is defined twice: SIG_GPExperiment.cpp for sigel and
-# guidrive, and SIG_GPExperimentClean.cpp, which builds no MT_Controller, for the
-# slave, coredrive and the tests. Both are in libSIGEL_GP.a, and the linker takes
-# the first one it meets. So each program names its object, and the recipes of
-# sigel, guidrive, sigel_slave and coredrive check by the size of the
-# constructor that the right one was linked.
-CLEAN_OBJ := $(OBJ)/sigel/SIGEL_GP/SIG_GPExperimentClean.o
-MASTER_OBJ := $(OBJ)/sigel/SIGEL_GP/SIG_GPExperiment.o
-
-ctor_size = nm -C -S $(1) | awk '/SIG_GPExperiment::SIG_GPExperiment\(\)$$/{print $$2; exit}'
-
 # One fitness evaluation. --start-group because the core modules call each
 # other in a cycle.
-$(B)/coredrive: checks/programs/coredrive.cpp $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS)
-	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS_CORE) $(CLEAN_OBJ) -o $@ \
+$(B)/coredrive: checks/programs/coredrive.cpp $(MOC_OBJS_CORE) $(CORE_LIBS) $(VENDOR_LIBS)
+	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS_CORE) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  -L$(QTLIB) -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
-	@want=`$(call ctor_size,$(CLEAN_OBJ))`; got=`$(call ctor_size,$@)`; \
-	 test -n "$$want" && test "$$got" = "$$want" || { \
-	   echo "coredrive linked the WRONG SIG_GPExperiment: constructor is $$got," \
-	        "Clean's is $$want." >&2; exit 1; }
 
 # The unit tests, with Qt Test, linked like coredrive plus PVM, which
 # SIG_GPPVMData calls. Each test class has a Q_OBJECT header. main.cpp names
@@ -361,8 +346,8 @@ $(OBJ)/tests/%.o: $(SRC)/tests/%.cpp $(STAMP) | $(UI_HDRS)
 	@mkdir -p $(dir $@)
 	$(SIGCXX) -MMD -MP $(TESTINC) -c $< -o $@
 
-$(B)/sigel_tests: $(TEST_OBJS) $(MOC_OBJS_CORE) $(CLEAN_OBJ) $(CORE_LIBS) $(VENDOR_LIBS) $(PVM_LIB)
-	$(SIGCXX) $(TEST_OBJS) $(MOC_OBJS_CORE) $(CLEAN_OBJ) -o $@ \
+$(B)/sigel_tests: $(TEST_OBJS) $(MOC_OBJS_CORE) $(CORE_LIBS) $(VENDOR_LIBS) $(PVM_LIB)
+	$(SIGCXX) $(TEST_OBJS) $(MOC_OBJS_CORE) -o $@ \
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  $(PVM_LIB) -ltirpc \
 	  -L$(QTLIB) -lQt6Test -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
@@ -403,21 +388,13 @@ SIGLIBS = $(PVM_LIB) -ltirpc \
 
 $(B)/sigel: $(SRC)/src/sigel.cpp $(MOC_OBJS) $(QRC_OBJS) $(GUI_LIBS) $(CORE_LIBS) \
             $(VENDOR_LIBS) $(PVM_LIB)
-	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS) $(QRC_VISUALISATION) $(MASTER_OBJ) -o $@ \
+	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS) $(QRC_VISUALISATION) -o $@ \
 	  -Wl,--start-group $(GUI_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group $(SIGLIBS)
-	@want=`$(call ctor_size,$(MASTER_OBJ))`; got=`$(call ctor_size,$@)`; \
-	 test -n "$$want" && test "$$got" = "$$want" || { \
-	   echo "sigel linked the WRONG SIG_GPExperiment: constructor is $$got," \
-	        "the master's is $$want. Clean leaves mtController uninitialised." >&2; exit 1; }
 
-$(B)/sigel_slave: $(SRC)/src/sigel_slave.cpp $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(QRC_VISUALISATION) $(CLEAN_OBJ) \
+$(B)/sigel_slave: $(SRC)/src/sigel_slave.cpp $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(QRC_VISUALISATION) \
                   $(GUI_SLAVE_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) $(PVM_LIB)
-	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(QRC_VISUALISATION) $(CLEAN_OBJ) -o $@ \
+	$(SIGCXX) $(SIGINC) $< $(MOC_OBJS_SLAVE) $(QRC_SLAVE) $(QRC_VISUALISATION) -o $@ \
 	  -Wl,--start-group $(GUI_SLAVE_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group $(SIGLIBS)
-	@want=`$(call ctor_size,$(CLEAN_OBJ))`; got=`$(call ctor_size,$@)`; \
-	 test -n "$$want" && test "$$got" = "$$want" || { \
-	   echo "sigel_slave linked the WRONG SIG_GPExperiment: constructor is $$got," \
-	        "Clean's is $$want." >&2; exit 1; }
 
 # manage_dyn_slave is C and needs only the C library. -std=gnu17, not c17: the
 # strict modes hide gethostname() and the member h_addr of struct hostent.
@@ -459,12 +436,8 @@ guidrive: $(B)/guidrive
 $(B)/guidrive: checks/programs/guidrive.cpp $(MOC_OBJS) $(QRC_OBJS) $(GUI_LIBS) $(CORE_LIBS) \
                $(VENDOR_LIBS) $(PVM_LIB)
 	$(SIGCXX) -DQT_CORE_LIB -DQT_GUI_LIB -DQT_WIDGETS_LIB -DQT_TESTLIB_LIB \
-	  $(SIGINC) -isystem $(QTINC)/QtTest $< $(MOC_OBJS) $(QRC_SLAVE) $(QRC_VISUALISATION) $(MASTER_OBJ) -o $@ \
+	  $(SIGINC) -isystem $(QTINC)/QtTest $< $(MOC_OBJS) $(QRC_SLAVE) $(QRC_VISUALISATION) -o $@ \
 	  -Wl,--start-group $(GUI_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  -lQt6Test $(SIGLIBS)
-	@want=`$(call ctor_size,$(MASTER_OBJ))`; got=`$(call ctor_size,$@)`; \
-	 test -n "$$want" && test "$$got" = "$$want" || { \
-	   echo "guidrive linked the WRONG SIG_GPExperiment: constructor is $$got," \
-	        "the master's is $$want." >&2; exit 1; }
 
 -include $(shell find $(OBJ) -name '*.d' 2>/dev/null)

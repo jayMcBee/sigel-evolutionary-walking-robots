@@ -63,10 +63,7 @@
                     experiment that ends on a date still to come; the seven in
                     experiments/ end in 2030.
 
-  Build: see check.sh, or the guidrive target in the Makefile. It MUST be
-  linked with the master SIG_GPExperiment, exactly as sigel is -- linking the
-  Clean variant leaves mtController uninitialised and the first tree selection
-  dereferences garbage. That cost one false defect before it was understood.
+  Build: see check.sh, or the guidrive target in the Makefile.
 */
 // Drives the REAL SIG_MainWindow with real Qt input events (QTest posts
 // QMouseEvent/QKeyEvent through QApplication::notify, so the widgets' own

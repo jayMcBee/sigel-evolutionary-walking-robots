@@ -20,7 +20,7 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_GP/SIG_GPExperimentClean.h"
+#include "SIGEL_GP/SIG_GPSlaveExperiment.h"
 
 #include <qfile.h>
 #include <qtextstream.h>
@@ -30,24 +30,24 @@
 
 #include <pvm3.h>
 
-SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment(QString exp)
+SIGEL_GP::SIG_GPSlaveExperiment::SIG_GPSlaveExperiment(QString exp)
 {
 	autosavePath = "new";
 }
 
-SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment()
+SIGEL_GP::SIG_GPSlaveExperiment::SIG_GPSlaveExperiment()
 {
   autosavePath = "new";
 }
 
-SIGEL_GP::SIG_GPExperiment::~SIG_GPExperiment()
+SIGEL_GP::SIG_GPSlaveExperiment::~SIG_GPSlaveExperiment()
 {
   // This class owns its history entries.
   qDeleteAll( experimentHistory );
   experimentHistory.clear();
 }
 
-void SIGEL_GP::SIG_GPExperiment::loadExperiment(QTextStream & file)
+void SIGEL_GP::SIG_GPSlaveExperiment::loadExperiment(QTextStream & file)
 {
   QString const separator( "#####" );
   QString const missingSeparator( "The file ends before a '#####' separator. It is not a complete experiment file." );
@@ -76,7 +76,7 @@ void SIGEL_GP::SIG_GPExperiment::loadExperiment(QTextStream & file)
   comment = file.readAll();
 }
 
-void SIGEL_GP::SIG_GPExperiment::saveExperiment(QTextStream & file)
+void SIGEL_GP::SIG_GPSlaveExperiment::saveExperiment(QTextStream & file)
 {
   QString fiveHashesLine("\n#####\n");
 
@@ -96,13 +96,13 @@ void SIGEL_GP::SIG_GPExperiment::saveExperiment(QTextStream & file)
   file << comment;
 }
 
-void SIGEL_GP::SIG_GPExperiment::writeHistoryToFileTransfer( QTextStream &file )
+void SIGEL_GP::SIG_GPSlaveExperiment::writeHistoryToFileTransfer( QTextStream &file )
 {
   for (const SIG_GPExperimentHistoryEntry *actEntry : experimentHistory)
     file << actEntry->print();
 }
 
-void SIGEL_GP::SIG_GPExperiment::readHistoryFromFileTransfer( QTextStream &file )
+void SIGEL_GP::SIG_GPSlaveExperiment::readHistoryFromFileTransfer( QTextStream &file )
 {
   qDeleteAll( experimentHistory );
   experimentHistory.clear();
@@ -119,27 +119,27 @@ void SIGEL_GP::SIG_GPExperiment::readHistoryFromFileTransfer( QTextStream &file 
     }
 }
 
-double SIGEL_GP::SIG_GPExperiment::calculateFitness(SIGEL_Program::SIG_Program & program)
+double SIGEL_GP::SIG_GPSlaveExperiment::calculateFitness(SIGEL_Program::SIG_Program & program)
 {
  return 0;
 }
 
-SIGEL_GP::SIG_GPParameter& SIGEL_GP::SIG_GPExperiment::getGPParameter()
+SIGEL_GP::SIG_GPParameter& SIGEL_GP::SIG_GPSlaveExperiment::getGPParameter()
 {
   return gpParameter;
 }
 
-SIGEL_GP::SIG_GPPopulation& SIGEL_GP::SIG_GPExperiment::getPopulation()
+SIGEL_GP::SIG_GPPopulation& SIGEL_GP::SIG_GPSlaveExperiment::getPopulation()
 {
   return population;
 }
 
-SIGEL_GP::SIG_GPPopulation *SIGEL_GP::SIG_GPExperiment::getPopulationPointer()
+SIGEL_GP::SIG_GPPopulation *SIGEL_GP::SIG_GPSlaveExperiment::getPopulationPointer()
 {
   return &population;
 }
 
-void SIGEL_GP::SIG_GPExperiment::exportExperimentHistoryToGNUPlot( QString fileName )
+void SIGEL_GP::SIG_GPSlaveExperiment::exportExperimentHistoryToGNUPlot( QString fileName )
 {
   QFile gnuPlotFile( fileName );
 
@@ -165,10 +165,10 @@ void SIGEL_GP::SIG_GPExperiment::exportExperimentHistoryToGNUPlot( QString fileN
 			      << "!" << Qt::endl;
 }
 
-QString SIGEL_GP::SIG_GPExperiment::getPath() {
+QString SIGEL_GP::SIG_GPSlaveExperiment::getPath() {
 	return autosavePath;
 }
 
-void SIGEL_GP::SIG_GPExperiment::setPath(QString path) {
+void SIGEL_GP::SIG_GPSlaveExperiment::setPath(QString path) {
 	autosavePath = path;
 }

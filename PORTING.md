@@ -911,6 +911,16 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-27 — DONE: ITEM 10. THE SLAVE'S EXPERIMENT IS `SIG_GPSlaveExperiment`.**
+
+- **Changed:** `SIG_GPExperimentClean.h/.cpp`, the copy of `SIG_GPExperiment`
+  without the MetaGP controller, are now `SIG_GPSlaveExperiment.h/.cpp`, with
+  their own class name and guard. `sigel_slave.cpp` includes that header; it
+  included the master's, whose class has one member more.
+- **Build:** the two classes no longer share a name, so a wrong link fails
+  at link time. The Makefile no longer names the object on each link line
+  and no longer checks the constructor size.
+
 **2026-10-27 — DONE: A MOVIE IS NAMED AFTER ITS EXPERIMENT.**
 
 - **Changed:** `SIG_SimulationVisualisationWidget::setStaticRunInfo` sets the

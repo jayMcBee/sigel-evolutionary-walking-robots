@@ -20,8 +20,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_GP_SIG_GPEXPERIMENT_H
-#define SIGEL_GP_SIG_GPEXPERIMENT_H
+#ifndef SIGEL_GP_SIG_GPSLAVEEXPERIMENT_H
+#define SIGEL_GP_SIG_GPSLAVEEXPERIMENT_H
 
 #include <QList>
 #include "SIGEL_Robot/SIG_Robot.h"
@@ -45,24 +45,24 @@ namespace SIGEL_GP
 {
 
 /**
- * SIG_GPExperiment is the main data structure of an evolution run. It holds
- * all the data that describe the run.
+ * SIG_GPSlaveExperiment is the experiment of sigel_slave: SIG_GPExperiment
+ * without the MetaGP controller. It holds all the data that describe the run.
  */
 
-class SIG_GPExperiment {
+class SIG_GPSlaveExperiment {
  public:
   /**
    * Builds an empty experiment.
    * @param exp
    *  Is not used.
    */
-  SIG_GPExperiment(QString exp);
+  SIG_GPSlaveExperiment(QString exp);
 
   /**
    * Builds an empty experiment.
    */
-  SIG_GPExperiment();
-  ~SIG_GPExperiment();
+  SIG_GPSlaveExperiment();
+  ~SIG_GPSlaveExperiment();
 
   /**
    * Reads the experiment from a text stream.
@@ -168,4 +168,4 @@ class SIG_GPExperiment {
 
 }
 
-#endif // SIGEL_GP_SIG_GPEXPERIMENT_H
+#endif // SIGEL_GP_SIG_GPSLAVEEXPERIMENT_H

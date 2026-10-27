@@ -25,7 +25,7 @@
 #include <QTextStream>
 
 
-#include "SIGEL_GP/SIG_GPExperiment.h"
+#include "SIGEL_GP/SIG_GPSlaveExperiment.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
     return 1;
   }
 
-  SIGEL_GP::SIG_GPExperiment experiment;
+  SIGEL_GP::SIG_GPSlaveExperiment experiment;
   try {
     QTextStream stream(&file);
     experiment.loadExperiment(stream);

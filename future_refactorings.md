@@ -29,17 +29,6 @@ Paths are relative to `sigel/`, the source tree.
 
 ## 2 · Renames and translation
 
-- [ ] **10. Rename the two `SIG_GPExperiment` variants.**
-  `SIG_GPExperiment.cpp` builds `sigel`, `SIG_GPExperimentClean.cpp` builds
-  `sigel_slave`; both define the same class and include guard. It has already
-  been misread as an accidental duplicate. **The master keeps
-  `SIG_GPExperiment`; the slave's gets the new name,** with its own guard.
-  The Makefile globs `src/<module>/*.cpp` and compiles both into
-  `libSIGEL_GP.a`, where 2003 built separate targets.
-  **Move `$(MASTER_OBJ)` with it:** the Makefile defines it as
-  `SIG_GPExperiment.o`, and `guidrive` names it and asserts on it.
-  Linking the Clean variant once produced a convincing false crash.
-
 - [ ] **11. Write `tour` out as `tournament` in every name,** in SIGEL and
   MetaGP.
 

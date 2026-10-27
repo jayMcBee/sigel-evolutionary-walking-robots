@@ -17,8 +17,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_GP_TST_SIG_GPEXPERIMENT_H
-#define SIGEL_GP_TST_SIG_GPEXPERIMENT_H
+#ifndef SIGEL_GP_TST_SIG_GPSLAVEEXPERIMENT_H
+#define SIGEL_GP_TST_SIG_GPSLAVEEXPERIMENT_H
 
 #include <QObject>
 
@@ -26,9 +26,9 @@ namespace SIGEL_GP
 {
 
 	/**
-	 * The unit tests of SIG_GPExperiment.
+	 * The unit tests of SIG_GPSlaveExperiment.
 	 */
-	class TST_SIG_GPExperiment : public QObject
+	class TST_SIG_GPSlaveExperiment : public QObject
 	{
 		Q_OBJECT
 
@@ -41,4 +41,4 @@ namespace SIGEL_GP
 
 }
 
-#endif // SIGEL_GP_TST_SIG_GPEXPERIMENT_H
+#endif // SIGEL_GP_TST_SIG_GPSLAVEEXPERIMENT_H

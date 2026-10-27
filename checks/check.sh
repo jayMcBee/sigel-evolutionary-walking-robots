@@ -250,8 +250,7 @@ if make -q --no-print-directory -C "$ROOT" programs sigelApp 2>/dev/null; then
             # else. It is -x, and it can exec the real binary, so the smoke
             # test below still sees the no-PVM guard. `make -q' calls the
             # target current, because the wrapper is newer than every
-            # prerequisite, so the link recipe and its ctor_size assertion
-            # never run.
+            # prerequisite, so the link recipe never runs.
             pf=$((pf+1)); echo "  build/$prog is not an ELF binary"
         else pp=$((pp+1)); fi
     done

@@ -169,7 +169,7 @@ class SIG_GPExperiment {
  public:
   /**
    * The controller of the MetaGP system. It is the last member, so it is
-   * destroyed first. SIG_GPExperimentClean.h has no such member.
+   * destroyed first. SIG_GPSlaveExperiment.h has no such member.
    */
   std::unique_ptr< MT_Controller > mtController;
 };

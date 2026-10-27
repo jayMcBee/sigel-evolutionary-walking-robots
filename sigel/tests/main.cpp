@@ -23,7 +23,7 @@
 */
 #include "MT_GPSystem/TST_MT_Search.h"
 #include "SIGEL_Environment/TST_SIG_Terrain.h"
-#include "SIGEL_GP/TST_SIG_GPExperiment.h"
+#include "SIGEL_GP/TST_SIG_GPSlaveExperiment.h"
 #include "SIGEL_GP/TST_SIG_GPIndividual.h"
 #include "SIGEL_GP/TST_SIG_GPOperations.h"
 #include "SIGEL_GP/TST_SIG_GPParameter.h"
@@ -59,7 +59,7 @@ int main( int argc, char *argv[] ) {
   std::vector<std::unique_ptr<QObject>> testClasses;
   testClasses.push_back( std::make_unique<TST_MT_Search>() );
   testClasses.push_back( std::make_unique<SIGEL_Environment::TST_SIG_Terrain>() );
-  testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPExperiment>() );
+  testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPSlaveExperiment>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPIndividual>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPOperations>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPParameter>() );
