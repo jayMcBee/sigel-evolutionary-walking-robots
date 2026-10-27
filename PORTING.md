@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-27 — DONE: `SIG_GPExperiment` DERIVES FROM `SIG_GPSlaveExperiment`.**
+
+- **Changed:** `SIG_GPExperiment` was a copy of `SIG_GPSlaveExperiment` plus
+  `mtController` and the MetaGP block. It now derives from it and keeps only
+  its constructors, `mtController`, `loadExperiment` and `saveExperiment`.
+  The base's two history methods are protected, because those two call them.
+
 **2026-10-27 — DONE: ITEM 10. THE SLAVE'S EXPERIMENT IS `SIG_GPSlaveExperiment`.**
 
 - **Changed:** `SIG_GPExperimentClean.h/.cpp`, the copy of `SIG_GPExperiment`

@@ -155,10 +155,11 @@ class SIG_GPSlaveExperiment {
 
   QList< SIG_GPExperimentHistoryEntry * > experimentHistory;
 
- private:
+ protected:
   void writeHistoryToFileTransfer( QTextStream &file );
   void readHistoryFromFileTransfer( QTextStream &file );
 
+ private:
   /**
    * The file the experiment is saved to. It is "new" until the experiment
    * has a file.

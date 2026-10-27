@@ -23,34 +23,23 @@
 #ifndef SIGEL_GP_SIG_GPEXPERIMENT_H
 #define SIGEL_GP_SIG_GPEXPERIMENT_H
 
-#include <QList>
 #include <memory>
-#include "SIGEL_Robot/SIG_Robot.h"
-#include "SIGEL_GP/SIG_GPParameter.h"
-#include "SIGEL_Environment/SIG_Environment.h"
-#include "SIGEL_GP/SIG_GPPopulation.h"
-#include "SIGEL_Simulation/SIG_SimulationParameters.h"
-#include "SIGEL_GP/SIG_GPExperimentHistoryEntry.h"
+#include "SIGEL_GP/SIG_GPSlaveExperiment.h"
 
 #include "MT_Control/MT_Controller.h"
 
 #include <qstring.h>
 #include <qtextstream.h>
 
-/**
- * The namespace SIGEL_GP holds the classes of genetic programming and
- * artificial evolution. They create and develop robot control programs.
- */
-
 namespace SIGEL_GP
 {
 
 /**
- * SIG_GPExperiment is the main data structure of an evolution run. It holds
- * all the data that describe the run.
+ * SIG_GPExperiment is the main data structure of an evolution run: the data
+ * of SIG_GPSlaveExperiment plus the controller of the MetaGP system.
  */
 
-class SIG_GPExperiment {
+class SIG_GPExperiment : public SIG_GPSlaveExperiment {
  public:
   /**
    * Builds an empty experiment.
@@ -63,7 +52,6 @@ class SIG_GPExperiment {
    * Builds an empty experiment.
    */
   SIG_GPExperiment();
-  ~SIG_GPExperiment();
 
   /**
    * Reads the experiment from a text stream.
@@ -80,96 +68,8 @@ class SIG_GPExperiment {
   void saveExperiment(QTextStream & file);
 
   /**
-   * Calculates nothing.
-   * @param program
-   *  Is not used.
-   * @return
-   *  Always 0.
-   */
-  double calculateFitness(SIGEL_Program::SIG_Program & program);
-
-  /**
-   * @return
-   *  A reference to the GP parameters.
-   */
-  SIGEL_GP::SIG_GPParameter& getGPParameter();
-
-  /**
-   * @return
-   *  A reference to the population.
-   */
-  SIGEL_GP::SIG_GPPopulation& getPopulation();
-
-  /**
-   * @return
-   *  A pointer to the population.
-   */
-  SIGEL_GP::SIG_GPPopulation *getPopulationPointer();
-
-  void exportExperimentHistoryToGNUPlot( QString fileName );
-
-  /** Sets autosavePath. */
-  void setPath(QString path);
-
-  /** Returns autosavePath. */
-  QString getPath();
-
-  /**
-   * The robot of the experiment.
-   */
-  SIGEL_Robot::SIG_Robot robot;
-
-  /**
-   * The parameters of the genetic programming.
-   */
-  SIG_GPParameter gpParameter;
-
-  /**
-   * The name of the experiment.
-   */
-  QString experimentName;
-
-  /**
-   * The environment of the experiment.
-   */
-  SIGEL_Environment::SIG_Environment environment;
-
-  /**
-   * The name of the fitness function.
-   */
-  QString fitnessFunctionName;
-
-  /**
-   * The population of the experiment.
-   */
-  SIG_GPPopulation population;
-
-  /**
-   * The parameters of the simulation.
-   */
-  SIGEL_Simulation::SIG_SimulationParameters simulationParameter;
-
-  /**
-   * A description of the experiment.
-   */
-  QString comment;
-
-  QList< SIG_GPExperimentHistoryEntry * > experimentHistory;
-
- private:
-  void writeHistoryToFileTransfer( QTextStream &file );
-  void readHistoryFromFileTransfer( QTextStream &file );
-
-  /**
-   * The file the experiment is saved to. It is "new" until the experiment
-   * has a file.
-   */
-  QString autosavePath;
-
- public:
-  /**
-   * The controller of the MetaGP system. It is the last member, so it is
-   * destroyed first. SIG_GPSlaveExperiment.h has no such member.
+   * The controller of the MetaGP system. It is destroyed before the members
+   * of SIG_GPSlaveExperiment.
    */
   std::unique_ptr< MT_Controller > mtController;
 };

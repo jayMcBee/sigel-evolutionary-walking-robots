@@ -22,31 +22,19 @@
 */
 #include "SIGEL_GP/SIG_GPExperiment.h"
 
-#include <qfile.h>
 #include <qtextstream.h>
 
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_FileUtils.h"
 
-#include <pvm3.h>
-
 SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment(QString exp)
+	: SIG_GPSlaveExperiment( exp )
 {
-	autosavePath = "new";
 	mtController = std::make_unique< MT_Controller >(*this);
 }
 
 SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment()
 {
-  autosavePath = "new";
   mtController = std::make_unique< MT_Controller >(*this);
-}
-
-SIGEL_GP::SIG_GPExperiment::~SIG_GPExperiment()
-{
-	// This class owns its history entries.
-	qDeleteAll( experimentHistory );
-	experimentHistory.clear();
 }
 
 void SIGEL_GP::SIG_GPExperiment::loadExperiment(QTextStream & file)
@@ -115,81 +103,4 @@ void SIGEL_GP::SIG_GPExperiment::saveExperiment(QTextStream & file)
   file << fiveHashesLine;
 
   file << comment;
-}
-
-void SIGEL_GP::SIG_GPExperiment::writeHistoryToFileTransfer( QTextStream &file )
-{
-  for (const SIG_GPExperimentHistoryEntry *actEntry : experimentHistory)
-    file << actEntry->print();
-}
-
-void SIGEL_GP::SIG_GPExperiment::readHistoryFromFileTransfer( QTextStream &file )
-{
-  qDeleteAll( experimentHistory );
-  experimentHistory.clear();
-
-  QString buffer = file.readLine();
-
-  while (!buffer.isEmpty())
-    {
-      SIG_GPExperimentHistoryEntry *newEntry = new SIG_GPExperimentHistoryEntry( buffer );
-
-      experimentHistory.append( newEntry );
-
-      buffer = file.readLine();
-    }
-}
-
-double SIGEL_GP::SIG_GPExperiment::calculateFitness(SIGEL_Program::SIG_Program & program)
-{
- return 0;
-}
-
-SIGEL_GP::SIG_GPParameter& SIGEL_GP::SIG_GPExperiment::getGPParameter()
-{
-  return gpParameter;
-}
-
-SIGEL_GP::SIG_GPPopulation& SIGEL_GP::SIG_GPExperiment::getPopulation()
-{
-  return population;
-}
-
-SIGEL_GP::SIG_GPPopulation *SIGEL_GP::SIG_GPExperiment::getPopulationPointer()
-{
-  return &population;
-}
-
-void SIGEL_GP::SIG_GPExperiment::exportExperimentHistoryToGNUPlot( QString fileName )
-{
-  QFile gnuPlotFile( fileName );
-
-  if (gnuPlotFile.open( QIODeviceBase::WriteOnly ))
-    {
-      QTextStream gnuPlotStream( &gnuPlotFile );
-
-      for (const SIG_GPExperimentHistoryEntry *actEntry : experimentHistory)
-	gnuPlotStream << actEntry->getGenerationNo()
-		      << " "
-		      << actEntry->getMaxFitness()
-		      << " "
-		      << actEntry->getMinFitness()
-		      << " "
-		      << actEntry->getAverageFitness()
-		      << "\n";
-
-      gnuPlotFile.close();
-  }
-  else
-    SIGEL_Tools::SIG_IO::cerr << "Could not export experiment history under "
-			      << fileName
-			      << "!" << Qt::endl;
-}
-
-QString SIGEL_GP::SIG_GPExperiment::getPath() {
-	return autosavePath;
-}
-
-void SIGEL_GP::SIG_GPExperiment::setPath(QString path) {
-	autosavePath = path;
 }
