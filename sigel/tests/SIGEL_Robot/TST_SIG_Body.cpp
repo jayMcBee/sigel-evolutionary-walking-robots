@@ -27,8 +27,8 @@
 #include "SIGEL_Robot/SIG_Geometry.h"
 #include "SIGEL_Robot/SIG_GeometryIterator.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
-#include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include "SIGEL_Robot/SIG_Robot.h"
+#include "SIGEL_Robot/SIG_VRMLFileError.h"
 
 #include <QFile>
 #include <QTemporaryDir>
@@ -867,7 +867,7 @@ void SIGEL_Robot::TST_SIG_Body::loadRefusesAMissingFile()
 
   QString thrown = thrownByLoad( body );
 
-  QVERIFY2( thrown.startsWith( "Geometry file \"" + folder.filePath( "missing.wrl" ) + "\": " ), qPrintable( thrown ) );
+  QVERIFY2( thrown.startsWith( "VRML file \"" + folder.filePath( "missing.wrl" ) + "\": " ), qPrintable( thrown ) );
   QVERIFY2( thrown.contains( "cannot be read" ), qPrintable( thrown ) );
   QCOMPARE( body.getGeometry(), nullptr );
 }
@@ -881,7 +881,7 @@ void SIGEL_Robot::TST_SIG_Body::loadRefusesAFileThatIsNotVRML()
 
   QString thrown = thrownByLoad( body );
 
-  QVERIFY2( thrown.startsWith( "Geometry file \"" + fileName + "\", line 1: " ), qPrintable( thrown ) );
+  QVERIFY2( thrown.startsWith( "VRML file \"" + fileName + "\", line 1: " ), qPrintable( thrown ) );
   QVERIFY2( thrown.contains( "syntax error" ), qPrintable( thrown ) );
   QCOMPARE( body.getGeometry(), nullptr );
 }
@@ -896,7 +896,7 @@ void SIGEL_Robot::TST_SIG_Body::loadRefusesAFileWithASyntaxErrorAfterValidShapes
 
   QString thrown = thrownByLoad( body );
 
-  QVERIFY2( thrown.startsWith( "Geometry file \"" + fileName + "\", line 4: " ), qPrintable( thrown ) );
+  QVERIFY2( thrown.startsWith( "VRML file \"" + fileName + "\", line 4: " ), qPrintable( thrown ) );
   QVERIFY2( thrown.contains( "syntax error" ), qPrintable( thrown ) );
   QCOMPARE( body.getGeometry(), nullptr );
 }
@@ -979,17 +979,17 @@ void SIGEL_Robot::TST_SIG_Body::loadRefusesAUseDirectlyAfterANodeEnd()
     body.load();
     QFAIL( "load threw nothing" );
   }
-  catch ( const SIG_GeometryFileError &e ) {
+  catch ( const SIG_VRMLFileError &e ) {
     thrown = e.getMessage();
   }
   catch ( const SIGEL_Tools::SIG_Exception &e ) {
-    QFAIL( qPrintable( "not a SIG_GeometryFileError: " + e.getMessage() ) );
+    QFAIL( qPrintable( "not a SIG_VRMLFileError: " + e.getMessage() ) );
   }
   catch ( ... ) {
     QFAIL( "an exception that is not a SIG_Exception" );
   }
 
-  QVERIFY2( thrown.startsWith( "Geometry file \"" + fileName + "\", line 4: " ), qPrintable( thrown ) );
+  QVERIFY2( thrown.startsWith( "VRML file \"" + fileName + "\", line 4: " ), qPrintable( thrown ) );
   QVERIFY2( thrown.contains( "Put a comma after" ), qPrintable( thrown ) );
   QCOMPARE( body.getGeometry(), nullptr );
 }

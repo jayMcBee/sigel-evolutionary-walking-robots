@@ -911,6 +911,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-27 — DONE: VRML LOADING AND THE TRANSFORM MATRIX MOVE INTO `SIG_VRMLUtils`.**
+
+- **Changed:** `SIG_VRMLUtils::transformNodeMatrix` builds the matrix of a
+  Transform node; `SIG_Body::readVRMLNode` multiplies it in.
+  `SIG_VRMLUtils::loadScene` opens the file, runs the USE check, loads the
+  scene and checks CyberVRML97's result; `SIG_Body::load` calls it.
+- **Exception:** `loadScene` throws the new `SIG_VRMLFileError`, which
+  replaces `SIG_GeometryFileError`. The message starts with "VRML file"
+  instead of "Geometry file".
+
+
 **2026-10-26 — DONE: ITEM 170, `lineOfUseAfterNodeEnd` IS READABLE, IN `SIG_VRMLGeometryReader`.**
 
 - **Changed:** the new class `SIGEL_Robot::SIG_VRMLGeometryReader` holds

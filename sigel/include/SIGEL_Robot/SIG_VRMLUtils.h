@@ -28,6 +28,7 @@
 #include <QString>
 #include <newmat.h>
 
+class SceneGraph;
 class TransformNode;
 
 namespace SIGEL_Robot
@@ -52,6 +53,9 @@ namespace SIGEL_Robot
 
 		/** The matrix of the Transform node, with inverseVRMLRotationMatrix for its two rotations. */
 		static NEWMAT::Matrix transformNodeMatrix( TransformNode *transformNode );
+
+		/** Loads fileName into scene. Throws SIG_VRMLFileError if it cannot be read or parsed. */
+		static void loadScene( SceneGraph &scene, QString const &fileName );
 
 	private:
 

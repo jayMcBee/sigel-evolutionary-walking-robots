@@ -22,8 +22,10 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_Robot/SIG_VRMLUtils.h"
+#include "SIGEL_Robot/SIG_VRMLFileError.h"
 
 #include <CyberVRML97.h>
+#include <QFile>
 #include <cmath>
 
 namespace SIGEL_Robot
@@ -145,6 +147,38 @@ namespace SIGEL_Robot
 			* scale
 			* scaleOrientation.i()
 			* center.i();
+	}
+
+	void SIG_VRMLUtils::loadScene( SceneGraph &scene, QString const &fileName )
+	{
+		QFile vrmlFile( fileName );
+		if (!vrmlFile.open( QIODeviceBase::ReadOnly ))
+		{
+			QString const message = "cannot be read.";
+			throw SIG_VRMLFileError( __FILE__, __LINE__, fileName, message );
+		}
+
+		int const useLine = lineOfUseAfterNodeEnd( QString::fromUtf8( vrmlFile.readAll() ) );
+		if (useLine)
+		{
+			QString const message = "USE directly after \"}\" is not supported. Put a comma after the \"}\".";
+			throw SIG_VRMLFileError( __FILE__, __LINE__, fileName, useLine, message );
+		}
+
+		QByteArray fileNameBytes = fileName.toUtf8();
+		scene.load( fileNameBytes.data() );
+
+		// CyberVRML97 keeps the nodes it parsed before an error, which would give a partial scene.
+		if (!scene.isOK())
+		{
+			QString message = "syntax error.";
+			QString const errorToken = QString::fromUtf8( scene.getErrorToken() );
+			if (!errorToken.isEmpty())
+				message = "syntax error at \"" + errorToken + "\".";
+
+			int const errorLine = scene.getErrorLineNumber();
+			throw SIG_VRMLFileError( __FILE__, __LINE__, fileName, errorLine, message );
+		}
 	}
 
 	qsizetype SIG_VRMLUtils::indexAfterComment( QString const &vrml, qsizetype start )

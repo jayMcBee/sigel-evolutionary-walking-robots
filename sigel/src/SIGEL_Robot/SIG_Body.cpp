@@ -23,8 +23,6 @@
 #include "SIGEL_Robot/SIG_Body.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
 #include "SIGEL_Robot/SIG_GeometryIterator.h"
-#include "SIGEL_Robot/SIG_RobotExceptions.h"
-#include <QFile>
 #include <QList>
 #include "SIGEL_Tools/SIG_FileUtils.h"
 #include "SIGEL_Robot/SIG_VRMLUtils.h"
@@ -129,35 +127,8 @@ namespace SIGEL_Robot
 			return;
 
 		// Before the geometry is created: a body that throws here stays without one.
-		QFile vrmlFile (getGeometryFile ());
-		if (!vrmlFile.open (QIODeviceBase::ReadOnly))
-		{
-			QString const message = "cannot be read.";
-			throw SIG_GeometryFileError (__FILE__, __LINE__, getGeometryFile (), message);
-		}
-
-		int const useLine = SIG_VRMLUtils::lineOfUseAfterNodeEnd (QString::fromUtf8 (vrmlFile.readAll ()));
-		if (useLine)
-		{
-			QString const message = "USE directly after \"}\" is not supported. Put a comma after the \"}\".";
-			throw SIG_GeometryFileError (__FILE__, __LINE__, getGeometryFile (), useLine, message);
-		}
-
 		SceneGraph bodyScene;
-		QByteArray geometryFileBytes = getGeometryFile ().toUtf8();
-		bodyScene.load( geometryFileBytes.data() );
-
-		// CyberVRML97 keeps the nodes it parsed before an error, which would give a partial geometry.
-		if (!bodyScene.isOK ())
-		{
-			QString message = "syntax error.";
-			QString const errorToken = QString::fromUtf8 (bodyScene.getErrorToken ());
-			if (!errorToken.isEmpty ())
-				message = "syntax error at \"" + errorToken + "\".";
-
-			int const errorLine = bodyScene.getErrorLineNumber ();
-			throw SIG_GeometryFileError (__FILE__, __LINE__, getGeometryFile (), errorLine, message);
-		}
+		SIG_VRMLUtils::loadScene (bodyScene, getGeometryFile ());
 
 		geometry = new SIG_Geometry ();
 
