@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-27 — DONE: A MOVIE IS NAMED AFTER ITS EXPERIMENT.**
+
+- **Changed:** `SIG_SimulationVisualisationWidget::setStaticRunInfo` sets the
+  movie file prefix to the experiment name, so the movie settings dialog offers
+  it instead of `sigel_pic`. The frames, thumbnails, MP4 and POV-Ray files carry
+  it; the user can still change it. Without an experiment name it stays `sigel_pic`.
+
 **2026-10-27 — DONE: THE VRML ROTATION TURNS BY THE RIGHT-HAND RULE.**
 
 - **Changed:** `SIG_VRMLUtils::inverseVRMLRotationMatrix` built the transpose

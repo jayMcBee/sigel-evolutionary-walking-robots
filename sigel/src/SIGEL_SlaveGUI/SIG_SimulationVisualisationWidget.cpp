@@ -344,6 +344,14 @@ void SIG_SimulationVisualisationWidget::visualizeThis(SIGEL_Robot::SIG_Robot con
 void SIG_SimulationVisualisationWidget::setStaticRunInfo( SIGEL_SlaveGUI::SIG_MovieStaticRunInfo const &staticRunInfo )
 {
 	movieRecorder.setStaticRunInfo( staticRunInfo );
+
+	if ( staticRunInfo.experimentName.isEmpty() )
+		return;
+
+	// The movie settings dialog then offers the experiment name as the file prefix.
+	SIGEL_SlaveGUI::SIG_MovieSettings movieSettings = movieRecorder.getSettings();
+	movieSettings.filePrefix = staticRunInfo.experimentName;
+	movieRecorder.setSettings( movieSettings );
 }
 
 void SIG_SimulationVisualisationWidget::resetRecorder()
