@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-27 — DONE: FORMATTING ROUND ON `SIG_GPExperiment` AND `SIG_GPSlaveExperiment`.**
+
+- **Changed:** tabs and Allman braces, braces on every branch and loop,
+  `exportExperimentHistoryToGNUPlot` returns early when the file cannot be
+  opened. `SIG_GPSlaveExperiment.h` no longer includes `MT_Controller.h`, and
+  its .cpp no longer includes `pvm3.h`; neither used them.
+
 **2026-10-27 — DONE: `SIG_GPExperiment` LOADS AND SAVES THROUGH ITS BASE.**
 
 - **Changed:** `SIG_GPSlaveExperiment` reads a block with `readBlock` and the

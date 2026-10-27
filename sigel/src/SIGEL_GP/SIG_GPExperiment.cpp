@@ -24,44 +24,50 @@
 
 #include <qtextstream.h>
 
-SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment(QString exp)
+SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment( QString exp )
 	: SIG_GPSlaveExperiment( exp )
 {
-	mtController = std::make_unique< MT_Controller >(*this);
+	mtController = std::make_unique< MT_Controller >( *this );
 }
 
 SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment()
 {
-  mtController = std::make_unique< MT_Controller >(*this);
+	mtController = std::make_unique< MT_Controller >( *this );
 }
 
-void SIGEL_GP::SIG_GPExperiment::loadExperiment(QTextStream & file)
+void SIGEL_GP::SIG_GPExperiment::loadExperiment( QTextStream &file )
 {
-  QString simParString;
+	QString simParString;
 
-  // check if there's a file for the meta-system to be loaded
-  QString metaFileString = readBlock( file );
+	// check if there's a file for the meta-system to be loaded
+	QString metaFileString = readBlock( file );
 
-  QTextStream metaFileStream( &metaFileString, QIODeviceBase::ReadOnly );
+	QTextStream metaFileStream( &metaFileString, QIODeviceBase::ReadOnly );
 
-  if(metaFileStream.readLine() == "MetaInUse"){
-	QString tmpFileString = metaFileStream.readLine();
-	if(int index = tmpFileString.indexOf("fileName=") != -1 ){
-		mtController->readFromFile( tmpFileString.mid(index+8) );
+	if( metaFileStream.readLine() == "MetaInUse" )
+	{
+		QString tmpFileString = metaFileStream.readLine();
+		if( int index = tmpFileString.indexOf( "fileName=" ) != -1 )
+		{
+			mtController->readFromFile( tmpFileString.mid( index + 8 ) );
+		}
+
+		simParString = readBlock( file );
+	}
+	else
+	{
+		simParString = metaFileString;
 	}
 
-	simParString = readBlock( file );
-  } else
-	simParString = metaFileString;
-
-  loadBlocks( simParString, file );
+	loadBlocks( simParString, file );
 }
 
-void SIGEL_GP::SIG_GPExperiment::saveExperiment(QTextStream & file)
+void SIGEL_GP::SIG_GPExperiment::saveExperiment( QTextStream &file )
 {
-  if(mtController->IsEnabled()){
-	  mtController->writeToFile(file, experimentName, environment.getAutosaveIntervalGenerations());
-  }
+	if( mtController->IsEnabled() )
+	{
+		mtController->writeToFile( file, experimentName, environment.getAutosaveIntervalGenerations() );
+	}
 
-  SIG_GPSlaveExperiment::saveExperiment( file );
+	SIG_GPSlaveExperiment::saveExperiment( file );
 }

@@ -34,45 +34,45 @@
 namespace SIGEL_GP
 {
 
-/**
- * SIG_GPExperiment is the main data structure of an evolution run: the data
- * of SIG_GPSlaveExperiment plus the controller of the MetaGP system.
- */
+	/**
+	 * SIG_GPExperiment is the main data structure of an evolution run: the data
+	 * of SIG_GPSlaveExperiment plus the controller of the MetaGP system.
+	 */
+	class SIG_GPExperiment : public SIG_GPSlaveExperiment
+	{
+	public:
+		/**
+		 * Builds an empty experiment.
+		 * @param exp
+		 *  Is not used.
+		 */
+		SIG_GPExperiment( QString exp );
 
-class SIG_GPExperiment : public SIG_GPSlaveExperiment {
- public:
-  /**
-   * Builds an empty experiment.
-   * @param exp
-   *  Is not used.
-   */
-  SIG_GPExperiment(QString exp);
+		/**
+		 * Builds an empty experiment.
+		 */
+		SIG_GPExperiment();
 
-  /**
-   * Builds an empty experiment.
-   */
-  SIG_GPExperiment();
+		/**
+		 * Reads the experiment from a text stream.
+		 * @param file
+		 *  The stream that holds a saved experiment.
+		 */
+		void loadExperiment( QTextStream &file ) override;
 
-  /**
-   * Reads the experiment from a text stream.
-   * @param file
-   *  The stream that holds a saved experiment.
-   */
-  void loadExperiment(QTextStream &file) override;
+		/**
+		 * Writes the experiment to a text stream.
+		 * @param file
+		 *  The stream that receives the experiment.
+		 */
+		void saveExperiment( QTextStream &file ) override;
 
-  /**
-   * Writes the experiment to a text stream.
-   * @param file
-   *  The stream that receives the experiment.
-   */
-  void saveExperiment(QTextStream & file) override;
-
-  /**
-   * The controller of the MetaGP system. It is destroyed before the members
-   * of SIG_GPSlaveExperiment.
-   */
-  std::unique_ptr< MT_Controller > mtController;
-};
+		/**
+		 * The controller of the MetaGP system. It is destroyed before the members
+		 * of SIG_GPSlaveExperiment.
+		 */
+		std::unique_ptr< MT_Controller > mtController;
+	};
 
 }
 
