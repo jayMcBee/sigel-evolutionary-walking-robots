@@ -3,6 +3,7 @@
 
 #include <QList>
 #include "MT_GPSystem/MT_StatisticsElement.h"
+#include "MT_GPSystem/MT_ErrorCode.h"
 
 
 /* manage the accrued Information of the run. It's include a QList of MT_StatisicsElement 
@@ -12,7 +13,7 @@ class MT_Statistics
 public:
 
 	/*update the Statistics about the whole GP-run*/
-	int updateStatistics();
+	MT_ErrorCode updateStatistics();
 
 	/* supply a pointer of the demand MT_StatisticsElement */
 	MT_StatisticsElement * getStatisticElement(int ElementOfGeneration);

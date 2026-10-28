@@ -911,6 +911,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_Statistics::updateStatistics` RETURNS AN `MT_ErrorCode`.**
+
+- **Changed:** its result is always `None` (it was always 0); `MT_GPManager`
+  still takes it as the reset of its own code after a run and casts it until
+  it follows.
+
 **2026-10-28 — DONE: `MT_TournamentManager` KEEPS ITS ERROR CODE IN `MT_ErrorCode`.**
 
 - **Changed:** 510, a missing "TournamentManager:" section, is named

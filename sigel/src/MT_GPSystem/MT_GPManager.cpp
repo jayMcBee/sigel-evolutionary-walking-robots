@@ -477,7 +477,7 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 
 	emit metaEvolutionRunning(false);
 
-	LastError = Statistics->updateStatistics();
+	LastError = static_cast< int >( Statistics->updateStatistics() );
 	
 	EvolStopped = false;
 }

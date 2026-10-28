@@ -72,9 +72,9 @@ MT_StatisticsElement * MT_Statistics::getStatisticElement(int ElementOfGeneratio
 	return StatisticsOfGeneration.value(ElementOfGeneration);
 }
 
-int MT_Statistics::updateStatistics()
+MT_ErrorCode MT_Statistics::updateStatistics()
 {
-	int Error=0;
+	MT_ErrorCode Error = MT_ErrorCode::None;
 	NumOfSimpleCopyParent =0;  
 	// Note: NumOfSimpleCopyParent now collects offspring data, not parent data  
 	NumOfMutateIndividuals = 0;
