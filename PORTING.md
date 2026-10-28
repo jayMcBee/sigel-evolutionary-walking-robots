@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_FitnessTrainer::calculateFitness( MT_Individual * )` LOSES ITS DEEP NESTING.**
+
+- **Changed:** an individual already evaluated on the training set and a
+  program of length 3 or less leave early; the training cases are run under
+  one `if`. Fitness values, error codes and the order of the calls are
+  unchanged.
+
 **2026-10-28 — DONE: `set`/`getSelektionValue` ARE RENAMED `set`/`getSelectionValue` (ITEM 14 DONE).**
 
 - **Changed:** the German spelling is translated in `MT_FitnessTrainer`,

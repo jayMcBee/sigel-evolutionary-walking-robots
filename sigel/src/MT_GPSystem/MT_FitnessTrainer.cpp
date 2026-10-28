@@ -147,56 +147,48 @@ void MT_FitnessTrainer::calculateFitness(MT_Population *Pop)
 	}
 }
 
-bool MT_FitnessTrainer::calculateFitness(MT_Individual *Indi)
+bool MT_FitnessTrainer::calculateFitness( MT_Individual *Indi )
 {
-	bool NewEvaluated = false;
-
-	if (false == Indi->toBeEvaluated(TSet->getName()))
+	if( Indi->toBeEvaluated( TSet->getName() ) )
 	{
-		NewEvaluated = true;
-		double Fit= -1.5;
-		if((Indi->getProgram()->getLength()) > 3)
-		{
-			PresentTSize = TSet->getPresentTSize();
-			if (PresentTSize >0)
-			{
-				LastError = Interpreter.loadProgram((Indi->getProgram()));
-				
-				MT_TrainingCase * InstantTCase; 
-			
-				for (int i=0; i<PresentTSize; i++)
-				{
-					InstantTCase = TSet->getTCase(i); 
-					
-					Result[i] = InstantTCase->getFitness();
+		return false;
+	}
 
-					ResultIst[i]= Interpreter.interpret(InstantTCase->getIndividual());
-				}
-				
-				switch (FitnessFunction)
-				{
-				case 1:	Fit = fitSimpleError(); break;
-				case 2: Fit = fitSquareError(); break;
-				case 3: Fit = simpleYesNo(); break;
-				case 4: Fit = weightYesNo(); break;
-				default:
-					{
-						Fit = -999.0;
-						LastError = 610;
-					}
-				}
-			}
-				Indi->setFitness(Fit);
-				Indi->setTrainingsSet(TSet->getName());
-		}
-		else
+	if( Indi->getProgram()->getLength() <= 3 )
+	{
+		Indi->setFitness( 0.0 );
+		Indi->setTrainingsSet( TSet->getName() );
+		return true;
+	}
+
+	double Fit = -1.5;
+	PresentTSize = TSet->getPresentTSize();
+	if( PresentTSize > 0 )
+	{
+		LastError = Interpreter.loadProgram( Indi->getProgram() );
+
+		for( int i = 0; i < PresentTSize; i++ )
 		{
-			Indi->setFitness(0.0);
-			Indi->setTrainingsSet(TSet->getName());
+			MT_TrainingCase *InstantTCase = TSet->getTCase( i );
+			Result[i] = InstantTCase->getFitness();
+			ResultIst[i] = Interpreter.interpret( InstantTCase->getIndividual() );
+		}
+
+		switch( FitnessFunction )
+		{
+		case 1: Fit = fitSimpleError(); break;
+		case 2: Fit = fitSquareError(); break;
+		case 3: Fit = simpleYesNo(); break;
+		case 4: Fit = weightYesNo(); break;
+		default:
+			Fit = -999.0;
+			LastError = 610;
 		}
 	}
 
-	return NewEvaluated;
+	Indi->setFitness( Fit );
+	Indi->setTrainingsSet( TSet->getName() );
+	return true;
 }
 
 double MT_FitnessTrainer::fitSquareError()
