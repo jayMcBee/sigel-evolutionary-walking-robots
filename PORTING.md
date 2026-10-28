@@ -911,6 +911,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: FORMATTING ROUND ON `MT_Randomizer::loadSetup`.**
+
+- **Changed:** braces on every branch and loop, among them a `while` whose
+  body was not indented, plus tabs and `( x )` spacing. The code tokens are
+  unchanged.
+
 **2026-10-28 — DONE: `MT_Randomizer` KEEPS ITS ERROR CODE IN `MT_ErrorCode`.**
 
 - **Changed:** 260 to 263 have names. `MT_GPManager` and `MT_Population`
