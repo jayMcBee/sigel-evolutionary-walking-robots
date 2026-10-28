@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: FORMATTING ROUND ON `MT_Tournament`.**
+
+- **Changed:** tabs, `( x )` spacing, spaces around operators, `Type *name`
+  for pointers, braces on every branch and loop, no trailing white space,
+  and the empty-line rules; the debug lines in `fitnessProp` that stood at
+  column 0 are indented. The code tokens are unchanged.
+
 **2026-10-28 — DONE: `MT_Population` KEEPS ITS ERROR CODE IN `MT_ErrorCode`.**
 
 - **Changed:** 320, 321 and 340 have names (`ImportPopulationSectionMissing`,
