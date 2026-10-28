@@ -94,8 +94,8 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 	if(Selector->getLastError() != 0)
 		LastError = Selector->getLastError();
 	FitnessTrainer = std::make_unique< MT_FitnessTrainer >(File);
-	if(FitnessTrainer->getLastError() != 0)
-		LastError = FitnessTrainer->getLastError();
+	if(FitnessTrainer->getLastError() != MT_ErrorCode::None)
+		LastError = static_cast< int >( FitnessTrainer->getLastError() );
 }
 
 MT_GPManager::MT_GPManager(MT_Substitute *Substitue) : QObject()
@@ -174,8 +174,8 @@ void MT_GPManager::loadSetup(QTextStream &File)
 		LastError = 12;
 	
 	FitnessTrainer->loadSetup(File);
-	if(FitnessTrainer->getLastError() != 0)
-		LastError = FitnessTrainer->getLastError();
+	if(FitnessTrainer->getLastError() != MT_ErrorCode::None)
+		LastError = static_cast< int >( FitnessTrainer->getLastError() );
 }
 
 void MT_GPManager::writeToFileGPSystem(QTextStream &File)

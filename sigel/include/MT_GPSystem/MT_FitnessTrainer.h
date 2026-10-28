@@ -10,6 +10,7 @@
 #include "MT_GPSystem/MT_Program.h"
 #include "MT_GPSystem/MT_Individual.h"
 #include "MT_GPSystem/MT_Population.h"
+#include "MT_GPSystem/MT_ErrorCode.h"
 
 #include <qstring.h>
 #include <qtextstream.h>
@@ -21,7 +22,7 @@
 class MT_FitnessTrainer
 {
 private:
-	int LastError;
+	MT_ErrorCode LastError;
 
 	/*Indicate which fitness function is choose for the fitness calculation
 	@param: 1 = fitSimpleError for the evaluator  approach
@@ -55,7 +56,7 @@ private:
 	MT_Interpreter Interpreter;
 
 public:
-	int getLastError();
+	MT_ErrorCode getLastError();
 
 	/* this method is needed by MT_GPManager::exchangeBest()
 	* the Substituter needed the both ResultArrys

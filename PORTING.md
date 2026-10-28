@@ -911,6 +911,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_ErrorCode` NAMES THE ERROR CODES OF `MT_FitnessTrainer`.**
+
+- **Changed:** the new scoped enum `MT_ErrorCode` (`MT_GPSystem/MT_ErrorCode.h`)
+  holds the MetaGP error codes with their old numbers. `MT_FitnessTrainer`
+  keeps its `LastError` in it: 601, 602 and 610 have names. The interpreter's
+  code and the copy in `MT_GPManager` are cast until their classes follow,
+  one class per step.
+
 **2026-10-28 — DONE: FORMATTING ROUND ON `MT_FitnessTrainer`.**
 
 - **Changed:** tabs, `( x )` spacing, spaces around operators, `Type *name`

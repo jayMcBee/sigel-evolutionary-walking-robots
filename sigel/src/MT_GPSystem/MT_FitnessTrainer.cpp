@@ -2,7 +2,7 @@
 
 MT_FitnessTrainer::MT_FitnessTrainer( QTextStream &File )
 {
-	LastError = 0;
+	LastError = MT_ErrorCode::None;
 
 	// NOTE: "FitnessTranier:" keeps the 2003 misspelling deliberately -- it is a
 	// section marker in the saved experiment format, not a name. Correcting it
@@ -34,13 +34,13 @@ MT_FitnessTrainer::MT_FitnessTrainer( QTextStream &File )
 	}
 	else
 	{
-		LastError = 601;
+		LastError = MT_ErrorCode::FitnessTrainerSectionMissing;
 	}
 }
 
 MT_FitnessTrainer::MT_FitnessTrainer()
 {
-	LastError = 0;
+	LastError = MT_ErrorCode::None;
 
 	FitnessFunction = 1;
 	PresentTSize = 0;
@@ -77,7 +77,7 @@ void MT_FitnessTrainer::loadSetup( QTextStream &File )
 	}
 	else
 	{
-		LastError = 602;
+		LastError = MT_ErrorCode::FitnessTrainerSetupSectionMissing;
 	}
 }
 
@@ -103,7 +103,7 @@ void MT_FitnessTrainer::writeToFileTrainer( QTextStream &File )
 	TSet->writeToFileTSet( File );
 }
 
-int MT_FitnessTrainer::getLastError()
+MT_ErrorCode MT_FitnessTrainer::getLastError()
 {
 	return LastError;
 }
@@ -173,7 +173,7 @@ bool MT_FitnessTrainer::calculateFitness( MT_Individual *Indi )
 	PresentTSize = TSet->getPresentTSize();
 	if( PresentTSize > 0 )
 	{
-		LastError = Interpreter.loadProgram( Indi->getProgram() );
+		LastError = static_cast< MT_ErrorCode >( Interpreter.loadProgram( Indi->getProgram() ) );
 
 		for( int i = 0; i < PresentTSize; i++ )
 		{
@@ -190,7 +190,7 @@ bool MT_FitnessTrainer::calculateFitness( MT_Individual *Indi )
 		case 4: Fit = weightYesNo(); break;
 		default:
 			Fit = -999.0;
-			LastError = 610;
+			LastError = MT_ErrorCode::UnknownFitnessFunction;
 		}
 	}
 
