@@ -16,24 +16,28 @@ extern bool guiEnabled;
 /***
  * this function is just used as the entry point of the meta thread
  ***/
-void StartMetaEvolution(void *inRawSubst)
+void StartMetaEvolution( void *inRawSubst )
 {
-	MT_Controller *th_contr = static_cast<MT_Controller*>(inRawSubst);
-	if(th_contr->startWOSigel)
+	MT_Controller *th_contr = static_cast<MT_Controller *>( inRawSubst );
+	if( th_contr->startWOSigel )
+	{
 		th_contr->callMetaEvolutionLoopWOSigel();
+	}
 	else
+	{
 		th_contr->callMetaEvolutionLoop();
+	}
 }
 
 
-MT_Controller::MT_Controller(SIGEL_GP::SIG_GPMetaGPExperiment &exp)
- : QObject(),
-   autoSaveCnt(0),
-   evolTimer(nullptr),
-   gpManager(nullptr),
-   mainWindow(nullptr),
-   substitution(nullptr),
-   sigExp(exp)
+MT_Controller::MT_Controller( SIGEL_GP::SIG_GPMetaGPExperiment &exp )
+	: QObject(),
+	  autoSaveCnt( 0 ),
+	  evolTimer( nullptr ),
+	  gpManager( nullptr ),
+	  mainWindow( nullptr ),
+	  substitution( nullptr ),
+	  sigExp( exp )
 {
 	startWOSigel = false;
 	withGUI = true;
@@ -50,13 +54,14 @@ MT_Controller::MT_Controller(SIGEL_GP::SIG_GPMetaGPExperiment &exp)
 	estimationState.strategy = -1;
 	estimationState.tolerance = 0;
 
-	defConfFileName = std::getenv("SIGEL_ROOT");
-	defConfFileName.append("/stdConf.mt");
+	defConfFileName = std::getenv( "SIGEL_ROOT" );
+	defConfFileName.append( "/stdConf.mt" );
 }
 
 MT_Controller::~MT_Controller()
 {
-	if(confFile.isOpen()){
+	if( confFile.isOpen() )
+	{
 		confFile.close();
 	}
 	delete mainWindow;
@@ -65,45 +70,49 @@ MT_Controller::~MT_Controller()
 }
 
 /***
- * start evolution without sigel 
+ * start evolution without sigel
  * called by the configuration window's start button
  ***/
 void MT_Controller::startSingleEvolution()
 {
 	startWOSigel = true;
 
-		pthread_create(&meta_thread, nullptr, reinterpret_cast<void*(*)(void*)>(&StartMetaEvolution), this);
+	pthread_create( &meta_thread, nullptr, reinterpret_cast<void *(*)( void * )>( &StartMetaEvolution ), this );
 }
 
 /***
  * starts the evolution with a timer that stops it if the given duration runs down
  * is called by the main() routine (if started with the appropiate options)
  ***/
-void MT_Controller::startTimedEvolution(int minutes)
+void MT_Controller::startTimedEvolution( int minutes )
 {
 	withGUI = false;
 
-	if(!evolTimer)
-		evolTimer = new QTimer(this);
+	if( !evolTimer )
+	{
+		evolTimer = new QTimer( this );
+	}
 
 	startWOSigel = true;
 
-	QObject::connect(evolTimer, SIGNAL(timeout()), SLOT(stopEvolution()));
+	QObject::connect( evolTimer, SIGNAL( timeout() ), SLOT( stopEvolution() ) );
 	createGPSystem();
-	evolTimer->setSingleShot(true);
-	evolTimer->start(minutes * 60000);
+	evolTimer->setSingleShot( true );
+	evolTimer->start( minutes * 60000 );
 
-	QObject::connect(gpManager, SIGNAL(metaEvolutionRunning(bool)), this, SLOT(slotEvolutionRunning(bool)));
-		pthread_create(&meta_thread, nullptr, reinterpret_cast<void*(*)(void*)>(&StartMetaEvolution), this);
+	QObject::connect( gpManager, SIGNAL( metaEvolutionRunning( bool ) ), this, SLOT( slotEvolutionRunning( bool ) ) );
+	pthread_create( &meta_thread, nullptr, reinterpret_cast<void *(*)( void * )>( &StartMetaEvolution ), this );
 }
 
-void MT_Controller::slotEvolutionRunning(bool running)
+void MT_Controller::slotEvolutionRunning( bool running )
 {
-	if(!running && startWOSigel && !withGUI){
-		QObject::disconnect(gpManager, SIGNAL(metaEvolutionRunning(bool)), this, SLOT(slotEvolutionRunning(bool)));
+	if( !running && startWOSigel && !withGUI )
+	{
+		QObject::disconnect( gpManager, SIGNAL( metaEvolutionRunning( bool ) ), this, SLOT( slotEvolutionRunning( bool ) ) );
+
 		// Not qApp: on the -mtevolve path main builds a plain QCoreApplication,
 		// and qApp's cast to QApplication would be undefined.
-		QCoreApplication::exit(0);
+		QCoreApplication::exit( 0 );
 	}
 }
 
@@ -115,31 +124,39 @@ bool MT_Controller::startEvolution()
 {
 	startWOSigel = false;
 
-	if(metaOn){
-		if(!createGPSystem())	// create the gp system if not created so far
+	if( metaOn )
+	{
+		if( !createGPSystem() ) // create the gp system if not created so far
+		{
 			return false;
+		}
 
 		// make sure there's an actually correct substituter
-		if(!substitution){
+		if( !substitution )
+		{
 			writeEstimationSettings();
 
-			switch(usedSystem){
-			case EVALUATOR_SUBST :
-				substitution = new MT_Evaluator(sigExp, estimationSettingsStream);
+			switch( usedSystem )
+			{
+			case EVALUATOR_SUBST:
+				substitution = new MT_Evaluator( sigExp, estimationSettingsStream );
 				break;
-			case CLASSIFIER_SUBST :
-				substitution = new MT_Classifier(estimationSettingsStream);
+			case CLASSIFIER_SUBST:
+				substitution = new MT_Classifier( estimationSettingsStream );
 				break;
 			}
-			if(!substitution){
-				if(guiEnabled)
+			if( !substitution )
+			{
+				if( guiEnabled )
+				{
 					SIGEL_Tools::SIG_IO::cerr << "Creating Meta GP-System: couldn't create a substituter." << Qt::endl;
+				}
 				return false;
 			}
 		}
 
 		// create a thread for the meta-evolution
-		pthread_create(&meta_thread, nullptr, reinterpret_cast<void*(*)(void*)>(&StartMetaEvolution), this);
+		pthread_create( &meta_thread, nullptr, reinterpret_cast<void *(*)( void * )>( &StartMetaEvolution ), this );
 	}
 
 	return true;
@@ -147,7 +164,7 @@ bool MT_Controller::startEvolution()
 
 void MT_Controller::callMetaEvolutionLoop()
 {
-	gpManager->startEvolution(substitution);
+	gpManager->startEvolution( substitution );
 }
 
 void MT_Controller::callMetaEvolutionLoopWOSigel()
@@ -161,33 +178,40 @@ void MT_Controller::callMetaEvolutionLoopWOSigel()
  ***/
 void MT_Controller::stopEvolution()
 {
-	if(IsEnabled() && gpManager)
+	if( IsEnabled() && gpManager )
+	{
 		gpManager->stopEvolution();
+	}
 }
 
 /***
  * switch between the two meta-systems
  * called from sig_mainwindow
  ***/
-bool MT_Controller::switchSystem(int wantedSystem)
+bool MT_Controller::switchSystem( int wantedSystem )
 {
 	// the wanted system equals the used system -> nothing to do so leave here
-	if(usedSystem == wantedSystem)
+	if( usedSystem == wantedSystem )
+	{
 		return true;
+	}
 
 	// if we have constructed a substituter or a gpmanager yet, we have to destroy them
-	if(gpManager || estimationState.inUse || substitution){
-		if(QMessageBox::warning(SIGEL_CommonGUI::dialogParent(), "Switching the MetaGP System", 
-			"Switching the system requires deleting the current\n"
-			"GP system. Do you want to delete it?",
-			QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes){
-			if(mainWindow){
-				QObject::disconnect(mainWindow->mtStartEvolutionAction, SIGNAL( triggered() ), this, SLOT( startSingleEvolution() ));
-				QObject::disconnect(mainWindow->mtStopEvolutionAction, SIGNAL( triggered() ), this, SLOT( stopEvolution() ));
-				QObject::disconnect(mainWindow->mtDefaultAction, SIGNAL( triggered() ), this, SLOT(slotLoadDefault() ) );
-				QObject::disconnect(mainWindow->mtLoadAction, SIGNAL( triggered() ), this, SLOT( slotLoadSetup() ) );
-				QObject::disconnect(mainWindow->mtSaveAction, SIGNAL( triggered() ), this, SLOT( slotSaveSetup() ));
-				QObject::disconnect(mainWindow->evolTimer, SIGNAL( timeout() ), this, SLOT( stopEvolution() ));
+	if( gpManager || estimationState.inUse || substitution )
+	{
+		if( QMessageBox::warning( SIGEL_CommonGUI::dialogParent(), "Switching the MetaGP System",
+				"Switching the system requires deleting the current\n"
+				"GP system. Do you want to delete it?",
+				QMessageBox::Yes | QMessageBox::No, QMessageBox::No ) == QMessageBox::Yes )
+		{
+			if( mainWindow )
+			{
+				QObject::disconnect( mainWindow->mtStartEvolutionAction, SIGNAL( triggered() ), this, SLOT( startSingleEvolution() ) );
+				QObject::disconnect( mainWindow->mtStopEvolutionAction, SIGNAL( triggered() ), this, SLOT( stopEvolution() ) );
+				QObject::disconnect( mainWindow->mtDefaultAction, SIGNAL( triggered() ), this, SLOT( slotLoadDefault() ) );
+				QObject::disconnect( mainWindow->mtLoadAction, SIGNAL( triggered() ), this, SLOT( slotLoadSetup() ) );
+				QObject::disconnect( mainWindow->mtSaveAction, SIGNAL( triggered() ), this, SLOT( slotSaveSetup() ) );
+				QObject::disconnect( mainWindow->evolTimer, SIGNAL( timeout() ), this, SLOT( stopEvolution() ) );
 			}
 
 			delete mainWindow;
@@ -197,10 +221,16 @@ bool MT_Controller::switchSystem(int wantedSystem)
 			mainWindow = nullptr;
 			gpManager = nullptr;
 			substitution = nullptr;
-			confStrm.setDevice(nullptr);
-			if(confFile.isOpen()) confFile.close();
-		} else
+			confStrm.setDevice( nullptr );
+			if( confFile.isOpen() )
+			{
+				confFile.close();
+			}
+		}
+		else
+		{
 			return false;
+		}
 	}
 
 	// now really switch the systems
@@ -214,43 +244,51 @@ bool MT_Controller::switchSystem(int wantedSystem)
 /***
  * turn the use of the meta gp system on/off
  ***/
-bool MT_Controller::useMeta(bool state)
+bool MT_Controller::useMeta( bool state )
 {
-	if(metaOn == state)
+	if( metaOn == state )
+	{
 		return false;
+	}
 
-	if(state == false){		// the meta-system isn't needed anymore - therefore delete it?
+	if( state == false ) // the meta-system isn't needed anymore - therefore delete it?
+	{
 		QString proposedName = saveName;
-		if(guiEnabled){
-			QMessageBox box(QMessageBox::Information, "Disabling MetaGP",
-							"You are about to disable the MetaGP system. What shall\n"
-							"we do with the system?",
-							QMessageBox::Ignore | QMessageBox::Discard | QMessageBox::Save,
-							SIGEL_CommonGUI::dialogParent());
-			box.button(QMessageBox::Ignore)->setText("Disable");
-			box.button(QMessageBox::Discard)->setText("Remove");
+		if( guiEnabled )
+		{
+			QMessageBox box( QMessageBox::Information, "Disabling MetaGP",
+				"You are about to disable the MetaGP system. What shall\n"
+				"we do with the system?",
+				QMessageBox::Ignore | QMessageBox::Discard | QMessageBox::Save,
+				SIGEL_CommonGUI::dialogParent() );
+			box.button( QMessageBox::Ignore )->setText( "Disable" );
+			box.button( QMessageBox::Discard )->setText( "Remove" );
+
 			// Qt reads & in a label as the shortcut marker and draws an underline
 			// instead. "&&" is how Qt shows one real ampersand.
-			box.button(QMessageBox::Save)->setText("Save && Remove");
-			box.setDefaultButton(QMessageBox::Ignore);
-			box.setEscapeButton(QMessageBox::Ignore);
-			switch(box.exec())
+			box.button( QMessageBox::Save )->setText( "Save && Remove" );
+			box.setDefaultButton( QMessageBox::Ignore );
+			box.setEscapeButton( QMessageBox::Ignore );
+			switch( box.exec() )
 			{
-			case QMessageBox::Save :	// disables the system, saves it and finally delete it from memory
-					// save the gpSystem
-				saveName = QString();	// force the routine to show a filedialog
-				if(!saveSystem(proposedName))
+			case QMessageBox::Save: // disables the system, saves it and finally delete it from memory
+				// save the gpSystem
+				saveName = QString(); // force the routine to show a filedialog
+				if( !saveSystem( proposedName ) )
+				{
 					return false;
+				}
 
-			case QMessageBox::Discard :	// disables the system and remove it from memory
-						// remove it from memory
-				if(mainWindow){
-					QObject::disconnect(mainWindow->mtStartEvolutionAction, SIGNAL( triggered() ), this, SLOT( startSingleEvolution() ));
-					QObject::disconnect(mainWindow->mtStopEvolutionAction, SIGNAL( triggered() ), this, SLOT( stopEvolution() ));
-					QObject::disconnect(mainWindow->mtDefaultAction, SIGNAL( triggered() ), this, SLOT(slotLoadDefault() ) );
-					QObject::disconnect(mainWindow->mtLoadAction, SIGNAL( triggered() ), this, SLOT( slotLoadSetup() ) );
-					QObject::disconnect(mainWindow->mtSaveAction, SIGNAL( triggered() ), this, SLOT( slotSaveSetup() ));
-					QObject::disconnect(mainWindow->evolTimer, SIGNAL( timeout() ), this, SLOT( stopEvolution() ));
+			case QMessageBox::Discard: // disables the system and remove it from memory
+				// remove it from memory
+				if( mainWindow )
+				{
+					QObject::disconnect( mainWindow->mtStartEvolutionAction, SIGNAL( triggered() ), this, SLOT( startSingleEvolution() ) );
+					QObject::disconnect( mainWindow->mtStopEvolutionAction, SIGNAL( triggered() ), this, SLOT( stopEvolution() ) );
+					QObject::disconnect( mainWindow->mtDefaultAction, SIGNAL( triggered() ), this, SLOT( slotLoadDefault() ) );
+					QObject::disconnect( mainWindow->mtLoadAction, SIGNAL( triggered() ), this, SLOT( slotLoadSetup() ) );
+					QObject::disconnect( mainWindow->mtSaveAction, SIGNAL( triggered() ), this, SLOT( slotSaveSetup() ) );
+					QObject::disconnect( mainWindow->evolTimer, SIGNAL( timeout() ), this, SLOT( stopEvolution() ) );
 				}
 
 				delete gpManager;
@@ -261,16 +299,21 @@ bool MT_Controller::useMeta(bool state)
 				mainWindow = nullptr;
 				substitution = nullptr;
 				saveName = QString();
-				confStrm.setDevice(nullptr);
-				if(confFile.isOpen()) confFile.close();
-			
-			case QMessageBox::Ignore :	// disables the system and keeps it in memory
-						// switch to normal fitness calculation / tournament
+				confStrm.setDevice( nullptr );
+				if( confFile.isOpen() )
+				{
+					confFile.close();
+				}
+
+			case QMessageBox::Ignore: // disables the system and keeps it in memory
+				// switch to normal fitness calculation / tournament
 				metaOn = state;
 				usedSystem = NOMETA_SUBST;
 				break;
 			}
-		} else {
+		}
+		else
+		{
 			// disables the system and keeps it in memory
 			// switch to normal fitness calculation / tournament
 			metaOn = state;
@@ -292,30 +335,39 @@ bool MT_Controller::useMeta(bool state)
 bool MT_Controller::createGPSystem()
 {
 	// make sure we loaded a configuration
-	if(!confStrm.device()){
-		readFromFile(QString());	// load an experiment without a filename
-										// this should result in loading the 
+	if( !confStrm.device() )
+	{
+		readFromFile( QString() ); // load an experiment without a filename
+										// this should result in loading the
 										// default configuration file
 	}
 
-	if(!confFile.isOpen()){
-		confFile.open(QIODevice::ReadOnly);
+	if( !confFile.isOpen() )
+	{
+		confFile.open( QIODevice::ReadOnly );
 	}
 
 	// fill the estimation state
-	if(estimationState.inUse == false)
-		loadEstimationState(confStrm);
+	if( estimationState.inUse == false )
+	{
+		loadEstimationState( confStrm );
+	}
 
 	// make sure we have a gp-manager
-	if(!gpManager){
-		if(!(gpManager = new MT_GPManager(confStrm))){
+	if( !gpManager )
+	{
+		if( !( gpManager = new MT_GPManager( confStrm ) ) )
+		{
 			SIGEL_Tools::SIG_IO::cerr << "Creating Meta GP-System: couldn't create GP-Manager." << Qt::endl;
 			return false;
-		} else {
+		}
+		else
+		{
 			MT_ErrorCode error = gpManager->getLastError();
-			if( ( error != MT_ErrorCode::None ) && guiEnabled ){
+			if( ( error != MT_ErrorCode::None ) && guiEnabled )
+			{
 				SIGEL_Tools::SIG_IO::cerr << "Creating GP-System: error in creating Meta-GP-System. Error no: "
-						<< static_cast< int >( error ) << Qt::endl;
+					<< static_cast< int >( error ) << Qt::endl;
 			}
 		}
 	}
@@ -328,42 +380,47 @@ bool MT_Controller::createGPSystem()
  * popup the configuration window
  * called by sigel mainwindow, which passes itself as the window's owner
  ***/
-void MT_Controller::configureSystem(QWidget *owner)
+void MT_Controller::configureSystem( QWidget *owner )
 {
-	// if there is an up to date substituter, fill the estimation state with 
+	// if there is an up to date substituter, fill the estimation state with
 	// the data from this substituter
-	if(substitution){
-		QBuffer buffer;					// create a buffered stream
-		QTextStream inStrm(&buffer);
+	if( substitution )
+	{
+		QBuffer buffer;     // create a buffered stream
+		QTextStream inStrm( &buffer );
 
-		buffer.open(QIODevice::WriteOnly);		// save the substituter to the stream
-		substitution->writeToFile(inStrm);
+		buffer.open( QIODevice::WriteOnly );  // save the substituter to the stream
+		substitution->writeToFile( inStrm );
 		buffer.close();
 
-		buffer.open(QIODevice::ReadOnly);		// load the estimation state from the stream
-		loadEstimationState(inStrm);
+		buffer.open( QIODevice::ReadOnly );  // load the estimation state from the stream
+		loadEstimationState( inStrm );
 		buffer.close();
 	}
 
-	if(!gpManager || !estimationState.inUse){
-		if(!createGPSystem()){
+	if( !gpManager || !estimationState.inUse )
+	{
+		if( !createGPSystem() )
+		{
 			SIGEL_Tools::SIG_IO::cerr << "Configure meta system: couldn't create the GP system." << Qt::endl;
 			return;
 		}
 	}
-	if(!mainWindow){
-		if(!(mainWindow = new MT_MainWindow(this, gpManager, &estimationState, owner, "MTMainWindow"))){
+	if( !mainWindow )
+	{
+		if( !( mainWindow = new MT_MainWindow( this, gpManager, &estimationState, owner, "MTMainWindow" ) ) )
+		{
 			SIGEL_Tools::SIG_IO::cerr << "Configure meta system: couldn't open the configuration window." << Qt::endl;
 			return;
 		}
 	}
 
-	QObject::connect(mainWindow->mtStartEvolutionAction, SIGNAL( triggered() ), this, SLOT( startSingleEvolution() ));
-	QObject::connect(mainWindow->mtStopEvolutionAction, SIGNAL( triggered() ), this, SLOT( stopEvolution() ));
-	QObject::connect(mainWindow->mtDefaultAction, SIGNAL( triggered() ), this, SLOT(slotLoadDefault() ) );
-	QObject::connect(mainWindow->mtLoadAction, SIGNAL( triggered() ), this, SLOT( slotLoadSetup() ) );
-	QObject::connect(mainWindow->mtSaveAction, SIGNAL( triggered() ), this, SLOT( slotSaveSetup() ));
-	QObject::connect(mainWindow->evolTimer, SIGNAL( timeout() ), this, SLOT( stopEvolution() ));
+	QObject::connect( mainWindow->mtStartEvolutionAction, SIGNAL( triggered() ), this, SLOT( startSingleEvolution() ) );
+	QObject::connect( mainWindow->mtStopEvolutionAction, SIGNAL( triggered() ), this, SLOT( stopEvolution() ) );
+	QObject::connect( mainWindow->mtDefaultAction, SIGNAL( triggered() ), this, SLOT( slotLoadDefault() ) );
+	QObject::connect( mainWindow->mtLoadAction, SIGNAL( triggered() ), this, SLOT( slotLoadSetup() ) );
+	QObject::connect( mainWindow->mtSaveAction, SIGNAL( triggered() ), this, SLOT( slotSaveSetup() ) );
+	QObject::connect( mainWindow->evolTimer, SIGNAL( timeout() ), this, SLOT( stopEvolution() ) );
 
 	mainWindow->show();
 	delete substitution;
@@ -375,63 +432,81 @@ void MT_Controller::configureSystem(QWidget *owner)
  * called from SIG_GPMetaGPExperiment::loadExperiment(QTextStream & file)
  * if the loaded experiment uses meta
  ***/
-bool MT_Controller::readFromFile(QString fileName)
+bool MT_Controller::readFromFile( QString fileName )
 {
-	if(confFile.isOpen()){
+	if( confFile.isOpen() )
+	{
 		confFile.close();
 	}
-	if(confStrm.device()){
-		confStrm.setDevice(nullptr);
+	if( confStrm.device() )
+	{
+		confStrm.setDevice( nullptr );
 	}
 
 	bool stdConf = false;
-	if(fileName.isNull()){
+	if( fileName.isNull() )
+	{
 		stdConf = true;
-		defConfFileName = ::getenv("SIGEL_ROOT");
-		defConfFileName.append("/stdConf.mt");
-		confFile.setFileName(defConfFileName);
-	} else {
-		confFile.setFileName(fileName);
+		defConfFileName = ::getenv( "SIGEL_ROOT" );
+		defConfFileName.append( "/stdConf.mt" );
+		confFile.setFileName( defConfFileName );
+	}
+	else
+	{
+		confFile.setFileName( fileName );
 	}
 
-	if(confFile.open(QIODevice::ReadOnly)){
-		if(!stdConf)
-			saveName = fileName;		// remember where to save the system
+	if( confFile.open( QIODevice::ReadOnly ) )
+	{
+		if( !stdConf )
+		{
+			saveName = fileName;  // remember where to save the system
+		}
 		else
+		{
 			saveName = QString();
-	} else {
-		if(guiEnabled){
-			QMessageBox box(QMessageBox::Critical, "Loading Experiment",
-							"An error occurred while loading the meta experiment.\n"
-							"Press <standard> to load the default setup or\n"
-							"press <deactivate> to disable the MetaGP system.",
-							QMessageBox::RestoreDefaults | QMessageBox::Abort,
-							SIGEL_CommonGUI::dialogParent());
-			box.button(QMessageBox::RestoreDefaults)->setText("Standard");
-			box.button(QMessageBox::Abort)->setText("Deactivate");
-			box.setDefaultButton(QMessageBox::RestoreDefaults);
-			box.setEscapeButton(QMessageBox::Abort);
-			switch(box.exec())
+		}
+	}
+	else
+	{
+		if( guiEnabled )
+		{
+			QMessageBox box( QMessageBox::Critical, "Loading Experiment",
+				"An error occurred while loading the meta experiment.\n"
+				"Press <standard> to load the default setup or\n"
+				"press <deactivate> to disable the MetaGP system.",
+				QMessageBox::RestoreDefaults | QMessageBox::Abort,
+				SIGEL_CommonGUI::dialogParent() );
+			box.button( QMessageBox::RestoreDefaults )->setText( "Standard" );
+			box.button( QMessageBox::Abort )->setText( "Deactivate" );
+			box.setDefaultButton( QMessageBox::RestoreDefaults );
+			box.setEscapeButton( QMessageBox::Abort );
+			switch( box.exec() )
 			{
-			case QMessageBox::RestoreDefaults :	// load default settings
+			case QMessageBox::RestoreDefaults: // load default settings
 				saveName = QString();
-				confFile.setFileName(defConfFileName);
-				if(!confFile.open(QIODevice::ReadOnly)){
+				confFile.setFileName( defConfFileName );
+				if( !confFile.open( QIODevice::ReadOnly ) )
+				{
 					// oops, couldn't open default configuration file
 					SIGEL_Tools::SIG_IO::cerr << "Loading experiment: couldn't load default settings. "
 						"The meta system will be disabled." << Qt::endl;
-				} else {
+				}
+				else
+				{
 					break;
 				}
-			case QMessageBox::Abort :	// disable meta system
+			case QMessageBox::Abort: // disable meta system
 				saveName = QString();
-				useMeta(false);
+				useMeta( false );
 				return false;
 				break;
 			}
-		} else {
+		}
+		else
+		{
 			pvm_halt();
-			exit(1);
+			exit( 1 );
 		}
 	}
 
@@ -439,50 +514,61 @@ bool MT_Controller::readFromFile(QString fileName)
 	// the data determined for the controller
 	bool error = false;
 
-	int idx = saveName.lastIndexOf(".mexp");
- 	if(idx == -1){
+	int idx = saveName.lastIndexOf( ".mexp" );
+	if( idx == -1 )
+	{
 		baseName = saveName;
-	} else {
-		baseName = saveName.left(idx);
-		baseName.append(".mexp");
+	}
+	else
+	{
+		baseName = saveName.left( idx );
+		baseName.append( ".mexp" );
 	}
 
-	confStrm.setDevice(&confFile);
+	confStrm.setDevice( &confFile );
 	QString tmpStr = confStrm.readLine();
-	if(stdConf == true){
+	if( stdConf == true )
+	{
 		usedSystem = selectedSystem;
-		useMeta(true);
-	} else if(int index = tmpStr.indexOf("usedSystem=") != -1 ){
-		switch(tmpStr.mid(index+10).toInt()){
-		case EVALUATOR_SUBST :
+		useMeta( true );
+	}
+	else if( int index = tmpStr.indexOf( "usedSystem=" ) != -1 )
+	{
+		switch( tmpStr.mid( index + 10 ).toInt() )
+		{
+		case EVALUATOR_SUBST:
 			usedSystem = EVALUATOR_SUBST;
 			selectedSystem = usedSystem;
-			useMeta(true);
+			useMeta( true );
 			break;
 
-		case CLASSIFIER_SUBST :
+		case CLASSIFIER_SUBST:
 			usedSystem = CLASSIFIER_SUBST;
 			selectedSystem = usedSystem;
-			useMeta(true);
+			useMeta( true );
 			break;
 
-		case NOMETA_SUBST :
+		case NOMETA_SUBST:
 		default:
 			error = true;
 		}
-		loadEstimationState(confStrm);
-	} else {
+		loadEstimationState( confStrm );
+	}
+	else
+	{
 		// we are in trouble; loaded file has incorrect syntax
 		// this should never happen;
-
 		error = true;
 	}
 
-	if(error){
-		if(guiEnabled)
+	if( error )
+	{
+		if( guiEnabled )
+		{
 			SIGEL_Tools::SIG_IO::cerr << "Loading experiment: error in loading experiment. "
-						"The meta experiment file is corrupted. Disabling the meta system." << Qt::endl;
-		useMeta(false);
+				"The meta experiment file is corrupted. Disabling the meta system." << Qt::endl;
+		}
+		useMeta( false );
 		return false;
 	}
 
@@ -493,29 +579,43 @@ bool MT_Controller::readFromFile(QString fileName)
  * save the meta system if sigel saves the experiment
  * called from SIG_GPMetaGPExperiment::saveExperiment(QTextStream & file)
  ***/
-void MT_Controller::writeToFile(QTextStream &file, QString name, int autoSave)
+void MT_Controller::writeToFile( QTextStream &file, QString name, int autoSave )
 {
-	if(metaOn){
+	if( metaOn )
+	{
 		// wait for the evolution to end before saving the system
 		// to prevent problems with the concurrent threads
-		if(gpManager)
-			pthread_mutex_lock(&gpManager->evolutionMutex);
-			
-		// save the meta system
-		if(autoSave){
-			if(!baseName.isEmpty())
-				saveName = baseName + QString("%1").arg(autoSaveCnt = autoSaveCnt++ % 3);
-			if(!saveSystem( name ))
-				return;		// oops, something went wrong
-		} else {
-			if(!saveSystem(name))
-				return;		// oops, something went wrong
+		if( gpManager )
+		{
+			pthread_mutex_lock( &gpManager->evolutionMutex );
 		}
 
-		if(gpManager)
-			pthread_mutex_unlock(&gpManager->evolutionMutex);
+		// save the meta system
+		if( autoSave )
+		{
+			if( !baseName.isEmpty() )
+			{
+				saveName = baseName + QString( "%1" ).arg( autoSaveCnt = autoSaveCnt++ % 3 );
+			}
+			if( !saveSystem( name ) )
+			{
+				return;  // oops, something went wrong
+			}
+		}
+		else
+		{
+			if( !saveSystem( name ) )
+			{
+				return;  // oops, something went wrong
+			}
+		}
 
-		file << "MetaInUse\n";					// write the file name for the meta experiment
+		if( gpManager )
+		{
+			pthread_mutex_unlock( &gpManager->evolutionMutex );
+		}
+
+		file << "MetaInUse\n";     // write the file name for the meta experiment
 		file << "fileName=" << saveName << "\n";// into the sigel experiment file
 		file << "#####\n";
 	}
@@ -525,77 +625,104 @@ void MT_Controller::writeToFile(QTextStream &file, QString name, int autoSave)
  * saves just the meta gp-system
  * leaves the used filename in saveName
  ***/
-bool MT_Controller::saveSystem(QString sigExpName)
+bool MT_Controller::saveSystem( QString sigExpName )
 {
 	// before we do anything lets close the configuration file we are reading from
-	if(confFile.isOpen()){
+	if( confFile.isOpen() )
+	{
 		confFile.close();
 	}
 
-	bool stdConf = false;	// default configuration used ?
-	QString proposedName("mt_");
-	proposedName.append(sigExp.experimentName);		// proposed filename based on the name
+	bool stdConf = false; // default configuration used ?
+	QString proposedName( "mt_" );
+	proposedName.append( sigExp.experimentName );  // proposed filename based on the name
 													// of the corresponding sigel experiment
 	// ask the user for a filename if no name is given so far
-	if(saveName.isEmpty()){
+	if( saveName.isEmpty() )
+	{
 		stdConf = true;
-		if(guiEnabled)
-			saveName = QFileDialog::getSaveFileName(SIGEL_CommonGUI::dialogParent(), QString(), proposedName, "*.mexp;;*");
+		if( guiEnabled )
+		{
+			saveName = QFileDialog::getSaveFileName( SIGEL_CommonGUI::dialogParent(), QString(), proposedName, "*.mexp;;*" );
+		}
 		else
+		{
 			saveName = "lastExperiment.mexp";
+		}
 
-		if(saveName.isEmpty())	// the user doesn't want to save the system anymore ? Bye!
+		if( saveName.isEmpty() ) // the user doesn't want to save the system anymore ? Bye!
+		{
 			return false;
-		if(saveName.right(5) != ".mexp")
-			saveName.append(".mexp");
+		}
+		if( saveName.right( 5 ) != ".mexp" )
+		{
+			saveName.append( ".mexp" );
+		}
 
 		baseName = saveName;
 	}
 
 	// open the file, create a filestream and save the system
-	if(!gpManager && !stdConf)		// there's no gpManager therefore there was no change
-		return true;				// --> no need to save anything
+	if( !gpManager && !stdConf )  // there's no gpManager therefore there was no change
+	{
+		return true;    // --> no need to save anything
+	}
 
-	QFile file(saveName);
-	if(file.open(QIODevice::WriteOnly)){
-		QTextStream fileStr(&file);
+	QFile file( saveName );
+	if( file.open( QIODevice::WriteOnly ) )
+	{
+		QTextStream fileStr( &file );
 
-		fileStr << "usedSystem=" << usedSystem << "\n";		// remember the used type of system
+		fileStr << "usedSystem=" << usedSystem << "\n";  // remember the used type of system
 
 		// save the substituter / the substituter settings
-		if(substitution){
-			substitution->writeToFile(fileStr);
-		} else if(estimationState.inUse){
-			saveEstimationState(fileStr);
+		if( substitution )
+		{
+			substitution->writeToFile( fileStr );
+		}
+		else if( estimationState.inUse )
+		{
+			saveEstimationState( fileStr );
 		}
 
 		// save the gp system
-		if(gpManager){
-			gpManager->writeToFileGPSystem(fileStr);			// save the rest
+		if( gpManager )
+		{
+			gpManager->writeToFileGPSystem( fileStr );   // save the rest
 		}
 		else
-		{	
-			if(stdConf){
+		{
+			if( stdConf )
+			{
 				// system uses the default configuration
 				// therefore copy the default configuration file
-				QFile stdFile(defConfFileName);
+				QFile stdFile( defConfFileName );
+
 				// Text, or a CRLF config file is copied verbatim into the saved .mexp.
-				if(stdFile.open(QIODevice::ReadOnly | QIODevice::Text)){
-					QTextStream stdStr(&stdFile);
+				if( stdFile.open( QIODevice::ReadOnly | QIODevice::Text ) )
+				{
+					QTextStream stdStr( &stdFile );
 					fileStr << stdStr.readAll();
 					stdFile.close();
-				} else
+				}
+				else
+				{
 					return false;
-			} // in the other case there was no change in the system 
+				}
+			} // in the other case there was no change in the system
 			  // therefore there's no need to save it
 		}
 
-		file.close();		// finished - close everything
-		file.open(QIODevice::ReadOnly);
-	} else {
+		file.close();  // finished - close everything
+		file.open( QIODevice::ReadOnly );
+	}
+	else
+	{
 		// oops, something went wrong
-		if(guiEnabled)
+		if( guiEnabled )
+		{
 			SIGEL_Tools::SIG_IO::cerr << "Saving experiment: couldn't save the experiment." << Qt::endl;
+		}
 		return false;
 	}
 
@@ -612,102 +739,126 @@ bool MT_Controller::IsEnabled()
 	return metaOn;
 }
 
-MT_Substitute* MT_Controller::getFitnessTrainer()
+MT_Substitute *MT_Controller::getFitnessTrainer()
 {
-	if(UsedSystem() == EVALUATOR_SUBST){
+	if( UsedSystem() == EVALUATOR_SUBST )
+	{
 		createGPSystem();
-		if(!substitution){
+		if( !substitution )
+		{
 			writeEstimationSettings();
-			substitution = new MT_Evaluator(sigExp, estimationSettingsStream);
+			substitution = new MT_Evaluator( sigExp, estimationSettingsStream );
 		}
 		return substitution;
 	}
 	else
+	{
 		return nullptr;
+	}
 }
 
-MT_Substitute* MT_Controller::getClassifier()
+MT_Substitute *MT_Controller::getClassifier()
 {
-	if(UsedSystem() == CLASSIFIER_SUBST){
+	if( UsedSystem() == CLASSIFIER_SUBST )
+	{
 		createGPSystem();
-		if(!substitution){
+		if( !substitution )
+		{
 			writeEstimationSettings();
-			substitution = new MT_Classifier(estimationSettingsStream);
+			substitution = new MT_Classifier( estimationSettingsStream );
 		}
 		return substitution;
 	}
 	else
+	{
 		return nullptr;
+	}
 }
 
 /***
  * all the functions for the estimation state
  **/
-void MT_Controller::loadEstimationState(QTextStream &File)
+void MT_Controller::loadEstimationState( QTextStream &File )
 {
 	QString Classifier( "Classifier:" );
 	QString Evaluator( "Evaluator:" );
 
 	QString PresentLine = File.readLine();
 
-	while((PresentLine != Classifier) && (PresentLine != Evaluator) && !(File.atEnd()))
+	while( ( PresentLine != Classifier ) && ( PresentLine != Evaluator ) && !( File.atEnd() ) )
+	{
 		PresentLine = File.readLine();
+	}
 
 	int savedSystem = 0;
-	if(PresentLine == Classifier){
+	if( PresentLine == Classifier )
+	{
 		savedSystem = CLASSIFIER_SUBST;
-	} else if(PresentLine == Evaluator){
+	}
+	else if( PresentLine == Evaluator )
+	{
 		savedSystem = EVALUATOR_SUBST;
 	}
 
 	estimationState.simulationCounts = nullptr;
 	estimationState.estimationCounts = nullptr;
-	if(usedSystem == savedSystem){
-		estimationState.strategy = (File.readLine()).toInt();
-		estimationState.tolerance = (File.readLine()).toDouble();
-		estimationState.refreshInterval = (File.readLine()).toInt();
-		estimationState.generationCount = (File.readLine()).toUInt();
-		if(estimationState.generationCount != 0){
-			correctEst.resize(estimationState.generationCount);
-			metaEst.resize(estimationState.generationCount);
-						
-			for(int i=0; i< estimationState.generationCount; i++)
+	if( usedSystem == savedSystem )
+	{
+		estimationState.strategy = ( File.readLine() ).toInt();
+		estimationState.tolerance = ( File.readLine() ).toDouble();
+		estimationState.refreshInterval = ( File.readLine() ).toInt();
+		estimationState.generationCount = ( File.readLine() ).toUInt();
+		if( estimationState.generationCount != 0 )
+		{
+			correctEst.resize( estimationState.generationCount );
+			metaEst.resize( estimationState.generationCount );
+
+			for( int i = 0; i < estimationState.generationCount; i++ )
 			{
-				correctEst[i] = (File.readLine()).toUInt();
-				metaEst[i] = (File.readLine()).toUInt();
+				correctEst[i] = ( File.readLine() ).toUInt();
+				metaEst[i] = ( File.readLine() ).toUInt();
 			}
 			estimationState.simulationCounts = &correctEst;
 			estimationState.estimationCounts = &metaEst;
 		}
-	} else {		// default setup
-		QFile defFile(defConfFileName);
-		QTextStream defStrm(&defFile);
-		defFile.open(QIODevice::ReadOnly);
+	}
+	else // default setup
+	{
+		QFile defFile( defConfFileName );
+		QTextStream defStrm( &defFile );
+		defFile.open( QIODevice::ReadOnly );
 
-		switch(usedSystem){
-		case CLASSIFIER_SUBST :
+		switch( usedSystem )
+		{
+		case CLASSIFIER_SUBST:
 
 			// load a classifier
-			while ((PresentLine != Classifier) && !(defStrm.atEnd()))
+			while( ( PresentLine != Classifier ) && !( defStrm.atEnd() ) )
+			{
 				PresentLine = defStrm.readLine();
-			if ((PresentLine == Classifier) && !(defStrm.atEnd())){
-				estimationState.strategy = (defStrm.readLine()).toInt();
-				estimationState.tolerance = (defStrm.readLine()).toDouble();
-				estimationState.refreshInterval = (defStrm.readLine()).toInt();
-				estimationState.generationCount = (defStrm.readLine()).toUInt();
+			}
+			if( ( PresentLine == Classifier ) && !( defStrm.atEnd() ) )
+			{
+				estimationState.strategy = ( defStrm.readLine() ).toInt();
+				estimationState.tolerance = ( defStrm.readLine() ).toDouble();
+				estimationState.refreshInterval = ( defStrm.readLine() ).toInt();
+				estimationState.generationCount = ( defStrm.readLine() ).toUInt();
 			}
 			break;
 
-		case EVALUATOR_SUBST :
-	
+		case EVALUATOR_SUBST:
+
 			// load an evaluator
-			while ((PresentLine != Evaluator) && !(defStrm.atEnd()))
+			while( ( PresentLine != Evaluator ) && !( defStrm.atEnd() ) )
+			{
 				PresentLine = defStrm.readLine();
-			if ((PresentLine == Evaluator) && !(defStrm.atEnd())){
-				estimationState.strategy = (defStrm.readLine()).toInt();
-				estimationState.tolerance = (defStrm.readLine()).toDouble();
-				estimationState.refreshInterval = (defStrm.readLine()).toInt();
-				estimationState.generationCount = (defStrm.readLine()).toUInt();
+			}
+			if( ( PresentLine == Evaluator ) && !( defStrm.atEnd() ) )
+			{
+				estimationState.strategy = ( defStrm.readLine() ).toInt();
+				estimationState.tolerance = ( defStrm.readLine() ).toDouble();
+				estimationState.refreshInterval = ( defStrm.readLine() ).toInt();
+				estimationState.generationCount = ( defStrm.readLine() ).toUInt();
 			}
 			break;
 		}
@@ -715,23 +866,26 @@ void MT_Controller::loadEstimationState(QTextStream &File)
 	estimationState.inUse = true;
 }
 
-void MT_Controller::saveEstimationState(QTextStream &File)
+void MT_Controller::saveEstimationState( QTextStream &File )
 {
-	switch(usedSystem){
-	case CLASSIFIER_SUBST :
-		File << ("Classifier:\n");
+	switch( usedSystem )
+	{
+	case CLASSIFIER_SUBST:
+		File << ( "Classifier:\n" );
 		break;
 
-	case EVALUATOR_SUBST :
-		File << ("Evaluator:\n");
+	case EVALUATOR_SUBST:
+		File << ( "Evaluator:\n" );
 		break;
 	}
-	File << estimationState.strategy <<Qt::endl;
-	File << estimationState.tolerance <<Qt::endl;
-	File << estimationState.refreshInterval <<Qt::endl;
-	File << estimationState.generationCount <<Qt::endl;
-	if(estimationState.generationCount != 0){
-		for(int i=0; i< estimationState.generationCount; i++){
+	File << estimationState.strategy << Qt::endl;
+	File << estimationState.tolerance << Qt::endl;
+	File << estimationState.refreshInterval << Qt::endl;
+	File << estimationState.generationCount << Qt::endl;
+	if( estimationState.generationCount != 0 )
+	{
+		for( int i = 0; i < estimationState.generationCount; i++ )
+		{
 			File << correctEst[i] << "\n";
 			File << metaEst[i] << "\n";
 		}
@@ -740,22 +894,27 @@ void MT_Controller::saveEstimationState(QTextStream &File)
 
 void MT_Controller::writeEstimationSettings()
 {
-	if(usedSystem == EVALUATOR_SUBST){
+	if( usedSystem == EVALUATOR_SUBST )
+	{
 		estimationSettingsText = "Evaluator:\n";
-	} else {
+	}
+	else
+	{
 		estimationSettingsText = "Classifier:\n";
 	}
-	estimationSettingsText.append(QString("%1\n").arg(estimationState.strategy));
-	estimationSettingsText.append(QString("%1\n").arg(estimationState.tolerance));
-	estimationSettingsText.append(QString("%1\n").arg(estimationState.refreshInterval));
-	estimationSettingsText.append(QString("%1\n").arg(estimationState.generationCount));
-	if(estimationState.generationCount != 0){
-		for(int i=0; i<estimationState.generationCount; i++){
-			estimationSettingsText.append(QString("%1\n%2\n").arg(correctEst[i]).arg(metaEst[i]));
+	estimationSettingsText.append( QString( "%1\n" ).arg( estimationState.strategy ) );
+	estimationSettingsText.append( QString( "%1\n" ).arg( estimationState.tolerance ) );
+	estimationSettingsText.append( QString( "%1\n" ).arg( estimationState.refreshInterval ) );
+	estimationSettingsText.append( QString( "%1\n" ).arg( estimationState.generationCount ) );
+	if( estimationState.generationCount != 0 )
+	{
+		for( int i = 0; i < estimationState.generationCount; i++ )
+		{
+			estimationSettingsText.append( QString( "%1\n%2\n" ).arg( correctEst[i] ).arg( metaEst[i] ) );
 		}
 	}
-	
-	estimationSettingsStream.setString(&estimationSettingsText, QIODevice::ReadOnly);
+
+	estimationSettingsStream.setString( &estimationSettingsText, QIODevice::ReadOnly );
 }
 
 /***
@@ -763,118 +922,139 @@ void MT_Controller::writeEstimationSettings()
  ***/
 void MT_Controller::slotLoadDefault()
 {
-	QFile file(defConfFileName);
-	if(file.open(QIODevice::ReadOnly)){
-		QTextStream strm(&file);
+	QFile file( defConfFileName );
+	if( file.open( QIODevice::ReadOnly ) )
+	{
+		QTextStream strm( &file );
 		delete substitution;
 		substitution = nullptr;
 
 		// get to know what kind of system to use
 		QString tmpStr = strm.readLine();
-		if(int index = tmpStr.indexOf("usedSystem=") != -1 ){
-			switch(tmpStr.mid(index+10).toInt()){
-			case EVALUATOR_SUBST :
+		if( int index = tmpStr.indexOf( "usedSystem=" ) != -1 )
+		{
+			switch( tmpStr.mid( index + 10 ).toInt() )
+			{
+			case EVALUATOR_SUBST:
 				usedSystem = EVALUATOR_SUBST;
-				useMeta(true);
+				useMeta( true );
 				break;
 
-			case CLASSIFIER_SUBST :
+			case CLASSIFIER_SUBST:
 				usedSystem = CLASSIFIER_SUBST;
-				useMeta(true);
+				useMeta( true );
 				break;
 
-			case NOMETA_SUBST :
+			case NOMETA_SUBST:
 			default:
 				break;
 			}
 		}
 
 		// load substituter and gp system setup
-		loadEstimationState(strm);
-		gpManager->loadSetup(strm);
+		loadEstimationState( strm );
+		gpManager->loadSetup( strm );
 
-		mainWindow->enforceUpdate(true);
+		mainWindow->enforceUpdate( true );
 		file.close();
-	} else {		// read error
+	}
+	else // read error
+	{
 		SIGEL_Tools::SIG_IO::cerr << "Load setup: couldn't load default setup. Aborting operation." << Qt::endl;
 	}
 }
 
 void MT_Controller::slotLoadSetup()
 {
-	QString fileName = QFileDialog::getOpenFileName(mainWindow, QString(), QString(), "Setup (*.mcnf);;All Files (*)");
-	
-	if(fileName.isEmpty())
-		return;
+	QString fileName = QFileDialog::getOpenFileName( mainWindow, QString(), QString(), "Setup (*.mcnf);;All Files (*)" );
 
-	QFile file(fileName);
-	if(file.open(QIODevice::ReadOnly)){
-		QTextStream strm(&file);
+	if( fileName.isEmpty() )
+	{
+		return;
+	}
+
+	QFile file( fileName );
+	if( file.open( QIODevice::ReadOnly ) )
+	{
+		QTextStream strm( &file );
 		delete substitution;
 		substitution = nullptr;
 
 		// get to know what kind of system to use
 		QString tmpStr = strm.readLine();
-		if(int index = tmpStr.indexOf("usedSystem=") != -1 ){
-			switch(tmpStr.mid(index+10).toInt()){
-			case EVALUATOR_SUBST :
+		if( int index = tmpStr.indexOf( "usedSystem=" ) != -1 )
+		{
+			switch( tmpStr.mid( index + 10 ).toInt() )
+			{
+			case EVALUATOR_SUBST:
 				usedSystem = EVALUATOR_SUBST;
-				useMeta(true);
+				useMeta( true );
 				break;
 
-			case CLASSIFIER_SUBST :
+			case CLASSIFIER_SUBST:
 				usedSystem = CLASSIFIER_SUBST;
-				useMeta(true);
+				useMeta( true );
 				break;
 
-			case NOMETA_SUBST :
+			case NOMETA_SUBST:
 			default:
 				break;
 			}
 		}
 
 		// load substituter and gp system setup
-		loadEstimationState(strm);
-		gpManager->loadSetup(strm);
+		loadEstimationState( strm );
+		gpManager->loadSetup( strm );
 
-		mainWindow->enforceUpdate(true);
+		mainWindow->enforceUpdate( true );
 		file.close();
-	} else {		// read error
+	}
+	else // read error
+	{
 		SIGEL_Tools::SIG_IO::cerr << "Load setup: couldn't open specified file. Aborting operation." << Qt::endl;
 	}
 }
 
 void MT_Controller::slotSaveSetup()
 {
-	QString fileName = QFileDialog::getSaveFileName(mainWindow, QString(), QString(), "Setup (*.mcnf);;All Files (*)");
+	QString fileName = QFileDialog::getSaveFileName( mainWindow, QString(), QString(), "Setup (*.mcnf);;All Files (*)" );
 
-	if(fileName.isEmpty())
+	if( fileName.isEmpty() )
+	{
 		return;
+	}
 
-	if(fileName.right(5) != ".mcnf")
-		fileName.append(".mcnf");
+	if( fileName.right( 5 ) != ".mcnf" )
+	{
+		fileName.append( ".mcnf" );
+	}
 
-	QFile file(fileName);
-	if(file.open(QIODevice::WriteOnly)){
-		QTextStream strm(&file);
+	QFile file( fileName );
+	if( file.open( QIODevice::WriteOnly ) )
+	{
+		QTextStream strm( &file );
 
-		strm << "usedSystem=" << usedSystem << "\n";		// remember the used type of system
+		strm << "usedSystem=" << usedSystem << "\n";  // remember the used type of system
 
-		mainWindow->enforceUpdate(false);		// enforce an update of the gp-system
+		mainWindow->enforceUpdate( false );  // enforce an update of the gp-system
 
 		// save the substituter / the substituter settings
-		if(estimationState.inUse){
-			saveEstimationState(strm);
+		if( estimationState.inUse )
+		{
+			saveEstimationState( strm );
 		}
 
 		// save the gp system
-		if(gpManager){
-			gpManager->writeToFileSetup(strm);			// save the rest
+		if( gpManager )
+		{
+			gpManager->writeToFileSetup( strm );   // save the rest
 		}
 		file.close();
 
-		mainWindow->enforceUpdate(true);		// enforce an update of the GUI
-	} else {
+		mainWindow->enforceUpdate( true );  // enforce an update of the GUI
+	}
+	else
+	{
 		SIGEL_Tools::SIG_IO::cerr << "Load setup: couldn't open specified file. Aborting operation." << Qt::endl;
 	}
 }

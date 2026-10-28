@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: FORMATTING ROUND ON `MT_Controller.cpp`.**
+
+- **Changed:** Allman braces instead of K&R, braces on every branch and loop,
+  tabs, `( x )` spacing, spaces around operators and the empty-line rules;
+  a comment that followed a K&R `{` now ends its `if` or `else` line. The
+  code tokens are unchanged apart from the added braces.
+
 **2026-10-28 — DONE: `MT_GPManager` KEEPS ITS ERROR CODE IN `MT_ErrorCode`; THE METAGP ERROR CODES ARE ALL NAMED.**
 
 - **Changed:** 1, 3, 7, 11, 12, 13, 77, 200 and 300 have names, and the
