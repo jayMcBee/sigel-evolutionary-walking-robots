@@ -408,9 +408,9 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 	FitnessTrainer->getSelectionValue(&FitFunction, &trainingDuration, &trainingSetSize);
 	
 	if (FitFunction < 3)
-		Selector->setTypOfIndividual(0); // Evaluator Meta System;
+		Selector->setTypeOfIndividual(0); // Evaluator Meta System;
 	else 
-		Selector->setTypOfIndividual(1); // Classifier Meta System;
+		Selector->setTypeOfIndividual(1); // Classifier Meta System;
 
 	bool TSetOK = false;
 

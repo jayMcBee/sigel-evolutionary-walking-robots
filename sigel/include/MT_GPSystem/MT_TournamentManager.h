@@ -34,10 +34,10 @@ public:
 	*/
 	void setTournamentSize(int SizeOfT);
 
-	/* Typ 1 = means there are Classifier Meta Individuals;
-	*  Typ 0 = means there are Evaluator Meta Individuals;
-	*  the typ is needed for fitnessproportiona Selection  */
-	void setTypOfIndividual (int Typ);
+	/* Type 1 = means there are Classifier Meta Individuals;
+	*  Type 0 = means there are Evaluator Meta Individuals;
+	*  the type is needed for fitnessproportiona Selection  */
+	void setTypeOfIndividual (int Type);
 
 	void writeToFileSetup(QTextStream & File);
 	

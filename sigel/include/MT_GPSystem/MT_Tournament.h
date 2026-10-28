@@ -25,7 +25,7 @@ public:
 	*/
 	void ranking( QList<int> *WinnerLoser );
 
-	void setTypOfIndividual( int Typ );
+	void setTypeOfIndividual( int Type );
 
 	/* create a empty tournament of Size "Size" and a "Winner Array" */
 	MT_Tournament( int Size, int num );
@@ -37,7 +37,7 @@ private:
 	*/
 	int NumberOfWinner;
 
-	int TypOfIndividual;
+	int TypeOfIndividual;
 
 	/*  denote which players have gain the present tournaments and which are the loser*/
 	QList<int> *WinnerLoser;

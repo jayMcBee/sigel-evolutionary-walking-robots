@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `TypOfIndividual` IS RENAMED `TypeOfIndividual`.**
+
+- **Changed:** the German "Typ" is translated in the `MT_Tournament` member,
+  the `setTypeOfIndividual` setters of `MT_Tournament` and
+  `MT_TournamentManager` (parameter `Type`), the setter's comment and the two
+  calls in `MT_GPManager`. A rename only.
+
 **2026-10-28 — DONE: FORMATTING ROUND ON `MT_Tournament`.**
 
 - **Changed:** tabs, `( x )` spacing, spaces around operators, `Type *name`

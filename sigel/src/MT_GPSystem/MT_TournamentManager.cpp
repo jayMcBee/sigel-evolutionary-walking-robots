@@ -107,10 +107,10 @@ void MT_TournamentManager::setTournamentSize(int SizeOfT)
 	createTournaments();
 }
 
-void MT_TournamentManager::setTypOfIndividual(int Typ)
+void MT_TournamentManager::setTypeOfIndividual(int Type)
 {
 	for(int i=0; i<TournamentNumber; i++)
-		Tournaments[i]->setTypOfIndividual(Typ);
+		Tournaments[i]->setTypeOfIndividual(Type);
 }
 
 // special method

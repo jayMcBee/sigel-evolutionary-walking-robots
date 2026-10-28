@@ -16,14 +16,14 @@ MT_Tournament::MT_Tournament( int Size, int num )
 	LastError = MT_ErrorCode::None;
 	FirstFreePos = num;
 	PopSize = Size;
-	TypOfIndividual = 0;
+	TypeOfIndividual = 0;
 }
 
 // further method
 
-void MT_Tournament::setTypOfIndividual( int Typ )
+void MT_Tournament::setTypeOfIndividual( int Type )
 {
-	TypOfIndividual = Typ;
+	TypeOfIndividual = Type;
 }
 
 void MT_Tournament::ranking( QList<int> *WinnerLoser )
@@ -104,7 +104,7 @@ void MT_Tournament::fitnessProp( MT_Randomizer *Randi, QList<int> *WinnerLoser )
 	QList<int> ProporFit;
 	ProporFit.resize( PopSize );
 
-	if( TypOfIndividual == 0 ) // Evaluator Meta System;
+	if( TypeOfIndividual == 0 ) // Evaluator Meta System;
 	{
 		for( int i = 0; i < PopSize; i++ )
 		{
