@@ -25,7 +25,7 @@
 #include <qtextstream.h>
 
 SIGEL_GP::SIG_GPMetaGPExperiment::SIG_GPMetaGPExperiment( QString exp )
-	: SIG_GPSlaveExperiment( exp )
+	: SIG_GPExperiment( exp )
 {
 	mtController = std::make_unique< MT_Controller >( *this );
 }
@@ -69,5 +69,5 @@ void SIGEL_GP::SIG_GPMetaGPExperiment::saveExperiment( QTextStream &file )
 		mtController->writeToFile( file, experimentName, environment.getAutosaveIntervalGenerations() );
 	}
 
-	SIG_GPSlaveExperiment::saveExperiment( file );
+	SIG_GPExperiment::saveExperiment( file );
 }

@@ -17,9 +17,9 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_GP/TST_SIG_GPSlaveExperiment.h"
+#include "SIGEL_GP/TST_SIG_GPExperiment.h"
 
-#include "SIGEL_GP/SIG_GPSlaveExperiment.h"
+#include "SIGEL_GP/SIG_GPExperiment.h"
 #include "SIGEL_GP/SIG_GPExperimentHistoryEntry.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
@@ -28,7 +28,7 @@
 namespace {
 
 	// The file text saveExperiment writes for experiment.
-	QString savedText( SIGEL_GP::SIG_GPSlaveExperiment &experiment )
+	QString savedText( SIGEL_GP::SIG_GPExperiment &experiment )
 	{
 		QString text;
 		QTextStream stream( &text );
@@ -40,9 +40,9 @@ namespace {
 }
 
 // Each block holds a value other than its default, so a block read by the wrong reader shows.
-void SIGEL_GP::TST_SIG_GPSlaveExperiment::loadExperimentReadsEachBlockThatSaveExperimentWrote()
+void SIGEL_GP::TST_SIG_GPExperiment::loadExperimentReadsEachBlockThatSaveExperimentWrote()
 {
-	SIG_GPSlaveExperiment written;
+	SIG_GPExperiment written;
 	written.simulationParameter.setStepSize( 0.02 );
 	written.environment.setVeloDamping( 0.5 );
 	written.gpParameter.setMinIndLength( 123 );
@@ -51,7 +51,7 @@ void SIGEL_GP::TST_SIG_GPSlaveExperiment::loadExperimentReadsEachBlockThatSaveEx
 	written.comment = "a comment\n";
 	QString text = savedText( written );
 	QTextStream stream( &text );
-	SIG_GPSlaveExperiment read;
+	SIG_GPExperiment read;
 	QString thrown;
 
 	try {
@@ -73,11 +73,11 @@ void SIGEL_GP::TST_SIG_GPSlaveExperiment::loadExperimentReadsEachBlockThatSaveEx
 	QCOMPARE( savedText( read ), text );
 }
 
-void SIGEL_GP::TST_SIG_GPSlaveExperiment::loadExperimentThrowsForAFileThatEndsBeforeASeparator()
+void SIGEL_GP::TST_SIG_GPExperiment::loadExperimentThrowsForAFileThatEndsBeforeASeparator()
 {
 	QString text( "no separator\n" );
 	QTextStream stream( &text );
-	SIG_GPSlaveExperiment experiment;
+	SIG_GPExperiment experiment;
 	QString thrown;
 
 	try {

@@ -24,7 +24,7 @@
 #define SIGEL_GP_SIG_GPMETAGPEXPERIMENT_H
 
 #include <memory>
-#include "SIGEL_GP/SIG_GPSlaveExperiment.h"
+#include "SIGEL_GP/SIG_GPExperiment.h"
 
 #include "MT_Control/MT_Controller.h"
 
@@ -36,9 +36,9 @@ namespace SIGEL_GP
 
 	/**
 	 * SIG_GPMetaGPExperiment is the main data structure of an evolution run: the data
-	 * of SIG_GPSlaveExperiment plus the controller of the MetaGP system.
+	 * of SIG_GPExperiment plus the controller of the MetaGP system.
 	 */
-	class SIG_GPMetaGPExperiment : public SIG_GPSlaveExperiment
+	class SIG_GPMetaGPExperiment : public SIG_GPExperiment
 	{
 	public:
 		/**
@@ -69,7 +69,7 @@ namespace SIGEL_GP
 
 		/**
 		 * The controller of the MetaGP system. It is destroyed before the members
-		 * of SIG_GPSlaveExperiment.
+		 * of SIG_GPExperiment.
 		 */
 		std::unique_ptr< MT_Controller > mtController;
 	};

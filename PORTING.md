@@ -911,6 +911,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `SIG_GPSlaveExperiment` IS RENAMED `SIG_GPExperiment`.**
+
+- **Changed:** the base class holds the plain experiment and gets the plain
+  name, with its tests `TST_SIG_GPExperiment`. sigel_slave uses it as it is;
+  `SIG_GPMetaGPExperiment` derives from it. A rename only.
+
 **2026-10-28 — DONE: `SIG_GPExperiment` IS RENAMED `SIG_GPMetaGPExperiment`.**
 
 - **Changed:** the class that adds the MetaGP controller to the experiment

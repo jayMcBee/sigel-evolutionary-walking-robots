@@ -38,7 +38,7 @@
 #include "SIGEL_Simulation/SIG_SimulationParameters.h"
 #include "SIGEL_GP/SIG_GPPVMData.h"
 #include "SIGEL_GP/SIG_GPFitnessFunction.h"
-#include "SIGEL_GP/SIG_GPSlaveExperiment.h"
+#include "SIGEL_GP/SIG_GPExperiment.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
 #include "SIGEL_GP/SIG_GPFitnessFunctionRegistry.h"
@@ -160,7 +160,7 @@ int showFirstIndividualOfExperimentFile( int argc, char *argv[], QString const &
 		return 1;
 	}
 
-	SIGEL_GP::SIG_GPSlaveExperiment experiment;
+	SIGEL_GP::SIG_GPExperiment experiment;
 
 	QTextStream experimentStream( &experimentFile );
 
