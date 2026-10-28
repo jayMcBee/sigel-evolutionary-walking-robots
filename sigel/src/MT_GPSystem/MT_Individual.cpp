@@ -2,7 +2,7 @@
 
 MT_Individual::MT_Individual()
 {
-	LastError=0;
+	LastError = MT_ErrorCode::None;
 	Name=-1;
 	Age =0;
 	Fitness =-1.0;
@@ -20,7 +20,7 @@ MT_Individual::~MT_Individual()
 
 MT_Individual::MT_Individual(int Na, MT_Randomizer *Randi)
 {
-	LastError=0;
+	LastError = MT_ErrorCode::None;
 	Name=Na;
 	Age =0;
 	Fitness =-1.0;
@@ -34,7 +34,7 @@ MT_Individual::MT_Individual(int Na, MT_Randomizer *Randi)
 
 MT_Individual::MT_Individual(QTextStream &File)
 {
-	LastError=0;
+	LastError = MT_ErrorCode::None;
 	QString Individual( "Individual:" );
 	QString PresentLine = File.readLine();
 	while ((PresentLine != Individual) && !(File.atEnd()))
@@ -52,12 +52,12 @@ MT_Individual::MT_Individual(QTextStream &File)
 		Program = new MT_Program(File);
 	}
 	else
-		LastError=370;
+		LastError = MT_ErrorCode::IndividualSectionMissing;
 }
 
 MT_Individual::MT_Individual(MT_Program *Prog, bool copy)
 {
-	LastError=0;
+	LastError = MT_ErrorCode::None;
 	Name=-1;
 	Age =0;
 	Fitness =-1.0;
@@ -187,7 +187,7 @@ int MT_Individual::getTypOfGenesis()
 	return TspOfGenesis;
 }
 
-int MT_Individual::getLastError()
+MT_ErrorCode MT_Individual::getLastError()
 {
 	return LastError;
 }

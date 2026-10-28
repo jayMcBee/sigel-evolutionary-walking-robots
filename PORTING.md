@@ -911,6 +911,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_Individual` KEEPS ITS ERROR CODE IN `MT_ErrorCode`.**
+
+- **Changed:** 370, a missing "Individual:" section, is named
+  `IndividualSectionMissing`. `MT_GPManager` casts the code until it follows.
+
 **2026-10-28 — DONE: `MT_Program` KEEPS ITS ERROR CODE IN `MT_ErrorCode`.**
 
 - **Changed:** 360, a missing "Program:" section, is named

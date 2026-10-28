@@ -7,6 +7,7 @@
 #include <qtextstream.h>
 #include "MT_GPSystem/MT_Program.h"
 #include "MT_GPSystem/MT_Randomizer.h"	
+#include "MT_GPSystem/MT_ErrorCode.h"
 
 /*This class represent a Meta Individual, which contain especially the program 
 * for Interpreting  
@@ -48,7 +49,7 @@ public:
 	double getFitness();
 	int getName();
 	int getAge();
-	int getLastError();
+	MT_ErrorCode getLastError();
 	MT_Programline * getProgramLine(int Line);
 	MT_Program * getProgram();
 
@@ -65,7 +66,7 @@ public:
 
 private:
 
-	int LastError;
+	MT_ErrorCode LastError;
 	/* indicate the Fitness of a Parent; -1 = Parent not existing */
 	double FitnessOfParent;
 

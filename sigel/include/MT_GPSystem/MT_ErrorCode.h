@@ -41,6 +41,9 @@ enum class MT_ErrorCode
 	// MT_Program
 	ProgramSectionMissing = 360,
 
+	// MT_Individual
+	IndividualSectionMissing = 370,
+
 	// MT_Search
 	BroodSizeSectionMissing = 410,
 
