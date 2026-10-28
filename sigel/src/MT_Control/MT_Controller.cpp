@@ -312,9 +312,10 @@ bool MT_Controller::createGPSystem()
 			SIGEL_Tools::SIG_IO::cerr << "Creating Meta GP-System: couldn't create GP-Manager." << Qt::endl;
 			return false;
 		} else {
-			if(int error = gpManager->getLastError() && guiEnabled){
+			MT_ErrorCode error = gpManager->getLastError();
+			if( ( error != MT_ErrorCode::None ) && guiEnabled ){
 				SIGEL_Tools::SIG_IO::cerr << "Creating GP-System: error in creating Meta-GP-System. Error no: "
-						<< error << Qt::endl;
+						<< static_cast< int >( error ) << Qt::endl;
 			}
 		}
 	}

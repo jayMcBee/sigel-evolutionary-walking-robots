@@ -26,7 +26,7 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 	sepEvolPossible = false;
 	Substituter = nullptr;
 	EvolStopped = false;
-	LastError =0;
+	LastError = MT_ErrorCode::None;
 
 	QString Generation( "Generation:" );
 	QString PresentLine = File.readLine();
@@ -37,7 +37,7 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 	if ((PresentLine == Generation) && !(File.atEnd()))
 		GenerationNumber = (File.readLine()).toInt();
 	else 
-		LastError = 1;
+		LastError = MT_ErrorCode::GenerationSectionMissing;
 	
 	if (GenerationNumber !=0)
 		BestIndividual = std::make_unique< MT_Individual >(File);
@@ -48,9 +48,9 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 		BestIndividual = std::make_unique< MT_Individual >(-1, Randi.get());
 
 	if(BestIndividual->getLastError() != MT_ErrorCode::None)
-		LastError = static_cast< int >( BestIndividual->getLastError() );
+		LastError = BestIndividual->getLastError();
 	if(Randi->getLastError() != MT_ErrorCode::None)
-		LastError = static_cast< int >( Randi->getLastError() );
+		LastError = Randi->getLastError();
 
 	Statistics = std::make_unique< MT_Statistics >(File);
 	
@@ -61,7 +61,7 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 	if ((PresentLine == OffspringSize) && !(File.atEnd()))
 		Offspring->changePopSize((File.readLine()).toInt());
 	else
-		LastError = 200;
+		LastError = MT_ErrorCode::OffspringSizeSectionMissing;
 	
 	QString PopulationString ("Population:");
 	while ((PresentLine != PopulationString) && !(File.atEnd()))
@@ -77,25 +77,25 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 		}
 	}
 	else 
-		LastError = 300;
+		LastError = MT_ErrorCode::ParentPopulationSectionMissing;
 
 	if (Offspring->getSize()< Parent->getSize())
 	{
 		Offspring->changePopSize(Parent->getSize());
 		Randi->setOffspringSize(Parent->getSize());
-		LastError = 3;
+		LastError = MT_ErrorCode::OffspringSizeRaisedToParentSize;
 	}
 
 	Seeker = std::make_unique< MT_Search >(Parent.get(), Offspring.get(), Randi.get(), File);
 	if(Seeker->getLastError() != MT_ErrorCode::None)
-		LastError = static_cast< int >( Seeker->getLastError() );
+		LastError = Seeker->getLastError();
 
 	Selector = std::make_unique< MT_TournamentManager >(Parent.get(), Offspring.get(), Randi.get(), File);
 	if(Selector->getLastError() != MT_ErrorCode::None)
-		LastError = static_cast< int >( Selector->getLastError() );
+		LastError = Selector->getLastError();
 	FitnessTrainer = std::make_unique< MT_FitnessTrainer >(File);
 	if(FitnessTrainer->getLastError() != MT_ErrorCode::None)
-		LastError = static_cast< int >( FitnessTrainer->getLastError() );
+		LastError = FitnessTrainer->getLastError();
 }
 
 MT_GPManager::MT_GPManager(MT_Substitute *Substitue) : QObject()
@@ -140,7 +140,7 @@ void MT_GPManager::loadSetup(QTextStream &File)
 	if ((PresentLine == ParentString) && !(File.atEnd()))
 		Parent->changePopSize((File.readLine()).toInt());
 	else 
-		LastError = 77;
+		LastError = MT_ErrorCode::ParentPopulationSetupSectionMissing;
 	
 	Parent->changeMaxNumVariable(Randi->getNumOfVari());
 
@@ -148,7 +148,7 @@ void MT_GPManager::loadSetup(QTextStream &File)
 	{
 		Offspring->changePopSize(Parent->getSize());
 		Randi->setOffspringSize(Parent->getSize());
-		LastError = 3;
+		LastError = MT_ErrorCode::OffspringSizeRaisedToParentSize;
 	}
 
 	QString BrutString ( "BrutSize:" );
@@ -159,7 +159,7 @@ void MT_GPManager::loadSetup(QTextStream &File)
 	if ((PresentLine == BrutString) && !(File.atEnd()))
 		Seeker->setBrutSize((File.readLine()).toInt());
 	else 
-		LastError = 11;
+		LastError = MT_ErrorCode::BroodSizeSetupSectionMissing;
 	
 	QString TManager ( "TournamentManager:");
 	while ((PresentLine != TManager) && !(File.atEnd()))
@@ -171,11 +171,11 @@ void MT_GPManager::loadSetup(QTextStream &File)
 		Selector->setTournamentSize((File.readLine()).toInt());
  	}
 	else 
-		LastError = 12;
+		LastError = MT_ErrorCode::TournamentManagerSetupSectionMissing;
 	
 	FitnessTrainer->loadSetup(File);
 	if(FitnessTrainer->getLastError() != MT_ErrorCode::None)
-		LastError = static_cast< int >( FitnessTrainer->getLastError() );
+		LastError = FitnessTrainer->getLastError();
 }
 
 void MT_GPManager::writeToFileGPSystem(QTextStream &File)
@@ -333,7 +333,7 @@ void MT_GPManager::setSelectionValue(int OffspringSize, int TournamentSize, int 
 		{
 			Offspring->changePopSize(Parent->getSize());
 			Randi->setOffspringSize(Parent->getSize());
-			LastError = 3;
+			LastError = MT_ErrorCode::OffspringSizeRaisedToParentSize;
 		}
 
 		Selector->setTournamentSize(TournamentSize); // does more!!
@@ -341,7 +341,7 @@ void MT_GPManager::setSelectionValue(int OffspringSize, int TournamentSize, int 
 		FitnessTrainer->setSelectionValue(FitnessFunction, TrainingDuration, TrainingSetSize);
 	}
 	else
-		LastError =13;
+		LastError = MT_ErrorCode::SizeIsZero;
 }
 
 void MT_GPManager::getSelectionValue(int *OffspringSize, int *TournamentSize, int *SMethod, int *FitnessFunction, int *TrainingSetSize, int *TrainingDuration)
@@ -358,7 +358,7 @@ void MT_GPManager::setBrutSize(int NewSize)
 	if(NewSize !=0)
 		Seeker->setBrutSize(NewSize);
 	else
-		LastError =13;
+		LastError = MT_ErrorCode::SizeIsZero;
 }
 
 int MT_GPManager::getBrutSize()
@@ -374,7 +374,7 @@ void MT_GPManager::setPopAndTournamentSize(int NewPopSize, int NewTournamentSize
 		Selector->setTournamentSize(NewTournamentSize);
 	}
 	else
-		LastError = 13;
+		LastError = MT_ErrorCode::SizeIsZero;
 }
 
 // special method
@@ -387,7 +387,7 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 	if (Substituter !=nullptr)
 		Substitute->setInterpreter(Randi->getNumOfVari(), FitnessTrainer->getTDuration());
 	else
-		LastError = 7;
+		LastError = MT_ErrorCode::SubstituteMissing;
 
 	int GreatestName =0; 
 	for (int i=0; i<Parent->getSize(); i++)
@@ -477,7 +477,7 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 
 	emit metaEvolutionRunning(false);
 
-	LastError = static_cast< int >( Statistics->updateStatistics() );
+	LastError = Statistics->updateStatistics();
 	
 	EvolStopped = false;
 }
@@ -654,7 +654,7 @@ void MT_GPManager::setInterpreterNumVar(int NewSize)
 		Substituter->setInterpreter(NewSize, FitnessTrainer->getTDuration());
 }
 
-int MT_GPManager::getLastError()
+MT_ErrorCode MT_GPManager::getLastError()
 {
 	return LastError;
 }

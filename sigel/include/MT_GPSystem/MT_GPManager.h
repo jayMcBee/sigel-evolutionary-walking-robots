@@ -14,6 +14,7 @@ class MT_Substitute;
 #include "MT_GPSystem/MT_Search.h"
 #include "MT_GPSystem/MT_FitnessTrainer.h"
 #include "MT_GPSystem/MT_TournamentManager.h"
+#include "MT_GPSystem/MT_ErrorCode.h"
 
 #include <pthread.h>
 
@@ -75,10 +76,10 @@ public:
 
 	void setInterpreterNumVar(int NewSize);		
 
-	/* Returns a result != 0 if an error occurred anywhere in the meta GP system;
-	* if != 0, the value indicates which error it was
+	/* Returns a result != MT_ErrorCode::None if an error occurred anywhere in the meta GP system;
+	* if != MT_ErrorCode::None, the value indicates which error it was
 	*/
-	int getLastError();
+	MT_ErrorCode getLastError();
 
 	/******************** special method ********************/
 
@@ -116,9 +117,9 @@ private:
 	bool EvolStopped;
 	bool sepEvolPossible;
 	
-	/* if an error occurs anywhere in the GP system, LastError is set != 0 
+	/* if an error occurs anywhere in the GP system, LastError is set != MT_ErrorCode::None
 	*/
-	int LastError;
+	MT_ErrorCode LastError;
 
 	int GenerationNumber;
 

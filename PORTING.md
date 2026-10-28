@@ -911,6 +911,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_GPManager` KEEPS ITS ERROR CODE IN `MT_ErrorCode`; THE METAGP ERROR CODES ARE ALL NAMED.**
+
+- **Changed:** 1, 3, 7, 11, 12, 13, 77, 200 and 300 have names, and the
+  temporary casts of the earlier steps are gone. `MT_Controller` printed
+  "Error no: 1" for every error, because `int error = getLastError() &&
+  guiEnabled` stored the result of the `&&`; it now reads the code first and
+  prints its number.
+
 **2026-10-28 — DONE: `MT_Statistics::updateStatistics` RETURNS AN `MT_ErrorCode`.**
 
 - **Changed:** its result is always `None` (it was always 0); `MT_GPManager`

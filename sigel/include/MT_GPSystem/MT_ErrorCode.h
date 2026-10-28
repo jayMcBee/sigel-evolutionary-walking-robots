@@ -32,6 +32,17 @@ enum class MT_ErrorCode
 {
 	None = 0,
 
+	// MT_GPManager
+	GenerationSectionMissing = 1,
+	OffspringSizeRaisedToParentSize = 3,
+	SubstituteMissing = 7,
+	BroodSizeSetupSectionMissing = 11,
+	TournamentManagerSetupSectionMissing = 12,
+	SizeIsZero = 13,
+	ParentPopulationSetupSectionMissing = 77,
+	OffspringSizeSectionMissing = 200,
+	ParentPopulationSectionMissing = 300,
+
 	// MT_Randomizer
 	RandomizerSectionMissing = 260,
 	ConstantSectionMissing = 261,
