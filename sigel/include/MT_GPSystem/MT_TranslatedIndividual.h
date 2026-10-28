@@ -33,7 +33,7 @@ public:
 	* @pre: the MT_Translator produce this array
 	* @post: the destructor of this class must destroy this array
 	*/
-	QList<int> * T_Instruktion;
+	QList<int> * T_Instruction;
 	
 	/* An array of integer represent the first operands
 	* of a SIGEL robot control program.
@@ -67,7 +67,7 @@ public:
 	* representing the SIGEL robot control program thought the MT_Translator 
 	* @pre the three arrays must existed 
 	*/
-	MT_TranslatedIndividual (QList<int> * T_Instruk, QList<int> * T_OperOne, QList<int>  * T_OperTwo, QList<int>  * MData );
+	MT_TranslatedIndividual (QList<int> * Instructions, QList<int> * T_OperOne, QList<int>  * T_OperTwo, QList<int>  * MData );
 
 	/* The constructor of a translated individual, used for initializing
 	* a translated individual with data from a Qstring, by loading an experiment.

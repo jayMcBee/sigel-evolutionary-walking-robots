@@ -37,7 +37,6 @@ Paths are relative to `sigel/`, the source tree.
 
   | symbol | where |
   |---|---|
-  | `T_Instruktion`, `T_Instruk` | `MT_TranslatedIndividual.h` |
   | `Instruktion` | `MT_Classifier.cpp, createDoubleTransIndi`; `MT_Substitute.cpp, translatedSIGProg` |
   | `set`/`getSelektionValue` | `MT_FitnessTrainer.h`, `MT_GPManager.h` |
 

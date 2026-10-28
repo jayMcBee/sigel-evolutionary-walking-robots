@@ -911,6 +911,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_TranslatedIndividual::T_Instruktion` IS RENAMED `T_Instruction`.**
+
+- **Changed:** the German spelling of the member is translated, with its uses
+  in `MT_Interpreter`. The constructor parameter `T_Instruk` becomes
+  `Instructions`, so it does not hide the member. A rename only.
+
 **2026-10-28 — DONE: `MT_Randomizer::ProbInstruktion` IS RENAMED `ProbInstruction`.**
 
 - **Changed:** the German spelling of the member is translated, in its uses

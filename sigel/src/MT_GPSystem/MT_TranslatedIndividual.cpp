@@ -4,7 +4,7 @@ MT_TranslatedIndividual::MT_TranslatedIndividual()
 {
 	//Do not use 
 
-	T_Instruktion=nullptr;
+	T_Instruction=nullptr;
 	T_Operand1 = nullptr;
 	T_Operand2 =nullptr;
 	T_length = 0;
@@ -16,16 +16,16 @@ MT_TranslatedIndividual::~MT_TranslatedIndividual()
 {
 	delete T_Operand1;
 	delete T_Operand2;
-	delete T_Instruktion;
+	delete T_Instruction;
 	delete MetaData;
 }
 
-MT_TranslatedIndividual::MT_TranslatedIndividual(QList<int> *T_Instruk, QList<int> *T_OperOne, QList<int> *T_OperTwo, QList<int> *MData )
+MT_TranslatedIndividual::MT_TranslatedIndividual(QList<int> *Instructions, QList<int> *T_OperOne, QList<int> *T_OperTwo, QList<int> *MData )
 {
-	T_Instruktion= T_Instruk;
+	T_Instruction= Instructions;
 	T_Operand1 = T_OperOne;
 	T_Operand2 = T_OperTwo;
-	T_length = T_Instruktion->size();
+	T_length = T_Instruction->size();
 	MetaData = MData;
 	
 	Boundary = -1;
@@ -44,7 +44,7 @@ MT_TranslatedIndividual::MT_TranslatedIndividual(QTextStream &File)
 		T_length = (File.readLine()).toInt();
 		Boundary = (File.readLine()).toInt();
 
-		T_Instruktion = new QList<int>;
+		T_Instruction = new QList<int>;
 		T_Operand1 = new QList<int>;
 		T_Operand2 = new QList<int>;
 		MetaData = new QList<int>;
@@ -54,7 +54,7 @@ MT_TranslatedIndividual::MT_TranslatedIndividual(QTextStream &File)
 		else
 			MetaData->resize(32);			
 
-		T_Instruktion->resize(T_length);
+		T_Instruction->resize(T_length);
 		T_Operand1->resize(T_length);
 		T_Operand2->resize(T_length);
 
@@ -64,7 +64,7 @@ MT_TranslatedIndividual::MT_TranslatedIndividual(QTextStream &File)
 		{
 			PresentLine = File.readLine();
 			PartOfLine = PresentLine.mid(0,4); 
-			(*T_Instruktion)[i] = PartOfLine.toInt();
+			(*T_Instruction)[i] = PartOfLine.toInt();
 			PartOfLine = PresentLine.mid(4,7);
 			(*T_Operand1)[i] = PartOfLine.toInt();
 			PartOfLine = PresentLine.mid(11,7);
@@ -96,18 +96,18 @@ MT_TranslatedIndividual::MT_TranslatedIndividual(QTextStream &File)
 			if (Boundary <=0)		// For the evaluator
 			{
 				(*MetaData)[0] = T_length;
-				for (int k=0; k< T_Instruktion->size(); k++)
-					(*MetaData)[(*T_Instruktion)[k]] ++;		
+				for (int k=0; k< T_Instruction->size(); k++)
+					(*MetaData)[(*T_Instruction)[k]] ++;		
 			}
 			else						// For the classifier
 			{
 				(*MetaData)[0] = Boundary;
 				for (int k=0; k< Boundary; k++)
-					(*MetaData)[(*T_Instruktion)[k]] ++;
+					(*MetaData)[(*T_Instruction)[k]] ++;
 
 				(*MetaData)[16] = T_length-Boundary;
-				for (int k=Boundary; k< T_Instruktion->size(); k++)
-					(*MetaData)[16+(*T_Instruktion)[k]] ++;
+				for (int k=Boundary; k< T_Instruction->size(); k++)
+					(*MetaData)[16+(*T_Instruction)[k]] ++;
 			}
 		}
 	}
@@ -125,7 +125,7 @@ void MT_TranslatedIndividual::writeToFileTransIndi(QTextStream &File)
 
 	for (int i=0; i<T_length;i++)
 	{
-		PartOfLine.setNum((*T_Instruktion)[i]);
+		PartOfLine.setNum((*T_Instruction)[i]);
 		File<<PartOfLine.leftJustified(4,' ', true);
 
 		PartOfLine.setNum((*T_Operand1)[i]);

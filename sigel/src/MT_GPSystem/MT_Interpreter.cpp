@@ -394,7 +394,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 					else
 						Mod1 = Offset + abs(target % SigProLengthTwo);
 
-					Variables[Source] = RobProg->T_Instruktion->at(Mod1);
+					Variables[Source] = RobProg->T_Instruction->at(Mod1);
 				}
 				else
 				{
@@ -404,7 +404,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 					else
 						Mod1 = Offset + abs(target % SigProLengthTwo);
 
-					Variables[Source] = RobProg->T_Instruktion->at(Mod1);
+					Variables[Source] = RobProg->T_Instruction->at(Mod1);
 				}
 
 				ProgramCounter++;
