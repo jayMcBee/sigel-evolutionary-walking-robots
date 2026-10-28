@@ -141,19 +141,19 @@ private:
 
 	/* contain the probability for chosen a Instruction 
 	* by the mutation or the generation of a program line
-	* ProbInstruktion[0] = probability of SWT 
-	* ProbInstruktion[1] = probability of CPY  ;ProbInstruktion[2]= probability of ADD
-	* ProbInstruktion[3] = probability of SUB  ;ProbInstruktion[4]= probability of MUL
-	* ProbInstruktion[5] = probability of DIV  ;ProbInstruktion[6]= probability of MOD
-	* ProbInstruktion[7] = probability of MIN  ;ProbInstruktion[8]= probability of MAX
+	* ProbInstruction[0] = probability of SWT 
+	* ProbInstruction[1] = probability of CPY  ;ProbInstruction[2]= probability of ADD
+	* ProbInstruction[3] = probability of SUB  ;ProbInstruction[4]= probability of MUL
+	* ProbInstruction[5] = probability of DIV  ;ProbInstruction[6]= probability of MOD
+	* ProbInstruction[7] = probability of MIN  ;ProbInstruction[8]= probability of MAX
 	*
-	* ProbInstruktion[9] = probability of CMP  ;ProbInstruktion[10]= probability of JMP
-	* ProbInstruktion[11] = probability of JLE  ;ProbInstruktion[12]= probability of JEQ
-	* ProbInstruktion[13]= probability of NOP
-	* ProbInstruktion[14] = probability of LUI ;ProbInstruktion[15]= probability of LUS
- 	* ProbInstruktion[16] = probability of LUT ; ProbInstruktion[17] = probability of LUM ;
+	* ProbInstruction[9] = probability of CMP  ;ProbInstruction[10]= probability of JMP
+	* ProbInstruction[11] = probability of JLE  ;ProbInstruction[12]= probability of JEQ
+	* ProbInstruction[13]= probability of NOP
+	* ProbInstruction[14] = probability of LUI ;ProbInstruction[15]= probability of LUS
+ 	* ProbInstruction[16] = probability of LUT ; ProbInstruction[17] = probability of LUM ;
 	*/
-	QList<double> ProbInstruktion;
+	QList<double> ProbInstruction;
 };
 
 #endif // MT_GPSYSTEM_MT_RANDOMIZER_H

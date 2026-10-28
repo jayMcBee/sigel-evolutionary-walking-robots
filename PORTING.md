@@ -911,6 +911,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_Randomizer::ProbInstruktion` IS RENAMED `ProbInstruction`.**
+
+- **Changed:** the German spelling of the member is translated, in its uses
+  and its comment. A rename only.
+
 **2026-10-28 — DONE: TYPOS IN THE COMMENTS OF `MT_Search::crossover`.**
 
 - **Changed:** comments only.

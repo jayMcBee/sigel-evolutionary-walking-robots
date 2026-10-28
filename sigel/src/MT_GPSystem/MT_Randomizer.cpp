@@ -32,9 +32,9 @@ MT_Randomizer::MT_Randomizer()
 	for (int i=0; i<3; i++)
 		ProbCrossOverPoints[i]=0;
 
-	ProbInstruktion.resize(18);
+	ProbInstruction.resize(18);
 	for (int i=0; i<18; i++)
-		ProbInstruktion[i]=0;
+		ProbInstruction[i]=0;
 
 	createConstant (50, true , 0, 1000);
 }
@@ -76,18 +76,18 @@ MT_Randomizer::MT_Randomizer(QTextStream &File)
 		for (int i=0; i<3; i++)
 			ProbCrossOverPoints[i]=(File.readLine()).toDouble();
 	
-		ProbInstruktion.resize(18);
+		ProbInstruction.resize(18);
 		for (int i=0; i<17; i++)
-			ProbInstruktion[i]=(File.readLine()).toDouble();
+			ProbInstruction[i]=(File.readLine()).toDouble();
 
 		PresentLine = File.readLine();
 		if (PresentLine.toDouble() >= 1.0)
 		{
-			ProbInstruktion[17]=PresentLine.toDouble();
+			ProbInstruction[17]=PresentLine.toDouble();
 			PresentLine = File.readLine();
 		}
 		else
-			ProbInstruktion[17] = ProbInstruktion[16];
+			ProbInstruction[17] = ProbInstruction[16];
 
 		QString ConString( "Constant:" );
 		
@@ -151,16 +151,16 @@ void MT_Randomizer::loadSetup(QTextStream &File)
 			ProbCrossOverPoints[i]=(File.readLine()).toDouble();
 	
 		for (int i=0; i<17; i++)
-			ProbInstruktion[i]=(File.readLine()).toDouble();
+			ProbInstruction[i]=(File.readLine()).toDouble();
 
 		PresentLine = File.readLine();
 		if (PresentLine.toDouble() >= 1.0)
 		{
-			ProbInstruktion[17]=PresentLine.toDouble();
+			ProbInstruction[17]=PresentLine.toDouble();
 			PresentLine = File.readLine();
 		}
 		else
-			ProbInstruktion[17] = ProbInstruktion[16];
+			ProbInstruction[17] = ProbInstruction[16];
 
 		QString ConString( "Constant:" );
 		PresentLine = File.readLine();
@@ -215,7 +215,7 @@ void MT_Randomizer::writeToFileRandi(QTextStream &File)
 	File << ProbCrossOverPoints[2] << Qt::endl;
 
 	for (int i=0; i<18; i++)
-		File << ProbInstruktion[i] <<Qt::endl;
+		File << ProbInstruction[i] <<Qt::endl;
 	
 	File << Qt::endl;
 
@@ -235,7 +235,7 @@ void MT_Randomizer::returnIndividualsValue(int **Length, int **NumOfVar, QList<d
 	*NumOfVar= &NumberOfVariables;
 
 	*Con = &Constant;
-	*ProbOfFu = &ProbInstruktion;
+	*ProbOfFu = &ProbInstruction;
 }
 
 void MT_Randomizer::returnSearchValue(QList<double> **ProbMPower, QList<double> **ProbSOperator, QList<double> **ProbXPoints)
@@ -407,11 +407,11 @@ MT_Instruction MT_Randomizer::getRandomInstruction()
 	int Choice =1;
 	MT_Instruction NewInstruction;
 
-	unsigned long  Random = getRandomInteger(ProbInstruktion[17]);
+	unsigned long  Random = getRandomInteger(ProbInstruction[17]);
 
 	for (int i=0; i<18; i++)
 	{
-		if (Random<ProbInstruktion[i])
+		if (Random<ProbInstruction[i])
 		{
 			Choice =i;
 			break;
