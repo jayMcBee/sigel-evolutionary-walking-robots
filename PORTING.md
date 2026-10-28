@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: FORMATTING ROUND ON `MT_FitnessTrainer`.**
+
+- **Changed:** tabs, `( x )` spacing, spaces around operators, `Type *name`
+  for pointers, braces on every branch and loop, no trailing white space, and
+  the empty-line rules. The `QTextStream` constructor moves under the comment
+  that describes it. The text of the comments and the code is unchanged.
+
 **2026-10-28 — DONE: `MT_FitnessTrainer::calculateFitness( MT_Individual * )` LOSES ITS DEEP NESTING.**
 
 - **Changed:** an individual already evaluated on the training set and a

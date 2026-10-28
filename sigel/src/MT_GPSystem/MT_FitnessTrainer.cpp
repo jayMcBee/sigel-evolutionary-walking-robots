@@ -1,81 +1,89 @@
 #include "MT_GPSystem/MT_FitnessTrainer.h"
 
-MT_FitnessTrainer::MT_FitnessTrainer(QTextStream &File)
+MT_FitnessTrainer::MT_FitnessTrainer( QTextStream &File )
 {
-	LastError=0;
+	LastError = 0;
 
 	// NOTE: "FitnessTranier:" keeps the 2003 misspelling deliberately -- it is a
 	// section marker in the saved experiment format, not a name. Correcting it
 	// would make this build unable to read experiments written by any other.
 	QString FitTrainer( "FitnessTranier:" );
 	QString PresentLine = File.readLine();
-	while ((PresentLine != FitTrainer) && !(File.atEnd()))
+	while( ( PresentLine != FitTrainer ) && !( File.atEnd() ) )
+	{
 		PresentLine = File.readLine();
+	}
 
-	if ((PresentLine == FitTrainer) && !(File.atEnd()))
-	{	
-		FitnessFunction=(File.readLine()).toInt();
-		PresentTSize =(File.readLine()).toInt();
-		TSetSize=(File.readLine()).toInt();
-		Result.resize(TSetSize);
-		ResultIst.resize(TSetSize);
-		for (int i=0; i<TSetSize; i++)
+	if( ( PresentLine == FitTrainer ) && !( File.atEnd() ) )
+	{
+		FitnessFunction = ( File.readLine() ).toInt();
+		PresentTSize = ( File.readLine() ).toInt();
+		TSetSize = ( File.readLine() ).toInt();
+		Result.resize( TSetSize );
+		ResultIst.resize( TSetSize );
+		for( int i = 0; i < TSetSize; i++ )
 		{
-			Result[i] =0.0;
-			ResultIst[i] =0.0;
+			Result[i] = 0.0;
+			ResultIst[i] = 0.0;
 		}
 
-		Interpreter.setDuration((File.readLine()).toInt());
-		Interpreter.setVariableNumber((File.readLine()).toInt());
-	
-		TSet = std::make_unique< MT_Trainingset >(File);
+		Interpreter.setDuration( ( File.readLine() ).toInt() );
+		Interpreter.setVariableNumber( ( File.readLine() ).toInt() );
+
+		TSet = std::make_unique< MT_Trainingset >( File );
 	}
 	else
-		LastError =601;
+	{
+		LastError = 601;
+	}
 }
 
 MT_FitnessTrainer::MT_FitnessTrainer()
 {
-	LastError=0;
+	LastError = 0;
 
-	FitnessFunction=1;
-	PresentTSize =0;
-	TSetSize=10;
-	Result.resize(TSetSize);
-	ResultIst.resize(TSetSize);
-	
-	TSet = std::make_unique< MT_Trainingset >(TSetSize,1);
+	FitnessFunction = 1;
+	PresentTSize = 0;
+	TSetSize = 10;
+	Result.resize( TSetSize );
+	ResultIst.resize( TSetSize );
+
+	TSet = std::make_unique< MT_Trainingset >( TSetSize, 1 );
 }
 
 // further methods
 
-void MT_FitnessTrainer::loadSetup(QTextStream &File)
+void MT_FitnessTrainer::loadSetup( QTextStream &File )
 {
 	QString FitTrainer( "FitnessTranier:" );
 	QString PresentLine = File.readLine();
-	while ((PresentLine != FitTrainer) && !(File.atEnd()))
+	while( ( PresentLine != FitTrainer ) && !( File.atEnd() ) )
+	{
 		PresentLine = File.readLine();
+	}
 
-	if ((PresentLine == FitTrainer) && !(File.atEnd()))
-	{	
-		FitnessFunction=(File.readLine()).toInt();
-		int NewPresentTSize =(File.readLine()).toInt();
-		int NewTSetSize=(File.readLine()).toInt();
-		Interpreter.setDuration((File.readLine()).toInt());
-		Interpreter.setVariableNumber((File.readLine()).toInt());
-	
+	if( ( PresentLine == FitTrainer ) && !( File.atEnd() ) )
+	{
+		FitnessFunction = ( File.readLine() ).toInt();
+		int NewPresentTSize = ( File.readLine() ).toInt();
+		int NewTSetSize = ( File.readLine() ).toInt();
+		Interpreter.setDuration( ( File.readLine() ).toInt() );
+		Interpreter.setVariableNumber( ( File.readLine() ).toInt() );
+
 		TSetSize = NewTSetSize;
-		TSet->changeTSize(TSetSize);
-		Result.resize(TSetSize);
-		ResultIst.resize(TSetSize);
+		TSet->changeTSize( TSetSize );
+		Result.resize( TSetSize );
+		ResultIst.resize( TSetSize );
 	}
 	else
-		LastError =602;
+	{
+		LastError = 602;
+	}
 }
 
-void MT_FitnessTrainer::writeToFileSetup(QTextStream &File)
+void MT_FitnessTrainer::writeToFileSetup( QTextStream &File )
 {
-	File << ("FitnessTranier:\n");
+	File << ( "FitnessTranier:\n" );
 	File << FitnessFunction << Qt::endl;
 	File << PresentTSize << Qt::endl;
 	File << TSetSize << Qt::endl;
@@ -83,16 +91,16 @@ void MT_FitnessTrainer::writeToFileSetup(QTextStream &File)
 	File << Interpreter.getVariableNumber() << Qt::endl << Qt::endl;
 }
 
-void MT_FitnessTrainer::writeToFileTrainer(QTextStream &File)
+void MT_FitnessTrainer::writeToFileTrainer( QTextStream &File )
 {
-	File << ("FitnessTranier:\n");
+	File << ( "FitnessTranier:\n" );
 	File << FitnessFunction << Qt::endl;
 	File << PresentTSize << Qt::endl;
 	File << TSetSize << Qt::endl;
 	File << Interpreter.getDuration() << Qt::endl;
 	File << Interpreter.getVariableNumber() << Qt::endl << Qt::endl;
 
-	TSet->writeToFileTSet(File);
+	TSet->writeToFileTSet( File );
 }
 
 int MT_FitnessTrainer::getLastError()
@@ -100,7 +108,7 @@ int MT_FitnessTrainer::getLastError()
 	return LastError;
 }
 
-void MT_FitnessTrainer::getSelectionValue(int *FitFunction, int *TDuration, int *TSize)
+void MT_FitnessTrainer::getSelectionValue( int *FitFunction, int *TDuration, int *TSize )
 {
 	*FitFunction = FitnessFunction;
 	*TDuration = Interpreter.getDuration();
@@ -112,38 +120,38 @@ int MT_FitnessTrainer::getTDuration()
 	return Interpreter.getDuration();
 }
 
-void MT_FitnessTrainer::setSelectionValue(int FitFunction, int TDuration, int TSize)
+void MT_FitnessTrainer::setSelectionValue( int FitFunction, int TDuration, int TSize )
 {
-	FitnessFunction =FitFunction;
-	TSetSize =TSize;
-	TSet->changeTSize(TSize);
-	Result.resize(TSize);
-	ResultIst.resize(TSize);
-	Interpreter.setDuration(TDuration);
-	
-	PresentTSize = TSet->getPresentTSize(); 
+	FitnessFunction = FitFunction;
+	TSetSize = TSize;
+	TSet->changeTSize( TSize );
+	Result.resize( TSize );
+	ResultIst.resize( TSize );
+	Interpreter.setDuration( TDuration );
+
+	PresentTSize = TSet->getPresentTSize();
 }
 
-void MT_FitnessTrainer::setNumberOfVariables(int varNumber)
+void MT_FitnessTrainer::setNumberOfVariables( int varNumber )
 {
-	Interpreter.setVariableNumber(varNumber);
+	Interpreter.setVariableNumber( varNumber );
 }
 
-int MT_FitnessTrainer::insertNewTCases(QQueue<MT_TrainingCase *> *NewTCase)
+int MT_FitnessTrainer::insertNewTCases( QQueue<MT_TrainingCase *> *NewTCase )
 {
-	TSet->updateTSet(NewTCase);
-	
+	TSet->updateTSet( NewTCase );
+
 	return TSet->getPresentTSize();
 }
 
-void MT_FitnessTrainer::calculateFitness(MT_Population *Pop)
+void MT_FitnessTrainer::calculateFitness( MT_Population *Pop )
 {
 	MT_Individual *PresentIndi;
 
-	for (int i=0; i<Pop->getSize(); i++)
+	for( int i = 0; i < Pop->getSize(); i++ )
 	{
-		PresentIndi = Pop->getIndividual(i);
-		calculateFitness(PresentIndi);
+		PresentIndi = Pop->getIndividual( i );
+		calculateFitness( PresentIndi );
 	}
 }
 
@@ -193,25 +201,29 @@ bool MT_FitnessTrainer::calculateFitness( MT_Individual *Indi )
 
 double MT_FitnessTrainer::fitSquareError()
 {
-	double Fitness=0.0;
+	double Fitness = 0.0;
 
-	for (int i=0; i<PresentTSize; i++)	
-		Fitness = Fitness + (ResultIst[i]-Result[i]) * (ResultIst[i]-Result[i]);
+	for( int i = 0; i < PresentTSize; i++ )
+	{
+		Fitness = Fitness + ( ResultIst[i] - Result[i] ) * ( ResultIst[i] - Result[i] );
+	}
 
-	Fitness = 1.0 / (1.0 + Fitness);
+	Fitness = 1.0 / ( 1.0 + Fitness );
 	return Fitness;
 }
 
 double MT_FitnessTrainer::fitSimpleError()
 {
-	double Fitness=0.0;
+	double Fitness = 0.0;
 
 	// total error
-	for (int i=0; i<PresentTSize; i++)
-		Fitness = Fitness + fabs(ResultIst[i]-Result[i]);
+	for( int i = 0; i < PresentTSize; i++ )
+	{
+		Fitness = Fitness + fabs( ResultIst[i] - Result[i] );
+	}
 
 	// fit error into interval [0, 1]
-	Fitness = 1.0 / (1.0 + Fitness);
+	Fitness = 1.0 / ( 1.0 + Fitness );
 
 	return Fitness;
 }
@@ -221,25 +233,29 @@ int MT_FitnessTrainer::getPresentTSize()
 	return PresentTSize;
 }
 
-QList<double> * MT_FitnessTrainer::getResultIstArray()
+QList<double> *MT_FitnessTrainer::getResultIstArray()
 {
 	return &ResultIst;
 }
 
-QList<double> * MT_FitnessTrainer::getResultArray()
+QList<double> *MT_FitnessTrainer::getResultArray()
 {
 	return &Result;
 }
 
 double MT_FitnessTrainer::simpleYesNo()
 {
-	double Fitness=0.0;
+	double Fitness = 0.0;
 
-	for (int i=0; i<PresentTSize; i++)
-		if( ((ResultIst[i]<0.0)&&(Result[i]<0.0)) || ((ResultIst[i]>=0.0)&&(Result[i]>=0.0)) )
+	for( int i = 0; i < PresentTSize; i++ )
+	{
+		if( ( ( ResultIst[i] < 0.0 ) && ( Result[i] < 0.0 ) ) || ( ( ResultIst[i] >= 0.0 ) && ( Result[i] >= 0.0 ) ) )
+		{
 			Fitness++;
+		}
+	}
 
-	Fitness = Fitness/PresentTSize;
+	Fitness = Fitness / PresentTSize;
 	Fitness = Fitness * 1000.0;
 
 	return Fitness;
@@ -247,41 +263,49 @@ double MT_FitnessTrainer::simpleYesNo()
 
 double MT_FitnessTrainer::weightYesNo()
 {
-	double Fitness=0.0;
-	double DiffResult =0.0;
-	double TotalWeight =0.0;
+	double Fitness = 0.0;
+	double DiffResult = 0.0;
+	double TotalWeight = 0.0;
 
-	for (int i=0; i<PresentTSize; i++)
+	for( int i = 0; i < PresentTSize; i++ )
 	{
-		DiffResult = fabs(Result[i]);
-		// Reminder: Result[i] holds the fitness difference of the two SIGEL individuals
-	
-		if( ((ResultIst[i]<0.0)&&(Result[i]<0.0)) || ((ResultIst[i]>0.0)&&(Result[i]>0.0)) )
-		{	
-			if (DiffResult >0.0001)
-				DiffResult = 0.1 / DiffResult;
-			else
-				DiffResult = 1000.0;
+		DiffResult = fabs( Result[i] );
 
-			Fitness= Fitness + DiffResult;
+		// Reminder: Result[i] holds the fitness difference of the two SIGEL individuals
+		if( ( ( ResultIst[i] < 0.0 ) && ( Result[i] < 0.0 ) ) || ( ( ResultIst[i] > 0.0 ) && ( Result[i] > 0.0 ) ) )
+		{
+			if( DiffResult > 0.0001 )
+			{
+				DiffResult = 0.1 / DiffResult;
+			}
+			else
+			{
+				DiffResult = 1000.0;
+			}
+
+			Fitness = Fitness + DiffResult;
 			TotalWeight = TotalWeight + DiffResult;
 		}
 		else
 		{
-			DiffResult = DiffResult*1000.0;
-			Fitness= Fitness - DiffResult;
+			DiffResult = DiffResult * 1000.0;
+			Fitness = Fitness - DiffResult;
 			TotalWeight = TotalWeight + DiffResult;
 		}
 	}
-	
-	if (TotalWeight <=0.0)
-		TotalWeight =1.0;
 
-	Fitness = Fitness/TotalWeight; // -1<= Fitness <=1
-	Fitness = (Fitness+1.0)*500.0; // 0<=Fitness<=1000
+	if( TotalWeight <= 0.0 )
+	{
+		TotalWeight = 1.0;
+	}
 
-	if (Fitness < 0.0)
+	Fitness = Fitness / TotalWeight; // -1<= Fitness <=1
+	Fitness = ( Fitness + 1.0 ) * 500.0; // 0<=Fitness<=1000
+
+	if( Fitness < 0.0 )
+	{
 		Fitness = 0.0;
+	}
 
-	return  Fitness;
+	return Fitness;
 }
