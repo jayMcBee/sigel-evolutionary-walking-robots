@@ -38,6 +38,9 @@ enum class MT_ErrorCode
 	RandomizerSetupSectionMissing = 262,
 	ConstantSetupSectionMissing = 263,
 
+	// MT_Search
+	BroodSizeSectionMissing = 410,
+
 	// MT_FitnessTrainer
 	FitnessTrainerSectionMissing = 601,
 	FitnessTrainerSetupSectionMissing = 602,

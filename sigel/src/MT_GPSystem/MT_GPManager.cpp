@@ -87,8 +87,8 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 	}
 
 	Seeker = std::make_unique< MT_Search >(Parent.get(), Offspring.get(), Randi.get(), File);
-	if(Seeker->getLastError() != 0)
-		LastError = Seeker->getLastError();
+	if(Seeker->getLastError() != MT_ErrorCode::None)
+		LastError = static_cast< int >( Seeker->getLastError() );
 
 	Selector = std::make_unique< MT_TournamentManager >(Parent.get(), Offspring.get(), Randi.get(), File);
 	if(Selector->getLastError() != 0)

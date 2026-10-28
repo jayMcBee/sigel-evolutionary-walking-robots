@@ -911,6 +911,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_Search` KEEPS ITS ERROR CODE IN `MT_ErrorCode`.**
+
+- **Changed:** 410, a missing "BrutSize:" section, is named
+  `BroodSizeSectionMissing`. `MT_GPManager` casts the code until it follows.
+
 **2026-10-28 — DONE: `MT_Randomizer::loadSetup` LEAVES EARLY.**
 
 - **Changed:** a missing "Randomizer:" or "Constant:" section sets its error

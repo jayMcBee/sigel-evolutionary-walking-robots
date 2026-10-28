@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include "MT_GPSystem/MT_Population.h"
 #include "MT_GPSystem/MT_Randomizer.h"	
+#include "MT_GPSystem/MT_ErrorCode.h"
 
 
 /* This class manage the GP variation;
@@ -26,7 +27,7 @@ public:
 	/* set/get functions used to update the GUI or the GP system*/
 	void setBrutSize(int  SizeOfBrut);
 	int getBrutSize();
-	int getLastError();
+	MT_ErrorCode getLastError();
 
 	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * NewRandi, QTextStream & File);
 	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * NewRandi);
@@ -50,7 +51,7 @@ private:
 
 	// The brood size. It is loaded and saved; no search reads it.
 	int BrutSize;
-	int LastError;
+	MT_ErrorCode LastError;
 
 	MT_Individual * ChildOne;
 	MT_Individual *ChildTwo;

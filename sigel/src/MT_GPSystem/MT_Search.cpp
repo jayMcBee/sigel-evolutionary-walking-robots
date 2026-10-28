@@ -7,7 +7,7 @@ MT_Search::MT_Search()
 
 MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_Randomizer *NewRandi)
 {
-	LastError =0;
+	LastError = MT_ErrorCode::None;
 	TargetPop = OffspringPop;
 	SourcePop = ParentPop;
 	Randi = NewRandi;
@@ -19,7 +19,7 @@ MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_R
 
 MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_Randomizer *NewRandi, QTextStream &File)
 {
-	LastError =0;
+	LastError = MT_ErrorCode::None;
 	TargetPop = OffspringPop;
 	SourcePop = ParentPop;
 	Randi = NewRandi;
@@ -38,7 +38,7 @@ MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_R
 	if ((PresentLine == BrutString) && !(File.atEnd()))
 		BrutSize = (File.readLine()).toInt();
 	else
-		LastError =410;
+		LastError = MT_ErrorCode::BroodSizeSectionMissing;
 }
 
 int MT_Search::getBrutSize()
@@ -46,7 +46,7 @@ int MT_Search::getBrutSize()
 	return BrutSize; 
 }
 
-int MT_Search::getLastError()
+MT_ErrorCode MT_Search::getLastError()
 {
 	return LastError; 
 }
