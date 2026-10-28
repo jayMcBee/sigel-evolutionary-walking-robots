@@ -7,6 +7,7 @@
 #include <qtextstream.h>
 #include "MT_GPSystem/MT_Programline.h"
 #include "MT_GPSystem/MT_Randomizer.h"	
+#include "MT_GPSystem/MT_ErrorCode.h"
 
 /*
 * This class are the main part of a META Individual. 
@@ -70,10 +71,10 @@ public:
 	*/
 	void changeMaxProgLen(int NewLen);
 
-	int getLastError();
+	MT_ErrorCode getLastError();
 
 private:
-	int LastError;
+	MT_ErrorCode LastError;
 	int MaxLength;
 	int Length;
 	std::vector< MT_Programline * > Program;

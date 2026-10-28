@@ -911,6 +911,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_Program` KEEPS ITS ERROR CODE IN `MT_ErrorCode`.**
+
+- **Changed:** 360, a missing "Program:" section, is named
+  `ProgramSectionMissing`. Nothing reads `MT_Program::getLastError()`.
+
 **2026-10-28 — DONE: `MT_Interpreter` KEEPS ITS ERROR CODE IN `MT_ErrorCode`.**
 
 - **Changed:** `Error`, `getLastError()` and `loadProgram()` use

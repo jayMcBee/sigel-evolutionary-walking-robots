@@ -4,20 +4,20 @@
 
 MT_Program::MT_Program()
 {
-	LastError= 0;
+	LastError = MT_ErrorCode::None;
 	Length   = 0;
 }
 
 MT_Program::~MT_Program()
 {
-	LastError=0;
+	LastError = MT_ErrorCode::None;
 	for(int i=0; i<Length; i++)
 		delete Program[i];
 }
 
 MT_Program::MT_Program (MT_Randomizer *Randi)
 {
-	LastError= 0;
+	LastError = MT_ErrorCode::None;
 	Length   = 0;
 	int nLength = Randi->getProgLength();
 	MaxLength = Randi->getProgramLengthMax();
@@ -31,7 +31,7 @@ MT_Program::MT_Program (MT_Randomizer *Randi)
 
 MT_Program::MT_Program(QTextStream &File)
 {
-	LastError= 0;
+	LastError = MT_ErrorCode::None;
 	Length   = 0;
 	int nLength = 0;
 	QString ProString ("Program:" );
@@ -50,12 +50,12 @@ MT_Program::MT_Program(QTextStream &File)
 		}
 	}
 	else
-		LastError=360;
+		LastError = MT_ErrorCode::ProgramSectionMissing;
 }
 
 MT_Program::MT_Program(MT_Program *Prog)
 {
-	LastError=0;
+	LastError = MT_ErrorCode::None;
 	Length  = 0;
 	int nLength = Prog->Length;
 	MaxLength = Prog->MaxLength;
@@ -67,7 +67,7 @@ MT_Program::MT_Program(MT_Program *Prog)
 
 MT_Program::MT_Program(MT_Program *Prog, int Start, int End)
 {
-	LastError=0;
+	LastError = MT_ErrorCode::None;
 	Length  = 0;
 	int nLength = End-Start+1;
 	MaxLength = nLength;
@@ -185,7 +185,7 @@ void MT_Program::clearProgram()
 	}
 }
 
-int MT_Program::getLastError()
+MT_ErrorCode MT_Program::getLastError()
 {
 	return LastError;
 }
