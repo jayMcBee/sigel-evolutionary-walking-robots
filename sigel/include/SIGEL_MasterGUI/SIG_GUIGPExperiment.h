@@ -39,7 +39,7 @@
 #include "SIGEL_MasterGUI/SIG_AllIndividualsView.h"
 #include "SIGEL_MasterGUI/SIG_LanguageParameters.h"
 
-#include "SIGEL_GP/SIG_GPExperiment.h"
+#include "SIGEL_GP/SIG_GPMetaGPExperiment.h"
 
 namespace SIGEL_GP
 { class SIG_GUIGPManager; }
@@ -52,7 +52,7 @@ namespace SIGEL_MasterGUI
   /**
    * This class encapsules an experiment on GUI-side.
    *
-   * It holds one SIG_GPExperiment as well as one SIG_GPManager.
+   * It holds one SIG_GPMetaGPExperiment as well as one SIG_GPManager.
    */
   class SIG_GUIGPExperiment : public QWidget
     {
@@ -63,7 +63,7 @@ namespace SIGEL_MasterGUI
       /**
        * The constructor of SIG_GUIGPExperiment.
        *
-       * Receives the SIG_GPExperiment it belongs to.
+       * Receives the SIG_GPMetaGPExperiment it belongs to.
        * @param parent The parent widget of SIG_AllIndividualsView
        * @param name Internal name for Qt.
        * @param theExperiment A reference to the experiment this view belongs to.
@@ -93,9 +93,9 @@ namespace SIGEL_MasterGUI
       void setName( QString newName );
 
       /**
-       * The SIG_GPExperiment belonging to this experiment.
+       * The SIG_GPMetaGPExperiment belonging to this experiment.
        */
-      SIGEL_GP::SIG_GPExperiment gpExperiment;
+      SIGEL_GP::SIG_GPMetaGPExperiment gpExperiment;
 
       /**
        * The SIG_GPManager belonging to this experiment.

@@ -250,7 +250,7 @@ void SIG_ExperimentListView::slotCloneExperiment()
     QTextStream copyOut( &copy, QIODevice::WriteOnly );
     theExperiment->gpExperiment.saveExperiment( copyOut );
   }
-  SIGEL_GP::SIG_GPExperiment fresh;
+  SIGEL_GP::SIG_GPMetaGPExperiment fresh;
   {
     QTextStream copyIn( &copy, QIODevice::ReadOnly );
     try {

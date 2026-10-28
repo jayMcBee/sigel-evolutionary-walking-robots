@@ -38,7 +38,7 @@
 #include "MT_Control/MT_Controller.h"
 #include "MT_Control/MT_Classifier.h"
 
-SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
+SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPMetaGPExperiment &experiment)
 	: userTerminated( false ),
 	  currentExperiment( experiment ),
 	  stopEvolutionNow( false ),
@@ -68,7 +68,7 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPExperiment &experiment)
 }
 
 //Returns a reference to the experiment
-SIGEL_GP::SIG_GPExperiment &SIGEL_GP::SIG_GPManager::getCurrentExperiment()
+SIGEL_GP::SIG_GPMetaGPExperiment &SIGEL_GP::SIG_GPManager::getCurrentExperiment()
 {
 	return currentExperiment;
 }

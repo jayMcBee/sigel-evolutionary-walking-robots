@@ -26,7 +26,7 @@
 #include <QList>
 #include <QString>
 #include <pthread.h>
-#include "SIGEL_GP/SIG_GPExperiment.h"
+#include "SIGEL_GP/SIG_GPMetaGPExperiment.h"
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #include "SIGEL_GP/SIG_GPPVMData.h"
 #include "SIGEL_GP/SIG_GPActivePVMHost.h"
@@ -64,7 +64,7 @@ namespace SIGEL_GP
 		 * @param exp
 		 * The actual experiment data of the GPManager.
 		 */
-		SIG_GPFitnessTrainer(SIG_GPExperiment& exp);
+		SIG_GPFitnessTrainer(SIG_GPMetaGPExperiment& exp);
 
 		/**
 		 * The destructor of the an SIG_GPFitnessTrainer-object
@@ -146,7 +146,7 @@ namespace SIGEL_GP
 		/**
 		 * A refernce to the actual experiment datas.
 		 */
-		SIG_GPExperiment& exp;
+		SIG_GPMetaGPExperiment& exp;
 
 		/**
 		 * The array of TIDs from PVM, to identify the PVMtasks.

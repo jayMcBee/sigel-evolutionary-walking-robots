@@ -45,7 +45,7 @@ namespace SIGEL_MasterGUI
  *  Constructs a SIG_LanguageParameters which is a child of 'parent', with the 
  *  name 'name' and widget flags set to 'f' 
  */
-SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
+SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment )
   : SIG_LanguageParametersBase( parent, name, fl ), theExperiment( theExperiment ), sigelRoot( std::getenv( "SIGEL_ROOT" ) )
 {
   allow = QPixmap( sigelRoot + "/pixmaps/allow.xpm" );

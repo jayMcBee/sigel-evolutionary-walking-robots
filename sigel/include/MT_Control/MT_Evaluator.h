@@ -10,7 +10,7 @@ class MT_Evaluator : public MT_Substitute, public SIGEL_GP::SIG_GPFitnessTrainer
 public:
 
 	// administrative method 
-	MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File);
+	MT_Evaluator(SIGEL_GP::SIG_GPMetaGPExperiment& exp, QTextStream &File);
 	~MT_Evaluator() override = default;
 	void loadSetup(QTextStream & File) override;
    void writeToFile(QTextStream & File) override;

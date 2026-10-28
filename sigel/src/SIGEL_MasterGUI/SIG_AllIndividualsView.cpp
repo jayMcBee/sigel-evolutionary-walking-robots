@@ -49,7 +49,7 @@
 namespace SIGEL_MasterGUI
 {
 
-	SIG_AllIndividualsView::SIG_AllIndividualsView( QWidget * parent, const char * name, SIGEL_GP::SIG_GPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment )
+	SIG_AllIndividualsView::SIG_AllIndividualsView( QWidget * parent, const char * name, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment )
 		: QSplitter( parent ), theExperiment( theExperiment ), guiExperiment( guiExperiment )
 	{
 		// change some splitter settings

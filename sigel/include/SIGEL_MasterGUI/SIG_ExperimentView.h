@@ -25,7 +25,7 @@
 
 #include "SIGEL_MasterGUI/SIG_ExperimentViewBase.h"
 
-#include "SIGEL_GP/SIG_GPExperiment.h"
+#include "SIGEL_GP/SIG_GPMetaGPExperiment.h"
 
 namespace SIGEL_MasterGUI
 {
@@ -47,13 +47,13 @@ public:
     /**
      * The constructor of SIG_ExperimentView.
      *
-     * Receives the SIG_GPExperiment it belongs to.
+     * Receives the SIG_GPMetaGPExperiment it belongs to.
      * @param parent The parent widget of SIG_AllIndividualsView
      * @param name Internal name for Qt.
      * @param theExperiment A reference to the experiment this view belongs to.
      * @param guiExperiment The SIG_GUIGPExperiment this view belongs to.
      */
-    SIG_ExperimentView( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment );
+    SIG_ExperimentView( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment );
 
     void putIntoExperiment();
 
@@ -78,9 +78,9 @@ public:
  private:
     
     /**
-     * The SIG_GPExperiment belonging to this experiment.
+     * The SIG_GPMetaGPExperiment belonging to this experiment.
      */
-    SIGEL_GP::SIG_GPExperiment &theExperiment;
+    SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment;
 
     /**
      * The SIG_GUIGPExperiment this view belongs to.

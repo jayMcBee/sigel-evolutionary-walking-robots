@@ -177,7 +177,7 @@ int main( int argc, char *argv[] ) {
 
     // The trainer's destructor calls pvm_delhosts, so the experiment and the manager end before pvm_halt().
     try {
-      SIGEL_GP::SIG_GPExperiment experiment;
+      SIGEL_GP::SIG_GPMetaGPExperiment experiment;
 
       experiment.experimentName = experimentName;
       // sets the autosave path

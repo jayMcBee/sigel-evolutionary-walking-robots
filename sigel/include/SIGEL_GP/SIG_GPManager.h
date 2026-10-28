@@ -41,7 +41,7 @@ namespace SIGEL_GP
 	/**
 	 * This class manages the genetic-programming algorithm.
 	 *
-	 * It uses the class SIG_GPExperiment to organize the data of the
+	 * It uses the class SIG_GPMetaGPExperiment to organize the data of the
 	 * different experiments, like the GPParameter, which are used to
 	 * store the current genetic-programming-parameters. A nessecary part
 	 * of the evolution, the fitnesstrainer, are included, which manages
@@ -61,7 +61,7 @@ namespace SIGEL_GP
 		 * @param experiment
 		 * A reference of the experiment to work with.
 		 */
-		SIG_GPManager(SIG_GPExperiment &experiment);
+		SIG_GPManager(SIG_GPMetaGPExperiment &experiment);
 
 		/**
 		 * The destructor of the SIG_GPManager class.
@@ -133,7 +133,7 @@ namespace SIGEL_GP
 		 * The experiment object, which contains all the data related to the
 		 * current experiment.
 		 */
-		SIG_GPExperiment &currentExperiment;
+		SIG_GPMetaGPExperiment &currentExperiment;
 
 		bool stopEvolutionNow;
 
@@ -249,7 +249,7 @@ namespace SIGEL_GP
 		 * @return
 		 * The actual experiment.
 		 */
-		SIG_GPExperiment& getCurrentExperiment();
+		SIG_GPMetaGPExperiment& getCurrentExperiment();
 
 		/**
 		 * The server for the dynamic clients of an evolution started with '-de'.

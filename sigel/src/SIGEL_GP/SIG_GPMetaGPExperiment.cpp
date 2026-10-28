@@ -20,22 +20,22 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#include "SIGEL_GP/SIG_GPExperiment.h"
+#include "SIGEL_GP/SIG_GPMetaGPExperiment.h"
 
 #include <qtextstream.h>
 
-SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment( QString exp )
+SIGEL_GP::SIG_GPMetaGPExperiment::SIG_GPMetaGPExperiment( QString exp )
 	: SIG_GPSlaveExperiment( exp )
 {
 	mtController = std::make_unique< MT_Controller >( *this );
 }
 
-SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment()
+SIGEL_GP::SIG_GPMetaGPExperiment::SIG_GPMetaGPExperiment()
 {
 	mtController = std::make_unique< MT_Controller >( *this );
 }
 
-void SIGEL_GP::SIG_GPExperiment::loadExperiment( QTextStream &file )
+void SIGEL_GP::SIG_GPMetaGPExperiment::loadExperiment( QTextStream &file )
 {
 	QString simParString;
 
@@ -62,7 +62,7 @@ void SIGEL_GP::SIG_GPExperiment::loadExperiment( QTextStream &file )
 	loadBlocks( simParString, file );
 }
 
-void SIGEL_GP::SIG_GPExperiment::saveExperiment( QTextStream &file )
+void SIGEL_GP::SIG_GPMetaGPExperiment::saveExperiment( QTextStream &file )
 {
 	if( mtController->IsEnabled() )
 	{

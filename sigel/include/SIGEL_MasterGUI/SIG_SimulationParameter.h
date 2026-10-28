@@ -25,7 +25,7 @@
 
 #include "SIGEL_MasterGUI/SIG_SimulationParameterBase.h"
 
-#include "SIGEL_GP/SIG_GPExperiment.h"
+#include "SIGEL_GP/SIG_GPMetaGPExperiment.h"
 
 namespace SIGEL_MasterGUI
 {
@@ -45,12 +45,12 @@ public:
     /**
      * The constructor of SIG_SimulationParameter.
      *
-     * Receives the SIG_GPExperiment it belongs to.
+     * Receives the SIG_GPMetaGPExperiment it belongs to.
      * @param parent The parent widget of SIG_AllIndividualsView
      * @param name Internal name for Qt.
      * @param theExperiment A reference to the experiment this view belongs to.
      */
-    SIG_SimulationParameter( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment );
+    SIG_SimulationParameter( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment );
 
  public slots:
       /**
@@ -69,7 +69,7 @@ public:
     /**
      * A reference to the gp experiment.
      */
-    SIGEL_GP::SIG_GPExperiment &theExperiment;
+    SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment;
 };
 
 }

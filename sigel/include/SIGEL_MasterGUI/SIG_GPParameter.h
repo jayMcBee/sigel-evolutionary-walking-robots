@@ -25,7 +25,7 @@
 
 #include "SIGEL_MasterGUI/SIG_GPParameterBase.h"
 
-#include "SIGEL_GP/SIG_GPExperiment.h"
+#include "SIGEL_GP/SIG_GPMetaGPExperiment.h"
 
 #include <optional>
 
@@ -44,12 +44,12 @@ public:
     /**
      * The constructor of SIG_GPParameter.
      *
-     * Receives the SIG_GPExperiment it belongs to.
+     * Receives the SIG_GPMetaGPExperiment it belongs to.
      * @param parent The parent widget of SIG_AllIndividualsView
      * @param name Internal name for Qt.
      * @param theExperiment A reference to the experiment this view belongs to.
      */
-    SIG_GPParameter( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment );
+    SIG_GPParameter( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment );
 
     /**
      * This slot is called whenever the values of the widgets shall be
@@ -115,9 +115,9 @@ public slots:
  std::optional<int> selectedFitnessFunction() const;
 
  /**
-  * The SIG_GPExperiment belonging to this experiment.
+  * The SIG_GPMetaGPExperiment belonging to this experiment.
   */
- SIGEL_GP::SIG_GPExperiment &theExperiment;
+ SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment;
 
  /**
   * This string saves the SIGEL_ROOT environment variable which will be needed several

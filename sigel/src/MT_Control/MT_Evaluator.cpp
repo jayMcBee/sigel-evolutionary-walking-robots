@@ -6,7 +6,7 @@
 
 // administrative method
 
-MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPExperiment& exp, QTextStream &File) : MT_Substitute(), SIGEL_GP::SIG_GPFitnessTrainer(exp) 
+MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPMetaGPExperiment& exp, QTextStream &File) : MT_Substitute(), SIGEL_GP::SIG_GPFitnessTrainer(exp) 
 {
 	Typ=1;
 	AverageSigelFitness = 0.01; 

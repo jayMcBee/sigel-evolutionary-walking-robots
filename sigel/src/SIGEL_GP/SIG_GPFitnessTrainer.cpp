@@ -30,7 +30,7 @@
 #include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
-SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPExperiment& exp)
+SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPMetaGPExperiment& exp)
   :pvmLost(false),
    exp(exp),
    pvmTasks( exp.population.getSize() ),

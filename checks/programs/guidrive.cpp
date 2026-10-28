@@ -137,7 +137,7 @@ extern "C" {
 #include "SIGEL_MasterGUI/SIG_IndividualView.h"
 #include "SIGEL_SlaveGUI/SIG_SimulationWindow.h"
 #include "SIGEL_SlaveGUI/SIG_MovieSettingsDialog.h"
-#include "SIGEL_GP/SIG_GPExperiment.h"
+#include "SIGEL_GP/SIG_GPMetaGPExperiment.h"
 #include "SIGEL_Tools/SIG_IO.h"
 
 // sigel.cpp:95 owns this global; anything that pulls MT_Controller needs it.
@@ -1514,7 +1514,7 @@ static int guidriveMain(int argc, char **argv)
     step("fresh start, no experiment");
 
     // `damagedopen': File > Open on a copy of the experiment that ends inside
-    // its first block, so the master's SIG_GPExperiment::loadExperiment must
+    // its first block, so the master's SIG_GPMetaGPExperiment::loadExperiment must
     // refuse it. The message box text is printed up to the "File: ... Line:"
     // that SIG_Exception appends, which names a source line.
     if (scenario == "damagedopen") {
@@ -1560,7 +1560,7 @@ static int guidriveMain(int argc, char **argv)
     if (scenario == "povexport") {
         QFile expIn(expFile);
         if (!expIn.open(QIODevice::ReadOnly)) { printf("!! cannot open %s\n", qPrintable(expFile)); return 1; }
-        SIGEL_GP::SIG_GPExperiment experiment;
+        SIGEL_GP::SIG_GPMetaGPExperiment experiment;
         QTextStream expStream(&expIn);
         experiment.loadExperiment(expStream);
         SIGEL_Robot::SIG_Robot robot(experiment.robot);

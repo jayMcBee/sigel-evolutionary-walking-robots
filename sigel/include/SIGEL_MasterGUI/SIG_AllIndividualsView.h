@@ -33,7 +33,7 @@
 #include "SIGEL_MasterGUI/SIG_IndividualView.h"
 #include "SIGEL_MasterGUI/SIG_AddIndividualsDialog.h"
 
-#include "SIGEL_GP/SIG_GPExperiment.h"
+#include "SIGEL_GP/SIG_GPMetaGPExperiment.h"
 
 // only needed for the interim goal!!!
 #include "SIGEL_Tools/SIG_Randomizer.h"
@@ -56,13 +56,13 @@ namespace SIGEL_MasterGUI
       /**
        * The constructor of SIG_AllIndividualsView.
        *
-       * Receives the SIG_GPExperiment it belongs to.
+       * Receives the SIG_GPMetaGPExperiment it belongs to.
        * @param parent The parent widget of SIG_AllIndividualsView
        * @param name Internal name for Qt.
        * @param theExperiment A reference to the experiment this view belongs to.
        * @param guiExperiment The SIG_GUIGPExperiment this view belongs to.
        */
-      SIG_AllIndividualsView( QWidget * parent, const char * name, SIGEL_GP::SIG_GPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment );
+      SIG_AllIndividualsView( QWidget * parent, const char * name, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment );
 
       /**
        * This function returns the number of selected items in the listview.
@@ -165,7 +165,7 @@ namespace SIGEL_MasterGUI
       /**
        * A reference to the experiment object.
        */
-      SIGEL_GP::SIG_GPExperiment &theExperiment;
+      SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment;
 
       /**
        * The SIG_GUIGPExperiment this view belongs to.

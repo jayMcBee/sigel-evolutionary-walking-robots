@@ -25,7 +25,7 @@
 
 #include "SIGEL_MasterGUI/SIG_RobotBase.h"
 
-#include "SIGEL_GP/SIG_GPExperiment.h"
+#include "SIGEL_GP/SIG_GPMetaGPExperiment.h"
 #include "SIGEL_RobotCheck/SIG_RobotIssue.h"
 
 namespace SIGEL_MasterGUI
@@ -45,7 +45,7 @@ public:
     /**
      * The constructor.
      */
-    SIG_RobotView( QWidget* paren, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment );
+    SIG_RobotView( QWidget* paren, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment );
 
     void putIntoExperiment();
     
@@ -69,7 +69,7 @@ public:
     void slotIssueSelected();
 
  private:
-    SIGEL_GP::SIG_GPExperiment &theExperiment;
+    SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment;
 
     QList<SIGEL_RobotCheck::SIG_RobotIssue> shownIssues;
 };

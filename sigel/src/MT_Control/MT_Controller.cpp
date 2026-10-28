@@ -26,7 +26,7 @@ void StartMetaEvolution(void *inRawSubst)
 }
 
 
-MT_Controller::MT_Controller(SIGEL_GP::SIG_GPExperiment &exp)
+MT_Controller::MT_Controller(SIGEL_GP::SIG_GPMetaGPExperiment &exp)
  : QObject(),
    autoSaveCnt(0),
    evolTimer(nullptr),
@@ -371,7 +371,7 @@ void MT_Controller::configureSystem(QWidget *owner)
 
 /***
  * read the meta system if sigel reads the experiment
- * called from SIG_GPExperiment::loadExperiment(QTextStream & file)
+ * called from SIG_GPMetaGPExperiment::loadExperiment(QTextStream & file)
  * if the loaded experiment uses meta
  ***/
 bool MT_Controller::readFromFile(QString fileName)
@@ -490,7 +490,7 @@ bool MT_Controller::readFromFile(QString fileName)
 
 /***
  * save the meta system if sigel saves the experiment
- * called from SIG_GPExperiment::saveExperiment(QTextStream & file)
+ * called from SIG_GPMetaGPExperiment::saveExperiment(QTextStream & file)
  ***/
 void MT_Controller::writeToFile(QTextStream &file, QString name, int autoSave)
 {

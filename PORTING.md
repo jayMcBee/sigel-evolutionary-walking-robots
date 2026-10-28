@@ -911,6 +911,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `SIG_GPExperiment` IS RENAMED `SIG_GPMetaGPExperiment`.**
+
+- **Changed:** the class that adds the MetaGP controller to the experiment
+  data is named after it. Files, class, guard and all users follow. A rename
+  only; it frees the name `SIG_GPExperiment` for the base class.
+
 **2026-10-27 — DONE: FORMATTING ROUND ON `SIG_GPExperiment` AND `SIG_GPSlaveExperiment`.**
 
 - **Changed:** tabs and Allman braces, braces on every branch and loop,

@@ -42,7 +42,7 @@ namespace SIGEL_GP
 {
 
 	/**
-	 * SIG_GPSlaveExperiment is the experiment of sigel_slave: SIG_GPExperiment
+	 * SIG_GPSlaveExperiment is the experiment of sigel_slave: SIG_GPMetaGPExperiment
 	 * without the MetaGP controller. It holds all the data that describe the run.
 	 */
 	class SIG_GPSlaveExperiment

@@ -43,7 +43,7 @@ namespace SIGEL_MasterGUI
  *  Constructs a SIG_Environment which is a child of 'parent', with the
  *  name 'name' and widget flags set to 'f'
  */
-SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
+SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment )
 	: SIG_EnvironmentBase( parent, name, fl ), theExperiment( theExperiment )
 {
 	// gravity validators

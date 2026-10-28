@@ -52,7 +52,7 @@ namespace SIGEL_MasterGUI
  *  Constructs a SIG_GPParameter which is a child of 'parent', with the
  *  name 'name' and widget flags set to 'f'
  */
-SIG_GPParameter::SIG_GPParameter( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPExperiment &theExperiment )
+SIG_GPParameter::SIG_GPParameter( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment )
 	: SIG_GPParameterBase( parent, name, fl ), theExperiment( theExperiment ), sigelRoot( std::getenv( "SIGEL_ROOT" ) )
 {
 	for ( const SIGEL_GP::SIG_GPFitnessFunction *fitnessFunction : SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions() )

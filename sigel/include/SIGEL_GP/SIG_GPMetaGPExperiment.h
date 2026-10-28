@@ -20,8 +20,8 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-#ifndef SIGEL_GP_SIG_GPEXPERIMENT_H
-#define SIGEL_GP_SIG_GPEXPERIMENT_H
+#ifndef SIGEL_GP_SIG_GPMETAGPEXPERIMENT_H
+#define SIGEL_GP_SIG_GPMETAGPEXPERIMENT_H
 
 #include <memory>
 #include "SIGEL_GP/SIG_GPSlaveExperiment.h"
@@ -35,10 +35,10 @@ namespace SIGEL_GP
 {
 
 	/**
-	 * SIG_GPExperiment is the main data structure of an evolution run: the data
+	 * SIG_GPMetaGPExperiment is the main data structure of an evolution run: the data
 	 * of SIG_GPSlaveExperiment plus the controller of the MetaGP system.
 	 */
-	class SIG_GPExperiment : public SIG_GPSlaveExperiment
+	class SIG_GPMetaGPExperiment : public SIG_GPSlaveExperiment
 	{
 	public:
 		/**
@@ -46,12 +46,12 @@ namespace SIGEL_GP
 		 * @param exp
 		 *  Is not used.
 		 */
-		SIG_GPExperiment( QString exp );
+		SIG_GPMetaGPExperiment( QString exp );
 
 		/**
 		 * Builds an empty experiment.
 		 */
-		SIG_GPExperiment();
+		SIG_GPMetaGPExperiment();
 
 		/**
 		 * Reads the experiment from a text stream.
@@ -76,4 +76,4 @@ namespace SIGEL_GP
 
 }
 
-#endif // SIGEL_GP_SIG_GPEXPERIMENT_H
+#endif // SIGEL_GP_SIG_GPMETAGPEXPERIMENT_H

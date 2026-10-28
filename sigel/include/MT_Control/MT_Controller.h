@@ -22,7 +22,7 @@ class QWidget;
 
 namespace SIGEL_GP {
 
-	class SIG_GPExperiment;
+	class SIG_GPMetaGPExperiment;
 
 }
 
@@ -33,7 +33,7 @@ class MT_Controller : public QObject
 	friend void StartMetaEvolution(void *inRawSubst);
 
 public:
-	MT_Controller(SIGEL_GP::SIG_GPExperiment &exp);
+	MT_Controller(SIGEL_GP::SIG_GPMetaGPExperiment &exp);
 	~MT_Controller() override;
 
 public:
@@ -59,7 +59,7 @@ private:
 	MT_GPManager *gpManager;
 	MT_MainWindow *mainWindow;
 	MT_Substitute *substitution;
-	SIGEL_GP::SIG_GPExperiment &sigExp;
+	SIGEL_GP::SIG_GPMetaGPExperiment &sigExp;
 	QObject *sigMainWindow;
 	QList<unsigned int> correctEst;
 	QList<unsigned int> metaEst;
