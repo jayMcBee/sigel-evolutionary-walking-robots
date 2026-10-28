@@ -911,6 +911,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_Controller::writeToFile` LEAVES EARLY WHEN METAGP IS OFF.**
+
+- **Changed:** the body no longer sits inside `if( metaOn )`; the inverted
+  condition returns first. Behaviour is unchanged.
+
 **2026-10-28 — DONE: FORMATTING ROUND ON `MT_Controller.cpp`.**
 
 - **Changed:** Allman braces instead of K&R, braces on every branch and loop,

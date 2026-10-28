@@ -581,44 +581,46 @@ bool MT_Controller::readFromFile( QString fileName )
  ***/
 void MT_Controller::writeToFile( QTextStream &file, QString name, int autoSave )
 {
-	if( metaOn )
+	if( !metaOn )
 	{
-		// wait for the evolution to end before saving the system
-		// to prevent problems with the concurrent threads
-		if( gpManager )
-		{
-			pthread_mutex_lock( &gpManager->evolutionMutex );
-		}
-
-		// save the meta system
-		if( autoSave )
-		{
-			if( !baseName.isEmpty() )
-			{
-				saveName = baseName + QString( "%1" ).arg( autoSaveCnt = autoSaveCnt++ % 3 );
-			}
-			if( !saveSystem( name ) )
-			{
-				return;  // oops, something went wrong
-			}
-		}
-		else
-		{
-			if( !saveSystem( name ) )
-			{
-				return;  // oops, something went wrong
-			}
-		}
-
-		if( gpManager )
-		{
-			pthread_mutex_unlock( &gpManager->evolutionMutex );
-		}
-
-		file << "MetaInUse\n";     // write the file name for the meta experiment
-		file << "fileName=" << saveName << "\n";// into the sigel experiment file
-		file << "#####\n";
+		return;
 	}
+
+	// wait for the evolution to end before saving the system
+	// to prevent problems with the concurrent threads
+	if( gpManager )
+	{
+		pthread_mutex_lock( &gpManager->evolutionMutex );
+	}
+
+	// save the meta system
+	if( autoSave )
+	{
+		if( !baseName.isEmpty() )
+		{
+			saveName = baseName + QString( "%1" ).arg( autoSaveCnt = autoSaveCnt++ % 3 );
+		}
+		if( !saveSystem( name ) )
+		{
+			return;  // oops, something went wrong
+		}
+	}
+	else
+	{
+		if( !saveSystem( name ) )
+		{
+			return;  // oops, something went wrong
+		}
+	}
+
+	if( gpManager )
+	{
+		pthread_mutex_unlock( &gpManager->evolutionMutex );
+	}
+
+	file << "MetaInUse\n";     // write the file name for the meta experiment
+	file << "fileName=" << saveName << "\n";// into the sigel experiment file
+	file << "#####\n";
 }
 
 /***
