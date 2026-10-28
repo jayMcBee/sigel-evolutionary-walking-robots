@@ -8,7 +8,7 @@ MT_TournamentManager::MT_TournamentManager()
 
 MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *OPop, MT_Randomizer * NewRandi, int Method, int TSize)
 {
-	LastError=0;
+	LastError = MT_ErrorCode::None;
 	ParentPop = PPop;
 	OffspringPop = OPop;
 	Randi = NewRandi;
@@ -20,7 +20,7 @@ MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *O
 
 MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *OPop, MT_Randomizer *NewRandi, QTextStream &File)
 {
-	LastError=0;
+	LastError = MT_ErrorCode::None;
 	ParentPop = PPop;
 	OffspringPop = OPop;
 	Randi = NewRandi;
@@ -39,7 +39,7 @@ MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *O
 		setTournamentSize((File.readLine()).toInt());
 	}
 	else
-		LastError=510;
+		LastError = MT_ErrorCode::TournamentManagerSectionMissing;
 }
 
 MT_TournamentManager::~MT_TournamentManager()
@@ -57,7 +57,7 @@ MT_TournamentManager::~MT_TournamentManager()
 }
 
 // get/set method
-int MT_TournamentManager::getLastError()
+MT_ErrorCode MT_TournamentManager::getLastError()
 {
 	return LastError;
 }

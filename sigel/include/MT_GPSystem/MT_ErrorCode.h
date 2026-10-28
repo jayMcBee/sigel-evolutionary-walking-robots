@@ -52,6 +52,9 @@ enum class MT_ErrorCode
 	// MT_Search
 	BroodSizeSectionMissing = 410,
 
+	// MT_TournamentManager
+	TournamentManagerSectionMissing = 510,
+
 	// MT_FitnessTrainer
 	FitnessTrainerSectionMissing = 601,
 	FitnessTrainerSetupSectionMissing = 602,

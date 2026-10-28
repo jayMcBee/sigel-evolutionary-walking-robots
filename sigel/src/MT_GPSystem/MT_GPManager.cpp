@@ -91,8 +91,8 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 		LastError = static_cast< int >( Seeker->getLastError() );
 
 	Selector = std::make_unique< MT_TournamentManager >(Parent.get(), Offspring.get(), Randi.get(), File);
-	if(Selector->getLastError() != 0)
-		LastError = Selector->getLastError();
+	if(Selector->getLastError() != MT_ErrorCode::None)
+		LastError = static_cast< int >( Selector->getLastError() );
 	FitnessTrainer = std::make_unique< MT_FitnessTrainer >(File);
 	if(FitnessTrainer->getLastError() != MT_ErrorCode::None)
 		LastError = static_cast< int >( FitnessTrainer->getLastError() );

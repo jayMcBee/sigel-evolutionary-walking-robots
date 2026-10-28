@@ -911,6 +911,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_TournamentManager` KEEPS ITS ERROR CODE IN `MT_ErrorCode`.**
+
+- **Changed:** 510, a missing "TournamentManager:" section, is named
+  `TournamentManagerSectionMissing`. `MT_GPManager` casts the code until it
+  follows.
+
 **2026-10-28 — DONE: `TypOfIndividual` IS RENAMED `TypeOfIndividual`.**
 
 - **Changed:** the German "Typ" is translated in the `MT_Tournament` member,

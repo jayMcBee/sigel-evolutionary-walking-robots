@@ -5,6 +5,7 @@
 #include <QTextStream>
 #include "MT_GPSystem/MT_Population.h"
 #include "MT_GPSystem/MT_Tournament.h"
+#include "MT_GPSystem/MT_ErrorCode.h"
 
 
 /* This class manage the GP tournament;
@@ -24,7 +25,7 @@ public:
 	void setNameForParent(int Na);
 	int getSelectionMethod ();
 	int getTournamentSize();
-	int getLastError();
+	MT_ErrorCode getLastError();
 	
 	/* change the TournamentSize; 
 	* ATTENTION: function always use !! after change of the population size.
@@ -60,7 +61,7 @@ private:
 
 	int NameForNewParent;
 
-	int LastError;
+	MT_ErrorCode LastError;
 
 	/* denote which players have gain the present tournaments and which are the loser
 	* 0 indicate a Loser
