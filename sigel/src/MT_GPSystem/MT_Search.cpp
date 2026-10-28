@@ -64,41 +64,31 @@ MT_Individual * MT_Search::mutate(MT_Individual * Progenitor)
 	
 	int NumOfMutation =0;
 
-	for(int i=0; i< ChildProgram->getLength(); i++)
+	for( int i = 0; i < ChildProgram->getLength(); i++ )
 	{
-		if (Randi->answerMutateLine())
+		if( !Randi->answerMutateLine() )
 		{
-			//Iterate over the program line
-			for(int k=0; k<3; k++)
-			{
-				if (Randi->answerMutateElement())
-				{
-					NumOfMutation++;
-					switch (k)
-					{ 
-					case 0 :
-						{
-							// Mutate instruction!
-							(ChildProgram->getProgramLine(i))->setInstruction(Randi->getRandomInstruction());
-						}
-						break;
+			continue;
+		}
 
-					case 1:
-						{
-							// Mutate Variable - 1.Operand
-							(ChildProgram->getProgramLine(i))->setOperandA(Randi->getRandomVariable());
-						}
-						break;
+		MT_Programline *line = ChildProgram->getProgramLine( i );
 
-					case 2:
-						{
-							// Mutate 2. Operand!
-							(ChildProgram->getProgramLine(i))->setOperandB(Randi->getRandomOperand());
-						}
-						break;
-					}
-				}
-			}
+		if( Randi->answerMutateElement() )
+		{
+			NumOfMutation++;
+			line->setInstruction( Randi->getRandomInstruction() );
+		}
+
+		if( Randi->answerMutateElement() )
+		{
+			NumOfMutation++;
+			line->setOperandA( Randi->getRandomVariable() );
+		}
+
+		if( Randi->answerMutateElement() )
+		{
+			NumOfMutation++;
+			line->setOperandB( Randi->getRandomOperand() );
 		}
 	}
 

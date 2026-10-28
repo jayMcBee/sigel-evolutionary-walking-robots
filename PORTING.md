@@ -911,6 +911,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_Search::mutate` LOSES ITS DEEP NESTING.**
+
+- **Changed:** a line that is not mutated is skipped with `continue`, and the
+  loop over the three elements with its `switch` is written out as three
+  `if`s. The random calls keep their order, so a seed gives the same mutation.
+
 **2026-10-28 — DONE: `MT_Randomizer::getRandomInstruktion` IS RENAMED `getRandomInstruction`.**
 
 - **Changed:** the German spelling is translated, in the method and its two
