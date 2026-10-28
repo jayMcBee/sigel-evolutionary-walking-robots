@@ -911,6 +911,15 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_Interpreter` KEEPS ITS ERROR CODE IN `MT_ErrorCode`.**
+
+- **Changed:** `Error`, `getLastError()` and `loadProgram()` use
+  `MT_ErrorCode`. The header documented `1` as "no error", which only the
+  constructor with parameters set; the default constructor set `0`. Both now
+  set `None`, and the two comments say so. Nothing read the `1`: its only
+  user, `MT_Substitute`, ignores `loadProgram`'s result. The cast in
+  `MT_FitnessTrainer::calculateFitness` is gone.
+
 **2026-10-28 — DONE: `MT_Search` KEEPS ITS ERROR CODE IN `MT_ErrorCode`.**
 
 - **Changed:** 410, a missing "BrutSize:" section, is named

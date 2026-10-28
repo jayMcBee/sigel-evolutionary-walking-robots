@@ -173,7 +173,7 @@ bool MT_FitnessTrainer::calculateFitness( MT_Individual *Indi )
 	PresentTSize = TSet->getPresentTSize();
 	if( PresentTSize > 0 )
 	{
-		LastError = static_cast< MT_ErrorCode >( Interpreter.loadProgram( Indi->getProgram() ) );
+		LastError = Interpreter.loadProgram( Indi->getProgram() );
 
 		for( int i = 0; i < PresentTSize; i++ )
 		{

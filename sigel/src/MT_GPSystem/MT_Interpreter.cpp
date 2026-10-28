@@ -5,7 +5,7 @@
 
 MT_Interpreter::MT_Interpreter()
 {
-	Error =0;
+	Error = MT_ErrorCode::None;
 	Program =nullptr;
 }
 
@@ -17,7 +17,7 @@ MT_Interpreter::MT_Interpreter(int VarNum, int TDuration)
 	DurationToInterpret = TDuration;
 	resetMachine();
 
-	Error =1;
+	Error = MT_ErrorCode::None;
 }
 
 // further methods
@@ -48,7 +48,7 @@ void MT_Interpreter::resetMachine()
 	ProgramCounter=0;
 }
 
-int MT_Interpreter::getLastError()
+MT_ErrorCode MT_Interpreter::getLastError()
 {
 	return Error;
 }
@@ -513,7 +513,7 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 	return Variables[0];
 }
 
-int MT_Interpreter::loadProgram(MT_Program *Prog)
+MT_ErrorCode MT_Interpreter::loadProgram(MT_Program *Prog)
 {
 	Program = Prog;
 	return Error;

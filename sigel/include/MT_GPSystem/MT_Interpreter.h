@@ -4,6 +4,7 @@
 #include <QList>
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 #include "MT_GPSystem/MT_Program.h"
+#include "MT_GPSystem/MT_ErrorCode.h"
 
 /* This class interpret the MT_Program of the SIGLE translated Individual
 * (the robot control program). 
@@ -11,7 +12,7 @@
 class MT_Interpreter  
 {
 private:
-	int Error;
+	MT_ErrorCode Error;
 	/* Variables is a array of double with Size NumberVariable. 
 	* It's represent the variable/ register which can use a MT_Program
 	*/
@@ -58,9 +59,9 @@ public:
 	int getDuration();
 
 	/* load a given MT_Program (by a pointer) to the Interpreter 
-	* If an error occurs, the return value is not 1.
+	* If an error occurs, the return value is not MT_ErrorCode::None.
 	*/ 
-	int loadProgram (MT_Program * Prog);
+	MT_ErrorCode loadProgram (MT_Program * Prog);
 
 	/* interpret perform the MT_Program of the given translated SIGEL Individual
 	* (the robot control program).
@@ -73,9 +74,9 @@ public:
 	double interpret(MT_TranslatedIndividual * RobPro);
 
 	/* If an error occurred, this function supplies a reason
-	*	a 1 indicate, that no error occurred  
+	*	MT_ErrorCode::None indicate, that no error occurred
 	*/
-	int getLastError();
+	MT_ErrorCode getLastError();
 
 	/* This function reset the Interpret to the start conditions,
 	* @post: the Flag's, instruction counter and the Variables are setting of zero
