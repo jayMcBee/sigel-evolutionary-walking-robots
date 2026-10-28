@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `set`/`getSelektionValue` ARE RENAMED `set`/`getSelectionValue` (ITEM 14 DONE).**
+
+- **Changed:** the German spelling is translated in `MT_FitnessTrainer`,
+  `MT_GPManager`, their doc comments and the callers in `MT_GPManager`,
+  `MT_SelectionWidget` and `MT_PopulationWidget`. A rename only. This was the
+  last German symbol of item 14.
+
 **2026-10-28 — DONE: FORMATTING ROUND ON `MT_Substitute`.**
 
 - **Changed:** tabs, `( x )` spacing, spaces around operators, `Type *name`

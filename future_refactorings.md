@@ -32,18 +32,6 @@ Paths are relative to `sigel/`, the source tree.
 - [ ] **11. Write `tour` out as `tournament` in every name,** in SIGEL and
   MetaGP.
 
-- [ ] **14. Translate the German symbols.** Every miss is a compile error,
-  so `check.sh` verifies it.
-
-  | symbol | where |
-  |---|---|
-  | `set`/`getSelektionValue` | `MT_FitnessTrainer.h`, `MT_GPManager.h` |
-
-  `rot` in `getMinRot` and `rotMin` is rotation, not the colour — leave it.
-  **Check after each phase:** `./checks/check.sh`, then
-  `./checks/dictorder-dump.sh | diff -u checks/baselines/dictorder-baseline.txt -`
-  empty, then `./checks/fitness-check.sh` clean.
-
 - [ ] **15. Rename the `act` prefix to `current`.** German `aktuell`; reads as
   the verb "act". `actExperiment`, `actExpChanged` and `slotActExpChanged` are
   done.

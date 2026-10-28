@@ -159,7 +159,7 @@ bool MT_PopulationWidget::onHide(MT_GPManager *manager, MT_EstimationState *esti
 		int tsetSize;
 		int tDuration;
 
-		manager->getSelektionValue(&offspringSize, &tournSize,
+		manager->getSelectionValue(&offspringSize, &tournSize,
 		        &selMethod, &fitFunc,
 		        &tsetSize, &tDuration);
 
@@ -171,7 +171,7 @@ bool MT_PopulationWidget::onHide(MT_GPManager *manager, MT_EstimationState *esti
 		tournSize = mainWindow->calculateTournSize(popSize, offspringSize, tournSize);
 
 		// ... and finally set it
-		manager->setSelektionValue(offspringSize, tournSize,
+		manager->setSelectionValue(offspringSize, tournSize,
 		        selMethod, fitFunc,
 		        tsetSize, tDuration);
 

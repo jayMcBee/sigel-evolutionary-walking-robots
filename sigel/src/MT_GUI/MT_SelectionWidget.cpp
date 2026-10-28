@@ -76,7 +76,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	QObject::disconnect(overProductionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotOverProdChanged(int)));
 	QObject::disconnect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
 
-	manager->getSelektionValue(&offspringSize, &tournSize, 
+	manager->getSelectionValue(&offspringSize, &tournSize, 
 		&selMethod, &fitFunc, 
 		&tsetSize, &tDuration);
 
@@ -149,7 +149,7 @@ bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *estim
 	tsetSize = TSetSizeSpinBox->value();	// training set size
 	tDuration= TDurationSpinBox->value();	// set max interpretation duration
 
-	manager->setSelektionValue(offspringSize, tournSize,
+	manager->setSelectionValue(offspringSize, tournSize,
 		selMethod, fitFunc,
 		tsetSize, tDuration);
 

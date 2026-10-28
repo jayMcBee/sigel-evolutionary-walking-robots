@@ -53,15 +53,15 @@ public:
 	/*supply a pointer of the Randomizer*/
 	MT_Randomizer * getRandomizer();
 
-	/* update the Gp-System with the given SelektionValue
+	/* update the Gp-System with the given SelectionValue
 	* there are involved the class 
 	* @pre: the Offspring must be empty! Flush it first.*/
-	void setSelektionValue( int OffspringSize, int TournamentSize, int SMethod, int FitnessFunction, int TrainingSetSize, int TrainingDuration);
+	void setSelectionValue( int OffspringSize, int TournamentSize, int SMethod, int FitnessFunction, int TrainingSetSize, int TrainingDuration);
 	
 	/* for update the Selection window;
 	* the GP-System will change direct the value in the GUI-class 
 	*/
-	void getSelektionValue (int *OffspringSize, int  * TournamentSize, int * SMethod, int * FitnessFunction, int *TrainingSetSize, int * TrainingDuration);
+	void getSelectionValue (int *OffspringSize, int  * TournamentSize, int * SMethod, int * FitnessFunction, int *TrainingSetSize, int * TrainingDuration);
 	
 	/*change the BrutSize*/
 	void setBrutSize(int NewSize);

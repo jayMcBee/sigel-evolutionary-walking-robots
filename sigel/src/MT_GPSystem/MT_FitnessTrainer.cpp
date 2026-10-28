@@ -100,7 +100,7 @@ int MT_FitnessTrainer::getLastError()
 	return LastError;
 }
 
-void MT_FitnessTrainer::getSelektionValue(int *FitFunction, int *TDuration, int *TSize)
+void MT_FitnessTrainer::getSelectionValue(int *FitFunction, int *TDuration, int *TSize)
 {
 	*FitFunction = FitnessFunction;
 	*TDuration = Interpreter.getDuration();
@@ -112,7 +112,7 @@ int MT_FitnessTrainer::getTDuration()
 	return Interpreter.getDuration();
 }
 
-void MT_FitnessTrainer::setSelektionValue(int FitFunction, int TDuration, int TSize)
+void MT_FitnessTrainer::setSelectionValue(int FitFunction, int TDuration, int TSize)
 {
 	FitnessFunction =FitFunction;
 	TSetSize =TSize;

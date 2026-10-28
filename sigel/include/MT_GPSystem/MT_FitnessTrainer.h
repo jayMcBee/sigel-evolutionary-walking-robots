@@ -98,16 +98,16 @@ public:
 	/* change the Number of Variables, which the Interpreter allowed to use. */
 	void setNumberOfVariables(int varNumber);
 	
-	/* change the SelektionValue because the GUI have change.
+	/* change the SelectionValue because the GUI have change.
 	* post: the FitnessFunction, the TrainingDuration and the TrainingSetSize are now up to date
 	*/
-	void setSelektionValue(int FitFunction, int TDuration, int TSize);
+	void setSelectionValue(int FitFunction, int TDuration, int TSize);
 	
 	/* the GUI isn't up to date (e.g. load setup), this function bring the GUI up to date.
 	* the Value/ Data are directly change in the GUI by the given pointers.
 	* @post: the FitnessFunction, the TrainingDuration and the TrainingSetSize are now up to date
 	*/ 
-	void getSelektionValue(int *FitFunction, int * TDuration, int *TSize);
+	void getSelectionValue(int *FitFunction, int * TDuration, int *TSize);
 	
 	/* This function writes the MT_FitnessTrainer to a QTextStream.
 	* @param:

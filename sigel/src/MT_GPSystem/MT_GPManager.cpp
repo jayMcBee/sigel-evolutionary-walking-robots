@@ -214,7 +214,7 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 	File << "best fitness before calculation: " << NewBestIndi->getFitness() << Qt::endl;
 	NewBestIndi->setTrainingsSet(-1);
 	int fitFct, tDur, tSize;
-	FitnessTrainer->getSelektionValue(&fitFct, &tDur, &tSize);
+	FitnessTrainer->getSelectionValue(&fitFct, &tDur, &tSize);
 	double corFitValue = NewBestIndi->getFitness();
 	double ErrorCorrect =0.0;
 
@@ -231,7 +231,7 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 			
 		case 2: 
 			{
-				FitnessTrainer->setSelektionValue(1, tDur, tSize);
+				FitnessTrainer->setSelectionValue(1, tDur, tSize);
 				FitnessTrainer->calculateFitness(NewBestIndi);
 				ErrorCorrect = ((0.1/NewBestIndi->getFitness())/PresentTSize);
 			}
@@ -246,7 +246,7 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 
 		case 4:
 			{
-				FitnessTrainer->setSelektionValue(3, tDur, tSize);
+				FitnessTrainer->setSelectionValue(3, tDur, tSize);
 				FitnessTrainer->calculateFitness(NewBestIndi);
 				ErrorCorrect = (NewBestIndi->getFitness()/10.0);
 			}
@@ -276,7 +276,7 @@ void MT_GPManager::writeToFileGPSystem(QTextStream &File)
 	File << "avg. Fitness: " << Statistics->getStatisticElement(GenerationNumber-2)->AverageFitness << Qt::endl;
 	File << "average Error/ Percent of Correct Estimation: " << ErrorCorrect << Qt::endl;
 
-	FitnessTrainer->setSelektionValue(fitFct, tDur, tSize);
+	FitnessTrainer->setSelectionValue(fitFct, tDur, tSize);
 	NewBestIndi->setFitness(corFitValue);
 }
 
@@ -320,7 +320,7 @@ MT_Randomizer * MT_GPManager::getRandomizer()
 	return Randi.get();
 }
 
-void MT_GPManager::setSelektionValue(int OffspringSize, int TournamentSize, int SMethod, int FitnessFunction, int TrainingSetSize, int TrainingDuration)
+void MT_GPManager::setSelectionValue(int OffspringSize, int TournamentSize, int SMethod, int FitnessFunction, int TrainingSetSize, int TrainingDuration)
 {
 	if ((OffspringSize !=0)&&(TournamentSize!=0) && (TrainingSetSize !=0))
 	{
@@ -338,19 +338,19 @@ void MT_GPManager::setSelektionValue(int OffspringSize, int TournamentSize, int 
 
 		Selector->setTournamentSize(TournamentSize); // does more!!
 		Selector->setSelectionMethod(SMethod);
-		FitnessTrainer->setSelektionValue(FitnessFunction, TrainingDuration, TrainingSetSize);
+		FitnessTrainer->setSelectionValue(FitnessFunction, TrainingDuration, TrainingSetSize);
 	}
 	else
 		LastError =13;
 }
 
-void MT_GPManager::getSelektionValue(int *OffspringSize, int *TournamentSize, int *SMethod, int *FitnessFunction, int *TrainingSetSize, int *TrainingDuration)
+void MT_GPManager::getSelectionValue(int *OffspringSize, int *TournamentSize, int *SMethod, int *FitnessFunction, int *TrainingSetSize, int *TrainingDuration)
 {
 	*OffspringSize = Offspring->getSize();
 	*TournamentSize = Selector->getTournamentSize();
 	*SMethod = Selector->getSelectionMethod();
 
-	 FitnessTrainer->getSelektionValue(FitnessFunction, TrainingDuration, TrainingSetSize);
+	 FitnessTrainer->getSelectionValue(FitnessFunction, TrainingDuration, TrainingSetSize);
 }
 
 void MT_GPManager::setBrutSize(int NewSize)
@@ -405,7 +405,7 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 	int trainingDuration =0;
 	int trainingSetSize =0;
 	int FitFunction =0;
-	FitnessTrainer->getSelektionValue(&FitFunction, &trainingDuration, &trainingSetSize);
+	FitnessTrainer->getSelectionValue(&FitFunction, &trainingDuration, &trainingSetSize);
 	
 	if (FitFunction < 3)
 		Selector->setTypOfIndividual(0); // Evaluator Meta System;
