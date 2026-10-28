@@ -17,69 +17,67 @@
 #include <qtextstream.h>
 #include <math.h>
 
-class MT_Substitute  
+class MT_Substitute
 {
 public:
-	
 	// get/set method for Parameter update
-	void getEstimationParameter(int *EStrategy, double *Tol, int *ReInterval);
-	void setEstimationParameter(int EStrategy, double Tol, int ReInterval);
-	void setInterpreter(int NumOfVariable,  int TimeToInter);
-	void getNumOfEstimation(QList<unsigned int> *  MetaEstimation, QList<unsigned int>  *  CorrectEstimation);
+	void getEstimationParameter( int *EStrategy, double *Tol, int *ReInterval );
+	void setEstimationParameter( int EStrategy, double Tol, int ReInterval );
+	void setInterpreter( int NumOfVariable, int TimeToInter );
+	void getNumOfEstimation( QList<unsigned int> *MetaEstimation, QList<unsigned int> *CorrectEstimation );
 	int getTyp();
 
 	/*nextSIGGeneration() indicate the evaluator, that a new SIGEL Generation started */
-	void nextSIGGeneration(double AverageSigelFit);
+	void nextSIGGeneration( double AverageSigelFit );
 
 	pthread_mutex_t interpreterMutex;
 	pthread_mutex_t tCaseBufferMutex;
 	pthread_mutex_t fitnessMutex;
 
 	// changeTCases() supply the new TrainingCases for the Meta GP-System
-	QQueue<MT_TrainingCase *> * changeTCases();
+	QQueue<MT_TrainingCase *> *changeTCases();
 
-	// update the BestMETAProgram;  
-	void changeBest(MT_Program * MetaProg);
+	// update the BestMETAProgram;
+	void changeBest( MT_Program *MetaProg );
 
-	// used for update the MetaError 
-	void changeErrorInfo(QList<double> * OutCome, QList<double> * CorrectFit);
+	// used for update the MetaError
+	void changeErrorInfo( QList<double> *OutCome, QList<double> *CorrectFit );
 
-	//overriding methods 
+	//overriding methods
 	MT_Substitute();
 	virtual ~MT_Substitute();
-	virtual void loadSetup(QTextStream &File);
-    virtual void writeToFile(QTextStream &File);
-	virtual void writeToFileSetup(QTextStream &File);
+	virtual void loadSetup( QTextStream &File );
+	virtual void writeToFile( QTextStream &File );
+	virtual void writeToFileSetup( QTextStream &File );
 
 private:
 	static constexpr int startNumberOfVariables = 10;
 	static constexpr int startDuration = 100;
 
 protected:
-	
 	// Sigel Generation Number
 	int GenerationNumber;
-	
-	// translated a SIGEL Program to three arrays; which by a MetaProgram can used  
-	MT_TranslatedIndividual * translatedSIGProg(SIGEL_Program::SIG_Program const *SIGProg);
 
-	// the Program of the present best Meta Individuals 
+	// translated a SIGEL Program to three arrays; which by a MetaProgram can used
+	MT_TranslatedIndividual *translatedSIGProg( SIGEL_Program::SIG_Program const *SIGProg );
+
+	// the Program of the present best Meta Individuals
 	std::unique_ptr< MT_Program > BestMETAProgram;
-	
-	// for EstimationStrategy: count the Meta Estimation between the calibrationsteps   
+
+	// for EstimationStrategy: count the Meta Estimation between the calibrationsteps
 	int NumOfMeta;
-	
+
 	//for EstimationStrategy: indicate the goodness of the BestMETAProgram
 	double MetaProgError;
-	
-	// for EstimationStrategy: to determinate the MetaProgError, the training data are needed  
+
+	// for EstimationStrategy: to determinate the MetaProgError, the training data are needed
 	QList<double> CorrectFitness;
-	QList<double> AssumedFitness; 
+	QList<double> AssumedFitness;
 
 	// the AverageFitness of the Sigel GP Population for the last Generation
 	// supply for the evaluationTactic
 	double AverageSigelFitness;
-	
+
 	// buffer the New MT_TrainingCase;
 	QQueue<MT_TrainingCase *> TCaseBuffer;
 
@@ -87,27 +85,29 @@ protected:
 	MT_Interpreter Interpreter;
 
 	/*inidcate the Typ of Substitute
-	* 1:= Evaluator 2:= classifier  
-	*/ 
+	* 1:= Evaluator 2:= classifier
+	*/
 	int Typ;
 
-	/* Prescribes the strategy for deciding whether meta or simulation is used to 
+	/* Prescribes the strategy for deciding whether meta or simulation is used to
 	* determine the SIGEL fitness.
 	* For the evaluator:
 	* EstimationStrategy = 1 := average deviation from the fitness < Tolerance; Tolerance >= 0;
 	* EstimationStrategy = 2 := average deviation from the fitness excluding (***) < Tolerance;
-	* (***) := the (number of fitness cases)/10 largest deviations 
+	* (***) := the (number of fitness cases)/10 largest deviations
 	* EstimationStrategy = 3 := percentage of wrong decisions: 0% < Tolerance < 100%
 	* EstimationStrategy = 4 :=
-	* EstimationStrategy otherwise := 
+	* EstimationStrategy otherwise :=
 	*/
 	int EstimationStrategy;
-	// for EstimationStrategy: 
+
+	// for EstimationStrategy:
 	double Tolerance;
-	// for EstimationStrategy: 
+
+	// for EstimationStrategy:
 	int RefreshInterval;
 
-	// different variable for count; 
+	// different variable for count;
 	QList<unsigned int> NumOfCorrectEstimation;
 	QList<unsigned int> NumOfMetaEstimation;
 };

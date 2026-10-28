@@ -911,6 +911,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: FORMATTING ROUND ON `MT_Substitute`.**
+
+- **Changed:** tabs, `( x )` spacing, spaces around operators, `Type *name`
+  for pointers, braces on the one loop without them, no trailing white space,
+  and the empty-line rules (an empty line above a comment after code, none
+  after an access label or between a comment and its code). The text of the
+  comments and the code is unchanged.
+
 **2026-10-28 — DONE: THE LOCAL LIST `Instruktion` IS RENAMED `Instructions`.**
 
 - **Changed:** the German spelling is translated in
