@@ -11,7 +11,7 @@ MT_Tournament::MT_Tournament(int Size, int num)
 		Individuals[i]=nullptr;
 
 	NumberOfWinner=num;
-	LastError =0;
+	LastError = MT_ErrorCode::None;
 	FirstFreePos =num;
 	PopSize =Size;
 	TypOfIndividual = 0;

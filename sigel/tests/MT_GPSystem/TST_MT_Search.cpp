@@ -223,7 +223,7 @@ MT_MatingResult TST_MT_Search::mate( unsigned seed, const int searchOperator[3],
   MT_Population offspring;
   offspring.changePopSize( 4 );
   MT_Search search( &parents, &offspring, &randomizer );
-  const int error = search.startMatingProcess();
+  const MT_ErrorCode error = search.startMatingProcess();
 
   int parentsFound = 0;
   bool allFilled = true;
@@ -247,7 +247,7 @@ MT_MatingResult TST_MT_Search::mate( unsigned seed, const int searchOperator[3],
 
   for ( int i = 0; i < 2; i++ )
     result.parentLinesAfter[i] = programLines( parent[i]->getProgram() );
-  result.complete = ( error == 0 ) && allFilled && ( parentsFound == 2 ) && ( result.childLines.size() == 2 );
+  result.complete = ( error == MT_ErrorCode::None ) && allFilled && ( parentsFound == 2 ) && ( result.childLines.size() == 2 );
 
   return result;
 }

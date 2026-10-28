@@ -199,7 +199,7 @@ MT_Individual*  MT_Search::reproduce(MT_Individual * Progenitor)
 	return (new MT_Individual(Progenitor->getProgram(), true));
 }
 
-int MT_Search::startMatingProcess()
+MT_ErrorCode MT_Search::startMatingProcess()
 {
 /* ************************* Initialisations  **************************/
 	int ParentSize = SourcePop->getSize();
@@ -339,8 +339,8 @@ int MT_Search::startMatingProcess()
 
 	SourcePop->flush();
 		
-	if (TargetPop->getLastError() !=0)
+	if (TargetPop->getLastError() != MT_ErrorCode::None)
 		return TargetPop->getLastError();
 
-	return 0;
+	return MT_ErrorCode::None;
 }

@@ -6,6 +6,7 @@
 #include "MT_GPSystem/MT_Program.h"
 #include "MT_GPSystem/MT_Individual.h"
 #include "MT_GPSystem/MT_Randomizer.h"	
+#include "MT_GPSystem/MT_ErrorCode.h"
 
 #include <qstring.h>
 #include <qtextstream.h>
@@ -20,7 +21,7 @@ public:
 	/* supply a pointer on the best individual*/
 	MT_Individual * getBestIndividual();
 
-	int getLastError();
+	MT_ErrorCode getLastError();
 	
 	/* change the present PopSize to NewPopSize
 	* this is a special method for the offspring population
@@ -54,7 +55,7 @@ public:
 	MT_Individual * delIndividual (int Pos);
 
 	/* extended the population of one and add the given individual (by a pointer) at the end*/
-	int addIndividual (MT_Individual *NewIndividual );
+	MT_ErrorCode addIndividual (MT_Individual *NewIndividual );
 
 	/* insert the given individual at the given position,
 	* return a pointer of the existing individual
@@ -62,9 +63,8 @@ public:
 	MT_Individual * insertAtPos(MT_Individual * NewIndividual , int Pos);
 	
 	/* insert the given individual at the the next free place, 
-	* the return value is indicate the position of the individual in the population;
-	* if the population is full, the return value is -1 */
-	int insertIndividual (MT_Individual *NewIndividual);
+	* if the population is full, the return value is MT_ErrorCode::PopulationFull */
+	MT_ErrorCode insertIndividual (MT_Individual *NewIndividual);
 
 	/* create a random population of the given size, delete all present individuals */
 	void createNewPop(int PSize, MT_Randomizer *Randi);
@@ -82,13 +82,13 @@ public:
 	int getSize();
 
 	/* import a population from a file and add to the existed population*/
-	int importPop(QTextStream & File);
+	MT_ErrorCode importPop(QTextStream & File);
 
 	//* export the whole population into a file*/
-	int exportPop(QTextStream & File);
+	MT_ErrorCode exportPop(QTextStream & File);
 
 	/* load a population and write over the present population*/
-	int loadPop(QTextStream & File);
+	MT_ErrorCode loadPop(QTextStream & File);
 
 	void writeToFilePop(QTextStream & File);
 	
@@ -100,7 +100,7 @@ public:
 
 protected:
 
-	int LastError;
+	MT_ErrorCode LastError;
 	bool Change;
 
 	/*Indicate the first free position in the population

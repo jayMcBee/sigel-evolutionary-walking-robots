@@ -911,6 +911,15 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_Population` KEEPS ITS ERROR CODE IN `MT_ErrorCode`.**
+
+- **Changed:** 320, 321 and 340 have names (`ImportPopulationSectionMissing`,
+  `PopulationSectionMissing`, `PopulationFull`). The five methods that return
+  the code, and `MT_Search::startMatingProcess`, which passes the target
+  population's code on, return `MT_ErrorCode`; only `TST_MT_Search` uses
+  such a result and now compares it with `None`. `MT_Tournament` starts its
+  inherited code with `None`. The cast on the randomizer's code is gone.
+
 **2026-10-28 — DONE: `MT_Individual` KEEPS ITS ERROR CODE IN `MT_ErrorCode`.**
 
 - **Changed:** 370, a missing "Individual:" section, is named

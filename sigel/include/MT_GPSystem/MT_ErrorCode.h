@@ -38,6 +38,11 @@ enum class MT_ErrorCode
 	RandomizerSetupSectionMissing = 262,
 	ConstantSetupSectionMissing = 263,
 
+	// MT_Population
+	ImportPopulationSectionMissing = 320,
+	PopulationSectionMissing = 321,
+	PopulationFull = 340,
+
 	// MT_Program
 	ProgramSectionMissing = 360,
 

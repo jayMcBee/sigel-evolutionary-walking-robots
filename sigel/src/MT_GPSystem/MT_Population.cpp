@@ -6,7 +6,7 @@ MT_Population::MT_Population()
 	PopSize =1;
 	Individuals.resize(1);
 	Individuals[0]=nullptr;
-	LastError =0;
+	LastError = MT_ErrorCode::None;
 	Change =false;
 }
 
@@ -20,16 +20,16 @@ MT_Population::MT_Population(MT_Randomizer *Randi, int n)
 {
 	FirstFreePos=0;
 	PopSize =0;
-	LastError =0;
+	LastError = MT_ErrorCode::None;
 	Change =false;
 
 	createNewIndis(n, Randi);
-	LastError = static_cast< int >( Randi->getLastError() );
+	LastError = Randi->getLastError();
 }
 
 MT_Population::MT_Population(QTextStream &File)
 {
-	LastError=0;
+	LastError = MT_ErrorCode::None;
 	Change = false;
 	
 	PopSize = (File.readLine()).toInt();
@@ -54,7 +54,7 @@ void MT_Population::writeToFilePop(QTextStream &File)
 			(Individuals[i])->writeToFileIndi(File);
 }
 
-int MT_Population::loadPop(QTextStream &File)
+MT_ErrorCode MT_Population::loadPop(QTextStream &File)
 {
 	QString PopulationString ("Population:");
 	QString PresentLine= File.readLine();
@@ -78,18 +78,18 @@ int MT_Population::loadPop(QTextStream &File)
 			Individuals[i]->setNewName(i);
 	}
 	else
-		LastError=321;
+		LastError = MT_ErrorCode::PopulationSectionMissing;
 
 	return LastError;
 }
 
-int MT_Population::exportPop(QTextStream &File)
+MT_ErrorCode MT_Population::exportPop(QTextStream &File)
 {
 	writeToFilePop(File);
 	return LastError;
 }
 
-int MT_Population::importPop(QTextStream &File)
+MT_ErrorCode MT_Population::importPop(QTextStream &File)
 {
 	QString PopulationString ("Population:");
 	QString PresentLine= File.readLine();
@@ -111,7 +111,7 @@ int MT_Population::importPop(QTextStream &File)
 		FirstFreePos = FirstFreePos+ImportFreePos;
 	}
 	else
-		LastError= 320;
+		LastError = MT_ErrorCode::ImportPopulationSectionMissing;
 
 	return LastError;
 }
@@ -123,7 +123,7 @@ int MT_Population::getSize()
 	return PopSize;
 }
 
-int MT_Population::getLastError()
+MT_ErrorCode MT_Population::getLastError()
 {
 	return LastError;
 }
@@ -180,9 +180,9 @@ void MT_Population::createNewPop(int PSize, MT_Randomizer *Randi)
 	createNewIndis(PSize,Randi);
 }
 
-int MT_Population::insertIndividual(MT_Individual *NewIndividual)
+MT_ErrorCode MT_Population::insertIndividual(MT_Individual *NewIndividual)
 {
-	LastError = 0;
+	LastError = MT_ErrorCode::None;
 
 	if (FirstFreePos<PopSize)
 	{
@@ -191,7 +191,7 @@ int MT_Population::insertIndividual(MT_Individual *NewIndividual)
 		FirstFreePos++;
 	}
 	else
-		LastError = 340;
+		LastError = MT_ErrorCode::PopulationFull;
 
 	return LastError;
 }
@@ -209,7 +209,7 @@ MT_Individual * MT_Population::insertAtPos(MT_Individual *NewIndividual, int Pos
 	return Indi;
 }
 
-int MT_Population::addIndividual(MT_Individual *NewIndividual)
+MT_ErrorCode MT_Population::addIndividual(MT_Individual *NewIndividual)
 {
 	PopSize ++;
 	Individuals.resize(PopSize);

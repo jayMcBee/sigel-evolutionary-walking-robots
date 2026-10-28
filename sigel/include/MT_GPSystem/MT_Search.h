@@ -20,9 +20,9 @@ public:
 	* @pre: there are a corrcet parent, offspring population
 	* @pre: there are a correct randinomizer, which have the necessary 
 	* search parameters
-	* @param: return value indicate an error; 0 := it was a correct search
+	* @param: return value indicate an error; MT_ErrorCode::None := it was a correct search
 	*/ 
-	int startMatingProcess();
+	MT_ErrorCode startMatingProcess();
 
 	/* set/get functions used to update the GUI or the GP system*/
 	void setBrutSize(int  SizeOfBrut);
