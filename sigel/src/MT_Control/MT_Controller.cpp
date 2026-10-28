@@ -124,40 +124,42 @@ bool MT_Controller::startEvolution()
 {
 	startWOSigel = false;
 
-	if( metaOn )
+	if( !metaOn )
 	{
-		if( !createGPSystem() ) // create the gp system if not created so far
-		{
-			return false;
-		}
+		return true;
+	}
 
-		// make sure there's an actually correct substituter
+	if( !createGPSystem() ) // create the gp system if not created so far
+	{
+		return false;
+	}
+
+	// make sure there's an actually correct substituter
+	if( !substitution )
+	{
+		writeEstimationSettings();
+
+		switch( usedSystem )
+		{
+		case EVALUATOR_SUBST:
+			substitution = new MT_Evaluator( sigExp, estimationSettingsStream );
+			break;
+		case CLASSIFIER_SUBST:
+			substitution = new MT_Classifier( estimationSettingsStream );
+			break;
+		}
 		if( !substitution )
 		{
-			writeEstimationSettings();
-
-			switch( usedSystem )
+			if( guiEnabled )
 			{
-			case EVALUATOR_SUBST:
-				substitution = new MT_Evaluator( sigExp, estimationSettingsStream );
-				break;
-			case CLASSIFIER_SUBST:
-				substitution = new MT_Classifier( estimationSettingsStream );
-				break;
+				SIGEL_Tools::SIG_IO::cerr << "Creating Meta GP-System: couldn't create a substituter." << Qt::endl;
 			}
-			if( !substitution )
-			{
-				if( guiEnabled )
-				{
-					SIGEL_Tools::SIG_IO::cerr << "Creating Meta GP-System: couldn't create a substituter." << Qt::endl;
-				}
-				return false;
-			}
+			return false;
 		}
-
-		// create a thread for the meta-evolution
-		pthread_create( &meta_thread, nullptr, reinterpret_cast<void *(*)( void * )>( &StartMetaEvolution ), this );
 	}
+
+	// create a thread for the meta-evolution
+	pthread_create( &meta_thread, nullptr, reinterpret_cast<void *(*)( void * )>( &StartMetaEvolution ), this );
 
 	return true;
 }

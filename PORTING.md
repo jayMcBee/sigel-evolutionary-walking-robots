@@ -911,6 +911,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_Controller::startEvolution` LEAVES EARLY WHEN METAGP IS OFF.**
+
+- **Changed:** the inverted `metaOn` condition returns `true` first; the
+  rest of the body is one level less nested. Behaviour is unchanged.
+
 **2026-10-28 — DONE: `MT_Controller::writeToFile` LEAVES EARLY WHEN METAGP IS OFF.**
 
 - **Changed:** the body no longer sits inside `if( metaOn )`; the inverted
