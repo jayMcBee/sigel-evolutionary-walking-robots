@@ -911,6 +911,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_Randomizer::getRandomInstruktion` IS RENAMED `getRandomInstruction`.**
+
+- **Changed:** the German spelling is translated, in the method and its two
+  callers. A rename only.
+
 **2026-10-28 — DONE: `SIG_GPSlaveExperiment` IS RENAMED `SIG_GPExperiment`.**
 
 - **Changed:** the base class holds the plain experiment and gets the plain

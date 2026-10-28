@@ -79,7 +79,7 @@ MT_Individual * MT_Search::mutate(MT_Individual * Progenitor)
 					case 0 :
 						{
 							// Mutate instruction!
-							(ChildProgram->getProgramLine(i))->setInstruction(Randi->getRandomInstruktion());
+							(ChildProgram->getProgramLine(i))->setInstruction(Randi->getRandomInstruction());
 						}
 						break;
 

@@ -12,7 +12,7 @@ MT_Programline::~MT_Programline()
 
 MT_Programline::MT_Programline(MT_Randomizer *Randi)
 {
-	Instruction = Randi->getRandomInstruktion();
+	Instruction = Randi->getRandomInstruction();
 	OperandA = Randi->getRandomVariable();
 	OperandB = Randi->getRandomOperand();
 }

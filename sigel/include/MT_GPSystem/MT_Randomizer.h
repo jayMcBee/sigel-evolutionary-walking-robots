@@ -46,7 +46,7 @@ public:
 	
 	/* method to yield random instruction, variable or a Operand
 	* for creating a randm program line or mutate a line  */
-	MT_Instruction getRandomInstruktion();
+	MT_Instruction getRandomInstruction();
 	MT_Operand * getRandomVariable();
 	MT_Operand * getRandomOperand ();
 

@@ -402,7 +402,7 @@ int MT_Randomizer::getProportionalWinner(QList<int> * Players)
 	return Winner;
 }
 
-MT_Instruction MT_Randomizer::getRandomInstruktion()
+MT_Instruction MT_Randomizer::getRandomInstruction()
 {
 	int Choice =1;
 	MT_Instruction NewInstruction;
