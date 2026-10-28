@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_Randomizer::loadSetup` LEAVES EARLY.**
+
+- **Changed:** a missing "Randomizer:" or "Constant:" section sets its error
+  code and returns, and so does the "newConstant" case; the main path runs
+  without nesting. The reads, the error codes and the end state are
+  unchanged.
+
 **2026-10-28 — DONE: FORMATTING ROUND ON `MT_Randomizer::loadSetup`.**
 
 - **Changed:** braces on every branch and loop, among them a `while` whose

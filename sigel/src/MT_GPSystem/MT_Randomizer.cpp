@@ -135,81 +135,78 @@ void MT_Randomizer::loadSetup( QTextStream &File )
 		PresentLine = File.readLine();
 	}
 
-	if( ( PresentLine == Randomizer ) && !( File.atEnd() ) )
+	if( ( PresentLine != Randomizer ) || File.atEnd() )
 	{
-		ParentSize = ( File.readLine() ).toInt();
-		OffspringSize = ( File.readLine() ).toInt();
-		TournamentPartition.resize( OffspringSize );
-		NumberOfVariables = ( File.readLine() ).toInt();
-		ProgramLengthMax = ( File.readLine() ).toInt();
+		LastError = MT_ErrorCode::RandomizerSetupSectionMissing;
+		return;
+	}
 
-		for( int i = 0; i < 3; i++ )
-		{
-			ProbSearchOperator[i] = ( File.readLine() ).toDouble();
-		}
+	ParentSize = ( File.readLine() ).toInt();
+	OffspringSize = ( File.readLine() ).toInt();
+	TournamentPartition.resize( OffspringSize );
+	NumberOfVariables = ( File.readLine() ).toInt();
+	ProgramLengthMax = ( File.readLine() ).toInt();
 
-		for( int i = 0; i < 2; i++ )
-		{
-			ProbMutationPower[i] = ( File.readLine() ).toDouble();
-		}
+	for( int i = 0; i < 3; i++ )
+	{
+		ProbSearchOperator[i] = ( File.readLine() ).toDouble();
+	}
 
-		for( int i = 0; i < 3; i++ )
-		{
-			ProbCrossOverPoints[i] = ( File.readLine() ).toDouble();
-		}
+	for( int i = 0; i < 2; i++ )
+	{
+		ProbMutationPower[i] = ( File.readLine() ).toDouble();
+	}
 
-		for( int i = 0; i < 17; i++ )
-		{
-			ProbInstruction[i] = ( File.readLine() ).toDouble();
-		}
+	for( int i = 0; i < 3; i++ )
+	{
+		ProbCrossOverPoints[i] = ( File.readLine() ).toDouble();
+	}
 
+	for( int i = 0; i < 17; i++ )
+	{
+		ProbInstruction[i] = ( File.readLine() ).toDouble();
+	}
+
+	PresentLine = File.readLine();
+	if( PresentLine.toDouble() >= 1.0 )
+	{
+		ProbInstruction[17] = PresentLine.toDouble();
 		PresentLine = File.readLine();
-		if( PresentLine.toDouble() >= 1.0 )
-		{
-			ProbInstruction[17] = PresentLine.toDouble();
-			PresentLine = File.readLine();
-		}
-		else
-		{
-			ProbInstruction[17] = ProbInstruction[16];
-		}
-
-		QString ConString( "Constant:" );
-		PresentLine = File.readLine();
-
-		while( ( PresentLine != ConString ) && !( File.atEnd() ) )
-		{
-			PresentLine = File.readLine();
-		}
-
-		if( ( PresentLine == ConString ) && !( File.atEnd() ) )
-		{
-			PresentLine = File.readLine();
-			if( PresentLine == "newConstant" )
-			{
-				PresentLine = File.readLine();
-				createConstant( PresentLine.toInt(), true, 0, 1000 );
-			}
-			else
-			{
-				int NumOfConst = PresentLine.toInt();
-
-				Constant.resize( NumOfConst );
-				for( int i = 0; i < NumOfConst; i++ )
-				{
-					PresentLine = File.readLine();
-					Constant[i] = PresentLine.toDouble();
-				}
-			}
-		}
-		else
-		{
-			LastError = MT_ErrorCode::ConstantSetupSectionMissing;
-		}
 	}
 	else
 	{
-		LastError = MT_ErrorCode::RandomizerSetupSectionMissing;
+		ProbInstruction[17] = ProbInstruction[16];
+	}
+
+	QString ConString( "Constant:" );
+	PresentLine = File.readLine();
+
+	while( ( PresentLine != ConString ) && !( File.atEnd() ) )
+	{
+		PresentLine = File.readLine();
+	}
+
+	if( ( PresentLine != ConString ) || File.atEnd() )
+	{
+		LastError = MT_ErrorCode::ConstantSetupSectionMissing;
+		return;
+	}
+
+	PresentLine = File.readLine();
+	if( PresentLine == "newConstant" )
+	{
+		PresentLine = File.readLine();
+		createConstant( PresentLine.toInt(), true, 0, 1000 );
+		return;
+	}
+
+	int NumOfConst = PresentLine.toInt();
+
+	Constant.resize( NumOfConst );
+	for( int i = 0; i < NumOfConst; i++ )
+	{
+		PresentLine = File.readLine();
+		Constant[i] = PresentLine.toDouble();
 	}
 }
 
