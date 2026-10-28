@@ -8,7 +8,7 @@ MT_Randomizer::MT_Randomizer()
 	srand( static_cast<unsigned>(time( nullptr )) );
 
 // initialization
-	LastError =0;
+	LastError = MT_ErrorCode::None;
 
 	RandomXPoints.resize(7);
 	for (int i=0; i<7; i++)
@@ -44,7 +44,7 @@ MT_Randomizer::MT_Randomizer(QTextStream &File)
 	// set seed for the random method
 	srand( static_cast<unsigned>(time( nullptr )) );
 
-	LastError =0;
+	LastError = MT_ErrorCode::None;
 	RandomXPoints.resize(7);
 	for (int i=0; i<7; i++)
 		RandomXPoints[i]=0;
@@ -119,10 +119,10 @@ MT_Randomizer::MT_Randomizer(QTextStream &File)
 			}
 		}
 		else
-			LastError =261;
+			LastError = MT_ErrorCode::ConstantSectionMissing;
 	}
 	else
-		LastError =260;
+		LastError = MT_ErrorCode::RandomizerSectionMissing;
 }
 
 void MT_Randomizer::loadSetup(QTextStream &File)
@@ -189,10 +189,10 @@ void MT_Randomizer::loadSetup(QTextStream &File)
 			}
 		}
 		else
-			LastError =263;
+			LastError = MT_ErrorCode::ConstantSetupSectionMissing;
 	}
 	else
-		LastError =262;
+		LastError = MT_ErrorCode::RandomizerSetupSectionMissing;
 }
 
 void MT_Randomizer::writeToFileRandi(QTextStream &File)
@@ -245,7 +245,7 @@ void MT_Randomizer::returnSearchValue(QList<double> **ProbMPower, QList<double> 
 	*ProbXPoints = &ProbCrossOverPoints;
 }
 
-int MT_Randomizer::getLastError()
+MT_ErrorCode MT_Randomizer::getLastError()
 {
 	return LastError;
 }

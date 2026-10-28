@@ -911,6 +911,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: `MT_Randomizer` KEEPS ITS ERROR CODE IN `MT_ErrorCode`.**
+
+- **Changed:** 260 to 263 have names. `MT_GPManager` and `MT_Population`
+  cast the code until their classes follow.
+
 **2026-10-28 — DONE: `MT_ErrorCode` NAMES THE ERROR CODES OF `MT_FitnessTrainer`.**
 
 - **Changed:** the new scoped enum `MT_ErrorCode` (`MT_GPSystem/MT_ErrorCode.h`)

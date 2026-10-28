@@ -24,7 +24,7 @@ MT_Population::MT_Population(MT_Randomizer *Randi, int n)
 	Change =false;
 
 	createNewIndis(n, Randi);
-	LastError=Randi->getLastError();
+	LastError = static_cast< int >( Randi->getLastError() );
 }
 
 MT_Population::MT_Population(QTextStream &File)

@@ -32,6 +32,12 @@ enum class MT_ErrorCode
 {
 	None = 0,
 
+	// MT_Randomizer
+	RandomizerSectionMissing = 260,
+	ConstantSectionMissing = 261,
+	RandomizerSetupSectionMissing = 262,
+	ConstantSetupSectionMissing = 263,
+
 	// MT_FitnessTrainer
 	FitnessTrainerSectionMissing = 601,
 	FitnessTrainerSetupSectionMissing = 602,

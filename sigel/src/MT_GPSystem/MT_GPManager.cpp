@@ -49,8 +49,8 @@ MT_GPManager::MT_GPManager(QTextStream &File) : QObject()
 
 	if(BestIndividual->getLastError()!= 0)
 		LastError = BestIndividual->getLastError();
-	if(Randi->getLastError() != 0)
-		LastError = Randi->getLastError();
+	if(Randi->getLastError() != MT_ErrorCode::None)
+		LastError = static_cast< int >( Randi->getLastError() );
 
 	Statistics = std::make_unique< MT_Statistics >(File);
 	

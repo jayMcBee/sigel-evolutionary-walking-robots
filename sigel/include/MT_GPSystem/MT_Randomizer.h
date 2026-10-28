@@ -5,6 +5,7 @@
 #include <QList>
 #include "MT_GPSystem/MT_Operand.h"	
 #include "MT_GPSystem/MT_Instruction.h"
+#include "MT_GPSystem/MT_ErrorCode.h"
 
 #include <qstring.h>
 #include <qtextstream.h>
@@ -82,14 +83,14 @@ public:
 
 	int getNumOfVari();
 	int getProgramLengthMax();
-	int getLastError();
+	MT_ErrorCode getLastError();
 
 	/* supply a random unsigned long in [0, upperBoundary)*/
 	unsigned long getRandomInteger(unsigned long upperBoundary);
 
 private:
 
-	int LastError;
+	MT_ErrorCode LastError;
 
 	/* contain the position for a crossover Event
 	* Array[0] = indicate the number of X points for this crossover event
