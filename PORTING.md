@@ -911,6 +911,10 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: TYPOS IN THE COMMENTS OF `MT_Search::crossover`.**
+
+- **Changed:** comments only.
+
 **2026-10-28 — DONE: `MT_Search::mutate` LOSES ITS DEEP NESTING.**
 
 - **Changed:** a line that is not mutated is skipped with `continue`, and the
