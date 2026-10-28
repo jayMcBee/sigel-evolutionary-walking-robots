@@ -263,12 +263,12 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 	int SigProgTwoSize = SigProgTwo->getProgramLength();
 	int TransIndiSize = SigProgOneSize + SigProgTwoSize;
 
-	QList<int> * Instruktion = new QList<int>;
+	QList<int> * Instructions = new QList<int>;
 	QList<int> * OperandOne = new QList<int>;
 	QList<int> * OperandTwo = new QList<int>;
 	QList<int> * MData = new QList<int>;
 
-	(*Instruktion).resize(TransIndiSize);
+	(*Instructions).resize(TransIndiSize);
 	(*OperandOne).resize(TransIndiSize);
 	(*OperandTwo).resize(TransIndiSize);
 	(*MData).resize(32);
@@ -290,21 +290,21 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 
 		switch( programLine.getRobotInstructionType() )
 		{
-		case SIGEL_Program::COPY: (*Instruktion)[i]= 1; break;
-		case SIGEL_Program::LOAD: (*Instruktion)[i]= 2; break;
-		case SIGEL_Program::ADD: (*Instruktion)[i]= 3;	break;
-		case SIGEL_Program::SUB: (*Instruktion)[i]= 4; break;
-		case SIGEL_Program::MUL: (*Instruktion)[i]= 5;	break;
-		case SIGEL_Program::DIV: (*Instruktion)[i]= 6;  break;
-		case SIGEL_Program::MIN: (*Instruktion)[i]= 7;	break;
-		case SIGEL_Program::MAX: (*Instruktion)[i]= 8;	break;
-		case SIGEL_Program::CMP: (*Instruktion)[i]= 9;	break;
-		case SIGEL_Program::JMP: (*Instruktion)[i]= 10; break;
-		case SIGEL_Program::SENSE: (*Instruktion)[i]= 11; break;
-		case SIGEL_Program::MOVE:(*Instruktion)[i]= 12; break;
-		case SIGEL_Program::DELAY:	(*Instruktion)[i]= 13;	break;
-		case SIGEL_Program::MOD: (*Instruktion)[i]= 14; break;
-		case SIGEL_Program::NOP: (*Instruktion)[i]= 15; break;
+		case SIGEL_Program::COPY: (*Instructions)[i]= 1; break;
+		case SIGEL_Program::LOAD: (*Instructions)[i]= 2; break;
+		case SIGEL_Program::ADD: (*Instructions)[i]= 3;	break;
+		case SIGEL_Program::SUB: (*Instructions)[i]= 4; break;
+		case SIGEL_Program::MUL: (*Instructions)[i]= 5;	break;
+		case SIGEL_Program::DIV: (*Instructions)[i]= 6;  break;
+		case SIGEL_Program::MIN: (*Instructions)[i]= 7;	break;
+		case SIGEL_Program::MAX: (*Instructions)[i]= 8;	break;
+		case SIGEL_Program::CMP: (*Instructions)[i]= 9;	break;
+		case SIGEL_Program::JMP: (*Instructions)[i]= 10; break;
+		case SIGEL_Program::SENSE: (*Instructions)[i]= 11; break;
+		case SIGEL_Program::MOVE:(*Instructions)[i]= 12; break;
+		case SIGEL_Program::DELAY:	(*Instructions)[i]= 13;	break;
+		case SIGEL_Program::MOD: (*Instructions)[i]= 14; break;
+		case SIGEL_Program::NOP: (*Instructions)[i]= 15; break;
 		}
 
 		switch( programLine.getRobotInstructionType() )
@@ -339,21 +339,21 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 
 		switch( programLine.getRobotInstructionType() )
 		{
-		case SIGEL_Program::COPY: (*Instruktion)[i+SigProgOneSize]= 1; break;
-		case SIGEL_Program::LOAD: (*Instruktion)[i+SigProgOneSize]= 2; break;
-		case SIGEL_Program::ADD: (*Instruktion)[i+SigProgOneSize]= 3;	break;
-		case SIGEL_Program::SUB: (*Instruktion)[i+SigProgOneSize]= 4; break;
-		case SIGEL_Program::MUL: (*Instruktion)[i+SigProgOneSize]= 5;	break;
-		case SIGEL_Program::DIV: (*Instruktion)[i+SigProgOneSize]= 6;  break;
-		case SIGEL_Program::MIN: (*Instruktion)[i+SigProgOneSize]= 7;	break;
-		case SIGEL_Program::MAX: (*Instruktion)[i+SigProgOneSize]= 8;	break;
-		case SIGEL_Program::CMP: (*Instruktion)[i+SigProgOneSize]= 9;	break;
-		case SIGEL_Program::JMP: (*Instruktion)[i+SigProgOneSize]= 10; break;
-		case SIGEL_Program::SENSE: (*Instruktion)[i+SigProgOneSize]= 11; break;
-		case SIGEL_Program::MOVE:(*Instruktion)[i+SigProgOneSize]= 12; break;
-		case SIGEL_Program::DELAY:	(*Instruktion)[i+SigProgOneSize]= 13;	break;
-		case SIGEL_Program::MOD: (*Instruktion)[i+SigProgOneSize]= 14; break;
-		case SIGEL_Program::NOP: (*Instruktion)[i+SigProgOneSize]= 15; break;
+		case SIGEL_Program::COPY: (*Instructions)[i+SigProgOneSize]= 1; break;
+		case SIGEL_Program::LOAD: (*Instructions)[i+SigProgOneSize]= 2; break;
+		case SIGEL_Program::ADD: (*Instructions)[i+SigProgOneSize]= 3;	break;
+		case SIGEL_Program::SUB: (*Instructions)[i+SigProgOneSize]= 4; break;
+		case SIGEL_Program::MUL: (*Instructions)[i+SigProgOneSize]= 5;	break;
+		case SIGEL_Program::DIV: (*Instructions)[i+SigProgOneSize]= 6;  break;
+		case SIGEL_Program::MIN: (*Instructions)[i+SigProgOneSize]= 7;	break;
+		case SIGEL_Program::MAX: (*Instructions)[i+SigProgOneSize]= 8;	break;
+		case SIGEL_Program::CMP: (*Instructions)[i+SigProgOneSize]= 9;	break;
+		case SIGEL_Program::JMP: (*Instructions)[i+SigProgOneSize]= 10; break;
+		case SIGEL_Program::SENSE: (*Instructions)[i+SigProgOneSize]= 11; break;
+		case SIGEL_Program::MOVE:(*Instructions)[i+SigProgOneSize]= 12; break;
+		case SIGEL_Program::DELAY:	(*Instructions)[i+SigProgOneSize]= 13;	break;
+		case SIGEL_Program::MOD: (*Instructions)[i+SigProgOneSize]= 14; break;
+		case SIGEL_Program::NOP: (*Instructions)[i+SigProgOneSize]= 15; break;
 		}
 	
 		switch( programLine.getRobotInstructionType() )
@@ -376,7 +376,7 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		}
 	}
 
-	MT_TranslatedIndividual * NewTransIndi = new MT_TranslatedIndividual(Instruktion,OperandOne,OperandTwo, MData);
+	MT_TranslatedIndividual * NewTransIndi = new MT_TranslatedIndividual(Instructions,OperandOne,OperandTwo, MData);
 	
 	NewTransIndi->Boundary = SigProgOneSize;
 

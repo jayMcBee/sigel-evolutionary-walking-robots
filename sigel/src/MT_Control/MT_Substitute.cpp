@@ -49,12 +49,12 @@ MT_TranslatedIndividual * MT_Substitute::translatedSIGProg(SIGEL_Program::SIG_Pr
 {
 	int ProgSize = SIGProg->getProgramLength();
 
-	QList<int> * Instruktion = new QList<int>;
+	QList<int> * Instructions = new QList<int>;
 	QList<int> * OperandOne = new QList<int>;
 	QList<int> * OperandTwo = new QList<int>;
 	QList<int> * MData = new QList<int>;
 
-	(*Instruktion).resize(ProgSize);
+	(*Instructions).resize(ProgSize);
 	(*OperandOne).resize(ProgSize);
 	(*OperandTwo).resize(ProgSize);
 	(*MData).resize(16);
@@ -74,25 +74,25 @@ MT_TranslatedIndividual * MT_Substitute::translatedSIGProg(SIGEL_Program::SIG_Pr
 
 		switch( programLine.getRobotInstructionType() )
 		{
-		case SIGEL_Program::COPY: (*Instruktion)[i]= 1; (*MData)[1]++; break;
-		case SIGEL_Program::LOAD: (*Instruktion)[i]= 2; (*MData)[2]++; break;
-		case SIGEL_Program::ADD: (*Instruktion)[i]= 3; (*MData)[3]++;	break;
-		case SIGEL_Program::SUB: (*Instruktion)[i]= 4; (*MData)[4]++; break;
-		case SIGEL_Program::MUL: (*Instruktion)[i]= 5; (*MData)[5]++;	break;
-		case SIGEL_Program::DIV: (*Instruktion)[i]= 6; (*MData)[6]++;  break;
-		case SIGEL_Program::MIN: (*Instruktion)[i]= 7; (*MData)[7]++;	break;
-		case SIGEL_Program::MAX: (*Instruktion)[i]= 8; (*MData)[8]++;	break;
-		case SIGEL_Program::CMP: (*Instruktion)[i]= 9; (*MData)[9]++;	break;
-		case SIGEL_Program::JMP: (*Instruktion)[i]= 10; (*MData)[10]++; break;
-		case SIGEL_Program::SENSE: (*Instruktion)[i]= 11; (*MData)[11]++; break;
-		case SIGEL_Program::MOVE:(*Instruktion)[i]= 12; (*MData)[12]++; break;
-		case SIGEL_Program::DELAY:	(*Instruktion)[i]= 13; (*MData)[13]++;	break;
-		case SIGEL_Program::MOD: (*Instruktion)[i]= 14; (*MData)[14]++; break;
-		case SIGEL_Program::NOP: (*Instruktion)[i]= 15; (*MData)[15]++; break;
+		case SIGEL_Program::COPY: (*Instructions)[i]= 1; (*MData)[1]++; break;
+		case SIGEL_Program::LOAD: (*Instructions)[i]= 2; (*MData)[2]++; break;
+		case SIGEL_Program::ADD: (*Instructions)[i]= 3; (*MData)[3]++;	break;
+		case SIGEL_Program::SUB: (*Instructions)[i]= 4; (*MData)[4]++; break;
+		case SIGEL_Program::MUL: (*Instructions)[i]= 5; (*MData)[5]++;	break;
+		case SIGEL_Program::DIV: (*Instructions)[i]= 6; (*MData)[6]++;  break;
+		case SIGEL_Program::MIN: (*Instructions)[i]= 7; (*MData)[7]++;	break;
+		case SIGEL_Program::MAX: (*Instructions)[i]= 8; (*MData)[8]++;	break;
+		case SIGEL_Program::CMP: (*Instructions)[i]= 9; (*MData)[9]++;	break;
+		case SIGEL_Program::JMP: (*Instructions)[i]= 10; (*MData)[10]++; break;
+		case SIGEL_Program::SENSE: (*Instructions)[i]= 11; (*MData)[11]++; break;
+		case SIGEL_Program::MOVE:(*Instructions)[i]= 12; (*MData)[12]++; break;
+		case SIGEL_Program::DELAY:	(*Instructions)[i]= 13; (*MData)[13]++;	break;
+		case SIGEL_Program::MOD: (*Instructions)[i]= 14; (*MData)[14]++; break;
+		case SIGEL_Program::NOP: (*Instructions)[i]= 15; (*MData)[15]++; break;
 		}
 	}
 
-	MT_TranslatedIndividual * NewTransIndi = new MT_TranslatedIndividual(Instruktion,OperandOne,OperandTwo, MData);
+	MT_TranslatedIndividual * NewTransIndi = new MT_TranslatedIndividual(Instructions,OperandOne,OperandTwo, MData);
 
 	return NewTransIndi;
 }

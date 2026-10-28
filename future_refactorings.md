@@ -37,7 +37,6 @@ Paths are relative to `sigel/`, the source tree.
 
   | symbol | where |
   |---|---|
-  | `Instruktion` | `MT_Classifier.cpp, createDoubleTransIndi`; `MT_Substitute.cpp, translatedSIGProg` |
   | `set`/`getSelektionValue` | `MT_FitnessTrainer.h`, `MT_GPManager.h` |
 
   `rot` in `getMinRot` and `rotMin` is rotation, not the colour — leave it.
