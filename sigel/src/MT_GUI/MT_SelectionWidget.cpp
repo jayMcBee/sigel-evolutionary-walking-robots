@@ -109,10 +109,10 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	}
 
 	// update labels
-	int tourNum = offspringSize / tournamentSize;
+	int tournamentCount = offspringSize / tournamentSize;
 	poolSizeLabel->setText(QString::number(offspringSize));
-	tourNumLabel->setText(QString::number(tourNum));
-	winNumLabel->setText(QString::number(parentSize / tourNum));
+	tourNumLabel->setText(QString::number(tournamentCount));
+	winNumLabel->setText(QString::number(parentSize / tournamentCount));
 
 	selectionMethodComboBox->setCurrentIndex(selMethod - 1);	// set the selection method
 
@@ -201,10 +201,10 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 
 	tournamentSize = tournamentSizeComboBox->currentText().toInt();
 
-	int tourNum = poolSize / tournamentSize;
+	int tournamentCount = poolSize / tournamentSize;
 	poolSizeLabel->setText(QString::number(poolSize));
-	tourNumLabel->setText(QString::number(tourNum));
-	winNumLabel->setText(QString::number(parentSize / tourNum));
+	tourNumLabel->setText(QString::number(tournamentCount));
+	winNumLabel->setText(QString::number(parentSize / tournamentCount));
 
 	QObject::connect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
 }
@@ -213,7 +213,7 @@ void MT_SelectionWidget::slotTourSizeChanged(const QString &text)
 {
 	int offSize = poolSizeLabel->text().toInt();
 	int tSize   = text.toInt();
-	int tourNum = offSize / tSize;
-	tourNumLabel->setText(QString::number(tourNum));
-	winNumLabel->setText(QString::number(parentSize / tourNum));
+	int tournamentCount = offSize / tSize;
+	tourNumLabel->setText(QString::number(tournamentCount));
+	winNumLabel->setText(QString::number(parentSize / tournamentCount));
 }
