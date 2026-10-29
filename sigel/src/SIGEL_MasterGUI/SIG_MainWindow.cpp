@@ -842,7 +842,7 @@ void SIG_MainWindow::slotMTConfigureSystem()
 	if( currentExperiment )
 	{
 		currentExperiment->gpExperiment.mtController->configureSystem( this );
-	};
+	}
 }
 
 // switch the actual experiment to the other metaGP system
@@ -889,39 +889,40 @@ void SIG_MainWindow::slotMTSwitchSystem( QAction *selSystem )
 void SIG_MainWindow::slotCurrentExperimentChanged()
 {
 	SIG_GUIGPExperiment *currentExperiment = experimentListView->currentlySelectedExperiment();
-	if( currentExperiment )
+	if( !currentExperiment )
 	{
-		if( currentExperiment->gpExperiment.mtController->IsEnabled() )
-		{
-			// currently selected experiment use meta gp-system
-			//
-			// NOT while a run is going. This slot fires one line after the
-			// tree-click emit that APPLIES the run lock
-			// (SIG_ExperimentListView::slotSelectionChanged), so without this
-			// check it would hand these two straight back.
-			if( !experimentListView->isRunning() )
-			{
-				mtChoiceTypeActionGroup->setEnabled( true );
-				mtConfigureAction->setEnabled( true );
-			}
+		return;
+	}
 
-			mtUseAction->setChecked( true );
-			if( currentExperiment->gpExperiment.mtController->UsedSystem() == MT_SubstituteKind::Evaluator )
-			{
-				mtChoiceEvaluatorAction->setChecked( true );
-			}
-			else
-			{
-				mtChoiceClassifierAction->setChecked( true );
-			}
-		}
-		else
-		{
-			// no meta gp-system is used
-			mtChoiceTypeActionGroup->setEnabled( false );
-			mtConfigureAction->setEnabled( false );
-			mtUseAction->setChecked( false );
-		}
+	if( !currentExperiment->gpExperiment.mtController->IsEnabled() )
+	{
+		// no meta gp-system is used
+		mtChoiceTypeActionGroup->setEnabled( false );
+		mtConfigureAction->setEnabled( false );
+		mtUseAction->setChecked( false );
+		return;
+	}
+
+	// currently selected experiment use meta gp-system
+	//
+	// NOT while a run is going. This slot fires one line after the
+	// tree-click emit that APPLIES the run lock
+	// (SIG_ExperimentListView::slotSelectionChanged), so without this
+	// check it would hand these two straight back.
+	if( !experimentListView->isRunning() )
+	{
+		mtChoiceTypeActionGroup->setEnabled( true );
+		mtConfigureAction->setEnabled( true );
+	}
+
+	mtUseAction->setChecked( true );
+	if( currentExperiment->gpExperiment.mtController->UsedSystem() == MT_SubstituteKind::Evaluator )
+	{
+		mtChoiceEvaluatorAction->setChecked( true );
+	}
+	else
+	{
+		mtChoiceClassifierAction->setChecked( true );
 	}
 }
 
