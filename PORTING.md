@@ -911,6 +911,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-29 — DONE: `MT_EstimationWidget` SHOWS A CLASSIFIER WITH "SAVE BEST" AS A CLASSIFIER.**
+
+- **Fault:** `onShow` removed the minus sign of "save best" from its local
+  copy of the strategy but tested the signed field, so a classifier strategy
+  with "save best" (-3 to -8) was shown as an evaluator, fell back to "Don't
+  use MetaGP", and closing the page stored -13.
+- **Fix:** the test uses the local, positive strategy.
+
 **2026-10-29 — DONE: `MT_SelectionWidget` OFFERS THE RIGHT FITNESS FUNCTIONS FOR EVERY ESTIMATION STRATEGY.**
 
 - **Fault:** it took a strategy below 3 for the evaluator. The evaluator

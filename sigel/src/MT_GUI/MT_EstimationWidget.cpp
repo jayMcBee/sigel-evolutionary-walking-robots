@@ -167,8 +167,11 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, MT_EstimationState *esti
 
 	// build new dropdownlist depending on the used substituter
 	strategyComboBox->clear();
-	if(estimationState->strategy < 3 ||
-		estimationState->strategy > 8)
+
+	// The evaluator strategies are 1, 2, 9, 10 and 13, the classifier strategies
+	// 3 to 6 and 8; the sign for "save best" is already removed here.
+	if(strategy < 3 ||
+		strategy > 8)
 	{
 		// of type evaluator */
 		estimationGroupBox->setTitle("Evaluation");
