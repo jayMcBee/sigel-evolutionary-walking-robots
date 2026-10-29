@@ -213,7 +213,7 @@
                   <widget class="QComboBox" name="tournamentSizeComboBox"/>
                 </item>
                 <item row="1" column="3">
-                  <widget class="QLabel" name="tourNumLabel">
+                  <widget class="QLabel" name="tournamentCountLabel">
                     <property name="sizePolicy">
                       <sizepolicy>
                         <hsizetype>0</hsizetype>
