@@ -46,7 +46,7 @@ MT_TournamentManager::~MT_TournamentManager()
 {
 	// Note: the array holds pointers to Tournament = Population
 	// The population must be clean, i.e. contain no individuals 
-	// own them! performaTournaments() is responsible for that.
+	// own them! performTournaments() is responsible for that.
 	if(TournamentSize !=0)
 	{
 		for(int i=0; i<Tournaments.size(); i++)
