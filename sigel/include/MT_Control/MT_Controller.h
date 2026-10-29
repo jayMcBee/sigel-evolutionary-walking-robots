@@ -16,9 +16,7 @@ class QWidget;
 #include <qtextstream.h>
 #include <pthread.h>
 
-#define NOMETA_SUBST	 0
-#define EVALUATOR_SUBST  1
-#define CLASSIFIER_SUBST 2
+#include "MT_Control/MT_SubstituteKind.h"
 
 namespace SIGEL_GP {
 
@@ -41,19 +39,19 @@ public:
 
 	void configureSystem(QWidget *owner);
 	bool useMeta(bool state);
-	bool switchSystem(int wantedSystem);
+	bool switchSystem(MT_SubstituteKind wantedSystem);
 	bool startEvolution();
 	void startTimedEvolution(int minutes);
 	bool readFromFile(QString fileName);
 	void writeToFile(QTextStream &file, QString name, int autoSave);
 	bool IsEnabled();
-	int UsedSystem();
+	MT_SubstituteKind UsedSystem();
 	MT_Substitute* getFitnessTrainer();
 	MT_Substitute* getClassifier();
 
 private:
 	bool withGUI;
-	int selectedSystem;
+	MT_SubstituteKind selectedSystem;
 	int autoSaveCnt;
 	QTimer *evolTimer;
 	MT_GPManager *gpManager;
@@ -66,7 +64,7 @@ private:
 
 	pthread_t meta_thread;
 
-	int usedSystem;
+	MT_SubstituteKind usedSystem;
 	bool metaOn;
 
 	QFile confFile;

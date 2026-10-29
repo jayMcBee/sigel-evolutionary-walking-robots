@@ -829,10 +829,10 @@ void SIG_MainWindow::slotMTSwitchSystem(QAction *selSystem)
 	SIG_GUIGPExperiment *currentExperiment = experimentListView->currentlySelectedExperiment();
 	if(currentExperiment){
 		if(mtChoiceClassifierAction->isChecked()){
-			if(!currentExperiment->gpExperiment.mtController->switchSystem(CLASSIFIER_SUBST))
+			if(!currentExperiment->gpExperiment.mtController->switchSystem(MT_SubstituteKind::Classifier))
 				mtChoiceEvaluatorAction->setChecked(true);
 		} else {
-			if(!currentExperiment->gpExperiment.mtController->switchSystem(EVALUATOR_SUBST))
+			if(!currentExperiment->gpExperiment.mtController->switchSystem(MT_SubstituteKind::Evaluator))
 				mtChoiceClassifierAction->setChecked(true);
 		}
 	}
@@ -858,7 +858,7 @@ void SIG_MainWindow::slotCurrentExperimentChanged()
 				mtConfigureAction->setEnabled(true);
 			}
 			mtUseAction->setChecked(true);
-			if(currentExperiment->gpExperiment.mtController->UsedSystem() == EVALUATOR_SUBST){
+			if(currentExperiment->gpExperiment.mtController->UsedSystem() == MT_SubstituteKind::Evaluator){
 				mtChoiceEvaluatorAction->setChecked(true);
 			} else {
 				mtChoiceClassifierAction->setChecked(true);

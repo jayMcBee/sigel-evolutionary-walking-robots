@@ -5017,7 +5017,7 @@ static int guidriveMain(int argc, char **argv)
         //     mainWindow->show();  delete substitution;  substitution = 0;
         // (MT_Controller.cpp:402-404). `substitution' is the MT_Evaluator, and
         // MT_Evaluator inherits SIG_GPFitnessTrainer -- so when the meta system
-        // is the Evaluator (stdConf.mt ships usedSystem=1 = EVALUATOR_SUBST),
+        // is the Evaluator (stdConf.mt ships usedSystem=1 = MT_SubstituteKind::Evaluator),
         // SIG_GPManager's `trainer' IS that object (SIG_GPManager.cpp:59-60,
         // via MT_Controller::getFitnessTrainer which returns `substitution').
         // Opening the window mid-run therefore DELETES THE TRAINER THE RUNNING

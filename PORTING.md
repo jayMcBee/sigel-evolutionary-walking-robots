@@ -911,6 +911,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-29 — DONE: `MT_SubstituteKind` NAMES THE KIND OF METAGP SUBSTITUTE.**
+
+- **Changed:** the scoped enum (`MT_Control/MT_SubstituteKind.h`) holds
+  0 `NoMetaGP`, 1 `Evaluator` and 2 `Classifier` and replaces the defines
+  `NOMETA_SUBST`, `EVALUATOR_SUBST` and `CLASSIFIER_SUBST` in
+  `MT_Controller`, `SIG_MainWindow` and `SIG_GPManager`, and the private enum
+  of `MT_EstimationWidget`. The number written as "usedSystem=" is unchanged.
+
 **2026-10-29 — DONE: THE UNUSED `MT_Substitute::Typ` AND `getTyp()` ARE GONE.**
 
 - **Changed:** `MT_Evaluator` set `Typ` to 1 and `MT_Classifier` to 2, but

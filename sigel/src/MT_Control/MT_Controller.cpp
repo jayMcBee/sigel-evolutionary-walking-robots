@@ -42,8 +42,8 @@ MT_Controller::MT_Controller( SIGEL_GP::SIG_GPMetaGPExperiment &exp )
 	startWOSigel = false;
 	withGUI = true;
 	saveName = QString();
-	usedSystem = NOMETA_SUBST;
-	selectedSystem = EVALUATOR_SUBST;
+	usedSystem = MT_SubstituteKind::NoMetaGP;
+	selectedSystem = MT_SubstituteKind::Evaluator;
 	metaOn = false;
 
 	estimationState.inUse = false;
@@ -141,11 +141,13 @@ bool MT_Controller::startEvolution()
 
 		switch( usedSystem )
 		{
-		case EVALUATOR_SUBST:
+		case MT_SubstituteKind::Evaluator:
 			substitution = new MT_Evaluator( sigExp, estimationSettingsStream );
 			break;
-		case CLASSIFIER_SUBST:
+		case MT_SubstituteKind::Classifier:
 			substitution = new MT_Classifier( estimationSettingsStream );
+			break;
+		case MT_SubstituteKind::NoMetaGP:
 			break;
 		}
 		if( !substitution )
@@ -190,7 +192,7 @@ void MT_Controller::stopEvolution()
  * switch between the two meta-systems
  * called from sig_mainwindow
  ***/
-bool MT_Controller::switchSystem( int wantedSystem )
+bool MT_Controller::switchSystem( MT_SubstituteKind wantedSystem )
 {
 	// the wanted system equals the used system -> nothing to do so leave here
 	if( usedSystem == wantedSystem )
@@ -310,7 +312,7 @@ bool MT_Controller::useMeta( bool state )
 			case QMessageBox::Ignore: // disables the system and keeps it in memory
 				// switch to normal fitness calculation / tournament
 				metaOn = state;
-				usedSystem = NOMETA_SUBST;
+				usedSystem = MT_SubstituteKind::NoMetaGP;
 				break;
 			}
 		}
@@ -319,7 +321,7 @@ bool MT_Controller::useMeta( bool state )
 			// disables the system and keeps it in memory
 			// switch to normal fitness calculation / tournament
 			metaOn = state;
-			usedSystem = NOMETA_SUBST;
+			usedSystem = MT_SubstituteKind::NoMetaGP;
 		}
 	}
 
@@ -534,21 +536,21 @@ bool MT_Controller::readFromFile( QString fileName )
 	}
 	else if( int index = tmpStr.indexOf( "usedSystem=" ) != -1 )
 	{
-		switch( tmpStr.mid( index + 10 ).toInt() )
+		switch( static_cast< MT_SubstituteKind >( tmpStr.mid( index + 10 ).toInt() ) )
 		{
-		case EVALUATOR_SUBST:
-			usedSystem = EVALUATOR_SUBST;
+		case MT_SubstituteKind::Evaluator:
+			usedSystem = MT_SubstituteKind::Evaluator;
 			selectedSystem = usedSystem;
 			useMeta( true );
 			break;
 
-		case CLASSIFIER_SUBST:
-			usedSystem = CLASSIFIER_SUBST;
+		case MT_SubstituteKind::Classifier:
+			usedSystem = MT_SubstituteKind::Classifier;
 			selectedSystem = usedSystem;
 			useMeta( true );
 			break;
 
-		case NOMETA_SUBST:
+		case MT_SubstituteKind::NoMetaGP:
 		default:
 			error = true;
 		}
@@ -675,7 +677,7 @@ bool MT_Controller::saveSystem( QString sigExpName )
 	{
 		QTextStream fileStr( &file );
 
-		fileStr << "usedSystem=" << usedSystem << "\n";  // remember the used type of system
+		fileStr << "usedSystem=" << static_cast< int >( usedSystem ) << "\n";  // remember the used type of system
 
 		// save the substituter / the substituter settings
 		if( substitution )
@@ -731,7 +733,7 @@ bool MT_Controller::saveSystem( QString sigExpName )
 	return true;
 }
 
-int MT_Controller::UsedSystem()
+MT_SubstituteKind MT_Controller::UsedSystem()
 {
 	return usedSystem;
 }
@@ -743,7 +745,7 @@ bool MT_Controller::IsEnabled()
 
 MT_Substitute *MT_Controller::getFitnessTrainer()
 {
-	if( UsedSystem() == EVALUATOR_SUBST )
+	if( UsedSystem() == MT_SubstituteKind::Evaluator )
 	{
 		createGPSystem();
 		if( !substitution )
@@ -761,7 +763,7 @@ MT_Substitute *MT_Controller::getFitnessTrainer()
 
 MT_Substitute *MT_Controller::getClassifier()
 {
-	if( UsedSystem() == CLASSIFIER_SUBST )
+	if( UsedSystem() == MT_SubstituteKind::Classifier )
 	{
 		createGPSystem();
 		if( !substitution )
@@ -792,14 +794,14 @@ void MT_Controller::loadEstimationState( QTextStream &File )
 		PresentLine = File.readLine();
 	}
 
-	int savedSystem = 0;
+	MT_SubstituteKind savedSystem = MT_SubstituteKind::NoMetaGP;
 	if( PresentLine == Classifier )
 	{
-		savedSystem = CLASSIFIER_SUBST;
+		savedSystem = MT_SubstituteKind::Classifier;
 	}
 	else if( PresentLine == Evaluator )
 	{
-		savedSystem = EVALUATOR_SUBST;
+		savedSystem = MT_SubstituteKind::Evaluator;
 	}
 
 	estimationState.simulationCounts = nullptr;
@@ -832,7 +834,7 @@ void MT_Controller::loadEstimationState( QTextStream &File )
 
 		switch( usedSystem )
 		{
-		case CLASSIFIER_SUBST:
+		case MT_SubstituteKind::Classifier:
 
 			// load a classifier
 			while( ( PresentLine != Classifier ) && !( defStrm.atEnd() ) )
@@ -848,7 +850,7 @@ void MT_Controller::loadEstimationState( QTextStream &File )
 			}
 			break;
 
-		case EVALUATOR_SUBST:
+		case MT_SubstituteKind::Evaluator:
 
 			// load an evaluator
 			while( ( PresentLine != Evaluator ) && !( defStrm.atEnd() ) )
@@ -863,6 +865,9 @@ void MT_Controller::loadEstimationState( QTextStream &File )
 				estimationState.generationCount = ( defStrm.readLine() ).toUInt();
 			}
 			break;
+
+		case MT_SubstituteKind::NoMetaGP:
+			break;
 		}
 	}
 	estimationState.inUse = true;
@@ -872,12 +877,15 @@ void MT_Controller::saveEstimationState( QTextStream &File )
 {
 	switch( usedSystem )
 	{
-	case CLASSIFIER_SUBST:
+	case MT_SubstituteKind::Classifier:
 		File << ( "Classifier:\n" );
 		break;
 
-	case EVALUATOR_SUBST:
+	case MT_SubstituteKind::Evaluator:
 		File << ( "Evaluator:\n" );
+		break;
+
+	case MT_SubstituteKind::NoMetaGP:
 		break;
 	}
 	File << estimationState.strategy << Qt::endl;
@@ -896,7 +904,7 @@ void MT_Controller::saveEstimationState( QTextStream &File )
 
 void MT_Controller::writeEstimationSettings()
 {
-	if( usedSystem == EVALUATOR_SUBST )
+	if( usedSystem == MT_SubstituteKind::Evaluator )
 	{
 		estimationSettingsText = "Evaluator:\n";
 	}
@@ -935,19 +943,19 @@ void MT_Controller::slotLoadDefault()
 		QString tmpStr = strm.readLine();
 		if( int index = tmpStr.indexOf( "usedSystem=" ) != -1 )
 		{
-			switch( tmpStr.mid( index + 10 ).toInt() )
+			switch( static_cast< MT_SubstituteKind >( tmpStr.mid( index + 10 ).toInt() ) )
 			{
-			case EVALUATOR_SUBST:
-				usedSystem = EVALUATOR_SUBST;
+			case MT_SubstituteKind::Evaluator:
+				usedSystem = MT_SubstituteKind::Evaluator;
 				useMeta( true );
 				break;
 
-			case CLASSIFIER_SUBST:
-				usedSystem = CLASSIFIER_SUBST;
+			case MT_SubstituteKind::Classifier:
+				usedSystem = MT_SubstituteKind::Classifier;
 				useMeta( true );
 				break;
 
-			case NOMETA_SUBST:
+			case MT_SubstituteKind::NoMetaGP:
 			default:
 				break;
 			}
@@ -986,19 +994,19 @@ void MT_Controller::slotLoadSetup()
 		QString tmpStr = strm.readLine();
 		if( int index = tmpStr.indexOf( "usedSystem=" ) != -1 )
 		{
-			switch( tmpStr.mid( index + 10 ).toInt() )
+			switch( static_cast< MT_SubstituteKind >( tmpStr.mid( index + 10 ).toInt() ) )
 			{
-			case EVALUATOR_SUBST:
-				usedSystem = EVALUATOR_SUBST;
+			case MT_SubstituteKind::Evaluator:
+				usedSystem = MT_SubstituteKind::Evaluator;
 				useMeta( true );
 				break;
 
-			case CLASSIFIER_SUBST:
-				usedSystem = CLASSIFIER_SUBST;
+			case MT_SubstituteKind::Classifier:
+				usedSystem = MT_SubstituteKind::Classifier;
 				useMeta( true );
 				break;
 
-			case NOMETA_SUBST:
+			case MT_SubstituteKind::NoMetaGP:
 			default:
 				break;
 			}
@@ -1036,7 +1044,7 @@ void MT_Controller::slotSaveSetup()
 	{
 		QTextStream strm( &file );
 
-		strm << "usedSystem=" << usedSystem << "\n";  // remember the used type of system
+		strm << "usedSystem=" << static_cast< int >( usedSystem ) << "\n";  // remember the used type of system
 
 		mainWindow->enforceUpdate( false );  // enforce an update of the gp-system
 

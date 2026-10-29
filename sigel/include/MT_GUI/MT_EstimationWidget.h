@@ -4,6 +4,7 @@
 #include "MT_GUI/MT_EstimationWidgetBase.h"
 #include "MT_GUI/MT_WidgetBase.h"
 #include "MT_GUI/DoubleSpinBox.h"
+#include "MT_Control/MT_SubstituteKind.h"
 
 class MT_EstimationWidget : public MT_EstimationWidgetBase, public MT_WidgetBase
 {
@@ -19,7 +20,7 @@ public slots:
 	void slotStrategyChanged(int index);
 
 private:
-	enum { evaluator, classifier } usedSys;
+	MT_SubstituteKind usedSys;
 	DISpinBox *toleranceSpinBox;
 	int lastIndex;
 	double tol0, tol1, tol2, tol3, tol4;

@@ -12,7 +12,7 @@ MT_EstimationWidget::MT_EstimationWidget(QWidget* parent, const char* name, Qt::
 {
 	lastIndex = 0;
 	tol0 = tol1 = 0.0;
-	usedSys = evaluator;
+	usedSys = MT_SubstituteKind::Evaluator;
 
 	toleranceSpinBox = new DISpinBox(3, estimationGroupBox, "toleranceSpinBox");
 	Layout61->addWidget(toleranceSpinBox, 1, 2);
@@ -42,7 +42,7 @@ void MT_EstimationWidget::slotStrategyChanged(int index)
 	}
 
 	lastIndex = index;
-	if(usedSys == evaluator){
+	if(usedSys == MT_SubstituteKind::Evaluator){
 		switch(index){
 		case 0 : 
 			toleranceSpinBox->setRange(3, 0.0, 100.0);
@@ -98,7 +98,7 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, MT_EstimationState *esti
 	int strategy, refInt;
 	double tolerance;
 
-	if(usedSys == evaluator){
+	if(usedSys == MT_SubstituteKind::Evaluator){
 		switch(strategyComboBox->currentIndex()){
 		case 0 : strategy = 1; break;
 		case 1 : strategy = 2; break;
@@ -175,7 +175,7 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, MT_EstimationState *esti
 	{
 		// of type evaluator */
 		estimationGroupBox->setTitle("Evaluation");
-		usedSys = evaluator;
+		usedSys = MT_SubstituteKind::Evaluator;
 		strategyComboBox->addItem("Mean error");
 		strategyComboBox->addItem("Cleaned mean error");
 		strategyComboBox->addItem("Adaptive error");
@@ -198,7 +198,7 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, MT_EstimationState *esti
 	} else {						
 		// of type classifier
 		estimationGroupBox->setTitle("Classification");
-		usedSys = classifier;
+		usedSys = MT_SubstituteKind::Classifier;
 		strategyComboBox->addItem("Error percentage");
 		strategyComboBox->addItem("Adaptive - generation");
 		strategyComboBox->addItem("Adaptive - fitness");

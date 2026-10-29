@@ -52,7 +52,7 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPMetaGPExperiment &experim
 	if (currentExperiment.gpParameter.getTimeOutMinutes() <= 0)
 		SIGEL_Tools::SIG_IO::cerr << "Warning: no slave time-out is set (TIMEOUTMINUTES 0). If a host is lost, the evolution stops until it is back." << Qt::endl;
 
-	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == EVALUATOR_SUBST)
+	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == MT_SubstituteKind::Evaluator)
 	{
 		trainer = dynamic_cast<SIG_GPFitnessTrainer*>(currentExperiment.mtController->getFitnessTrainer());
 		if(!trainer)
@@ -746,7 +746,7 @@ void SIGEL_GP::SIG_GPManager::start()
 		trainer->prepareTerrain();
 	}
 
-	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == CLASSIFIER_SUBST)
+	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == MT_SubstituteKind::Classifier)
 	{
 		run(dynamic_cast<MT_Classifier*>(currentExperiment.mtController->getClassifier()));
 	}
@@ -916,7 +916,7 @@ void SIGEL_GP::SIG_GPManager::RegisterDynPVMClients()
 
 SIGEL_GP::SIG_GPManager::~SIG_GPManager()
 {
-	if(!currentExperiment.mtController->IsEnabled() || currentExperiment.mtController->UsedSystem() != EVALUATOR_SUBST)
+	if(!currentExperiment.mtController->IsEnabled() || currentExperiment.mtController->UsedSystem() != MT_SubstituteKind::Evaluator)
 	{
 		delete trainer;
 	}
