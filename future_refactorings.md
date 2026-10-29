@@ -243,6 +243,14 @@ touched, because changing one changes behaviour against the reference binary.
   loading one. Found in use; the cause is not known yet
   (`MT_PopulationWidget::slotAddInd` and its dialog look complete).
 
+- [ ] **180. One member for the kind of substitute in `MT_Controller`.**
+  `selectedSystem` and `usedSystem` hold the same thing, the chosen kind;
+  whether MetaGP runs is `metaOn`. `useMeta` ends with `usedSystem =
+  selectedSystem`, so a disabled system does not stay `NoMetaGP`, and a kind
+  that `slotLoadDefault` or `slotLoadSetup` loads while MetaGP is off is
+  replaced by the old choice. Only with unit tests for `MT_Controller`'s
+  switching, loading and enabling in place first.
+
 - [ ] **179. Clean up `SIG_MainWindow`.** It drives the MetaGP system
   through `mtController`, and the class is hard to read; give it the same
   clean-up `MT_Controller` got.
