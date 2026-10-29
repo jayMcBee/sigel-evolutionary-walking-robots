@@ -98,9 +98,6 @@ void MT_Tournament::fitnessProp( MT_Randomizer *Randi, QList<int> *WinnerLoser )
 	int Winner = 0;
 	double FitTemp;
 
-	double DebugInfo = 0.0;
-	int DebugIn = 1;
-
 	QList<int> ProporFit;
 	ProporFit.resize( PopSize );
 
@@ -120,16 +117,8 @@ void MT_Tournament::fitnessProp( MT_Randomizer *Randi, QList<int> *WinnerLoser )
 	{
 		for( int i = 0; i < PopSize; i++ )
 		{
-			DebugInfo = Individuals[i]->getFitness();
-
 			ProporFit[i] = Individuals[i]->getFitness();
-
-			DebugIn = ProporFit[i];
-
 			ProporFit[i] = ProporFit[i] - 500;
-
-			DebugIn = ProporFit[i];
-
 			if( ProporFit[i] <= 0 )
 			{
 				ProporFit[i] = 1;
@@ -138,27 +127,12 @@ void MT_Tournament::fitnessProp( MT_Randomizer *Randi, QList<int> *WinnerLoser )
 	}
 
 	// Determine the winners using the randomizer
-	int DebugNumber = 0;
-	QList<int> DebugArray;
-
 	for( int i = 0; i < NumberOfWinner; i++ )
 	{
 		Winner = Randi->getProportionalWinner( &ProporFit );
-		if( ( *WinnerLoser )[Winner] != 0 )
-		{
-			DebugNumber = DebugNumber;
-		}
-
 		( *WinnerLoser )[Winner] = 1;
 
 		// A winner may not take part in any further tournament
 		ProporFit[Winner] = 0;
-
-		DebugNumber++;
-	}
-
-	if( DebugNumber != NumberOfWinner )
-	{
-		DebugNumber = DebugNumber;
 	}
 }

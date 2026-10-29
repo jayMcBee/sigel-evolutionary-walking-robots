@@ -911,6 +911,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-28 — DONE: THE DEBUG LEFTOVERS IN `MT_Tournament::fitnessProp` ARE GONE.**
+
+- **Changed:** `DebugInfo`, `DebugIn`, `DebugNumber` and `DebugArray` and the
+  self-assignments that used them are removed; nothing read them.
+
 **2026-10-28 — DONE: `MT_Controller::startEvolution` LEAVES EARLY WHEN METAGP IS OFF.**
 
 - **Changed:** the inverted `metaOn` condition returns `true` first; the
