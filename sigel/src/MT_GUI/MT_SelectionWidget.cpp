@@ -21,10 +21,13 @@ void MT_SelectionWidget::updateTSizeList(int pSize, int oSize)
 
 	int tNum;
 	int index = 0;
-	for(int tSize=1; tSize<=oSize; tSize++){
-		if( (oSize % tSize) == 0){
+	for(int tSize=1; tSize<=oSize; tSize++)
+	{
+		if( (oSize % tSize) == 0)
+		{
 			tNum = oSize / tSize;		// possible candidate reaches condition 1
-			if((tNum != 0)&&((pSize % tNum) == 0)){	//     "        "        "        "    1+2
+			if((tNum != 0)&&((pSize % tNum) == 0))	//     "        "        "        "    1+2
+			{
 				// candidate found so insert it into the list
 				tourSizeComboBox->addItem(QString::number(tSize));
 				tourSizeMap.insert(tSize, index++);
@@ -46,12 +49,13 @@ int MT_SelectionWidget::calculateTournSize(int pSize, int oSize, int oTSize)
 
 	if(tourSizeMap.contains(oTSize))
 		return oTSize;
-		
+
 	intMap::Iterator it = tourSizeMap.begin();
 	int lastSize, lastDiff, actDiff;
 
 	actDiff = abs( (it.value()) - oTSize);
-	do {
+	do
+	{
 		lastDiff = actDiff;
 		lastSize = it.value();
 		it++;
@@ -76,8 +80,8 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	QObject::disconnect(overProductionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotOverProdChanged(int)));
 	QObject::disconnect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
 
-	manager->getSelectionValue(&offspringSize, &tournamentSize, 
-		&selMethod, &fitFunc, 
+	manager->getSelectionValue(&offspringSize, &tournamentSize,
+		&selMethod, &fitFunc,
 		&tsetSize, &tDuration);
 
 	// set the overproduction factor
@@ -86,15 +90,19 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	overProductionSpinBox->setValue(overProdFac);
 
 	// rebuild the list of possible tournament sizes
-	if(lastParentSize != parentSize){
+	if(lastParentSize != parentSize)
+	{
 		updateTSizeList(parentSize, offspringSize);
 	}
 
 	// set the tournament size
-	if(tourSizeMap.contains(tournamentSize)){
+	if(tourSizeMap.contains(tournamentSize))
+	{
 		int index = tourSizeMap.find(tournamentSize).value();
 		tourSizeComboBox->setCurrentIndex(index);
-	} else {
+	}
+	else
+	{
 		QMessageBox::critical(this, "Configure MetaGP System", "The tournament size is invalid.\n"
 			"A default value will be used.");
 		tourSizeComboBox->setCurrentIndex(0);
@@ -114,11 +122,14 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	// The evaluator strategies are 1, 2, 9, 10 and 13, the classifier strategies
 	// 3 to 6 and 8; "save best" makes the number negative.
 	const int strategy = abs( estimationState->strategy );
-	if( ( strategy < 3 ) || ( strategy > 8 ) ){		// of type evaluator */
+	if( ( strategy < 3 ) || ( strategy > 8 ) )		// of type evaluator */
+	{
 		fitnessFunctionComboBox->addItem("Simple error");
 		fitnessFunctionComboBox->addItem("Square error");
 		fitnessFunctionComboBox->setCurrentIndex(fitFunc == MT_FitnessFunction::EvaluatorSquareError ? 1 : 0);
-	} else {						// of type classifier
+	}
+	else						// of type classifier
+	{
 		fitnessFunctionComboBox->addItem("Simple");
 		fitnessFunctionComboBox->addItem("Weighted");
 		fitnessFunctionComboBox->setCurrentIndex(fitFunc == MT_FitnessFunction::ClassifierWeighted ? 1 : 0);
@@ -147,9 +158,12 @@ bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *estim
 	// The evaluator strategies are 1, 2, 9, 10 and 13, the classifier strategies
 	// 3 to 6 and 8; "save best" makes the number negative.
 	const int strategy = abs( estimationState->strategy );
-	if( ( strategy < 3 ) || ( strategy > 8 ) ){		// of type evaluator */
+	if( ( strategy < 3 ) || ( strategy > 8 ) )		// of type evaluator */
+	{
 		fitFunc = fitnessFunctionComboBox->currentIndex() == 1 ? MT_FitnessFunction::EvaluatorSquareError : MT_FitnessFunction::EvaluatorSimpleError;
-	} else {						// of type classifier
+	}
+	else						// of type classifier
+	{
 		fitFunc = fitnessFunctionComboBox->currentIndex() == 1 ? MT_FitnessFunction::ClassifierWeighted : MT_FitnessFunction::ClassifierSimple;
 	}
 
@@ -175,10 +189,13 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 
 	QObject::disconnect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
 
-	if(tourSizeMap.contains(tourn)){
+	if(tourSizeMap.contains(tourn))
+	{
 		int index = tourSizeMap.find(tourn).value();
 		tourSizeComboBox->setCurrentIndex(index);
-	} else {
+	}
+	else
+	{
 		tourSizeComboBox->setCurrentIndex(0);
 	}
 
