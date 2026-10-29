@@ -911,6 +911,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-29 — DONE: A STRAY COMMENT IN `MT_Controller::useMeta` IS GONE.**
+
+- **Changed:** "// update sig_mainwindow" stood above nothing that updates a
+  main window; it is removed.
+
 **2026-10-28 — DONE: THE DEBUG LEFTOVERS IN `MT_Tournament::fitnessProp` ARE GONE.**
 
 - **Changed:** `DebugInfo`, `DebugIn`, `DebugNumber` and `DebugArray` and the

@@ -326,8 +326,6 @@ bool MT_Controller::useMeta( bool state )
 	metaOn = state;
 	usedSystem = selectedSystem;
 
-	// update sig_mainwindow
-
 	return true;
 }
 
