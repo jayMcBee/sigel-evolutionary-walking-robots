@@ -32,7 +32,7 @@
 #include <qtoolbar.h>
 #include <qaction.h>
 #include <QActionGroup>
-#include <qlabel.h> // only for baseWidget which will be nicer someday...
+#include <qlabel.h>
 
 #include "SIGEL_MasterGUI/SIG_ExperimentListView.h"
 
@@ -74,7 +74,7 @@ public slots:
 
 	/**
 	 * Enables or disables every action that must be off while the
-	 * evolution is running. Same reason as above.
+	 * evolution is running.
 	 */
 	void slotEnableEvolutionRunningActions( bool enable );
 
@@ -143,15 +143,13 @@ protected:
 	QToolBar *fileToolBar;
 
 	/**
-	 * The action group that is disabled when there is no
-	 * experiment present.
+	 * The actions that are disabled when there is no experiment present.
 	 */
 	// A plain list: a QAction belongs to at most one QActionGroup.
 	QList<QAction *> noExperimentActions;
 
 	/**
-	 * The action group that is disabled when there is no
-	 * experiment present.
+	 * The actions that are disabled while the evolution is running.
 	 */
 	QList<QAction *> evolutionRunningActions;
 

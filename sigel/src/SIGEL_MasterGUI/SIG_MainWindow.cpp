@@ -62,7 +62,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	setCentralWidget( splitter );
 
 	widgetStack = new QStackedWidget( splitter );
-	widgetStack->setObjectName( "WidgetStack" ); // this was splitter before...
+	widgetStack->setObjectName( "WidgetStack" );
 	widgetStack->setContentsMargins( 6, 6, 6, 6 );
 	widgetStack->setFrameStyle( QFrame::Box | QFrame::Sunken );
 
