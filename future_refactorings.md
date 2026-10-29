@@ -29,9 +29,6 @@ Paths are relative to `sigel/`, the source tree.
 
 ## 2 · Renames and translation
 
-- [ ] **11. Write `tour` out as `tournament` in every name,** in SIGEL and
-  MetaGP.
-
 - [ ] **15. Rename the `act` prefix to `current`.** German `aktuell`; reads as
   the verb "act". `actExperiment`, `actExpChanged` and `slotActExpChanged` are
   done.
