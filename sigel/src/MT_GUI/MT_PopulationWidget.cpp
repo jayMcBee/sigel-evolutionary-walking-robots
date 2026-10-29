@@ -153,13 +153,13 @@ bool MT_PopulationWidget::onHide(MT_GPManager *manager, MT_EstimationState *esti
 	if(oldPopSize != popSize)
 	{
 		int offspringSize;
-		int tournSize;
+		int tournamentSize;
 		int selMethod;
 		MT_FitnessFunction fitFunc;
 		int tsetSize;
 		int tDuration;
 
-		manager->getSelectionValue(&offspringSize, &tournSize,
+		manager->getSelectionValue(&offspringSize, &tournamentSize,
 		        &selMethod, &fitFunc,
 		        &tsetSize, &tDuration);
 
@@ -168,14 +168,14 @@ bool MT_PopulationWidget::onHide(MT_GPManager *manager, MT_EstimationState *esti
 		offspringSize   = popSize * overProdFac;
 
 		// offspring population size has changed so we have to recalculate a tournament size
-		tournSize = mainWindow->calculateTournSize(popSize, offspringSize, tournSize);
+		tournamentSize = mainWindow->calculateTournSize(popSize, offspringSize, tournamentSize);
 
 		// ... and finally set it
-		manager->setSelectionValue(offspringSize, tournSize,
+		manager->setSelectionValue(offspringSize, tournamentSize,
 		        selMethod, fitFunc,
 		        tsetSize, tDuration);
 
-		manager->setPopAndTournamentSize(popSize, tournSize);
+		manager->setPopAndTournamentSize(popSize, tournamentSize);
 	}
 
 	popToolBar->hide();

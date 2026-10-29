@@ -67,7 +67,7 @@ int MT_SelectionWidget::calculateTournSize(int pSize, int oSize, int oTSize)
 void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
 	int offspringSize;
-	int tournSize;
+	int tournamentSize;
 	int selMethod;
 	MT_FitnessFunction fitFunc;
 	int tsetSize;
@@ -76,7 +76,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	QObject::disconnect(overProductionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotOverProdChanged(int)));
 	QObject::disconnect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
 
-	manager->getSelectionValue(&offspringSize, &tournSize, 
+	manager->getSelectionValue(&offspringSize, &tournamentSize, 
 		&selMethod, &fitFunc, 
 		&tsetSize, &tDuration);
 
@@ -91,8 +91,8 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	}
 
 	// set the tournament size
-	if(tourSizeMap.contains(tournSize)){
-		int index = tourSizeMap.find(tournSize).value();
+	if(tourSizeMap.contains(tournamentSize)){
+		int index = tourSizeMap.find(tournamentSize).value();
 		tourSizeComboBox->setCurrentIndex(index);
 	} else {
 		QMessageBox::critical(this, "Configure MetaGP System", "The tournament size is invalid.\n"
@@ -101,7 +101,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	}
 
 	// update labels
-	int tourNum = offspringSize / tournSize;
+	int tourNum = offspringSize / tournamentSize;
 	poolSizeLabel->setText(QString::number(offspringSize));
 	tourNumLabel->setText(QString::number(tourNum));
 	winNumLabel->setText(QString::number(parentSize / tourNum));
@@ -134,14 +134,14 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
 	int offspringSize=0;
-	int tournSize=0;
+	int tournamentSize=0;
 	int selMethod=0;
 	MT_FitnessFunction fitFunc;
 	int tsetSize=0;
 	int tDuration=0;
 
 	offspringSize = parentSize * overProductionSpinBox->value();
-	tournSize = tourSizeComboBox->currentText().toInt();
+	tournamentSize = tourSizeComboBox->currentText().toInt();
 	selMethod = selectionMethodComboBox->currentIndex() + 1;
 
 	// The evaluator strategies are 1, 2, 9, 10 and 13, the classifier strategies
@@ -156,11 +156,11 @@ bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *estim
 	tsetSize = TSetSizeSpinBox->value();	// training set size
 	tDuration= TDurationSpinBox->value();	// set max interpretation duration
 
-	manager->setSelectionValue(offspringSize, tournSize,
+	manager->setSelectionValue(offspringSize, tournamentSize,
 		selMethod, fitFunc,
 		tsetSize, tDuration);
 
-	manager->setPopAndTournamentSize(parentSize, tournSize);
+	manager->setPopAndTournamentSize(parentSize, tournamentSize);
 
 	return true;
 }
