@@ -351,40 +351,40 @@ bool MT_Randomizer::answerMutateElement()
 	return Answer;
 }
 
-QList<int> * MT_Randomizer::getRandomTournamentPartition(int NumberOfTour)
+QList<int> * MT_Randomizer::getRandomTournamentPartition(int NumberOfTournaments)
 {
 	// Array holding the current number of players per tournament
 	QList<int> Index;
-	Index.resize(NumberOfTour);
-	for (int k =0; k<NumberOfTour; k++)
+	Index.resize(NumberOfTournaments);
+	for (int k =0; k<NumberOfTournaments; k++)
 		Index[k]=0;
 
 	// Index of the tournament the player should take part in
-	int IndexOfTour =0;
+	int IndexOfTournament =0;
 	// Number of players per tournament, i.e. the tournament size
-	int MaxPlayers = (OffspringSize/ NumberOfTour);
+	int MaxPlayers = (OffspringSize/ NumberOfTournaments);
 
 	for (int i=0; i<OffspringSize; i++)
 	{
-		IndexOfTour = getRandomInteger(NumberOfTour);
+		IndexOfTournament = getRandomInteger(NumberOfTournaments);
 			
-		if (Index[IndexOfTour] < MaxPlayers)
+		if (Index[IndexOfTournament] < MaxPlayers)
 		{
-			// There is still a free slot in tournament "IndexOfTour"
-			TournamentPartition[i]=IndexOfTour;
-			Index[IndexOfTour]++;
+			// There is still a free slot in tournament "IndexOfTournament"
+			TournamentPartition[i]=IndexOfTournament;
+			Index[IndexOfTournament]++;
 		}
 		else 
 		{
-			// Tournament "IndexOfTour" is full - then ...
-			while (IndexOfTour !=-1)
+			// Tournament "IndexOfTournament" is full - then ...
+			while (IndexOfTournament !=-1)
 			{
-				IndexOfTour = (IndexOfTour+1)%NumberOfTour;
-				if (Index[IndexOfTour] < MaxPlayers)
+				IndexOfTournament = (IndexOfTournament+1)%NumberOfTournaments;
+				if (Index[IndexOfTournament] < MaxPlayers)
 				{
-					TournamentPartition[i]=IndexOfTour;
-					Index[IndexOfTour]++;
-					IndexOfTour =-1;
+					TournamentPartition[i]=IndexOfTournament;
+					Index[IndexOfTournament]++;
+					IndexOfTournament =-1;
 				}
 			}
 		}

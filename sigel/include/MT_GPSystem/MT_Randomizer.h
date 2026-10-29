@@ -65,7 +65,7 @@ public:
 	/* supply a partition of the offspring into tournaments
 	* a entry (0-(num-1)) indicate in which tournament separate a individual form the offspring
 	*/
-	QList<int> * getRandomTournamentPartition(int NumberOfTour);
+	QList<int> * getRandomTournamentPartition(int NumberOfTournaments);
 
 	/******* normal set/ get method *******/
 	
@@ -78,7 +78,7 @@ public:
 	/* change the Offspring Size*/
 	void setOffspringSize (int setOffSize);
 	
-	/* ATTENTION: set ParentSize change TournamentNumber, TournamantSize and ParentSize !*/
+	/* ATTENTION: set ParentSize change TournamentNumber, TournamentSize and ParentSize !*/
 	void setParentSize (int SizeOfParent);
 
 	int getNumOfVari();

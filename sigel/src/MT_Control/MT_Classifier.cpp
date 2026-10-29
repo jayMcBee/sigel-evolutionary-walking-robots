@@ -116,7 +116,7 @@ void MT_Classifier::createNewTCase(SIGEL_Program::SIG_Program const * SigProgOne
 					pthread_mutex_unlock(&tCaseBufferMutex);
 }
 
-int MT_Classifier::evaluationTactic(int ToursSize)
+int MT_Classifier::evaluationTactic(int TournamentCount)
 {
 	int NumOfClassi=0; //Number of tournaments to be run with the classifier 
 	double Num =0.0;
@@ -143,13 +143,13 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 			
 			if(MetaProgError< Tolerance)
 			{
-				Num = ToursSize/RefreshInterval;
+				Num = TournamentCount/RefreshInterval;
 				if (Num <1.0)
 					NumOfMeta=1;
 				else
 					NumOfMeta = Num;
 
-				NumOfClassi = ToursSize-NumOfMeta;
+				NumOfClassi = TournamentCount-NumOfMeta;
 			}
 		}
 		break;
@@ -180,13 +180,13 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 		
 			if(MetaProgError < ToleranceNew)
 			{
-				Num = ToursSize/RefreshInterval;
+				Num = TournamentCount/RefreshInterval;
 				if (Num <1.0)
 					NumOfMeta=1;
 				else
 					NumOfMeta = Num;
 
-				NumOfClassi = ToursSize-NumOfMeta;
+				NumOfClassi = TournamentCount-NumOfMeta;
 			}
 		}
 		break;
@@ -219,13 +219,13 @@ int MT_Classifier::evaluationTactic(int ToursSize)
 
 			if(MetaProgError < ToleranceNew)
 			{
-				Num = ToursSize/RefreshInterval;
+				Num = TournamentCount/RefreshInterval;
 				if (Num <1.0)
 					NumOfMeta=1;
 				else
 					NumOfMeta = Num;
 
-				NumOfClassi = ToursSize-NumOfMeta;
+				NumOfClassi = TournamentCount-NumOfMeta;
 			}
 		}
 		break;
@@ -382,16 +382,16 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 	return NewTransIndi;
 }
 
-bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int PosBest)
+bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tournaments, int PosBest)
 {
-	SIGEL_GP::SIG_GPTournament *Tourna;
+	SIGEL_GP::SIG_GPTournament *Tournament;
 
 	bool Change = false;
-	int TourSize = tours->size();
+	int TournamentCount = tournaments->size();
 
 	pthread_mutex_lock(&fitnessMutex);
 
-	int NumOfClassi = evaluationTactic(TourSize);
+	int NumOfClassi = evaluationTactic(TournamentCount);
 
 	pthread_mutex_unlock(&fitnessMutex);
 
@@ -400,29 +400,29 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 		pthread_mutex_lock(&interpreterMutex);
 		for(int i=0; i<NumOfClassi; i++)
 		{	
-			Tourna = tours->value(i);
-			if (i < tours->size()) (*tours)[i] = nullptr;
-			Tourna->classify(this);
-			delete Tourna;
+			Tournament = tournaments->value(i);
+			if (i < tournaments->size()) (*tournaments)[i] = nullptr;
+			Tournament->classify(this);
+			delete Tournament;
 			NumOfMetaEstimation[GenerationNumber] += 1;
 		}
 
 // unlock the interpreter so that the program can be updated
 		pthread_mutex_unlock(&interpreterMutex);
 	
-		for( int i=0; i<TourSize-NumOfClassi; i++)
+		for( int i=0; i<TournamentCount-NumOfClassi; i++)
 		{
 			// Move the tournament in slot i+NumOfClassi down to slot i.
 			// Slot i is always empty here, so the delete frees nothing.
-			Tourna = tours->value(i+NumOfClassi);
-			if (i+NumOfClassi < tours->size()) (*tours)[i+NumOfClassi] = nullptr;
-			if (i < tours->size()) { delete (*tours)[i]; (*tours)[i] = Tourna; }
+			Tournament = tournaments->value(i+NumOfClassi);
+			if (i+NumOfClassi < tournaments->size()) (*tournaments)[i+NumOfClassi] = nullptr;
+			if (i < tournaments->size()) { delete (*tournaments)[i]; (*tournaments)[i] = Tournament; }
 		}
 
 		// Every slot in the tail is null here, so this delete loop frees nothing.
-		for (qsizetype k = TourSize-NumOfClassi; k < tours->size(); k++)
-			delete tours->at(k);
-		tours->resize(TourSize-NumOfClassi);
+		for (qsizetype k = TournamentCount-NumOfClassi; k < tournaments->size(); k++)
+			delete tournaments->at(k);
+		tournaments->resize(TournamentCount-NumOfClassi);
 		Change = true;
 	}
 
@@ -431,24 +431,24 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 
 	if (NumOfClassi == -1)  
 	{
-		QList<int> ToursWBestIndi;
-		ToursWBestIndi.resize(tours->size());
-		for(int i=0; i<ToursWBestIndi.size(); i++)
-			ToursWBestIndi[i] =0;
+		QList<int> TournamentsWithBestIndividual;
+		TournamentsWithBestIndividual.resize(tournaments->size());
+		for(int i=0; i<TournamentsWithBestIndividual.size(); i++)
+			TournamentsWithBestIndividual[i] =0;
 
-		int NewNumOfClassi = evalNeededTours(tours, & ToursWBestIndi, PosBest);
+		int NewNumOfClassi = evalNeededTournaments(tournaments, & TournamentsWithBestIndividual, PosBest);
 		if (NewNumOfClassi <=0)			// No tournament is to be classified
 			return Change;  
 
 		pthread_mutex_lock(&interpreterMutex);
-		for(int i=0; i<TourSize; i++)
+		for(int i=0; i<TournamentCount; i++)
 		{	
-			if(ToursWBestIndi[i] == 0)
+			if(TournamentsWithBestIndividual[i] == 0)
 			{
-				Tourna = tours->value(i);
-				if (i < tours->size()) (*tours)[i] = nullptr;
-				Tourna->classify(this);
-				delete Tourna;
+				Tournament = tournaments->value(i);
+				if (i < tournaments->size()) (*tournaments)[i] = nullptr;
+				Tournament->classify(this);
+				delete Tournament;
 				NumOfMetaEstimation[GenerationNumber] += 1;
 			}
 		}
@@ -456,19 +456,19 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 // unlock the interpreter so that the program can be updated
 		pthread_mutex_unlock(&interpreterMutex);
 
-		int NumOfTour = TourSize - NewNumOfClassi; // Number of tournaments to be run normally
-		for( int i=0; i<NumOfTour; i++)
+		int NumOfTournaments = TournamentCount - NewNumOfClassi; // Number of tournaments to be run normally
+		for( int i=0; i<NumOfTournaments; i++)
 		{
-			Tourna = tours->value(i);
-			if(Tourna == nullptr)
+			Tournament = tournaments->value(i);
+			if(Tournament == nullptr)
 			{
-				for(int NextTourPos = i+1; NextTourPos<TourSize; NextTourPos++)
+				for(int NextTournamentPosition = i+1; NextTournamentPosition<TournamentCount; NextTournamentPosition++)
 				{
-					Tourna = tours->value(NextTourPos);
-					if (NextTourPos < tours->size()) (*tours)[NextTourPos] = nullptr;
-					if(Tourna != nullptr)
+					Tournament = tournaments->value(NextTournamentPosition);
+					if (NextTournamentPosition < tournaments->size()) (*tournaments)[NextTournamentPosition] = nullptr;
+					if(Tournament != nullptr)
 					{
-						if (i < tours->size()) { delete (*tours)[i]; (*tours)[i] = Tourna; }
+						if (i < tournaments->size()) { delete (*tournaments)[i]; (*tournaments)[i] = Tournament; }
 						break;
 					}
 				}
@@ -476,17 +476,17 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tours, int
 		}
 
 		// Every slot in the tail is null here, so this delete loop frees nothing.
-		for (qsizetype k = NumOfTour; k < tours->size(); k++)
-			delete tours->at(k);
-		tours->resize(NumOfTour);
+		for (qsizetype k = NumOfTournaments; k < tournaments->size(); k++)
+			delete tournaments->at(k);
+		tournaments->resize(NumOfTournaments);
 
 //**************DebugInfo *************************************
-for(int d=0; d < tours->size();d++)
+for(int d=0; d < tournaments->size();d++)
 {
-	Tourna = tours->value(d);
-		if(Tourna == nullptr)
+	Tournament = tournaments->value(d);
+		if(Tournament == nullptr)
 		{
-			int DeugInfo= tours->size();
+			int DeugInfo= tournaments->size();
 		}
 }
 		
@@ -494,28 +494,28 @@ for(int d=0; d < tours->size();d++)
 		Change = true;
 	}
 
-	NumOfCorrectEstimation[GenerationNumber]= tours->size();
+	NumOfCorrectEstimation[GenerationNumber]= tournaments->size();
 	return Change;
 }
 
-int MT_Classifier::evalNeededTours(QList<SIGEL_GP::SIG_GPTournament *> *  tours, QList<int> * ToursWBestIndi, int PosBest)
+int MT_Classifier::evalNeededTournaments(QList<SIGEL_GP::SIG_GPTournament *> *  tournaments, QList<int> * TournamentsWithBestIndividual, int PosBest)
 {
-	SIGEL_GP::SIG_GPTournament *Tourna =nullptr;
+	SIGEL_GP::SIG_GPTournament *Tournament =nullptr;
 	int NumClassi=0;
-	int ToursSize = tours->size();
+	int TournamentCount = tournaments->size();
 
-	for(int i=0; i<ToursSize; i++)
+	for(int i=0; i<TournamentCount; i++)
 	{
-		Tourna = tours->value(i);
-		for (int k=0; k <Tourna->indis.size();k++)
+		Tournament = tournaments->value(i);
+		for (int k=0; k <Tournament->indis.size();k++)
 		{
-			if(PosBest == Tourna->indis.value(k)->indNumber){
-				(*ToursWBestIndi)[i] = 1;
+			if(PosBest == Tournament->indis.value(k)->indNumber){
+				(*TournamentsWithBestIndividual)[i] = 1;
 				break;
 			}
 		}
 
-		if(ToursWBestIndi->at(i) == 0)
+		if(TournamentsWithBestIndividual->at(i) == 0)
 			NumClassi ++;
 	}
 
@@ -525,22 +525,22 @@ int MT_Classifier::evalNeededTours(QList<SIGEL_GP::SIG_GPTournament *> *  tours,
 	if(RefreshInterval == 0)
 		RefreshInterval = 10;
 
-	const double toursPerRefresh = static_cast<double>(ToursSize) / RefreshInterval;
-	int MinNumTours = static_cast<int>(toursPerRefresh);
-	if (MinNumTours <= 0)
-		MinNumTours =1;
+	const double tournamentsPerRefresh = static_cast<double>(TournamentCount) / RefreshInterval;
+	int MinNumTournaments = static_cast<int>(tournamentsPerRefresh);
+	if (MinNumTournaments <= 0)
+		MinNumTournaments =1;
 
-	int NumKTours = ToursSize-NumClassi;
+	int NumKTournaments = TournamentCount-NumClassi;
 
-	if (NumKTours<MinNumTours)
+	if (NumKTournaments<MinNumTournaments)
 	{
-		for(int k=0; k< (MinNumTours-NumKTours);k++)
+		for(int k=0; k< (MinNumTournaments-NumKTournaments);k++)
 		{
-			for(int l=k; l< ToursSize;l++)
+			for(int l=k; l< TournamentCount;l++)
 			{
-				if(ToursWBestIndi->at(l)==0)
+				if(TournamentsWithBestIndividual->at(l)==0)
 				{
-					(*ToursWBestIndi)[l] = 1;
+					(*TournamentsWithBestIndividual)[l] = 1;
 					NumClassi--;
 					break;
 				}

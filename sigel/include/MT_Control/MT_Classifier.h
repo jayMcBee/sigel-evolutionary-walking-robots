@@ -27,7 +27,7 @@ public:
 
 	/* execute the first Tournaments by the MT_Classifier 
 	*/
-	bool preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *  tours, int PosBest);
+	bool preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *  tournaments, int PosBest);
 	
 	/* Method serves Tournament.run(Classifier)
 	* Runs the tournament normally, i.e. on exact fitness; 
@@ -47,15 +47,15 @@ private:
 
 	// Return value indicates how many SIGEL tournaments should be classified rather than run by exact fitness
 	//  
-	int evaluationTactic(int ToursSize);
+	int evaluationTactic(int TournamentCount);
 
 	// Determines which tournaments the best SIGEL individual takes part in 
-	// Modifies ToursWBestIndi; ToursWBestIndi[i] == 1 exactly when the best SIGEL individual appears
+	// Modifies TournamentsWithBestIndividual; TournamentsWithBestIndividual[i] == 1 exactly when the best SIGEL individual appears
 	// in tournament i. Exception: if the best individual appears in no tournament, 
-	// ToursWBestIndi[tours.size-1] == 1 is set anyway, so that the last tournament is not run with the
+	// TournamentsWithBestIndividual[tournaments.size-1] == 1 is set anyway, so that the last tournament is not run with the
 	// classifier but normally by exact fitness. This serves as calibration.
 	//
-	int evalNeededTours(QList<SIGEL_GP::SIG_GPTournament *> *  tours, QList<int> * ToursWBestIndi, int PosBest);
+	int evalNeededTournaments(QList<SIGEL_GP::SIG_GPTournament *> *  tournaments, QList<int> * TournamentsWithBestIndividual, int PosBest);
 };
 
 #endif // MT_CONTROL_MT_CLASSIFIER_H
