@@ -183,9 +183,9 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 {
 	int poolSize = parentSize * nvalue;
 
-	int otourn = tourSizeComboBox->currentText().toInt();
+	int oldTournamentSize = tourSizeComboBox->currentText().toInt();
 	updateTSizeList(parentSize, poolSize);
-	int tournamentSize = calculateTournSize(parentSize, poolSize, otourn);
+	int tournamentSize = calculateTournSize(parentSize, poolSize, oldTournamentSize);
 
 	QObject::disconnect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
 
