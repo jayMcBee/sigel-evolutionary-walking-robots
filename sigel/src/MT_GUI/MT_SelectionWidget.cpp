@@ -185,13 +185,13 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 
 	int otourn = tourSizeComboBox->currentText().toInt();
 	updateTSizeList(parentSize, poolSize);
-	int tourn = calculateTournSize(parentSize, poolSize, otourn);
+	int tournamentSize = calculateTournSize(parentSize, poolSize, otourn);
 
 	QObject::disconnect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
 
-	if(tourSizeMap.contains(tourn))
+	if(tourSizeMap.contains(tournamentSize))
 	{
-		int index = tourSizeMap.find(tourn).value();
+		int index = tourSizeMap.find(tournamentSize).value();
 		tourSizeComboBox->setCurrentIndex(index);
 	}
 	else
@@ -199,9 +199,9 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 		tourSizeComboBox->setCurrentIndex(0);
 	}
 
-	tourn = tourSizeComboBox->currentText().toInt();
+	tournamentSize = tourSizeComboBox->currentText().toInt();
 
-	int tourNum = poolSize / tourn;
+	int tourNum = poolSize / tournamentSize;
 	poolSizeLabel->setText(QString::number(poolSize));
 	tourNumLabel->setText(QString::number(tourNum));
 	winNumLabel->setText(QString::number(parentSize / tourNum));
