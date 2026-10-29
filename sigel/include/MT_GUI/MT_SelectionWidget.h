@@ -27,7 +27,7 @@ private:
 
 private slots:
 	void slotOverProdChanged(int nvalue);
-	void slotTourSizeChanged(const QString &text);
+	void slotTournamentSizeChanged(const QString &text);
 };
 
 #endif

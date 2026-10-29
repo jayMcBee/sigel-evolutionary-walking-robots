@@ -11,7 +11,7 @@ MT_SelectionWidget::MT_SelectionWidget(QWidget* parent, const char* name, Qt::Wi
 	lastParentSize = -1;
 
 	QObject::connect(overProductionSpinBox, SIGNAL(valueChanged(int)), SLOT(slotOverProdChanged(int)));
-	QObject::connect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
+	QObject::connect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTournamentSizeChanged(const QString&)));
 }
 
 void MT_SelectionWidget::updateTSizeList(int pSize, int oSize)
@@ -78,7 +78,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	int tDuration;
 
 	QObject::disconnect(overProductionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotOverProdChanged(int)));
-	QObject::disconnect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
+	QObject::disconnect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTournamentSizeChanged(const QString&)));
 
 	manager->getSelectionValue(&offspringSize, &tournamentSize,
 		&selMethod, &fitFunc,
@@ -139,7 +139,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	TDurationSpinBox->setValue(tDuration);	// set max interpretation duration
 
 	QObject::connect(overProductionSpinBox, SIGNAL(valueChanged(int)), SLOT(slotOverProdChanged(int)));
-	QObject::connect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
+	QObject::connect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTournamentSizeChanged(const QString&)));
 }
 
 bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *estimationState)
@@ -187,7 +187,7 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 	updateTSizeList(parentSize, poolSize);
 	int tournamentSize = calculateTournSize(parentSize, poolSize, oldTournamentSize);
 
-	QObject::disconnect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
+	QObject::disconnect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTournamentSizeChanged(const QString&)));
 
 	if(tournamentSizeMap.contains(tournamentSize))
 	{
@@ -206,10 +206,10 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 	tournamentCountLabel->setText(QString::number(tournamentCount));
 	winNumLabel->setText(QString::number(parentSize / tournamentCount));
 
-	QObject::connect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
+	QObject::connect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTournamentSizeChanged(const QString&)));
 }
 
-void MT_SelectionWidget::slotTourSizeChanged(const QString &text)
+void MT_SelectionWidget::slotTournamentSizeChanged(const QString &text)
 {
 	int offSize = poolSizeLabel->text().toInt();
 	int tSize   = text.toInt();
