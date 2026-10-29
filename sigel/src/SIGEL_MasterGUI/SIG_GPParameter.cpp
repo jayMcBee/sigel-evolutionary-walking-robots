@@ -331,7 +331,7 @@ void SIG_GPParameter::getOutOfExperiment()
 	int tournamentsPerGeneration = static_cast<int>( theExperiment.gpParameter.getTournamentsPerGeneration() * 1000 );
 	sliderTournamentsPerGeneration->setValue( tournamentsPerGeneration );
 
-	// display the REAL value, according to the calculations in SIG_GPManager.cpp, also see slotTourPerGen()
+	// display the REAL value, according to the calculations in SIG_GPManager.cpp, also see slotTournamentsPerGenerationChanged()
 	double tpg = (sliderTournamentsPerGeneration->value() / 1000.0) * theExperiment.population.getSize();
 	lcdnumberTournamentsPerGeneration->display( static_cast<int>( tpg ) );
 
@@ -712,10 +712,10 @@ void SIG_GPParameter::slotCrossoverChanged( int newCrossoverValue )
 	lcdnumberReproduction->display( qRound( (1000 - crossoverValue - mutationValue) / 10 ) );
 }
 
-void SIG_GPParameter::slotTourPerGenChanged( int )
+void SIG_GPParameter::slotTournamentsPerGenerationChanged( int )
 {
 	// display the *Real* value used in SIG_GPManager later on to call
-	// CreateTours() and thus the *actual* number of Tournament per generation
+	// createTournaments() and thus the *actual* number of Tournament per generation
 	double const tpg = (sliderTournamentsPerGeneration->value() / 1000.0) * theExperiment.population.getSize();
 	lcdnumberTournamentsPerGeneration->display( static_cast<int>( tpg ) );
 }
@@ -723,7 +723,7 @@ void SIG_GPParameter::slotTourPerGenChanged( int )
 void SIG_GPParameter::showEvent( QShowEvent *event )
 {
 	// Qt calls this each time this page is shown; the pool may have changed.
-	slotTourPerGenChanged( sliderTournamentsPerGeneration->value() );
+	slotTournamentsPerGenerationChanged( sliderTournamentsPerGeneration->value() );
 	SIG_GPParameterBase::showEvent( event );
 }
 

@@ -72,7 +72,7 @@ namespace SIGEL_GP
 		 */
 		virtual ~SIG_GPManager();
 
-		// The destructor deletes the tournaments in tours, so a copy would free them twice.
+		// The destructor deletes the entries of tournaments, so a copy would free them twice.
 		SIG_GPManager( SIG_GPManager const & ) = delete;
 		SIG_GPManager &operator=( SIG_GPManager const & ) = delete;
 
@@ -85,7 +85,7 @@ namespace SIGEL_GP
 
 		/**
 		 * How many of the current generation's tournaments are finished, out of
-		 * how many createTours planned. Both are 0 before the first createTours.
+		 * how many createTournaments planned. Both are 0 before the first createTournaments.
 		 */
 		struct TournamentProgress
 		{
@@ -182,12 +182,12 @@ namespace SIGEL_GP
 		 * @pre
 		 * The evolutionloop is started and a set of tournaments is needed.
 		 * @post
-		 * A set of tournaments is created and placed in the QList tours of
+		 * A set of tournaments is created and placed in the QList tournaments of
 		 * the GPManager.
 		 * @param quantity
 		 * This integer determines how many tournaments will be created.
 		 */
-		void createTours(int quantity);
+		void createTournaments(int quantity);
 
 		/**
 		 * This function checks the actuality of the fitness values of every
@@ -213,12 +213,12 @@ namespace SIGEL_GP
 		 * played. It is a topological sorting algorithm, used to avoid trouble with
 		 * tournament dependencies, caused by the steady state paradigm.
 		 * @pre
-		 * There is a set of tournaments created and placed in the QList tours.
+		 * There is a set of tournaments created and placed in the QList tournaments.
 		 * @post
-		 * taskCanDoList holds the indices of the tournaments in tours that can be
+		 * taskCanDoList holds the indices of the entries of tournaments that can be
 		 * played without waiting for another tournament.
 		 */
-		void calcInitTourSet();
+		void calcInitTournamentSet();
 
 		virtual void processInterfaceEvents();
 
@@ -257,7 +257,7 @@ namespace SIGEL_GP
 		SIG_GPPVMDynamicClientServer dynamicClientServer;
 
 		/**
-		 * This list contains the indices of all tournaments in tours
+		 * This list contains the indices of all entries of tournaments
 		 * that are free to start or that are waiting for the calculation
 		 * of fitness values for individuals that were created by them.
 		 */
@@ -275,7 +275,7 @@ namespace SIGEL_GP
 		 * This QList is used to store the randomly created tournaments for one
 		 * generation.
 		 */
-		QList<SIG_GPTournament *> tours;
+		QList<SIG_GPTournament *> tournaments;
 
 		/**
 		 * The randomizer object, used to create randomseeds for the evolution.

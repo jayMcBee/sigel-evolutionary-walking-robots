@@ -1871,7 +1871,7 @@ static int guidriveMain(int argc, char **argv)
     // Population was the only one of the six that was ever driven. These five
     // hold every spin box, slider, combo, checkbox and validator in the
     // application. The population is untouched here (the whole loaded pool), which
-    // matters: slotTourPerGenChanged reads the pool size to compute what its
+    // matters: slotTournamentsPerGenerationChanged reads the pool size to compute what its
     // LCD shows, so this scenario must not follow a delete.
     if (scenario == "pages") {
         QStackedWidget *st2 = W->findChild<QStackedWidget *>();

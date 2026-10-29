@@ -97,7 +97,7 @@ public slots:
 
  void slotCrossoverChanged( int ) override;
 
- void slotTourPerGenChanged( int ) override;
+ void slotTournamentsPerGenerationChanged( int ) override;
 
  protected:
 

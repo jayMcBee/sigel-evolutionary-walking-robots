@@ -30,7 +30,7 @@ public slots:
     virtual void slotEditHost() = 0;
     virtual void slotEnableAllHosts() = 0;
     virtual void slotMutationChanged( int ) = 0;
-    virtual void slotTourPerGenChanged( int ) = 0;
+    virtual void slotTournamentsPerGenerationChanged( int ) = 0;
 
 protected:
     // Drives languageChange; without it the slot never runs.

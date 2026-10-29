@@ -2144,7 +2144,7 @@
     <slot>slotEditHost()</slot>
     <slot>slotEnableAllHosts()</slot>
     <slot>slotMutationChanged(int)</slot>
-    <slot>slotTourPerGenChanged(int)</slot>
+    <slot>slotTournamentsPerGenerationChanged(int)</slot>
   </slots>
   <connections>
     <connection>
@@ -2211,7 +2211,7 @@
       <sender>sliderTournamentsPerGeneration</sender>
       <signal>valueChanged(int)</signal>
       <receiver>SIG_GPParameterBase</receiver>
-      <slot>slotTourPerGenChanged(int)</slot>
+      <slot>slotTournamentsPerGenerationChanged(int)</slot>
     </connection>
   </connections>
 </ui>
