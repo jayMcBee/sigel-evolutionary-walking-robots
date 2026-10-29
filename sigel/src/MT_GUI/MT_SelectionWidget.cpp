@@ -69,7 +69,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	int offspringSize;
 	int tournSize;
 	int selMethod;
-	int fitFunc;
+	MT_FitnessFunction fitFunc;
 	int tsetSize;
 	int tDuration;
 
@@ -117,11 +117,11 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	if( ( strategy < 3 ) || ( strategy > 8 ) ){		// of type evaluator */
 		fitnessFunctionComboBox->addItem("Simple error");
 		fitnessFunctionComboBox->addItem("Square error");
-		fitnessFunctionComboBox->setCurrentIndex(fitFunc - 1);
+		fitnessFunctionComboBox->setCurrentIndex(fitFunc == MT_FitnessFunction::EvaluatorSquareError ? 1 : 0);
 	} else {						// of type classifier
 		fitnessFunctionComboBox->addItem("Simple");
 		fitnessFunctionComboBox->addItem("Weighted");
-		fitnessFunctionComboBox->setCurrentIndex(fitFunc - 3);
+		fitnessFunctionComboBox->setCurrentIndex(fitFunc == MT_FitnessFunction::ClassifierWeighted ? 1 : 0);
 	}
 
 	TSetSizeSpinBox->setValue(tsetSize);	// training set size
@@ -136,7 +136,7 @@ bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *estim
 	int offspringSize=0;
 	int tournSize=0;
 	int selMethod=0;
-	int fitFunc=0;
+	MT_FitnessFunction fitFunc;
 	int tsetSize=0;
 	int tDuration=0;
 
@@ -148,9 +148,9 @@ bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *estim
 	// 3 to 6 and 8; "save best" makes the number negative.
 	const int strategy = abs( estimationState->strategy );
 	if( ( strategy < 3 ) || ( strategy > 8 ) ){		// of type evaluator */
-		fitFunc = fitnessFunctionComboBox->currentIndex() + 1;
+		fitFunc = fitnessFunctionComboBox->currentIndex() == 1 ? MT_FitnessFunction::EvaluatorSquareError : MT_FitnessFunction::EvaluatorSimpleError;
 	} else {						// of type classifier
-		fitFunc = fitnessFunctionComboBox->currentIndex() + 3;
+		fitFunc = fitnessFunctionComboBox->currentIndex() == 1 ? MT_FitnessFunction::ClassifierWeighted : MT_FitnessFunction::ClassifierSimple;
 	}
 
 	tsetSize = TSetSizeSpinBox->value();	// training set size

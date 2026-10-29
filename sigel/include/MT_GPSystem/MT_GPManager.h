@@ -15,6 +15,7 @@ class MT_Substitute;
 #include "MT_GPSystem/MT_FitnessTrainer.h"
 #include "MT_GPSystem/MT_TournamentManager.h"
 #include "MT_GPSystem/MT_ErrorCode.h"
+#include "MT_GPSystem/MT_FitnessFunction.h"
 
 #include <pthread.h>
 
@@ -57,12 +58,12 @@ public:
 	/* update the Gp-System with the given SelectionValue
 	* there are involved the class 
 	* @pre: the Offspring must be empty! Flush it first.*/
-	void setSelectionValue( int OffspringSize, int TournamentSize, int SMethod, int FitnessFunction, int TrainingSetSize, int TrainingDuration);
+	void setSelectionValue( int OffspringSize, int TournamentSize, int SMethod, MT_FitnessFunction FitnessFunction, int TrainingSetSize, int TrainingDuration);
 	
 	/* for update the Selection window;
 	* the GP-System will change direct the value in the GUI-class 
 	*/
-	void getSelectionValue (int *OffspringSize, int  * TournamentSize, int * SMethod, int * FitnessFunction, int *TrainingSetSize, int * TrainingDuration);
+	void getSelectionValue (int *OffspringSize, int  * TournamentSize, int * SMethod, MT_FitnessFunction * FitnessFunction, int *TrainingSetSize, int * TrainingDuration);
 	
 	/*change the BrutSize*/
 	void setBrutSize(int NewSize);

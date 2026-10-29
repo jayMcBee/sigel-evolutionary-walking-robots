@@ -11,6 +11,7 @@
 #include "MT_GPSystem/MT_Individual.h"
 #include "MT_GPSystem/MT_Population.h"
 #include "MT_GPSystem/MT_ErrorCode.h"
+#include "MT_GPSystem/MT_FitnessFunction.h"
 
 #include <qstring.h>
 #include <qtextstream.h>
@@ -24,13 +25,8 @@ class MT_FitnessTrainer
 private:
 	MT_ErrorCode LastError;
 
-	/*Indicate which fitness function is choose for the fitness calculation
-	@param: 1 = fitSimpleError for the evaluator  approach
-	@param: 2 = fitSquareError for the evaluator  approach
-	@param: 3 = simpleYesNo  for the classifier approach
-	@param: 4 = weightYesNo  for the classifier approach
-	*/
-	int FitnessFunction;
+	/*Indicate which fitness function is choose for the fitness calculation*/
+	MT_FitnessFunction FitnessFunction;
 
 	/* for the evaluator  approach:
 	* the both Result arrays serve for storing the fitness value
@@ -100,13 +96,13 @@ public:
 	/* change the SelectionValue because the GUI have change.
 	* post: the FitnessFunction, the TrainingDuration and the TrainingSetSize are now up to date
 	*/
-	void setSelectionValue( int FitFunction, int TDuration, int TSize );
+	void setSelectionValue( MT_FitnessFunction FitFunction, int TDuration, int TSize );
 
 	/* the GUI isn't up to date (e.g. load setup), this function bring the GUI up to date.
 	* the Value/ Data are directly change in the GUI by the given pointers.
 	* @post: the FitnessFunction, the TrainingDuration and the TrainingSetSize are now up to date
 	*/
-	void getSelectionValue( int *FitFunction, int *TDuration, int *TSize );
+	void getSelectionValue( MT_FitnessFunction *FitFunction, int *TDuration, int *TSize );
 
 	/* This function writes the MT_FitnessTrainer to a QTextStream.
 	* @param:

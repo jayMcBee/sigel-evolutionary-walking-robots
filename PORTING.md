@@ -911,6 +911,16 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-29 — DONE: `MT_FitnessFunction` NAMES THE METAGP FITNESS FUNCTIONS.**
+
+- **Changed:** the new scoped enum (`MT_GPSystem/MT_FitnessFunction.h`) holds
+  1 `EvaluatorSimpleError`, 2 `EvaluatorSquareError`, 3 `ClassifierSimple`
+  and 4 `ClassifierWeighted`, named after the labels of the MetaGP dialog.
+  `MT_FitnessTrainer`, `MT_GPManager`, `MT_SelectionWidget` and
+  `MT_PopulationWidget` use it instead of a bare `int`; the selection widget
+  maps the combo box index explicitly. The number in the MetaGP file is
+  unchanged.
+
 **2026-10-29 — DONE: `MT_EstimationWidget` SHOWS A CLASSIFIER WITH "SAVE BEST" AS A CLASSIFIER.**
 
 - **Fault:** `onShow` removed the minus sign of "save best" from its local

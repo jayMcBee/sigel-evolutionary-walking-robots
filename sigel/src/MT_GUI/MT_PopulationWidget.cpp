@@ -155,7 +155,7 @@ bool MT_PopulationWidget::onHide(MT_GPManager *manager, MT_EstimationState *esti
 		int offspringSize;
 		int tournSize;
 		int selMethod;
-		int fitFunc;
+		MT_FitnessFunction fitFunc;
 		int tsetSize;
 		int tDuration;
 

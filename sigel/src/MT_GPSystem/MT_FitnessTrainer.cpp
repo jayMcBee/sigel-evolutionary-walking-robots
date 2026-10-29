@@ -16,7 +16,7 @@ MT_FitnessTrainer::MT_FitnessTrainer( QTextStream &File )
 
 	if( ( PresentLine == FitTrainer ) && !( File.atEnd() ) )
 	{
-		FitnessFunction = ( File.readLine() ).toInt();
+		FitnessFunction = static_cast< MT_FitnessFunction >( ( File.readLine() ).toInt() );
 		PresentTSize = ( File.readLine() ).toInt();
 		TSetSize = ( File.readLine() ).toInt();
 		Result.resize( TSetSize );
@@ -42,7 +42,7 @@ MT_FitnessTrainer::MT_FitnessTrainer()
 {
 	LastError = MT_ErrorCode::None;
 
-	FitnessFunction = 1;
+	FitnessFunction = MT_FitnessFunction::EvaluatorSimpleError;
 	PresentTSize = 0;
 	TSetSize = 10;
 	Result.resize( TSetSize );
@@ -64,7 +64,7 @@ void MT_FitnessTrainer::loadSetup( QTextStream &File )
 
 	if( ( PresentLine == FitTrainer ) && !( File.atEnd() ) )
 	{
-		FitnessFunction = ( File.readLine() ).toInt();
+		FitnessFunction = static_cast< MT_FitnessFunction >( ( File.readLine() ).toInt() );
 		int NewPresentTSize = ( File.readLine() ).toInt();
 		int NewTSetSize = ( File.readLine() ).toInt();
 		Interpreter.setDuration( ( File.readLine() ).toInt() );
@@ -84,7 +84,7 @@ void MT_FitnessTrainer::loadSetup( QTextStream &File )
 void MT_FitnessTrainer::writeToFileSetup( QTextStream &File )
 {
 	File << ( "FitnessTranier:\n" );
-	File << FitnessFunction << Qt::endl;
+	File << static_cast< int >( FitnessFunction ) << Qt::endl;
 	File << PresentTSize << Qt::endl;
 	File << TSetSize << Qt::endl;
 	File << Interpreter.getDuration() << Qt::endl;
@@ -94,7 +94,7 @@ void MT_FitnessTrainer::writeToFileSetup( QTextStream &File )
 void MT_FitnessTrainer::writeToFileTrainer( QTextStream &File )
 {
 	File << ( "FitnessTranier:\n" );
-	File << FitnessFunction << Qt::endl;
+	File << static_cast< int >( FitnessFunction ) << Qt::endl;
 	File << PresentTSize << Qt::endl;
 	File << TSetSize << Qt::endl;
 	File << Interpreter.getDuration() << Qt::endl;
@@ -108,7 +108,7 @@ MT_ErrorCode MT_FitnessTrainer::getLastError()
 	return LastError;
 }
 
-void MT_FitnessTrainer::getSelectionValue( int *FitFunction, int *TDuration, int *TSize )
+void MT_FitnessTrainer::getSelectionValue( MT_FitnessFunction *FitFunction, int *TDuration, int *TSize )
 {
 	*FitFunction = FitnessFunction;
 	*TDuration = Interpreter.getDuration();
@@ -120,7 +120,7 @@ int MT_FitnessTrainer::getTDuration()
 	return Interpreter.getDuration();
 }
 
-void MT_FitnessTrainer::setSelectionValue( int FitFunction, int TDuration, int TSize )
+void MT_FitnessTrainer::setSelectionValue( MT_FitnessFunction FitFunction, int TDuration, int TSize )
 {
 	FitnessFunction = FitFunction;
 	TSetSize = TSize;
@@ -184,10 +184,10 @@ bool MT_FitnessTrainer::calculateFitness( MT_Individual *Indi )
 
 		switch( FitnessFunction )
 		{
-		case 1: Fit = fitSimpleError(); break;
-		case 2: Fit = fitSquareError(); break;
-		case 3: Fit = simpleYesNo(); break;
-		case 4: Fit = weightYesNo(); break;
+		case MT_FitnessFunction::EvaluatorSimpleError: Fit = fitSimpleError(); break;
+		case MT_FitnessFunction::EvaluatorSquareError: Fit = fitSquareError(); break;
+		case MT_FitnessFunction::ClassifierSimple: Fit = simpleYesNo(); break;
+		case MT_FitnessFunction::ClassifierWeighted: Fit = weightYesNo(); break;
 		default:
 			Fit = -999.0;
 			LastError = MT_ErrorCode::UnknownFitnessFunction;
