@@ -911,6 +911,16 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-29 — DONE: `MT_SelectionWidget` OFFERS THE RIGHT FITNESS FUNCTIONS FOR EVERY ESTIMATION STRATEGY.**
+
+- **Fault:** it took a strategy below 3 for the evaluator. The evaluator
+  strategies are 1, 2, 9, 10 and 13, the classifier strategies 3 to 6 and 8,
+  and "save best" makes the number negative. An evaluator with strategy 9, 10
+  or 13 got the classifier list, a classifier with "save best" the evaluator
+  list, and closing the dialog stored a fitness function of the wrong kind.
+- **Fix:** `onShow` and `onHide` take the absolute strategy; below 3 or
+  above 8 is the evaluator.
+
 **2026-10-29 — DONE: A STRAY COMMENT IN `MT_Controller::useMeta` IS GONE.**
 
 - **Changed:** "// update sig_mainwindow" stood above nothing that updates a

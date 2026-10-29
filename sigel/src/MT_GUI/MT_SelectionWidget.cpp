@@ -110,7 +110,11 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 
 	// set the fitness function
 	fitnessFunctionComboBox->clear();
-	if(estimationState->strategy < 3){		// of type evaluator */
+
+	// The evaluator strategies are 1, 2, 9, 10 and 13, the classifier strategies
+	// 3 to 6 and 8; "save best" makes the number negative.
+	const int strategy = abs( estimationState->strategy );
+	if( ( strategy < 3 ) || ( strategy > 8 ) ){		// of type evaluator */
 		fitnessFunctionComboBox->addItem("Simple error");
 		fitnessFunctionComboBox->addItem("Square error");
 		fitnessFunctionComboBox->setCurrentIndex(fitFunc - 1);
@@ -140,7 +144,10 @@ bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *estim
 	tournSize = tourSizeComboBox->currentText().toInt();
 	selMethod = selectionMethodComboBox->currentIndex() + 1;
 
-	if(estimationState->strategy < 3){		// of type evaluator */
+	// The evaluator strategies are 1, 2, 9, 10 and 13, the classifier strategies
+	// 3 to 6 and 8; "save best" makes the number negative.
+	const int strategy = abs( estimationState->strategy );
+	if( ( strategy < 3 ) || ( strategy > 8 ) ){		// of type evaluator */
 		fitFunc = fitnessFunctionComboBox->currentIndex() + 1;
 	} else {						// of type classifier
 		fitFunc = fitnessFunctionComboBox->currentIndex() + 3;
