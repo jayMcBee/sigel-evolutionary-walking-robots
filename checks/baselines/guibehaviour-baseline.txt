@@ -1769,7 +1769,7 @@ Do you want to replace it?]
       item1  [Fitness proportional]
       2 Down clamps at current=1 [Fitness proportional]
       2 Up   clamps at current=0 [Ranking]
-    combo  tourSizeComboBox                     count=4 current=0 [10] editable=0 enabled=1
+    combo  tournamentSizeComboBox               count=4 current=0 [10] editable=0 enabled=1
       item0  [10]
       item1  [20]
       item2  [50]

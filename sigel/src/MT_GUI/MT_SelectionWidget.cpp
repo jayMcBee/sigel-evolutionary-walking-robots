@@ -11,12 +11,12 @@ MT_SelectionWidget::MT_SelectionWidget(QWidget* parent, const char* name, Qt::Wi
 	lastParentSize = -1;
 
 	QObject::connect(overProductionSpinBox, SIGNAL(valueChanged(int)), SLOT(slotOverProdChanged(int)));
-	QObject::connect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
+	QObject::connect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
 }
 
 void MT_SelectionWidget::updateTSizeList(int pSize, int oSize)
 {
-	tourSizeComboBox->clear();
+	tournamentSizeComboBox->clear();
 	tourSizeMap.clear();
 
 	int tNum;
@@ -29,7 +29,7 @@ void MT_SelectionWidget::updateTSizeList(int pSize, int oSize)
 			if((tNum != 0)&&((pSize % tNum) == 0))	//     "        "        "        "    1+2
 			{
 				// candidate found so insert it into the list
-				tourSizeComboBox->addItem(QString::number(tSize));
+				tournamentSizeComboBox->addItem(QString::number(tSize));
 				tourSizeMap.insert(tSize, index++);
 			}
 		}
@@ -78,7 +78,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	int tDuration;
 
 	QObject::disconnect(overProductionSpinBox, SIGNAL(valueChanged(int)), this, SLOT(slotOverProdChanged(int)));
-	QObject::disconnect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
+	QObject::disconnect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
 
 	manager->getSelectionValue(&offspringSize, &tournamentSize,
 		&selMethod, &fitFunc,
@@ -99,13 +99,13 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	if(tourSizeMap.contains(tournamentSize))
 	{
 		int index = tourSizeMap.find(tournamentSize).value();
-		tourSizeComboBox->setCurrentIndex(index);
+		tournamentSizeComboBox->setCurrentIndex(index);
 	}
 	else
 	{
 		QMessageBox::critical(this, "Configure MetaGP System", "The tournament size is invalid.\n"
 			"A default value will be used.");
-		tourSizeComboBox->setCurrentIndex(0);
+		tournamentSizeComboBox->setCurrentIndex(0);
 	}
 
 	// update labels
@@ -139,7 +139,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	TDurationSpinBox->setValue(tDuration);	// set max interpretation duration
 
 	QObject::connect(overProductionSpinBox, SIGNAL(valueChanged(int)), SLOT(slotOverProdChanged(int)));
-	QObject::connect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
+	QObject::connect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
 }
 
 bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *estimationState)
@@ -152,7 +152,7 @@ bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *estim
 	int tDuration=0;
 
 	offspringSize = parentSize * overProductionSpinBox->value();
-	tournamentSize = tourSizeComboBox->currentText().toInt();
+	tournamentSize = tournamentSizeComboBox->currentText().toInt();
 	selMethod = selectionMethodComboBox->currentIndex() + 1;
 
 	// The evaluator strategies are 1, 2, 9, 10 and 13, the classifier strategies
@@ -183,30 +183,30 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 {
 	int poolSize = parentSize * nvalue;
 
-	int oldTournamentSize = tourSizeComboBox->currentText().toInt();
+	int oldTournamentSize = tournamentSizeComboBox->currentText().toInt();
 	updateTSizeList(parentSize, poolSize);
 	int tournamentSize = calculateTournSize(parentSize, poolSize, oldTournamentSize);
 
-	QObject::disconnect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
+	QObject::disconnect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
 
 	if(tourSizeMap.contains(tournamentSize))
 	{
 		int index = tourSizeMap.find(tournamentSize).value();
-		tourSizeComboBox->setCurrentIndex(index);
+		tournamentSizeComboBox->setCurrentIndex(index);
 	}
 	else
 	{
-		tourSizeComboBox->setCurrentIndex(0);
+		tournamentSizeComboBox->setCurrentIndex(0);
 	}
 
-	tournamentSize = tourSizeComboBox->currentText().toInt();
+	tournamentSize = tournamentSizeComboBox->currentText().toInt();
 
 	int tourNum = poolSize / tournamentSize;
 	poolSizeLabel->setText(QString::number(poolSize));
 	tourNumLabel->setText(QString::number(tourNum));
 	winNumLabel->setText(QString::number(parentSize / tourNum));
 
-	QObject::connect(tourSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
+	QObject::connect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), SLOT(slotTourSizeChanged(const QString&)));
 }
 
 void MT_SelectionWidget::slotTourSizeChanged(const QString &text)
