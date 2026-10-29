@@ -11,12 +11,14 @@ MT_Classifier::MT_Classifier(QTextStream &File) : MT_Substitute()
 	AssumedFitness.resize(0);
 	MetaProgError =-1.0;
 	NumOfMeta =0;
-	
+
 	QString Classifier( "Classifier:" );
 	QString PresentLine = File.readLine();
 
 	while ((PresentLine != Classifier) && !(File.atEnd()))
+	{
 		PresentLine = File.readLine();
+	}
 	if (PresentLine == Classifier)
 	{
 		EstimationStrategy = (File.readLine()).toInt();
@@ -28,7 +30,7 @@ MT_Classifier::MT_Classifier(QTextStream &File) : MT_Substitute()
 		{
 			NumOfCorrectEstimation.resize(GenerationNumber+1);
 			NumOfMetaEstimation.resize(GenerationNumber+1);
-						
+
 			for(int i=0; i< GenerationNumber; i++)
 			{
 				NumOfCorrectEstimation[i] = (File.readLine()).toUInt();
@@ -45,7 +47,7 @@ MT_Classifier::MT_Classifier(QTextStream &File) : MT_Substitute()
 			{
 				NumOfCorrectEstimation[i] = 0;
 				NumOfMetaEstimation[i] = 0;
-			}		
+			}
 		}
 	}
 }
@@ -56,7 +58,9 @@ void MT_Classifier::loadSetup(QTextStream &File)
 	QString PresentLine = File.readLine();
 
 	while ((PresentLine != Classifier) && !(File.atEnd()))
+	{
 		PresentLine = File.readLine();
+	}
 	if (PresentLine == Classifier)
 	{
 		EstimationStrategy = (File.readLine()).toInt();
@@ -74,10 +78,10 @@ void MT_Classifier::writeToFile(QTextStream &File)
 	File << GenerationNumber <<Qt::endl;
 
 	for(int i=0; i< GenerationNumber; i++)
-		{
-			File << NumOfCorrectEstimation[i] <<Qt::endl;
-			File << NumOfMetaEstimation[i] << Qt::endl;
-		}
+	{
+		File << NumOfCorrectEstimation[i] <<Qt::endl;
+		File << NumOfMetaEstimation[i] << Qt::endl;
+	}
 }
 
 void MT_Classifier::writeToFileSetup(QTextStream &File)
@@ -103,22 +107,22 @@ void MT_Classifier::createNewTCase(SIGEL_Program::SIG_Program const * SigProgOne
 {
 	MT_TranslatedIndividual * TransIndi = createDoubleTransIndi(SigProgOne, SigProgTwo);
 
-// lock the TCaseBuffer so that no TCases could be taken from it
-					pthread_mutex_lock(&tCaseBufferMutex);
-	
-					TCaseBuffer.enqueue (new MT_TrainingCase(FitDifference, TransIndi, NumOfCorrectEstimation[GenerationNumber], TransIndi->Boundary));
+	// lock the TCaseBuffer so that no TCases could be taken from it
+	pthread_mutex_lock(&tCaseBufferMutex);
 
-					// create the symmetric TCase
-					TransIndi = createDoubleTransIndi(SigProgTwo, SigProgOne);
-					TCaseBuffer.enqueue (new MT_TrainingCase(-1.0 * FitDifference, TransIndi, NumOfCorrectEstimation[GenerationNumber], TransIndi->Boundary));
+	TCaseBuffer.enqueue (new MT_TrainingCase(FitDifference, TransIndi, NumOfCorrectEstimation[GenerationNumber], TransIndi->Boundary));
 
-// unlock the TCaseBuffer
-					pthread_mutex_unlock(&tCaseBufferMutex);
+	// create the symmetric TCase
+	TransIndi = createDoubleTransIndi(SigProgTwo, SigProgOne);
+	TCaseBuffer.enqueue (new MT_TrainingCase(-1.0 * FitDifference, TransIndi, NumOfCorrectEstimation[GenerationNumber], TransIndi->Boundary));
+
+	// unlock the TCaseBuffer
+	pthread_mutex_unlock(&tCaseBufferMutex);
 }
 
 int MT_Classifier::evaluationTactic(int TournamentCount)
 {
-	int NumOfClassi=0; //Number of tournaments to be run with the classifier 
+	int NumOfClassi=0; //Number of tournaments to be run with the classifier
 	double Num =0.0;
 	double SigelGeneration = GenerationNumber;
 	if (SigelGeneration <1.0)
@@ -138,9 +142,9 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 					if( ((AssumedFitness[i]>=0.0)&&(CorrectFitness[i]<0.0)) || ((AssumedFitness[i]<0.0)&&(CorrectFitness[i]>=0.0)) )
 						MetaProgError++;
 
-				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := percentage error 
+				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := percentage error
 			}
-			
+
 			if(MetaProgError< Tolerance)
 			{
 				Num = TournamentCount/RefreshInterval;
@@ -153,8 +157,8 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 			}
 		}
 		break;
-	
-	case 4: 
+
+	case 4:
 		{
 			// Evaluation strategy weighted by SIGEL generation count
 			double ToleranceNew = Tolerance;
@@ -165,7 +169,7 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 					if( ((AssumedFitness[i]>=0.0)&&(CorrectFitness[i]<0.0)) || ((AssumedFitness[i]<0.0)&&(CorrectFitness[i]>=0.0)) )
 						MetaProgError++;
 
-				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := percentage error 
+				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := percentage error
 			}
 
 			// Tolerance is weighted by generation count
@@ -177,7 +181,7 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 					ToleranceNew = 40.0 - Rate*SigelGeneration;
 				}
 			}
-		
+
 			if(MetaProgError < ToleranceNew)
 			{
 				Num = TournamentCount/RefreshInterval;
@@ -190,7 +194,7 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 			}
 		}
 		break;
-	case 5: 
+	case 5:
 		{
 			// Evaluation strategy weighted by SIGEL fitness
 
@@ -203,10 +207,10 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 					if( ((AssumedFitness[i]>=0.0)&&(CorrectFitness[i]<0.0)) || ((AssumedFitness[i]<0.0)&&(CorrectFitness[i]>=0.0)) )
 						MetaProgError++;
 
-				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := percentage error 
+				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := percentage error
 			}
 
-		// Tolerance weighting: AverageSigelFitness 
+			// Tolerance weighting: AverageSigelFitness
 			if (AverageSigelFitness>0.1 && AverageSigelFitness<1.0)
 			{
 				double ASigelFit = AverageSigelFitness - 0.1;
@@ -229,13 +233,13 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 			}
 		}
 		break;
-	case 8: 
+	case 8:
 		{
 			NumOfClassi =0;
 		}
 		break;
 
-	case 6: 
+	case 6:
 		{
 			if(MetaProgError == -1.0)
 			{
@@ -244,16 +248,16 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 					if( ((AssumedFitness[i]>=0.0)&&(CorrectFitness[i]<0.0)) || ((AssumedFitness[i]<0.0)&&(CorrectFitness[i]>=0.0)) )
 						MetaProgError++;
 
-				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := percentage error 
+				MetaProgError = (MetaProgError/ CorrectFitness.size())*100.0;  //MetaProgError := percentage error
 			}
-			
+
 			if(MetaProgError< Tolerance)
 				NumOfClassi =-1;
 		}
 		break;
 	}
-	
-return NumOfClassi; 
+
+	return NumOfClassi;
 }
 
 MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo)
@@ -276,8 +280,8 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 	for(int k=1; k<32; k++)
 		(*MData)[k] =0;
 	(*MData)[16] = SigProgTwoSize;
-	
-// First SIGEL program is translated 
+
+	// First SIGEL program is translated
 	for (int i=0; i<SigProgOneSize;i++)
 	{
 		// WARNING: if the SIGEL instruction from SIGProg is JMP X, NOP, Sense ...
@@ -326,7 +330,7 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		}
 	}
 
-// Second SIGEL program is translated 
+	// Second SIGEL program is translated
 	for (int i=0; i<SigProgTwoSize;i++)
 	{
 		// WARNING: if the SIGEL instruction from SIGProg is JMP X, NOP, Sense ...
@@ -354,7 +358,7 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 		case SIGEL_Program::MOD: (*Instructions)[i+SigProgOneSize]= 14; break;
 		case SIGEL_Program::NOP: (*Instructions)[i+SigProgOneSize]= 15; break;
 		}
-	
+
 		switch( programLine.getRobotInstructionType() )
 		{
 		case SIGEL_Program::COPY: (*MData)[17] ++ ; break;
@@ -376,7 +380,7 @@ MT_TranslatedIndividual * MT_Classifier::createDoubleTransIndi(SIGEL_Program::SI
 	}
 
 	MT_TranslatedIndividual * NewTransIndi = new MT_TranslatedIndividual(Instructions,OperandOne,OperandTwo, MData);
-	
+
 	NewTransIndi->Boundary = SigProgOneSize;
 
 	return NewTransIndi;
@@ -399,7 +403,7 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tournament
 	{
 		pthread_mutex_lock(&interpreterMutex);
 		for(int i=0; i<NumOfClassi; i++)
-		{	
+		{
 			Tournament = tournaments->value(i);
 			if (i < tournaments->size()) (*tournaments)[i] = nullptr;
 			Tournament->classify(this);
@@ -407,9 +411,9 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tournament
 			NumOfMetaEstimation[GenerationNumber] += 1;
 		}
 
-// unlock the interpreter so that the program can be updated
+		// unlock the interpreter so that the program can be updated
 		pthread_mutex_unlock(&interpreterMutex);
-	
+
 		for( int i=0; i<TournamentCount-NumOfClassi; i++)
 		{
 			// Move the tournament in slot i+NumOfClassi down to slot i.
@@ -426,10 +430,10 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tournament
 		Change = true;
 	}
 
-// only  tournament, which haven't the best Sig Individual inside 
-// will run by the Classifier
+	// only  tournament, which haven't the best Sig Individual inside
+	// will run by the Classifier
 
-	if (NumOfClassi == -1)  
+	if (NumOfClassi == -1)
 	{
 		QList<int> TournamentsWithBestIndividual;
 		TournamentsWithBestIndividual.resize(tournaments->size());
@@ -438,11 +442,11 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tournament
 
 		int NewNumOfClassi = evalNeededTournaments(tournaments, & TournamentsWithBestIndividual, PosBest);
 		if (NewNumOfClassi <=0)			// No tournament is to be classified
-			return Change;  
+			return Change;
 
 		pthread_mutex_lock(&interpreterMutex);
 		for(int i=0; i<TournamentCount; i++)
-		{	
+		{
 			if(TournamentsWithBestIndividual[i] == 0)
 			{
 				Tournament = tournaments->value(i);
@@ -453,7 +457,7 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tournament
 			}
 		}
 
-// unlock the interpreter so that the program can be updated
+		// unlock the interpreter so that the program can be updated
 		pthread_mutex_unlock(&interpreterMutex);
 
 		int NumOfTournaments = TournamentCount - NewNumOfClassi; // Number of tournaments to be run normally
@@ -480,17 +484,17 @@ bool MT_Classifier::preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *tournament
 			delete tournaments->at(k);
 		tournaments->resize(NumOfTournaments);
 
-//**************DebugInfo *************************************
-for(int d=0; d < tournaments->size();d++)
-{
-	Tournament = tournaments->value(d);
-		if(Tournament == nullptr)
+		//**************DebugInfo *************************************
+		for(int d=0; d < tournaments->size();d++)
 		{
-			int DeugInfo= tournaments->size();
+			Tournament = tournaments->value(d);
+			if(Tournament == nullptr)
+			{
+				int DeugInfo= tournaments->size();
+			}
 		}
-}
-		
-//*************************************************************
+
+		//*************************************************************
 		Change = true;
 	}
 
@@ -519,7 +523,7 @@ int MT_Classifier::evalNeededTournaments(QList<SIGEL_GP::SIG_GPTournament *> *  
 			NumClassi ++;
 	}
 
-	// If the best SIGEL individual rarely takes part in tournaments, 
+	// If the best SIGEL individual rarely takes part in tournaments,
 	// further tournaments are used for calibration
 
 	if(RefreshInterval == 0)

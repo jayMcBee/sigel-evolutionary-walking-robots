@@ -14,44 +14,44 @@
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 
 
-class MT_Classifier : public MT_Substitute  
+class MT_Classifier : public MT_Substitute
 {
 public:
 
-	// administrative method 
+	// administrative method
 	MT_Classifier(QTextStream &File);
 	~MT_Classifier() override = default;
 	void writeToFileSetup(QTextStream &File) override;
 	void writeToFile(QTextStream &File) override;
 	void loadSetup(QTextStream &File) override;
 
-	/* execute the first Tournaments by the MT_Classifier 
+	/* execute the first Tournaments by the MT_Classifier
 	*/
 	bool preEvolution(QList<SIGEL_GP::SIG_GPTournament *> *  tournaments, int PosBest);
-	
+
 	/* Method serves Tournament.run(Classifier)
-	* Runs the tournament normally, i.e. on exact fitness; 
-	* creates a training case 
+	* Runs the tournament normally, i.e. on exact fitness;
+	* creates a training case
 	*/
 	void createNewTCase(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo, double FitDifference);
-	
+
 	/* Method serves Tournament.classifier(Classifier)
 	* Runs the tournament using the classifier.
-	* Tournament.classifier(Classifier) is called via preEvolution  
+	* Tournament.classifier(Classifier) is called via preEvolution
 	*/
-	double classifier(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo);	
-	
+	double classifier(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo);
+
 private:
 
 	MT_TranslatedIndividual* createDoubleTransIndi(SIGEL_Program::SIG_Program const * SigProgOne, SIGEL_Program::SIG_Program const * SigProgTwo);
 
 	// Return value indicates how many SIGEL tournaments should be classified rather than run by exact fitness
-	//  
+	//
 	int evaluationTactic(int TournamentCount);
 
-	// Determines which tournaments the best SIGEL individual takes part in 
+	// Determines which tournaments the best SIGEL individual takes part in
 	// Modifies TournamentsWithBestIndividual; TournamentsWithBestIndividual[i] == 1 exactly when the best SIGEL individual appears
-	// in tournament i. Exception: if the best individual appears in no tournament, 
+	// in tournament i. Exception: if the best individual appears in no tournament,
 	// TournamentsWithBestIndividual[tournaments.size-1] == 1 is set anyway, so that the last tournament is not run with the
 	// classifier but normally by exact fitness. This serves as calibration.
 	//
