@@ -212,8 +212,8 @@ touched, because changing one changes behaviour against the reference binary.
   number is written into the saved MetaGP file, so each enumerator keeps
   its value. The kind of substitute has the same fault: `MT_Controller.h`
   names it with three preprocessor defines, `NOMETA_SUBST`,
-  `EVALUATOR_SUBST` and `CLASSIFIER_SUBST`, and `MT_Substitute::Typ` holds
-  it as 1 or 2. Use one scoped enum for both.
+  `EVALUATOR_SUBST` and `CLASSIFIER_SUBST`. Use a scoped enum of its own for
+  the kind; the strategy and the kind are different things.
 
 - [ ] **132. Make the MetaGP autosave rotate.** In `MT_Controller`,
   `autoSaveCnt = autoSaveCnt++ % 3` writes the old value back, so the

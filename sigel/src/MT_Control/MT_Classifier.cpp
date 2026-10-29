@@ -6,7 +6,6 @@
 
 MT_Classifier::MT_Classifier(QTextStream &File) : MT_Substitute()
 {
-	Typ=2;
 	AverageSigelFitness = 0.01;
 	CorrectFitness.resize(0);
 	AssumedFitness.resize(0);

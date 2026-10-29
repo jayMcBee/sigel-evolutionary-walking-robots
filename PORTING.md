@@ -911,6 +911,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-10-29 — DONE: THE UNUSED `MT_Substitute::Typ` AND `getTyp()` ARE GONE.**
+
+- **Changed:** `MT_Evaluator` set `Typ` to 1 and `MT_Classifier` to 2, but
+  nothing called `getTyp()`; the member, the getter and the two writes are
+  removed. The kind of substitute is held by `MT_Controller`.
+
 **2026-10-29 — DONE: `MT_FitnessFunction` NAMES THE METAGP FITNESS FUNCTIONS.**
 
 - **Changed:** the new scoped enum (`MT_GPSystem/MT_FitnessFunction.h`) holds

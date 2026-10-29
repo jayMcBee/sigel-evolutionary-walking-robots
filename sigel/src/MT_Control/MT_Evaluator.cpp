@@ -8,7 +8,6 @@
 
 MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPMetaGPExperiment& exp, QTextStream &File) : MT_Substitute(), SIGEL_GP::SIG_GPFitnessTrainer(exp) 
 {
-	Typ=1;
 	AverageSigelFitness = 0.01; 
 	CorrectFitness.resize(0);
 	AssumedFitness.resize(0);

@@ -25,7 +25,6 @@ public:
 	void setEstimationParameter( int EStrategy, double Tol, int ReInterval );
 	void setInterpreter( int NumOfVariable, int TimeToInter );
 	void getNumOfEstimation( QList<unsigned int> *MetaEstimation, QList<unsigned int> *CorrectEstimation );
-	int getTyp();
 
 	/*nextSIGGeneration() indicate the evaluator, that a new SIGEL Generation started */
 	void nextSIGGeneration( double AverageSigelFit );
@@ -83,11 +82,6 @@ protected:
 
 	// to interpret a SigelProgram on the BestMETAProgram
 	MT_Interpreter Interpreter;
-
-	/*inidcate the Typ of Substitute
-	* 1:= Evaluator 2:= classifier
-	*/
-	int Typ;
 
 	/* Prescribes the strategy for deciding whether meta or simulation is used to
 	* determine the SIGEL fitness.

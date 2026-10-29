@@ -149,11 +149,6 @@ void MT_Substitute::writeToFileSetup( QTextStream &File )
 	// overloaded method
 }
 
-int MT_Substitute::getTyp()
-{
-	return Typ;
-}
-
 void MT_Substitute::nextSIGGeneration( double AverageSigelFit )
 {
 	GenerationNumber++;
