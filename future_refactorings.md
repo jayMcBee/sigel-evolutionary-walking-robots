@@ -210,7 +210,8 @@ touched, because changing one changes behaviour against the reference binary.
   `MT_Classifier::evaluationTactic` switch on its numbers, and only the
   list in `MT_EstimationWidget` gives them names. Use a scoped enum. The
   number is written into the saved MetaGP file, so each enumerator keeps
-  its value.
+  its value; "save best", now the sign, becomes a `bool` of its own in
+  memory. Only with the unit tests of item 180 in place first.
 
 - [ ] **132. Make the MetaGP autosave rotate.** In `MT_Controller`,
   `autoSaveCnt = autoSaveCnt++ % 3` writes the old value back, so the
