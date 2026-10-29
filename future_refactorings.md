@@ -243,6 +243,10 @@ touched, because changing one changes behaviour against the reference binary.
   loading one. Found in use; the cause is not known yet
   (`MT_PopulationWidget::slotAddInd` and its dialog look complete).
 
+- [ ] **179. Clean up `SIG_MainWindow`.** It drives the MetaGP system
+  through `mtController`, and the class is hard to read; give it the same
+  clean-up `MT_Controller` got.
+
 ---
 
 ## 6 · GP engine
