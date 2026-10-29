@@ -39,7 +39,6 @@
 /**
  * This is the namespace in which all GUI-elements live.
  */
-
 namespace SIGEL_MasterGUI
 {
 
@@ -132,6 +131,7 @@ protected:
 	 * The optionsMenu;
 	 */
 	QMenu *optionsMenu;
+
 	/**
 	 * The actions menu
 	 */
@@ -217,6 +217,7 @@ private:
 	QAction *mtChoiceEvaluatorAction;
 	QAction *mtChoiceClassifierAction;
 	QActionGroup *mtChoiceTypeActionGroup;
+
 public slots:
 	void slotMTUseMT( bool state );
 	void slotMTConfigureSystem();

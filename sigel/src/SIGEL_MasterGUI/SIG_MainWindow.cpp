@@ -41,12 +41,15 @@ namespace SIGEL_MasterGUI
 SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFlags f ) : QMainWindow( parent, f )
 {
 	setObjectName( QString::fromUtf8( name ) );
+
 	// A toolbar has one icon size. 25 is the largest of the small pixmaps,
 	// so no pixmap is drawn larger than its own size.
 	setIconSize( QSize( 25, 25 ) );
+
 	QString sigelRoot( std::getenv( "SIGEL_ROOT" ) );
 
 	resize( 1280, 860 );
+
 	// The Makefile compiles this file again whenever any other SIGEL object is
 	// compiled, so the date is the latest build's.
 	setWindowTitle( QString( "SIGEL %1 (built %2 %3)" )
@@ -206,6 +209,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			SIGNAL( triggered() ),
 			experimentListView,
 			SLOT( slotGPParametersImport() ) );
+
 	QAction *importSimulationParametersAction = new QAction( "Simulation Parameters...", this );
 	importSimulationParametersAction->setToolTip( "Import Simulation Parameters" );
 	importSimulationParametersAction->setIconText( "Import Simulation Parameters" );
@@ -215,6 +219,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			SIGNAL( triggered() ),
 			experimentListView,
 			SLOT( slotSimulationParametersImport() ) );
+
 	QAction *importLanguageParametersAction = new QAction( "Language Parameters...", this );
 	importLanguageParametersAction->setToolTip( "Import Language Parameters" );
 	importLanguageParametersAction->setIconText( "Import Language Parameters" );
@@ -224,6 +229,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			SIGNAL( triggered() ),
 			experimentListView,
 			SLOT( slotLanguageParametersImport() ) );
+
 	QAction *importEnvironmentAction = new QAction( "Environment...", this );
 	importEnvironmentAction->setToolTip( "Import Environment" );
 	importEnvironmentAction->setIconText( "Import Environment" );
@@ -233,6 +239,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			SIGNAL( triggered() ),
 			experimentListView,
 			SLOT( slotEnvironmentImport() ) );
+
 	QAction *importPopulationAction = new QAction( "Population...", this );
 	importPopulationAction->setToolTip( "Import Population" );
 	importPopulationAction->setIconText( "Import Population" );
@@ -242,6 +249,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			SIGNAL( triggered() ),
 			experimentListView,
 			SLOT( slotPopulationImport() ) );
+
 	QAction *importRobotAction = new QAction( "Robot...", this );
 	importRobotAction->setToolTip( "Import Robot" );
 	importRobotAction->setIconText( "Import Robot" );
@@ -290,6 +298,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			SIGNAL( triggered() ),
 			experimentListView,
 			SLOT( slotGPParametersExport() ) );
+
 	QAction *exportSimulationParametersAction = new QAction( "Simulation Parameters...", this );
 	exportSimulationParametersAction->setToolTip( "Export Simulation Parameters" );
 	exportSimulationParametersAction->setIconText( "Export Simulation Parameters" );
@@ -299,6 +308,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			SIGNAL( triggered() ),
 			experimentListView,
 			SLOT( slotSimulationParametersExport() ) );
+
 	QAction *exportLanguageParametersAction = new QAction( "Language Parameters...", this );
 	exportLanguageParametersAction->setToolTip( "Export Language Parameters" );
 	exportLanguageParametersAction->setIconText( "Export Language Parameters" );
@@ -308,6 +318,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			SIGNAL( triggered() ),
 			experimentListView,
 			SLOT( slotLanguageParametersExport() ) );
+
 	QAction *exportEnvironmentAction = new QAction( "Environment...", this );
 	exportEnvironmentAction->setToolTip( "Export Environment" );
 	exportEnvironmentAction->setIconText( "Export Environment" );
@@ -317,6 +328,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			SIGNAL( triggered() ),
 			experimentListView,
 			SLOT( slotEnvironmentExport() ) );
+
 	QAction *exportPopulationAction = new QAction( "Population...", this );
 	exportPopulationAction->setToolTip( "Export Population" );
 	exportPopulationAction->setIconText( "Export Population" );
@@ -387,7 +399,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	viewMenu->setObjectName( "viewMenu" );
 
 	// insert a lot of actions into the view menu
-
 	QIcon icon_viewPopulationAction( QPixmap( sigelRoot + "/pixmaps/individualSmall.xpm" ) );
 	icon_viewPopulationAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/individualLarge.xpm" ) );
 	QAction *viewPopulationAction = new QAction( icon_viewPopulationAction, "&Population", this );
@@ -501,6 +512,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	noExperimentActions.append( importEnvironmentAction );
 	noExperimentActions.append( importProgramAction );
 	noExperimentActions.append( importIndividualAction );
+
 	noExperimentActions.append( exportGPParametersAction );
 	noExperimentActions.append( exportSimulationParametersAction );
 	noExperimentActions.append( exportLanguageParametersAction );
@@ -591,6 +603,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	evolutionRunningActions.append( saveExperimentAsAction );
 	evolutionRunningActions.append( cloneExperimentAction );
 	evolutionRunningActions.append( quitProgramAction );
+
 	evolutionRunningActions.append( importGPParametersAction );
 	evolutionRunningActions.append( importSimulationParametersAction );
 	evolutionRunningActions.append( importRobotAction );
@@ -599,6 +612,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	evolutionRunningActions.append( importEnvironmentAction );
 	evolutionRunningActions.append( importProgramAction );
 	evolutionRunningActions.append( importIndividualAction );
+
 	evolutionRunningActions.append( exportGPParametersAction );
 	evolutionRunningActions.append( exportSimulationParametersAction );
 	evolutionRunningActions.append( exportLanguageParametersAction );
@@ -607,6 +621,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	evolutionRunningActions.append( exportToGNUPlotAction );
 	evolutionRunningActions.append( exportProgramAction );
 	evolutionRunningActions.append( exportIndividualAction );
+
 	evolutionRunningActions.append( addIndividualsAction );
 	evolutionRunningActions.append( deleteIndividualsAction );
 	evolutionRunningActions.append( resetAllFitnessValuesAction );
@@ -661,11 +676,13 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	mtChoiceEvaluatorAction->setChecked( true );
 	mtSelectedSystem = mtChoiceEvaluatorAction;
 	mtChoiceEvaluatorAction->setStatusTip( "Chooses the Evaluator System. Replaces the simulation-based fitness calculation by a MetaGP system which needs fewer simulations." );
+
 	mtChoiceClassifierAction = new QAction( "Cl&assifier System", mtChoiceTypeActionGroup );
 	mtChoiceClassifierAction->setToolTip( "Choose classifier system" );
 	mtChoiceClassifierAction->setIconText( "Choose classifier system" );
 	mtChoiceClassifierAction->setCheckable( true );
 	mtChoiceClassifierAction->setStatusTip( "Chooses the Classifier System. Replaces the fitness-based tournament decision by a MetaGP system which needs fewer fitness calculations." );
+
 	mtMenu->addActions( mtChoiceTypeActionGroup->actions() );
 	mtChoiceTypeActionGroup->setEnabled( false );
 	QObject::connect( mtChoiceTypeActionGroup, SIGNAL( triggered( QAction * ) ), SLOT( slotMTSwitchSystem( QAction * ) ) );
@@ -678,6 +695,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	evolutionRunningActions.append( mtConfigureAction );
 	evolutionRunningActions.append( mtChoiceEvaluatorAction );
 	evolutionRunningActions.append( mtChoiceClassifierAction );
+
 	QObject::connect( experimentListView,
 			SIGNAL( currentExperimentChanged() ),
 			this,
@@ -711,6 +729,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	widgetBase = new QLabel( this );
 	widgetBase->setObjectName( "baseWidget" );
 	widgetBase->setPixmap( QPixmap( sigelRoot + "/pixmaps/noExperiment.png" ) );
+
 	// The image is square. Scaling it to the widget stretches it.
 	widgetBase->setAlignment( Qt::AlignCenter );
 	widgetStack->addWidget( widgetBase );
@@ -725,6 +744,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			SIGNAL( evolutionNotRunning( bool ) ),
 			this,
 			SLOT( slotEnableEvolutionRunningActions( bool ) ) );
+
 	statusBar()->showMessage( "Ready.", 5000 );
 }
 
@@ -799,6 +819,7 @@ void SIG_MainWindow::slotMTUseMT( bool state )
 	{
 		return;
 	}
+
 	SIG_GUIGPExperiment *currentExperiment = experimentListView->currentlySelectedExperiment();
 	if( currentExperiment && currentExperiment->gpExperiment.mtController->useMeta( state ) )
 	{
@@ -816,6 +837,7 @@ void SIG_MainWindow::slotMTConfigureSystem()
 	{
 		return;
 	}
+
 	SIG_GUIGPExperiment *currentExperiment = experimentListView->currentlySelectedExperiment();
 	if( currentExperiment )
 	{
@@ -831,6 +853,7 @@ void SIG_MainWindow::slotMTSwitchSystem( QAction *selSystem )
 	{
 		return;
 	}
+
 	// triggered() also fires when the user clicks the system that is already
 	// selected. Nothing changes then.
 	if( selSystem == mtSelectedSystem )
@@ -856,6 +879,7 @@ void SIG_MainWindow::slotMTSwitchSystem( QAction *selSystem )
 			}
 		}
 	}
+
 	// switchSystem() may refuse and roll the choice back above,
 	// so this records what is actually checked.
 	mtSelectedSystem = mtChoiceClassifierAction->isChecked()
@@ -880,6 +904,7 @@ void SIG_MainWindow::slotCurrentExperimentChanged()
 				mtChoiceTypeActionGroup->setEnabled( true );
 				mtConfigureAction->setEnabled( true );
 			}
+
 			mtUseAction->setChecked( true );
 			if( currentExperiment->gpExperiment.mtController->UsedSystem() == MT_SubstituteKind::Evaluator )
 			{
