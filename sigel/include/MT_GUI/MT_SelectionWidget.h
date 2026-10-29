@@ -22,7 +22,7 @@ public:
 private:
 	int parentSize;
 	int lastParentSize;
-	QMap<int, int>	tourSizeMap;
+	QMap<int, int>	tournamentSizeMap;
 	void updateTSizeList(int pSize, int oSize);
 
 private slots:

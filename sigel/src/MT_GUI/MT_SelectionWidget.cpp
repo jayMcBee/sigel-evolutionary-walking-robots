@@ -17,7 +17,7 @@ MT_SelectionWidget::MT_SelectionWidget(QWidget* parent, const char* name, Qt::Wi
 void MT_SelectionWidget::updateTSizeList(int pSize, int oSize)
 {
 	tournamentSizeComboBox->clear();
-	tourSizeMap.clear();
+	tournamentSizeMap.clear();
 
 	int tNum;
 	int index = 0;
@@ -30,7 +30,7 @@ void MT_SelectionWidget::updateTSizeList(int pSize, int oSize)
 			{
 				// candidate found so insert it into the list
 				tournamentSizeComboBox->addItem(QString::number(tSize));
-				tourSizeMap.insert(tSize, index++);
+				tournamentSizeMap.insert(tSize, index++);
 			}
 		}
 	}
@@ -47,10 +47,10 @@ int MT_SelectionWidget::calculateTournSize(int pSize, int oSize, int oTSize)
 
 	updateTSizeList(pSize, oSize);
 
-	if(tourSizeMap.contains(oTSize))
+	if(tournamentSizeMap.contains(oTSize))
 		return oTSize;
 
-	intMap::Iterator it = tourSizeMap.begin();
+	intMap::Iterator it = tournamentSizeMap.begin();
 	int lastSize, lastDiff, actDiff;
 
 	actDiff = abs( (it.value()) - oTSize);
@@ -59,7 +59,7 @@ int MT_SelectionWidget::calculateTournSize(int pSize, int oSize, int oTSize)
 		lastDiff = actDiff;
 		lastSize = it.value();
 		it++;
-		if(it == tourSizeMap.end())
+		if(it == tournamentSizeMap.end())
 			break;
 
 		actDiff = abs( (it.value()) - oTSize);
@@ -96,9 +96,9 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	}
 
 	// set the tournament size
-	if(tourSizeMap.contains(tournamentSize))
+	if(tournamentSizeMap.contains(tournamentSize))
 	{
-		int index = tourSizeMap.find(tournamentSize).value();
+		int index = tournamentSizeMap.find(tournamentSize).value();
 		tournamentSizeComboBox->setCurrentIndex(index);
 	}
 	else
@@ -189,9 +189,9 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 
 	QObject::disconnect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTourSizeChanged(const QString&)));
 
-	if(tourSizeMap.contains(tournamentSize))
+	if(tournamentSizeMap.contains(tournamentSize))
 	{
-		int index = tourSizeMap.find(tournamentSize).value();
+		int index = tournamentSizeMap.find(tournamentSize).value();
 		tournamentSizeComboBox->setCurrentIndex(index);
 	}
 	else
