@@ -38,7 +38,7 @@ public:
 
 	MT_GPManager* getManager();
 	void enforceUpdate(bool GUI);
-	int calculateTournSize(int pSize, int oSize, int oTSize);
+	int calculateTournamentSize(int pSize, int oSize, int oTSize);
 
 public slots:
 	void slotRaiseWidget(QTreeWidgetItem *item);

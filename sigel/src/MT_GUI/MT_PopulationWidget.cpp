@@ -168,7 +168,7 @@ bool MT_PopulationWidget::onHide(MT_GPManager *manager, MT_EstimationState *esti
 		offspringSize   = popSize * overProdFac;
 
 		// offspring population size has changed so we have to recalculate a tournament size
-		tournamentSize = mainWindow->calculateTournSize(popSize, offspringSize, tournamentSize);
+		tournamentSize = mainWindow->calculateTournamentSize(popSize, offspringSize, tournamentSize);
 
 		// ... and finally set it
 		manager->setSelectionValue(offspringSize, tournamentSize,

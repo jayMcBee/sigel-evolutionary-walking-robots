@@ -326,9 +326,9 @@ void MT_MainWindow::enforceUpdate(bool GUI)
 	}
 }
 
-int MT_MainWindow::calculateTournSize(int pSize, int oSize, int oTSize)
+int MT_MainWindow::calculateTournamentSize(int pSize, int oSize, int oTSize)
 {
-	return selectionWidget->calculateTournSize(pSize, oSize, oTSize);
+	return selectionWidget->calculateTournamentSize(pSize, oSize, oTSize);
 }
 
 /***

@@ -17,7 +17,7 @@ public:
 	void onShow(MT_GPManager *manager, MT_EstimationState *estimationState) override;
 	bool onHide(MT_GPManager *manager, MT_EstimationState *estimationState) override;
 
-	int calculateTournSize(int pSize, int oSize, int oTSize);
+	int calculateTournamentSize(int pSize, int oSize, int oTSize);
 
 private:
 	int parentSize;

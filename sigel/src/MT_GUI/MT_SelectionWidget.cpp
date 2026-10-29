@@ -41,7 +41,7 @@ void MT_SelectionWidget::updateTSizeList(int pSize, int oSize)
 /***
  * indirectly called from population widget if size of parent population changed
  ***/
-int MT_SelectionWidget::calculateTournSize(int pSize, int oSize, int oTSize)
+int MT_SelectionWidget::calculateTournamentSize(int pSize, int oSize, int oTSize)
 {
 	typedef QMap<int,int> intMap;
 
@@ -185,7 +185,7 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 
 	int oldTournamentSize = tournamentSizeComboBox->currentText().toInt();
 	updateTSizeList(parentSize, poolSize);
-	int tournamentSize = calculateTournSize(parentSize, poolSize, oldTournamentSize);
+	int tournamentSize = calculateTournamentSize(parentSize, poolSize, oldTournamentSize);
 
 	QObject::disconnect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTournamentSizeChanged(const QString&)));
 
