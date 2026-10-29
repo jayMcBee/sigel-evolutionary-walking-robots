@@ -204,10 +204,10 @@ protected:
 	 */
 	SIGEL_MasterGUI::SIG_ExperimentListView *experimentListView;
 
+private:
 	/**
 	 * The Meta-GP definitions
 	 */
-private:
 	QMenu *mtMenu;
 	QToolBar *mtToolBar;
 	QAction *mtUseAction;
@@ -215,6 +215,12 @@ private:
 	QAction *mtChoiceEvaluatorAction;
 	QAction *mtChoiceClassifierAction;
 	QActionGroup *mtChoiceTypeActionGroup;
+
+	/**
+	 * Builds the splitter with the experiment list view on the left and the
+	 * widget stack on the right, which shows the "no experiment" picture first.
+	 */
+	void createWidgets( const QString &sigelRoot );
 
 public slots:
 	void slotMTUseMT( bool state );

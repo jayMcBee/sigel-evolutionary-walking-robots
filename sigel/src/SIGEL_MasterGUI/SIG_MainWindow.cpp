@@ -55,32 +55,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	setWindowTitle( QString( "SIGEL %1 (built %2 %3)" )
 			.arg( SIGEL_Tools::SIG_Version::number, __DATE__, __TIME__ ) );
 
-	splitter = new QSplitter( this );
-	splitter->setObjectName( "Splitter" );
-	splitter->setFrameStyle( QFrame::Box | QFrame::Sunken );
-
-	setCentralWidget( splitter );
-
-	widgetStack = new QStackedWidget( splitter );
-	widgetStack->setObjectName( "WidgetStack" );
-	widgetStack->setContentsMargins( 6, 6, 6, 6 );
-	widgetStack->setFrameStyle( QFrame::Box | QFrame::Sunken );
-
-	experimentListView = new SIGEL_MasterGUI::SIG_ExperimentListView( splitter, "ExperimentListView", widgetStack );
-
-	splitter->insertWidget( 0, experimentListView );
-	splitter->setOpaqueResize();
-
-	// Real pixel widths. Numbers far below the splitter's width are ignored and
-	// the surplus goes by size policy instead, which hands most of it to the tree.
-	QList<int> valList;
-	valList += 280;
-	valList += 1000;
-	splitter->setSizes( valList );
-	splitter->setStretchFactor( 0, 0 );
-	splitter->setStretchFactor( 1, 1 );
-
-	splitter->setContentsMargins( 6, 6, 6, 6 );
+	createWidgets( sigelRoot );
 
 	// create the file menu and toolbar
 	fileMenu = new QMenu( this );
@@ -726,15 +701,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			this,
 			SLOT( slotEnableNoExperimentActions( bool ) ) );
 
-	widgetBase = new QLabel( this );
-	widgetBase->setObjectName( "baseWidget" );
-	widgetBase->setPixmap( QPixmap( sigelRoot + "/pixmaps/noExperiment.png" ) );
-
-	// The image is square. Scaling it to the widget stretches it.
-	widgetBase->setAlignment( Qt::AlignCenter );
-	widgetStack->addWidget( widgetBase );
-	widgetStack->setCurrentWidget( widgetBase );
-
 	QObject::connect( experimentListView,
 			SIGNAL( isNotEmpty( bool ) ),
 			this,
@@ -746,6 +712,45 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			SLOT( slotEnableEvolutionRunningActions( bool ) ) );
 
 	statusBar()->showMessage( "Ready.", 5000 );
+}
+
+void SIG_MainWindow::createWidgets( const QString &sigelRoot )
+{
+	splitter = new QSplitter( this );
+	splitter->setObjectName( "Splitter" );
+	splitter->setFrameStyle( QFrame::Box | QFrame::Sunken );
+
+	setCentralWidget( splitter );
+
+	widgetStack = new QStackedWidget( splitter );
+	widgetStack->setObjectName( "WidgetStack" );
+	widgetStack->setContentsMargins( 6, 6, 6, 6 );
+	widgetStack->setFrameStyle( QFrame::Box | QFrame::Sunken );
+
+	experimentListView = new SIGEL_MasterGUI::SIG_ExperimentListView( splitter, "ExperimentListView", widgetStack );
+
+	splitter->insertWidget( 0, experimentListView );
+	splitter->setOpaqueResize();
+
+	// Real pixel widths. Numbers far below the splitter's width are ignored and
+	// the surplus goes by size policy instead, which hands most of it to the tree.
+	QList<int> valList;
+	valList += 280;
+	valList += 1000;
+	splitter->setSizes( valList );
+	splitter->setStretchFactor( 0, 0 );
+	splitter->setStretchFactor( 1, 1 );
+
+	splitter->setContentsMargins( 6, 6, 6, 6 );
+
+	widgetBase = new QLabel( this );
+	widgetBase->setObjectName( "baseWidget" );
+	widgetBase->setPixmap( QPixmap( sigelRoot + "/pixmaps/noExperiment.png" ) );
+
+	// The image is square. Scaling it to the widget stretches it.
+	widgetBase->setAlignment( Qt::AlignCenter );
+	widgetStack->addWidget( widgetBase );
+	widgetStack->setCurrentWidget( widgetBase );
 }
 
 void SIG_MainWindow::slotAbout()
