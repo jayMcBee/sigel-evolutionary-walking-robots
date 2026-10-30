@@ -104,41 +104,7 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	QObject::connect( mtAutoStopAction, SIGNAL( toggled( bool ) ), SLOT( slotAutoStop( bool ) ) );
 	QObject::connect( mtMin, SIGNAL( valueChanged( int ) ), SLOT( slotMinChanged( int ) ) );
 
-	// divide the window horizontally in to resizable parts
-	splitter = new QSplitter( this );
-	splitter->setObjectName( "Splitter" );
-	splitter->setFrameStyle( QFrame::Box | QFrame::Sunken );
-	splitter->setOpaqueResize();
-	splitter->setContentsMargins( 6, 6, 6, 6 );
-
-	setCentralWidget( splitter ); // make splitter the main widgets
-
-	// set the selection tree into the left part of the window
-	experimentWidget = new MT_ExperimentWidget( splitter );
-
-	// put a stack of widgets into the right part of the window
-	widgetStack = new QStackedWidget( splitter );
-	widgetStack->setObjectName( "WidgetStack" );
-	widgetStack->setContentsMargins( 6, 6, 6, 6 );
-	widgetStack->setFrameStyle( QFrame::Box | QFrame::Sunken );
-
-	widgets[0] = estimationWidget = new MT_EstimationWidget( this, "MTEstimationWidget", Qt::WindowFlags() );
-	widgetStack->insertWidget( 0, estimationWidget );
-
-	widgets[1] = individualsWidget = new MT_IndividualsWidget( this, "MTIndividualsWidget", Qt::WindowFlags() );
-	widgetStack->insertWidget( 1, individualsWidget );
-
-	widgets[2] = populationWidget = new MT_PopulationWidget( this, "MTPopulationWidget", Qt::WindowFlags() );
-	widgetStack->insertWidget( 2, populationWidget );
-
-	widgets[3] = searchWidget = new MT_SearchWidget( this, "MTSearchWidget", Qt::WindowFlags() );
-	widgetStack->insertWidget( 3, searchWidget );
-
-	widgets[4] = selectionWidget = new MT_SelectionWidget( this, "MTSelectionWidget", Qt::WindowFlags() );
-	widgetStack->insertWidget( 4, selectionWidget );
-
-	widgets[5] = statisticsWidget = new MT_StatisticsWidget( this, "MTStatisticsWidget", Qt::WindowFlags() );
-	widgetStack->insertWidget( 5, statisticsWidget );
+	createWidgets();
 
 	// create the actions for the menu and the toolbar
 	// - restore default settings
@@ -192,6 +158,45 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	QObject::connect( experimentWidget, SIGNAL( currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ) ), SLOT( slotRaiseWidget( QTreeWidgetItem * ) ) );
 
 	raiseWidget( 0 );
+}
+
+void MT_MainWindow::createWidgets()
+{
+	// divide the window horizontally in to resizable parts
+	splitter = new QSplitter( this );
+	splitter->setObjectName( "Splitter" );
+	splitter->setFrameStyle( QFrame::Box | QFrame::Sunken );
+	splitter->setOpaqueResize();
+	splitter->setContentsMargins( 6, 6, 6, 6 );
+
+	setCentralWidget( splitter ); // make splitter the main widgets
+
+	// set the selection tree into the left part of the window
+	experimentWidget = new MT_ExperimentWidget( splitter );
+
+	// put a stack of widgets into the right part of the window
+	widgetStack = new QStackedWidget( splitter );
+	widgetStack->setObjectName( "WidgetStack" );
+	widgetStack->setContentsMargins( 6, 6, 6, 6 );
+	widgetStack->setFrameStyle( QFrame::Box | QFrame::Sunken );
+
+	widgets[0] = estimationWidget = new MT_EstimationWidget( this, "MTEstimationWidget", Qt::WindowFlags() );
+	widgetStack->insertWidget( 0, estimationWidget );
+
+	widgets[1] = individualsWidget = new MT_IndividualsWidget( this, "MTIndividualsWidget", Qt::WindowFlags() );
+	widgetStack->insertWidget( 1, individualsWidget );
+
+	widgets[2] = populationWidget = new MT_PopulationWidget( this, "MTPopulationWidget", Qt::WindowFlags() );
+	widgetStack->insertWidget( 2, populationWidget );
+
+	widgets[3] = searchWidget = new MT_SearchWidget( this, "MTSearchWidget", Qt::WindowFlags() );
+	widgetStack->insertWidget( 3, searchWidget );
+
+	widgets[4] = selectionWidget = new MT_SelectionWidget( this, "MTSelectionWidget", Qt::WindowFlags() );
+	widgetStack->insertWidget( 4, selectionWidget );
+
+	widgets[5] = statisticsWidget = new MT_StatisticsWidget( this, "MTStatisticsWidget", Qt::WindowFlags() );
+	widgetStack->insertWidget( 5, statisticsWidget );
 }
 
 MT_MainWindow::~MT_MainWindow()
