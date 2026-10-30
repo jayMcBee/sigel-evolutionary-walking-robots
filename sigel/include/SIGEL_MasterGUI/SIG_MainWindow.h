@@ -206,6 +206,66 @@ protected:
 
 private:
 	/**
+	 * The View and Individuals toolbars.
+	 */
+	QToolBar *viewToolBar;
+	QToolBar *individualsToolBar;
+
+	/**
+	 * The actions of the File menu.
+	 */
+	QAction *newExperimentAction;
+	QAction *cloneExperimentAction;
+	QAction *renameExperimentAction;
+	QAction *deleteExperimentAction;
+	QAction *openExperimentAction;
+	QAction *saveExperimentAction;
+	QAction *saveExperimentAsAction;
+	QAction *quitProgramAction;
+
+	/**
+	 * The actions of the Import menu.
+	 */
+	QAction *importGPParametersAction;
+	QAction *importSimulationParametersAction;
+	QAction *importLanguageParametersAction;
+	QAction *importEnvironmentAction;
+	QAction *importPopulationAction;
+	QAction *importRobotAction;
+	QAction *importProgramAction;
+	QAction *importIndividualAction;
+
+	/**
+	 * The actions of the Export menu.
+	 */
+	QAction *exportGPParametersAction;
+	QAction *exportSimulationParametersAction;
+	QAction *exportLanguageParametersAction;
+	QAction *exportEnvironmentAction;
+	QAction *exportPopulationAction;
+	QAction *exportProgramAction;
+	QAction *exportIndividualAction;
+	QAction *exportToGNUPlotAction;
+
+	/**
+	 * The actions of the View menu.
+	 */
+	QAction *viewPopulationAction;
+	QAction *viewRobotAction;
+	QAction *viewLanguageParametersAction;
+	QAction *viewGPParametersAction;
+	QAction *viewSimulationParametersAction;
+	QAction *viewEnvironmentAction;
+
+	/**
+	 * The actions of the Individuals menu.
+	 */
+	QAction *addIndividualsAction;
+	QAction *deleteIndividualsAction;
+	QAction *resetAllFitnessValuesAction;
+	QAction *visualizeIndividualsAction;
+
+	/**
 	 * The Meta-GP definitions
 	 */
 	QMenu *mtMenu;
