@@ -86,6 +86,7 @@ private:
 	MT_GPManager *gpManager;
 	MT_EstimationState *estimationState;
 
+	void createMenus();
 	void createToolBars();
 	void createWidgets();
 	void raiseWidget( int pos );

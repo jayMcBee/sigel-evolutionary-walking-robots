@@ -29,10 +29,6 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	// add a statusbar and a tooltip group
 	statusBar();
 
-	// create the menu
-	fileMenu = new QMenu( this );
-	fileMenu->setObjectName( "mtFileMenu" );
-
 	QIcon icon_mtStartEvolutionAction( QPixmap( pixPath + "mt_StartSmall.xpm" ) );
 	icon_mtStartEvolutionAction.addPixmap( QPixmap( pixPath + "mt_StartLarge.xpm" ) );
 	mtStartEvolutionAction = new QAction( icon_mtStartEvolutionAction, "Start", this );
@@ -65,8 +61,6 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	mtDefaultAction->setToolTip( "Default" );
 	mtDefaultAction->setShortcut( Qt::CTRL | Qt::Key_D );
 	mtDefaultAction->setStatusTip( "Restores the default settings." );
-	fileMenu->addAction( mtDefaultAction );
-	fileMenu->addSeparator();
 
 	// - load settings
 	QIcon icon_mtLoadAction( QPixmap( pixPath + "openExperimentSmall.xpm" ) );
@@ -75,7 +69,6 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	mtLoadAction->setToolTip( "Open" );
 	mtLoadAction->setShortcut( Qt::CTRL | Qt::Key_O );
 	mtLoadAction->setStatusTip( "Opens a settings file." );
-	fileMenu->addAction( mtLoadAction );
 
 	// - save settings
 	QIcon icon_mtSaveAction( QPixmap( pixPath + "saveExperimentSmall.xpm" ) );
@@ -84,8 +77,6 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	mtSaveAction->setToolTip( "Save" );
 	mtSaveAction->setShortcut( Qt::CTRL | Qt::Key_S );
 	mtSaveAction->setStatusTip( "Saves the current settings to a file." );
-	fileMenu->addAction( mtSaveAction );
-	fileMenu->addSeparator();
 
 	// - close window
 	QIcon icon_mtExitAction( QPixmap( pixPath + "quitApplicationSmall.xpm" ) );
@@ -94,7 +85,6 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	mtExitAction->setToolTip( "Exit" );
 	mtExitAction->setShortcut( Qt::ALT | Qt::Key_F4 );
 	mtExitAction->setStatusTip( "Applies changes and closes the configuration window." );
-	fileMenu->addAction( mtExitAction );
 	QObject::connect( mtExitAction, SIGNAL( triggered() ), SLOT( close() ) );
 
 	createToolBars();
@@ -103,12 +93,25 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	QObject::connect( mtAutoStopAction, SIGNAL( toggled( bool ) ), SLOT( slotAutoStop( bool ) ) );
 	QObject::connect( mtMin, SIGNAL( valueChanged( int ) ), SLOT( slotMinChanged( int ) ) );
 
-	fileMenu->setTitle( "&File" );
-	menuBar()->addMenu( fileMenu );
+	createMenus();
 
 	QObject::connect( experimentWidget, SIGNAL( currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ) ), SLOT( slotRaiseWidget( QTreeWidgetItem * ) ) );
 
 	raiseWidget( 0 );
+}
+
+void MT_MainWindow::createMenus()
+{
+	fileMenu = new QMenu( this );
+	fileMenu->setObjectName( "mtFileMenu" );
+	fileMenu->addAction( mtDefaultAction );
+	fileMenu->addSeparator();
+	fileMenu->addAction( mtLoadAction );
+	fileMenu->addAction( mtSaveAction );
+	fileMenu->addSeparator();
+	fileMenu->addAction( mtExitAction );
+	fileMenu->setTitle( "&File" );
+	menuBar()->addMenu( fileMenu );
 }
 
 void MT_MainWindow::createToolBars()
