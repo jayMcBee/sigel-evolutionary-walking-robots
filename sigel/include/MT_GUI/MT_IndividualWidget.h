@@ -53,6 +53,7 @@ private:
 	QAction	*editConstAction;
 	MT_Editor	*editor;
 
+	void createActions();
 	void createContextMenu();
 
 signals:

@@ -99,16 +99,7 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt
 	connect(editLUD, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
 	connect(editLUM, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
 
-	delConstAction = new QAction("&Delete", this);
-	delConstAction->setToolTip("Delete Constant");
-	delConstAction->setStatusTip("Deletes the selected constants.");
-	delConstAction->setEnabled(false);
-
-	editConstAction = new QAction("&Edit", this);
-	editConstAction->setToolTip("Edit Constant");
-	editConstAction->setStatusTip("Edits the current constant.");
-	editConstAction->setEnabled(false);
-
+	createActions();
 	createContextMenu();
 
 	connect(delConstAction, SIGNAL(triggered()), SLOT(slotDelConst()));
@@ -131,6 +122,19 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt
 	// create the editor
 	editor = new MT_Editor(constantsListBox);
 	connect(editor, SIGNAL(newText(const QString &)), SLOT(slotChangeConstant(const QString &)));
+}
+
+void MT_IndividualsWidget::createActions()
+{
+	delConstAction = new QAction("&Delete", this);
+	delConstAction->setToolTip("Delete Constant");
+	delConstAction->setStatusTip("Deletes the selected constants.");
+	delConstAction->setEnabled(false);
+
+	editConstAction = new QAction("&Edit", this);
+	editConstAction->setToolTip("Edit Constant");
+	editConstAction->setStatusTip("Edits the current constant.");
+	editConstAction->setEnabled(false);
 }
 
 void MT_IndividualsWidget::createContextMenu()
