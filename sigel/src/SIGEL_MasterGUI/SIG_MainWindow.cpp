@@ -57,22 +57,8 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 
 	createWidgets( sigelRoot );
 
-	// create the file menu and toolbar
+	// create the file menu
 	fileMenu = new QMenu( this );
-	fileToolBar = new QToolBar( this );
-	fileToolBar->setObjectName( "fileToolbar" );
-	addToolBar( Qt::TopToolBarArea, fileToolBar );
-	fileToolBar->setWindowTitle( "File" );
-
-	viewToolBar = new QToolBar( this );
-	viewToolBar->setObjectName( "viewToolBar" );
-	addToolBar( Qt::TopToolBarArea, viewToolBar );
-	viewToolBar->setWindowTitle( "View" );
-
-	individualsToolBar = new QToolBar( this );
-	individualsToolBar->setObjectName( "individualsToolBar" );
-	addToolBar( Qt::TopToolBarArea, individualsToolBar );
-	individualsToolBar->setWindowTitle( "Individuals" );
 
 	// create the new experiment action
 	QIcon icon_newExperimentAction( QPixmap( sigelRoot + "/pixmaps/newExperimentSmall.xpm" ) );
@@ -82,7 +68,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	newExperimentAction->setIconText( "New" );
 	newExperimentAction->setShortcut( Qt::CTRL | Qt::Key_N );
 	fileMenu->addAction( newExperimentAction );
-	fileToolBar->addAction( newExperimentAction );
 	experimentListView->experimentListViewMenu->addAction( newExperimentAction );
 	QObject::connect( newExperimentAction,
 			SIGNAL( triggered() ),
@@ -117,7 +102,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	deleteExperimentAction->setIconText( "Delete" );
 	deleteExperimentAction->setShortcut( Qt::CTRL | Qt::Key_D );
 	fileMenu->addAction( deleteExperimentAction );
-	fileToolBar->addAction( deleteExperimentAction );
 	experimentListView->experimentListViewMenu->addAction( deleteExperimentAction );
 	QObject::connect( deleteExperimentAction,
 			SIGNAL( triggered() ),
@@ -126,7 +110,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	deleteExperimentAction->setStatusTip( "Deletes the selected experiment." );
 
 	fileMenu->addSeparator();
-	fileToolBar->addSeparator();
 	experimentListView->experimentListViewMenu->addSeparator();
 
 	QIcon icon_openExperimentAction( QPixmap( sigelRoot + "/pixmaps/openExperimentSmall.xpm" ) );
@@ -136,7 +119,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	openExperimentAction->setIconText( "Open" );
 	openExperimentAction->setShortcut( Qt::CTRL | Qt::Key_O );
 	fileMenu->addAction( openExperimentAction );
-	fileToolBar->addAction( openExperimentAction );
 	experimentListView->experimentListViewMenu->addAction( openExperimentAction );
 	QObject::connect( openExperimentAction,
 			SIGNAL( triggered() ),
@@ -151,7 +133,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	saveExperimentAction->setIconText( "Save" );
 	saveExperimentAction->setShortcut( Qt::CTRL | Qt::Key_S );
 	fileMenu->addAction( saveExperimentAction );
-	fileToolBar->addAction( saveExperimentAction );
 	experimentListView->experimentListViewMenu->addAction( saveExperimentAction );
 	QObject::connect( saveExperimentAction,
 			SIGNAL( triggered() ),
@@ -353,8 +334,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 
 	fileMenu->addSeparator();
 
-	fileToolBar->addSeparator();
-
 	QIcon icon_quitProgramAction( QPixmap( sigelRoot + "/pixmaps/quitApplicationSmall.xpm" ) );
 	icon_quitProgramAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/quitApplicationLarge.xpm" ) );
 	quitProgramAction = new QAction( icon_quitProgramAction, "&Quit", this );
@@ -362,7 +341,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	quitProgramAction->setIconText( "Quit" );
 	quitProgramAction->setShortcut( Qt::CTRL | Qt::Key_Q );
 	fileMenu->addAction( quitProgramAction );
-	fileToolBar->addAction( quitProgramAction );
 	QObject::connect( quitProgramAction,
 			SIGNAL( triggered() ),
 			this,
@@ -381,7 +359,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	viewPopulationAction->setIconText( "Population" );
 	viewPopulationAction->setShortcut( Qt::ALT | Qt::Key_P );
 	viewMenu->addAction( viewPopulationAction );
-	viewToolBar->addAction( viewPopulationAction );
 	QObject::connect( viewPopulationAction,
 			SIGNAL( triggered() ),
 			experimentListView,
@@ -395,7 +372,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	viewRobotAction->setIconText( "Robot" );
 	viewRobotAction->setShortcut( Qt::ALT | Qt::Key_R );
 	viewMenu->addAction( viewRobotAction );
-	viewToolBar->addAction( viewRobotAction );
 	QObject::connect( viewRobotAction,
 			SIGNAL( triggered() ),
 			experimentListView,
@@ -409,7 +385,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	viewLanguageParametersAction->setIconText( "Language" );
 	viewLanguageParametersAction->setShortcut( Qt::ALT | Qt::Key_L );
 	viewMenu->addAction( viewLanguageParametersAction );
-	viewToolBar->addAction( viewLanguageParametersAction );
 	QObject::connect( viewLanguageParametersAction,
 			SIGNAL( triggered() ),
 			experimentListView,
@@ -423,7 +398,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	viewGPParametersAction->setIconText( "Genetic" );
 	viewGPParametersAction->setShortcut( Qt::ALT | Qt::Key_G );
 	viewMenu->addAction( viewGPParametersAction );
-	viewToolBar->addAction( viewGPParametersAction );
 	QObject::connect( viewGPParametersAction,
 			SIGNAL( triggered() ),
 			experimentListView,
@@ -437,7 +411,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	viewSimulationParametersAction->setIconText( "Simulation" );
 	viewSimulationParametersAction->setShortcut( Qt::ALT | Qt::Key_S );
 	viewMenu->addAction( viewSimulationParametersAction );
-	viewToolBar->addAction( viewSimulationParametersAction );
 	QObject::connect( viewSimulationParametersAction,
 			SIGNAL( triggered() ),
 			experimentListView,
@@ -451,7 +424,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	viewEnvironmentAction->setIconText( "Environment" );
 	viewEnvironmentAction->setShortcut( Qt::ALT | Qt::Key_E );
 	viewMenu->addAction( viewEnvironmentAction );
-	viewToolBar->addAction( viewEnvironmentAction );
 	QObject::connect( viewEnvironmentAction,
 			SIGNAL( triggered() ),
 			experimentListView,
@@ -513,7 +485,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	addIndividualsAction->setIconText( "Add" );
 	addIndividualsAction->setShortcut( Qt::ALT | Qt::Key_A );
 	individualsMenu->addAction( addIndividualsAction );
-	individualsToolBar->addAction( addIndividualsAction );
 	QObject::connect( addIndividualsAction,
 			SIGNAL( triggered() ),
 			experimentListView,
@@ -527,7 +498,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	deleteIndividualsAction->setIconText( "Delete" );
 	deleteIndividualsAction->setShortcut( Qt::ALT | Qt::Key_D );
 	individualsMenu->addAction( deleteIndividualsAction );
-	individualsToolBar->addAction( deleteIndividualsAction );
 	QObject::connect( deleteIndividualsAction,
 			SIGNAL( triggered() ),
 			experimentListView,
@@ -546,7 +516,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	resetAllFitnessValuesAction->setStatusTip( "Clears the fitness of every individual." );
 
 	individualsMenu->addSeparator();
-	individualsToolBar->addSeparator();
 
 	QIcon icon_visualizeIndividualsAction( QPixmap( sigelRoot + "/pixmaps/visualizeSmall.xpm" ) );
 	icon_visualizeIndividualsAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/visualizeLarge.xpm" ) );
@@ -555,7 +524,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	visualizeIndividualsAction->setIconText( "Visualize" );
 	visualizeIndividualsAction->setShortcut( Qt::ALT | Qt::Key_V );
 	individualsMenu->addAction( visualizeIndividualsAction );
-	individualsToolBar->addAction( visualizeIndividualsAction );
 	QObject::connect( visualizeIndividualsAction,
 			SIGNAL( triggered() ),
 			experimentListView,
@@ -603,16 +571,13 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	evolutionRunningActions.append( visualizeIndividualsAction );
 
 	/**
-	 * Meta-GP menu and toolbar definition
+	 * Meta-GP menu definition
 	 * begin
 	 **/
 
-	// create the menu and toolbar
+	// create the menu
 	mtMenu = new QMenu( this );
 	mtMenu->setObjectName( "helpMenu" );
-	mtToolBar = new QToolBar( this );
-	mtToolBar->setObjectName( "mtToolbar" );
-	addToolBar( Qt::TopToolBarArea, mtToolBar );
 
 	// use MetaGP button
 	QIcon icon_mtUseAction( QPixmap( sigelRoot + "/pixmaps/mt_UseSmall.xpm" ) );
@@ -623,7 +588,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	mtUseAction->setCheckable( true );
 	mtUseAction->setStatusTip( "Activates the use of the MetaGP system to speed up the evolution." );
 	mtMenu->addAction( mtUseAction );
-	mtToolBar->addAction( mtUseAction );
 	mtUseAction->setEnabled( false );
 	QObject::connect( mtUseAction, SIGNAL( toggled( bool ) ), SLOT( slotMTUseMT( bool ) ) );
 
@@ -635,7 +599,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	mtConfigureAction->setIconText( "Configure Meta" );
 	mtConfigureAction->setStatusTip( "Opens the configuration dialog of the MetaGP system." );
 	mtMenu->addAction( mtConfigureAction );
-	mtToolBar->addAction( mtConfigureAction );
 	mtConfigureAction->setEnabled( false );
 	QObject::connect( mtConfigureAction, SIGNAL( triggered() ), SLOT( slotMTConfigureSystem() ) );
 
@@ -677,7 +640,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			SLOT( slotCurrentExperimentChanged() ) );
 
 	/**
-	 * Meta-GP menu and toolbar definition
+	 * Meta-GP menu definition
 	 * end
 	 **/
 
@@ -696,6 +659,8 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	helpMenu->setTitle( "&Help" );
 	menuBar()->addMenu( helpMenu );
 
+	createToolBars();
+
 	QObject::connect( experimentListView,
 			SIGNAL( isNotEmpty( bool ) ),
 			this,
@@ -712,6 +677,51 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			SLOT( slotEnableEvolutionRunningActions( bool ) ) );
 
 	statusBar()->showMessage( "Ready.", 5000 );
+}
+
+void SIG_MainWindow::createToolBars()
+{
+	fileToolBar = new QToolBar( this );
+	fileToolBar->setObjectName( "fileToolbar" );
+	addToolBar( Qt::TopToolBarArea, fileToolBar );
+	fileToolBar->setWindowTitle( "File" );
+
+	fileToolBar->addAction( newExperimentAction );
+	fileToolBar->addAction( deleteExperimentAction );
+	fileToolBar->addSeparator();
+	fileToolBar->addAction( openExperimentAction );
+	fileToolBar->addAction( saveExperimentAction );
+	fileToolBar->addSeparator();
+	fileToolBar->addAction( quitProgramAction );
+
+	viewToolBar = new QToolBar( this );
+	viewToolBar->setObjectName( "viewToolBar" );
+	addToolBar( Qt::TopToolBarArea, viewToolBar );
+	viewToolBar->setWindowTitle( "View" );
+
+	viewToolBar->addAction( viewPopulationAction );
+	viewToolBar->addAction( viewRobotAction );
+	viewToolBar->addAction( viewLanguageParametersAction );
+	viewToolBar->addAction( viewGPParametersAction );
+	viewToolBar->addAction( viewSimulationParametersAction );
+	viewToolBar->addAction( viewEnvironmentAction );
+
+	individualsToolBar = new QToolBar( this );
+	individualsToolBar->setObjectName( "individualsToolBar" );
+	addToolBar( Qt::TopToolBarArea, individualsToolBar );
+	individualsToolBar->setWindowTitle( "Individuals" );
+
+	individualsToolBar->addAction( addIndividualsAction );
+	individualsToolBar->addAction( deleteIndividualsAction );
+	individualsToolBar->addSeparator();
+	individualsToolBar->addAction( visualizeIndividualsAction );
+
+	mtToolBar = new QToolBar( this );
+	mtToolBar->setObjectName( "mtToolbar" );
+	addToolBar( Qt::TopToolBarArea, mtToolBar );
+
+	mtToolBar->addAction( mtUseAction );
+	mtToolBar->addAction( mtConfigureAction );
 }
 
 void SIG_MainWindow::createWidgets( const QString &sigelRoot )

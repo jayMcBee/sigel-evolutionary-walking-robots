@@ -282,6 +282,12 @@ private:
 	 */
 	void createWidgets( const QString &sigelRoot );
 
+	/**
+	 * Creates the File, View, Individuals and MetaGP toolbars and puts the
+	 * actions onto them.
+	 */
+	void createToolBars();
+
 public slots:
 	void slotMTUseMT( bool state );
 	void slotMTConfigureSystem();
