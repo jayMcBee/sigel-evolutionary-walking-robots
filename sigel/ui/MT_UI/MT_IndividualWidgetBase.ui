@@ -307,7 +307,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider01">
+                      <widget class="QSlider" name="sliderSWT">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -317,7 +317,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit01">
+                      <widget class="QLineEdit" name="editSWT">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -359,7 +359,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider02">
+                      <widget class="QSlider" name="sliderCPY">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -369,7 +369,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit02">
+                      <widget class="QLineEdit" name="editCPY">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -411,7 +411,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider03">
+                      <widget class="QSlider" name="sliderADD">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -421,7 +421,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit03">
+                      <widget class="QLineEdit" name="editADD">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -463,7 +463,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider04">
+                      <widget class="QSlider" name="sliderSUB">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -473,7 +473,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit04">
+                      <widget class="QLineEdit" name="editSUB">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -515,7 +515,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider05">
+                      <widget class="QSlider" name="sliderMUL">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -525,7 +525,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit05">
+                      <widget class="QLineEdit" name="editMUL">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -567,7 +567,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider06">
+                      <widget class="QSlider" name="sliderDIV">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -577,7 +577,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit06">
+                      <widget class="QLineEdit" name="editDIV">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -629,7 +629,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider07">
+                      <widget class="QSlider" name="sliderMOD">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -639,7 +639,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit07">
+                      <widget class="QLineEdit" name="editMOD">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -681,7 +681,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider08">
+                      <widget class="QSlider" name="sliderMIN">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -691,7 +691,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit08">
+                      <widget class="QLineEdit" name="editMIN">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -733,7 +733,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider09">
+                      <widget class="QSlider" name="sliderMAX">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -743,7 +743,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit09">
+                      <widget class="QLineEdit" name="editMAX">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -785,7 +785,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider10">
+                      <widget class="QSlider" name="sliderCMP">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -795,7 +795,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit10">
+                      <widget class="QLineEdit" name="editCMP">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -837,7 +837,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider11">
+                      <widget class="QSlider" name="sliderJMP">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -847,7 +847,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit11">
+                      <widget class="QLineEdit" name="editJMP">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -889,7 +889,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider12">
+                      <widget class="QSlider" name="sliderJLE">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -899,7 +899,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit12">
+                      <widget class="QLineEdit" name="editJLE">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -951,7 +951,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider13">
+                      <widget class="QSlider" name="sliderJEQ">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -961,7 +961,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit13">
+                      <widget class="QLineEdit" name="editJEQ">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -1003,7 +1003,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider14">
+                      <widget class="QSlider" name="sliderNOP">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -1013,7 +1013,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit14">
+                      <widget class="QLineEdit" name="editNOP">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -1055,7 +1055,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider15">
+                      <widget class="QSlider" name="sliderLUI">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -1065,7 +1065,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit15">
+                      <widget class="QLineEdit" name="editLUI">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -1107,7 +1107,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider16">
+                      <widget class="QSlider" name="sliderLUS">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -1117,7 +1117,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit16">
+                      <widget class="QLineEdit" name="editLUS">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -1159,7 +1159,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider17">
+                      <widget class="QSlider" name="sliderLUD">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -1169,7 +1169,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit17">
+                      <widget class="QLineEdit" name="editLUD">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -1211,7 +1211,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QSlider" name="slider18">
+                      <widget class="QSlider" name="sliderLUM">
                         <property name="maximum">
                           <number>1000</number>
                         </property>
@@ -1221,7 +1221,7 @@
                       </widget>
                     </item>
                     <item>
-                      <widget class="QLineEdit" name="edit18">
+                      <widget class="QLineEdit" name="editLUM">
                         <property name="sizePolicy">
                           <sizepolicy>
                             <hsizetype>0</hsizetype>
@@ -1252,39 +1252,39 @@
     <tabstop>exportButton</tabstop>
     <tabstop>createButton</tabstop>
     <tabstop>constantsListBox</tabstop>
-    <tabstop>edit01</tabstop>
-    <tabstop>edit02</tabstop>
-    <tabstop>edit03</tabstop>
-    <tabstop>edit04</tabstop>
-    <tabstop>edit05</tabstop>
-    <tabstop>edit06</tabstop>
-    <tabstop>edit07</tabstop>
-    <tabstop>edit08</tabstop>
-    <tabstop>edit09</tabstop>
-    <tabstop>edit10</tabstop>
-    <tabstop>edit11</tabstop>
-    <tabstop>edit12</tabstop>
-    <tabstop>edit13</tabstop>
-    <tabstop>edit14</tabstop>
-    <tabstop>edit15</tabstop>
-    <tabstop>edit16</tabstop>
-    <tabstop>edit17</tabstop>
-    <tabstop>slider01</tabstop>
-    <tabstop>slider02</tabstop>
-    <tabstop>slider03</tabstop>
-    <tabstop>slider04</tabstop>
-    <tabstop>slider05</tabstop>
-    <tabstop>slider06</tabstop>
-    <tabstop>slider07</tabstop>
-    <tabstop>slider08</tabstop>
-    <tabstop>slider09</tabstop>
-    <tabstop>slider10</tabstop>
-    <tabstop>slider11</tabstop>
-    <tabstop>slider12</tabstop>
-    <tabstop>slider13</tabstop>
-    <tabstop>slider14</tabstop>
-    <tabstop>slider15</tabstop>
-    <tabstop>slider16</tabstop>
-    <tabstop>slider17</tabstop>
+    <tabstop>editSWT</tabstop>
+    <tabstop>editCPY</tabstop>
+    <tabstop>editADD</tabstop>
+    <tabstop>editSUB</tabstop>
+    <tabstop>editMUL</tabstop>
+    <tabstop>editDIV</tabstop>
+    <tabstop>editMOD</tabstop>
+    <tabstop>editMIN</tabstop>
+    <tabstop>editMAX</tabstop>
+    <tabstop>editCMP</tabstop>
+    <tabstop>editJMP</tabstop>
+    <tabstop>editJLE</tabstop>
+    <tabstop>editJEQ</tabstop>
+    <tabstop>editNOP</tabstop>
+    <tabstop>editLUI</tabstop>
+    <tabstop>editLUS</tabstop>
+    <tabstop>editLUD</tabstop>
+    <tabstop>sliderSWT</tabstop>
+    <tabstop>sliderCPY</tabstop>
+    <tabstop>sliderADD</tabstop>
+    <tabstop>sliderSUB</tabstop>
+    <tabstop>sliderMUL</tabstop>
+    <tabstop>sliderDIV</tabstop>
+    <tabstop>sliderMOD</tabstop>
+    <tabstop>sliderMIN</tabstop>
+    <tabstop>sliderMAX</tabstop>
+    <tabstop>sliderCMP</tabstop>
+    <tabstop>sliderJMP</tabstop>
+    <tabstop>sliderJLE</tabstop>
+    <tabstop>sliderJEQ</tabstop>
+    <tabstop>sliderNOP</tabstop>
+    <tabstop>sliderLUI</tabstop>
+    <tabstop>sliderLUS</tabstop>
+    <tabstop>sliderLUD</tabstop>
   </tabstops>
 </ui>

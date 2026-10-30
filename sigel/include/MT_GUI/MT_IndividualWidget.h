@@ -10,6 +10,7 @@
 #include <QValidator>
 #include <QMenu>
 #include <QAction>
+#include <QStringList>
 
 class MT_IndividualsWidget : public MT_IndividualsWidgetBase, public MT_WidgetBase
 {
@@ -42,6 +43,7 @@ private:
 	double minValue, maxValue;
 	bool integer;
 	int numToCreate;
+	QStringList commandNames;
 
 	MT_Randomizer *randomizer;
 

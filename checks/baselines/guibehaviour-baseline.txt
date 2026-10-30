@@ -1625,85 +1625,85 @@ Do you want to replace it?]
     group  [Terminal set:] enabled=1 checkable=0
     group  [Function set:] enabled=1 checkable=0
     edit   MT_Editor                            text=[] enabled=1 validator=none
-    edit   edit01                               text=[0] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit02                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit03                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit04                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit05                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit06                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit07                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit08                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit09                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit10                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit11                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit12                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit13                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit14                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit15                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit16                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit17                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
-    edit   edit18                               text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editSWT                              text=[0] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editCPY                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editADD                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editSUB                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editMUL                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editDIV                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editMOD                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editMIN                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editMAX                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editCMP                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editJMP                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editJLE                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editJEQ                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editNOP                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editLUI                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editLUS                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editLUD                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
+    edit   editLUM                              text=[1000] enabled=1 validator=QIntValidator bottom=0 top=1000 locale=[C] numberOptions=2
     list   constantsListBox                     count=30 current=-1 enabled=1
       (randomly generated at construction -- values differ every
        run and are deliberately not pinned) parsedAsInt=30/30 inRange[0..1000]=30
   [drive]
-    comma  edit01                               type[9,81] -> [981] acceptable=1
-    comma  edit02                               type[9,81] -> [981] acceptable=1
-    comma  edit03                               type[9,81] -> [981] acceptable=1
-    comma  edit04                               type[9,81] -> [981] acceptable=1
-    comma  edit05                               type[9,81] -> [981] acceptable=1
-    comma  edit06                               type[9,81] -> [981] acceptable=1
-    comma  edit07                               type[9,81] -> [981] acceptable=1
-    comma  edit08                               type[9,81] -> [981] acceptable=1
-    comma  edit09                               type[9,81] -> [981] acceptable=1
-    comma  edit10                               type[9,81] -> [981] acceptable=1
-    comma  edit11                               type[9,81] -> [981] acceptable=1
-    comma  edit12                               type[9,81] -> [981] acceptable=1
-    comma  edit13                               type[9,81] -> [981] acceptable=1
-    comma  edit14                               type[9,81] -> [981] acceptable=1
-    comma  edit15                               type[9,81] -> [981] acceptable=1
-    comma  edit16                               type[9,81] -> [981] acceptable=1
-    comma  edit17                               type[9,81] -> [981] acceptable=1
-    comma  edit18                               type[9,81] -> [981] acceptable=1
+    comma  editSWT                              type[9,81] -> [981] acceptable=1
+    comma  editCPY                              type[9,81] -> [981] acceptable=1
+    comma  editADD                              type[9,81] -> [981] acceptable=1
+    comma  editSUB                              type[9,81] -> [981] acceptable=1
+    comma  editMUL                              type[9,81] -> [981] acceptable=1
+    comma  editDIV                              type[9,81] -> [981] acceptable=1
+    comma  editMOD                              type[9,81] -> [981] acceptable=1
+    comma  editMIN                              type[9,81] -> [981] acceptable=1
+    comma  editMAX                              type[9,81] -> [981] acceptable=1
+    comma  editCMP                              type[9,81] -> [981] acceptable=1
+    comma  editJMP                              type[9,81] -> [981] acceptable=1
+    comma  editJLE                              type[9,81] -> [981] acceptable=1
+    comma  editJEQ                              type[9,81] -> [981] acceptable=1
+    comma  editNOP                              type[9,81] -> [981] acceptable=1
+    comma  editLUI                              type[9,81] -> [981] acceptable=1
+    comma  editLUS                              type[9,81] -> [981] acceptable=1
+    comma  editLUD                              type[9,81] -> [981] acceptable=1
+    comma  editLUM                              type[9,81] -> [981] acceptable=1
     spin   programLengthSpinBox                 v=50        [1..50000] step=1 pre=[] suf=[] up=51        dn2=49        typed(max+1)=[5000]->5000 commits=5000 enabled=1
     spin   numVariablesSpinBox                  v=10        [0..9999] step=1 pre=[] suf=[] up=11        dn2=9         typed(max+1)=[1000]->1000 commits=1000 enabled=1
-    slider slider01                             v=0      [0..1000] page=10 up=1      pgup=11     end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider01                             0 -> 10 (delta +10) focusPolicy=11 hasFocus=1
-    slider slider02                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider02                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider03                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider03                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider04                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider04                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider05                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider05                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider06                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider06                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider07                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider07                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider08                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider08                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider09                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider09                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider10                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider10                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider11                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider11                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider12                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider12                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider13                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider13                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider14                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider14                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider15                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider15                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider16                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider16                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider17                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider17                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    slider slider18                             v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
-    click  slider18                             1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
-    group  edit01                         type[1,000] -> [1000] acceptable=1 toInt=1000(ok=1)
+    slider sliderSWT                            v=0      [0..1000] page=10 up=1      pgup=11     end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderSWT                            0 -> 10 (delta +10) focusPolicy=11 hasFocus=1
+    slider sliderCPY                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderCPY                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderADD                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderADD                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderSUB                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderSUB                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderMUL                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderMUL                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderDIV                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderDIV                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderMOD                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderMOD                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderMIN                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderMIN                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderMAX                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderMAX                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderCMP                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderCMP                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderJMP                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderJMP                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderJLE                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderJLE                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderJEQ                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderJEQ                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderNOP                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderNOP                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderLUI                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderLUI                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderLUS                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderLUS                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderLUD                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderLUD                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    slider sliderLUM                            v=1000   [0..1000] page=10 up=1000   pgup=1000   end=1000   lcd=(none) 0/0/0/0 enabled=1
+    click  sliderLUM                            1000 -> 1000 (delta +0) focusPolicy=11 hasFocus=1
+    group  editSWT                        type[1,000] -> [1000] acceptable=1 toInt=1000(ok=1)
 
 == METAGP PAGE 2: clicked [Population] ==
   [page] index=2 class=MT_PopulationWidget objectName=[MTPopulationWidget]

@@ -27,26 +27,29 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt
 	integer  = false;
 	numToCreate = 0;
 
+	// the order of the command probabilities in the randomizer
+	commandNames = { "SWT", "CPY", "ADD", "SUB", "MUL", "DIV", "MOD", "MIN", "MAX", "CMP", "JMP", "JLE", "JEQ", "NOP", "LUI", "LUS", "LUD", "LUM" };
+
 	// limit the lineEdit's allowed values to that of the sliders
-	validator = new QIntValidator(slider01->minimum(), slider01->maximum(), this);
-	edit01->setValidator(validator);
-	edit02->setValidator(validator);
-	edit03->setValidator(validator);
-	edit04->setValidator(validator);
-	edit05->setValidator(validator);
-	edit06->setValidator(validator);
-	edit07->setValidator(validator);
-	edit08->setValidator(validator);
-	edit09->setValidator(validator);
-	edit10->setValidator(validator);
-	edit11->setValidator(validator);
-	edit12->setValidator(validator);
-	edit13->setValidator(validator);
-	edit14->setValidator(validator);
-	edit15->setValidator(validator);
-	edit16->setValidator(validator);
-	edit17->setValidator(validator);
-	edit18->setValidator(validator);
+	validator = new QIntValidator(sliderSWT->minimum(), sliderSWT->maximum(), this);
+	editSWT->setValidator(validator);
+	editCPY->setValidator(validator);
+	editADD->setValidator(validator);
+	editSUB->setValidator(validator);
+	editMUL->setValidator(validator);
+	editDIV->setValidator(validator);
+	editMOD->setValidator(validator);
+	editMIN->setValidator(validator);
+	editMAX->setValidator(validator);
+	editCMP->setValidator(validator);
+	editJMP->setValidator(validator);
+	editJLE->setValidator(validator);
+	editJEQ->setValidator(validator);
+	editNOP->setValidator(validator);
+	editLUI->setValidator(validator);
+	editLUS->setValidator(validator);
+	editLUD->setValidator(validator);
+	editLUM->setValidator(validator);
 // Pinned to the C locale: unpinned, "1,000" is ACCEPTABLE while text().toInt()
 // returns 0.
 {
@@ -57,44 +60,44 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt
 }
 
 	// connect the sliders to the corresponding lineEdits
-	connect(slider01, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider02, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider03, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider04, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider05, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider06, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider07, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider08, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider09, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider10, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider11, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider12, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider13, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider14, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider15, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider16, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider17, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
-	connect(slider18, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderSWT, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderCPY, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderADD, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderSUB, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderMUL, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderDIV, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderMOD, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderMIN, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderMAX, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderCMP, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderJMP, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderJLE, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderJEQ, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderNOP, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderLUI, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderLUS, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderLUD, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
+	connect(sliderLUM, SIGNAL(valueChanged(int)), SLOT(slotChangeEdit(int)));
 
 	// connect the lineEdits to the corresponding sliders
-	connect(edit01, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit02, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit03, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit04, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit05, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit06, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit07, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit08, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit09, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit10, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit11, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit12, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit13, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit14, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit15, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit16, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit17, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
-	connect(edit18, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editSWT, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editCPY, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editADD, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editSUB, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editMUL, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editDIV, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editMOD, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editMIN, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editMAX, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editCMP, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editJMP, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editJLE, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editJEQ, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editNOP, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editLUI, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editLUS, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editLUD, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
+	connect(editLUM, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
 
 	delConstAction = new QAction("&Delete", this);
 	delConstAction->setToolTip("Delete Constant");
@@ -168,31 +171,16 @@ void MT_IndividualsWidget::onShow(MT_GPManager *manager, MT_EstimationState *est
 		emit numConstChanged();
 		
 		// set the command probabilities
-		QString com1("edit0");
-		QString com2("edit");
 		QString valText;
-		QString receivername;
 		QLineEdit *receiverObject;
 		double previous = 0.0;
 		double actual;
-		for(int i=1; i<10; i++){
-			receivername = com1 + QString("%1").arg(i);
-			actual = functions->at(i-1);
+		for(int i=0; i<commandNames.size(); i++){
+			actual = functions->at(i);
 			valText = QString("%1").arg(static_cast<int>(actual - previous));
 			previous = actual;
 
-			receiverObject = findChild<QLineEdit*>(receivername);
-			if(receiverObject&& (receiverObject->text() != valText)){
-				receiverObject->setText(valText);
-			}
-		}
-		for(int i=10; i<19; i++){
-			receivername = com2 + QString("%1").arg(i);
-			actual = functions->at(i-1);
-			valText = QString("%1").arg(static_cast<int>(actual - previous));
-			previous = actual;
-
-			receiverObject = findChild<QLineEdit*>(receivername);
+			receiverObject = findChild<QLineEdit*>("edit" + commandNames.at(i));
 			if(receiverObject&& (receiverObject->text() != valText)){
 				receiverObject->setText(valText);
 			}
@@ -224,27 +212,14 @@ bool MT_IndividualsWidget::onHide(MT_GPManager *manager, MT_EstimationState *est
 	}
 
 	// set the command probabilities
-	QString com1("edit0");
-	QString com2("edit");
-	QString valText;
-	QString receivername;
 	QLineEdit *receiverObject;
 	double previous = 0.0;
-	for(int i=1; i<10; i++){
-		receivername = com1 + QString("%1").arg(i);
-		receiverObject = findChild<QLineEdit*>(receivername);
+	for(int i=0; i<commandNames.size(); i++){
+		receiverObject = findChild<QLineEdit*>("edit" + commandNames.at(i));
 		if(receiverObject){
 			previous += receiverObject->text().toDouble();
 		}
-		(*functions)[i-1] = previous;
-	}
-	for(int i=10; i<19; i++){
-		receivername = com2 + QString("%1").arg(i);
-		receiverObject = findChild<QLineEdit*>(receivername);
-		if(receiverObject){
-			previous += receiverObject->text().toDouble();
-		}
-		(*functions)[i-1] = previous;
+		(*functions)[i] = previous;
 	}
 	
 	return true;
@@ -445,7 +420,7 @@ void MT_IndividualsWidget::slotChangeEdit(int value)
 
 	// get the appropriate receiver
 	QString receiverName("edit");
-	receiverName += senderName.right(2);
+	receiverName += senderName.right(3);
 
 	QLineEdit *receiverObject = findChild<QLineEdit*>(receiverName);
 
@@ -464,7 +439,7 @@ void MT_IndividualsWidget::slotChangeSlider(const QString &text)
 
 	// get the appropriate receiver
 	QString receiverName("slider");
-	receiverName += senderName.right(2);
+	receiverName += senderName.right(3);
 
 	QSlider *receiverObject = findChild<QSlider*>(receiverName);
 
