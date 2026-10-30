@@ -19,21 +19,21 @@ class MT_IndividualsWidget : public MT_IndividualsWidgetBase, public MT_WidgetBa
 	friend class MT_AddConstantsWidget;
 
 public:
-	bool onHide(MT_GPManager *manager, MT_EstimationState *estimationState) override;
-	void onShow(MT_GPManager *manager, MT_EstimationState *estimationState) override;
+	bool onHide( MT_GPManager *manager, MT_EstimationState *estimationState ) override;
+	void onShow( MT_GPManager *manager, MT_EstimationState *estimationState ) override;
 
-	MT_IndividualsWidget(QWidget* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
+	MT_IndividualsWidget( QWidget *parent = nullptr, const char *name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags() );
 
 private slots:
 	void slotCreateConstants();
 	void slotImportConstants();
 	void slotExportConstants();
-	void slotChangeSlider(const QString &text);
-	void slotChangeEdit(int value);
+	void slotChangeSlider( const QString &text );
+	void slotChangeEdit( int value );
 	void slotEditConst();
-	void slotEditConst(QListWidgetItem *item);
-	void slotChangeConstant(const QString &ntext);
-	void slotRButtonClicked(const QPoint &pos);
+	void slotEditConst( QListWidgetItem *item );
+	void slotChangeConstant( const QString &ntext );
+	void slotRButtonClicked( const QPoint &pos );
 	void slotSelectionChanged();
 	void slotDelConst();
 	void slotResetFocus();
@@ -48,10 +48,10 @@ private:
 	MT_Randomizer *randomizer;
 
 	QIntValidator *validator;
-	QMenu	*constContextMenu;
-	QAction	*delConstAction;
-	QAction	*editConstAction;
-	MT_Editor	*editor;
+	QMenu *constContextMenu;
+	QAction *delConstAction;
+	QAction *editConstAction;
+	MT_Editor *editor;
 
 	void createActions();
 	void createContextMenu();
