@@ -30,37 +30,7 @@ MT_IndividualsWidget::MT_IndividualsWidget( QWidget *parent, const char *name, Q
 	// the order of the command probabilities in the randomizer
 	commandNames = { "SWT", "CPY", "ADD", "SUB", "MUL", "DIV", "MOD", "MIN", "MAX", "CMP", "JMP", "JLE", "JEQ", "NOP", "LUI", "LUS", "LUD", "LUM" };
 
-	// limit the lineEdit's allowed values to that of the sliders
-	validator = new QIntValidator( sliderSWT->minimum(), sliderSWT->maximum(), this );
-	editSWT->setValidator( validator );
-	editCPY->setValidator( validator );
-	editADD->setValidator( validator );
-	editSUB->setValidator( validator );
-	editMUL->setValidator( validator );
-	editDIV->setValidator( validator );
-	editMOD->setValidator( validator );
-	editMIN->setValidator( validator );
-	editMAX->setValidator( validator );
-	editCMP->setValidator( validator );
-	editJMP->setValidator( validator );
-	editJLE->setValidator( validator );
-	editJEQ->setValidator( validator );
-	editNOP->setValidator( validator );
-	editLUI->setValidator( validator );
-	editLUS->setValidator( validator );
-	editLUD->setValidator( validator );
-	editLUM->setValidator( validator );
-
-	// Pinned to the C locale: unpinned, "1,000" is ACCEPTABLE while text().toInt()
-	// returns 0.
-	{
-		QLocale cLocale = QLocale::c();
-		cLocale.setNumberOptions( QLocale::RejectGroupSeparator );
-		for( QValidator *v : findChildren<QValidator *>() )
-		{
-			v->setLocale( cLocale );
-		}
-	}
+	createWidgets();
 
 	// connect the sliders to the corresponding lineEdits
 	connect( sliderSWT, SIGNAL( valueChanged( int ) ), SLOT( slotChangeEdit( int ) ) );
@@ -122,9 +92,45 @@ MT_IndividualsWidget::MT_IndividualsWidget( QWidget *parent, const char *name, Q
 
 	connect( this, SIGNAL( numConstChanged() ), SLOT( slotNumConstChanged() ) );
 
+	connect( editor, SIGNAL( newText( const QString & ) ), SLOT( slotChangeConstant( const QString & ) ) );
+}
+
+void MT_IndividualsWidget::createWidgets()
+{
+	// limit the lineEdit's allowed values to that of the sliders
+	validator = new QIntValidator( sliderSWT->minimum(), sliderSWT->maximum(), this );
+	editSWT->setValidator( validator );
+	editCPY->setValidator( validator );
+	editADD->setValidator( validator );
+	editSUB->setValidator( validator );
+	editMUL->setValidator( validator );
+	editDIV->setValidator( validator );
+	editMOD->setValidator( validator );
+	editMIN->setValidator( validator );
+	editMAX->setValidator( validator );
+	editCMP->setValidator( validator );
+	editJMP->setValidator( validator );
+	editJLE->setValidator( validator );
+	editJEQ->setValidator( validator );
+	editNOP->setValidator( validator );
+	editLUI->setValidator( validator );
+	editLUS->setValidator( validator );
+	editLUD->setValidator( validator );
+	editLUM->setValidator( validator );
+
+	// Pinned to the C locale: unpinned, "1,000" is ACCEPTABLE while text().toInt()
+	// returns 0.
+	{
+		QLocale cLocale = QLocale::c();
+		cLocale.setNumberOptions( QLocale::RejectGroupSeparator );
+		for( QValidator *v : findChildren<QValidator *>() )
+		{
+			v->setLocale( cLocale );
+		}
+	}
+
 	// create the editor
 	editor = new MT_Editor( constantsListBox );
-	connect( editor, SIGNAL( newText( const QString & ) ), SLOT( slotChangeConstant( const QString & ) ) );
 }
 
 void MT_IndividualsWidget::createActions()

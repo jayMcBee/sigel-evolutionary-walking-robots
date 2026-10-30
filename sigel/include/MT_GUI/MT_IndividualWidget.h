@@ -54,6 +54,7 @@ private:
 	QAction *editConstAction;
 	MT_Editor *editor;
 
+	void createWidgets();
 	void createActions();
 	void createContextMenu();
 	void importConstantsFromFile( const QString &fileName );
