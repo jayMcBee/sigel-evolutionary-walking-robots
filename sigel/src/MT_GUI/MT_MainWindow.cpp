@@ -144,9 +144,7 @@ void MT_MainWindow::createToolBars()
 	evolCtrlToolbar->addSeparator();
 	evolCtrlToolbar->addAction( mtAutoStopAction );
 
-	// max timed evolution duration is set to 24 days because the duration
-	// is to be calculated in milli seconds and stored in an integer
-	// (assumed that an integer has 32bit)
+	// Maximum 24 days: the duration is an int in milliseconds, assuming a 32-bit int.
 	mtHour = new QSpinBox( evolCtrlToolbar );
 	mtHour->setRange( 0, 576 );
 	mtHour->setSingleStep( 1 );
