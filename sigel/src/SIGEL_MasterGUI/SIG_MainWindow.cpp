@@ -59,11 +59,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 
 	createActions( sigelRoot );
 
-	QObject::connect( experimentListView,
-			SIGNAL( currentExperimentChanged() ),
-			this,
-			SLOT( slotCurrentExperimentChanged() ) );
-
 	createMenus();
 
 	createToolBars();
@@ -82,6 +77,11 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			SIGNAL( evolutionNotRunning( bool ) ),
 			this,
 			SLOT( slotEnableEvolutionRunningActions( bool ) ) );
+
+	QObject::connect( experimentListView,
+			SIGNAL( currentExperimentChanged() ),
+			this,
+			SLOT( slotCurrentExperimentChanged() ) );
 
 	statusBar()->showMessage( "Ready.", 5000 );
 }
