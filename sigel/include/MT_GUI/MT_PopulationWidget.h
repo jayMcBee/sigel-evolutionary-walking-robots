@@ -36,6 +36,7 @@ private:
 	MT_Population *population;
 	MT_GPManager  *gpManager;
 	MT_MainWindow *mainWindow;
+	void createContextMenu();
 	void createToolBar(QMainWindow *parent);
 	QList<MT_PopListViewItem *> getSelectedItems();
 	void exportAsPopulation(const QList<MT_PopListViewItem *> &selectedItems);

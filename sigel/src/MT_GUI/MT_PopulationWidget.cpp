@@ -29,17 +29,12 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	QString pixPath = ::getenv("SIGEL_ROOT");
 	pixPath += "/pixmaps/";
 
-	// create context menu
-	popContextMenu = new QMenu(this);
-	popContextMenu->setObjectName("mtPopContextMenu");
-
-	// create the actions and insert them
+	// create the actions
 	QIcon icon_addIndAction(QPixmap(pixPath+"addIndividualsSmall.xpm"));
 	icon_addIndAction.addPixmap(QPixmap(pixPath+"addIndividualsLarge.xpm"));
 	addIndAction = new QAction(icon_addIndAction, "&Add...", parentWindow);
 	addIndAction->setToolTip("Add Individual");
 	addIndAction->setStatusTip("Adds a randomly created individual to the population.");
-	popContextMenu->addAction(addIndAction);
 
 	QIcon icon_delIndAction(QPixmap(pixPath+"deleteIndividualsSmall.xpm"));
 	icon_delIndAction.addPixmap(QPixmap(pixPath+"deleteIndividualsLarge.xpm"));
@@ -47,21 +42,18 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	delIndAction->setToolTip("Delete Individual");
 	delIndAction->setEnabled(false);
 	delIndAction->setStatusTip("Deletes the selected individual from the population.");
-	popContextMenu->addAction(delIndAction);
 
 	QIcon icon_impIndAction(QPixmap(pixPath+"mt_ImpIndSmall.xpm"));
 	icon_impIndAction.addPixmap(QPixmap(pixPath+"/mt_ImpIndSmall.xpm"));
 	impIndAction = new QAction(icon_impIndAction, "&Import...", parentWindow);
 	impIndAction->setToolTip("Import Individual");
 	impIndAction->setStatusTip("Imports one or more individuals from a file.");
-	popContextMenu->addAction(impIndAction);
 
 	QIcon icon_expIndAction(QPixmap(pixPath+"mt_ExpIndSmall.xpm"));
 	icon_expIndAction.addPixmap(QPixmap(pixPath+"mt_ExpIndSmall.xpm"));
 	expIndAction = new QAction(icon_expIndAction, "&Export...", parentWindow);
 	expIndAction->setToolTip("Export Individual");
 	expIndAction->setStatusTip("Writes the selected individuals to a file.");
-	popContextMenu->addAction(expIndAction);
 
 	QIcon icon_loadPopAction(QPixmap(pixPath+"openExperimentSmall.xpm"));
 	icon_loadPopAction.addPixmap(QPixmap(pixPath+"openExperimentLarge.xpm"));
@@ -76,6 +68,7 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	savePopAction->setStatusTip("Saves the complete population to a file.");
 
 	createToolBar(parent);
+	createContextMenu();
 
 	// establish connections
 	individualListView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -89,6 +82,16 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	QObject::connect(loadPopAction, SIGNAL(triggered()), SLOT(slotLoadPop()));
 	QObject::connect(savePopAction, SIGNAL(triggered()), SLOT(slotSavePop()));
 	QObject::connect(this, SIGNAL(numChanged()), SLOT(slotNumChanged()));
+}
+
+void MT_PopulationWidget::createContextMenu()
+{
+	popContextMenu = new QMenu(this);
+	popContextMenu->setObjectName("mtPopContextMenu");
+	popContextMenu->addAction(addIndAction);
+	popContextMenu->addAction(delIndAction);
+	popContextMenu->addAction(impIndAction);
+	popContextMenu->addAction(expIndAction);
 }
 
 void MT_PopulationWidget::createToolBar(QMainWindow *parent)
