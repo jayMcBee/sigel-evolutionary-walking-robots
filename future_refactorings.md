@@ -249,6 +249,10 @@ touched, because changing one changes behaviour against the reference binary.
   replaced by the old choice. Only with unit tests for `MT_Controller`'s
   switching, loading and enabling in place first.
 
+- [ ] **181. Put the copyright banner in every source file.** Most MetaGP
+  files and some others have none, and the repository is public, so the
+  copyright must stand in every file.
+
 ---
 
 ## 6 · GP engine
