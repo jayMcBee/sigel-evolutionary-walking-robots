@@ -1337,16 +1337,16 @@ Do you want to replace it?]
 
 == EDIT COMMAND ==
   rows=15 MOVE at row 10 duration=[0.01]
-  [modal] class=SIGEL_MasterGUI::SIG_EditCommandDialog title=[Edit Command MOVE]
-  [dialog] class=SIGEL_MasterGUI::SIG_EditCommandDialog title=[Edit Command MOVE] modal=1
-    label  [Command: MOVE]
+  [modal] class=SIGEL_MasterGUI::SIG_EditCommandDialog title=[Edit Command]
+  [dialog] class=SIGEL_MasterGUI::SIG_EditCommandDialog title=[Edit Command] modal=1
+    label  [Command: <b>MOVE</b>]
     label  [Duration:]
     edit   [] text=[0.01] selected=[] focus=1
     button [&OK         ] default=1 enabled=1 focus=0
     button [&Cancel     ] default=0 enabled=1 focus=0
     radio  [Allow] checked=1
     radio  [Disallow] checked=0
-    group  [Allow/Disallow]
+    group  [Availability]
     prefill=[0.01] selected=[]; typing "5" gives [0.015]  (1.3 appends -> 0.015)
     validator QDoubleValidator bottom=-inf top=inf decimals=-1 notation=1 locale=[C] numberOptions=2
     -- C7's 21st validator, the one C11a could not reach
@@ -1364,7 +1364,7 @@ Do you want to replace it?]
 
 == ALLOW A DISALLOWED COMMAND (JMP) ==
   JMP at row 5 duration=[0] (0 means disallowed)
-  [modal] class=SIGEL_MasterGUI::SIG_EditCommandDialog title=[Edit Command JMP]
+  [modal] class=SIGEL_MasterGUI::SIG_EditCommandDialog title=[Edit Command]
     as opened: [Allow] checked=0
     as opened: [Disallow] checked=1
     typed duration [0.007]

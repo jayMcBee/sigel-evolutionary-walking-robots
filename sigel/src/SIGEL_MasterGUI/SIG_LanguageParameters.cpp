@@ -167,8 +167,7 @@ void SIG_LanguageParameters::slotCommandDoubleClicked( QTreeWidgetItem *theItem 
       SIG_EditCommandDialog editCommandDialog( this, "EditCommandDialog", true );
       if( numberOfSelectedCommands == 1 )
 	{
-	  editCommandDialog.setWindowTitle( "Edit Command " + command );
-	  editCommandDialog.textlabelCommand->setText( "Command: " + command );
+	  editCommandDialog.textlabelCommand->setText( "Command: <b>" + command + "</b>" );
 	  if( theExperiment.robot.getLangParam()->hasCommand( command ) )
 	    editCommandDialog.radiobuttonAllow->setChecked( true );
 	  else
@@ -190,7 +189,6 @@ void SIG_LanguageParameters::slotCommandDoubleClicked( QTreeWidgetItem *theItem 
 	  editCommandDialog.lineeditDuration->setText( theItem->text( 2 ) );
 	  editCommandDialog.lineeditDuration->setFocus();
 	  { QLineEdit *le = editCommandDialog.lineeditDuration; QTimer::singleShot( 0, le, [le]{ le->end( false ); } ); }
-	  editCommandDialog.resize( QSize() );
 	}
 
       QTreeWidgetItemIterator listIt2( listviewCommands );

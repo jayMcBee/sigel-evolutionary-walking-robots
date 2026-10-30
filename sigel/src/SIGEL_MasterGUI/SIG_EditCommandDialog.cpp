@@ -61,22 +61,22 @@ SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent,  const char* name
 
     if ( !name )
 	setObjectName( "SIG_EditCommandDialog" );
-    resize( 222, 201 ); 
+    setMinimumWidth( 400 );
     setWindowTitle( tr( "Edit Command" ) );
     SIG_EditCommandDialogLayout = new QVBoxLayout( this ); 
-    SIG_EditCommandDialogLayout->setSpacing( 6 );
-    SIG_EditCommandDialogLayout->setContentsMargins( 11, 11, 11, 11 );
+    SIG_EditCommandDialogLayout->setSpacing( 20 );
+    SIG_EditCommandDialogLayout->setContentsMargins( 16, 16, 16, 16 );
 
     textlabelCommand = new QLabel( this );
     textlabelCommand->setText( tr( "Command:" ) );
     SIG_EditCommandDialogLayout->addWidget( textlabelCommand );
 
     buttongroupAllowDisallow = new QGroupBox( this );
-    buttongroupAllowDisallow->setTitle( tr( "Allow/Disallow" ) );
+    buttongroupAllowDisallow->setTitle( tr( "Availability" ) );
     buttongroupAllowDisallowLayout = new QVBoxLayout( buttongroupAllowDisallow );
     buttongroupAllowDisallowLayout->setAlignment( Qt::AlignTop );
-    buttongroupAllowDisallowLayout->setSpacing( 6 );
-    buttongroupAllowDisallowLayout->setContentsMargins( 11, 11, 11, 11 );
+    buttongroupAllowDisallowLayout->setSpacing( 12 );
+    buttongroupAllowDisallowLayout->setContentsMargins( 16, 16, 16, 16 );
 
     radiobuttonAllow = new QRadioButton( buttongroupAllowDisallow );
     radiobuttonAllow->setText( tr( "Allow" ) );
@@ -89,7 +89,7 @@ SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent,  const char* name
     SIG_EditCommandDialogLayout->addWidget( buttongroupAllowDisallow );
 
     Layout2 = new QHBoxLayout; 
-    Layout2->setSpacing( 6 );
+    Layout2->setSpacing( 12 );
     Layout2->setContentsMargins( 0, 0, 0, 0 );
 
     textlabelDuration = new QLabel( this );
@@ -102,7 +102,7 @@ SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent,  const char* name
     SIG_EditCommandDialogLayout->addLayout( Layout2 );
 
     Layout1 = new QHBoxLayout; 
-    Layout1->setSpacing( 6 );
+    Layout1->setSpacing( 12 );
     Layout1->setContentsMargins( 0, 0, 0, 0 );
     QSpacerItem* spacer = new QSpacerItem( 20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
     Layout1->addItem( spacer );
