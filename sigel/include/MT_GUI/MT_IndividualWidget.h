@@ -11,6 +11,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QStringList>
+#include <QTextStream>
 
 class MT_IndividualsWidget : public MT_IndividualsWidgetBase, public MT_WidgetBase
 {
@@ -55,6 +56,9 @@ private:
 
 	void createActions();
 	void createContextMenu();
+	void importConstantsFromFile( const QString &fileName );
+	int readConstants( QTextStream &stream );
+	void addConstants( QTextStream &stream, int count );
 
 signals:
 	void numConstChanged();

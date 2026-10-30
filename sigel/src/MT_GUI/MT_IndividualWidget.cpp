@@ -260,56 +260,72 @@ void MT_IndividualsWidget::slotImportConstants()
 	// iterate over all selected files
 	for( QStringList::Iterator it = files.begin(); it != files.end(); ++it )
 	{
-		QFile file( *it );
+		importConstantsFromFile( *it );
+	}
+}
 
-		if( file.open( QIODevice::ReadOnly ) )
+void MT_IndividualsWidget::importConstantsFromFile( const QString &fileName )
+{
+	QFile file( fileName );
+
+	if( !file.open( QIODevice::ReadOnly ) )
+	{
+		QMessageBox::critical( this, "Import Constants",
+			"Couldn't open file.\n"
+			"Constants won't be loaded." );
+		return;
+	}
+
+	QTextStream stream( &file );
+	if( !readConstants( stream ) )
+	{
+		QMessageBox::information( this, "Load Constants",
+			"Import operation aborted.\n"
+			"The loaded file is not a valid constants file." );
+	}
+	file.close();
+}
+
+/***
+ * returns the number of constants the file announces, 0 if it is not a
+ * constants file
+ ***/
+int MT_IndividualsWidget::readConstants( QTextStream &stream )
+{
+	QString s;
+	bool found = false;
+	int count = 0;
+	while( !stream.atEnd() ) // iterate the whole file
+	{
+		s = stream.readLine();
+		if( !found && s == "[constants]" )
 		{
-			// file was successfully opened
-			// so read it and fill the datastructures
-			QTextStream stream( &file );
-			QString s;
-			bool found = false;
-			int count = 0;
-			while( !stream.atEnd() ) // iterate the whole file
-			{
-				s = stream.readLine();
-				if( !found && s == "[constants]" )
-				{
-					found = true;
-					s = stream.readLine();
-				}
-				if( found && s == "count" )
-				{
-					s = stream.readLine();
-					int tc = count = s.toInt();
-					QProgressDialog progress( "Loading constants", QString(), 0, count, this );
-					progress.setWindowModality( Qt::ApplicationModal );
-					while( tc && !stream.atEnd() )
-					{
-						progress.setValue( count - tc );
-						s = stream.readLine();
-						constantsListBox->addItem( QString( s ) );
-						tc--;
-						emit numConstChanged();
-					}
-					progress.setValue( count );
-				}
-			}
-			if( !found || !count )
-			{
-				QMessageBox::information( this, "Load Constants",
-					"Import operation aborted.\n"
-					"The loaded file is not a valid constants file." );
-			}
-			file.close();
+			found = true;
+			s = stream.readLine();
 		}
-		else
+		if( found && s == "count" )
 		{
-			QMessageBox::critical( this, "Import Constants",
-				"Couldn't open file.\n"
-				"Constants won't be loaded." );
+			s = stream.readLine();
+			count = s.toInt();
+			addConstants( stream, count );
 		}
 	}
+	return count;
+}
+
+void MT_IndividualsWidget::addConstants( QTextStream &stream, int count )
+{
+	int tc = count;
+	QProgressDialog progress( "Loading constants", QString(), 0, count, this );
+	progress.setWindowModality( Qt::ApplicationModal );
+	while( tc && !stream.atEnd() )
+	{
+		progress.setValue( count - tc );
+		constantsListBox->addItem( stream.readLine() );
+		tc--;
+		emit numConstChanged();
+	}
+	progress.setValue( count );
 }
 
 void MT_IndividualsWidget::slotExportConstants()
