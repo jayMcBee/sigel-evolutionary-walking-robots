@@ -5,13 +5,11 @@
 #include <QPixmap>
 #include <stdlib.h>
 
-MT_ExperimentWidget::MT_ExperimentWidget(QWidget* parent, const char* name, Qt::WindowFlags fl ) 
+MT_ExperimentWidget::MT_ExperimentWidget(QWidget* parent, const char* name)
 	: QTreeWidget( parent )
 {
 	if ( name )
 		setObjectName( QString::fromUtf8( name ) );
-	if ( fl != Qt::WindowFlags() )
-		setWindowFlags( fl );
 
 	// Sorting stays off. Each item goes on top of the list, so the pages show
 	// in reverse order: Strategy first, Statistics last.
