@@ -220,6 +220,9 @@ private:
 	 */
 	void createWidgets( const QString &sigelRoot );
 
+	/** Creates the menus and the menu bar and puts the actions into them. */
+	void createMenus();
+
 	/** Creates the File, View, Individuals and MetaGP toolbars and puts the actions onto them. */
 	void createToolBars();
 
