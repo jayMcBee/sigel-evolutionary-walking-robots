@@ -152,6 +152,10 @@ namespace SIGEL_SlaveGUI
       void slotStopPressed();
 
       void slotRecordingAllowed( bool isAllowed );
+
+    private:
+
+      void createActions();
   };
 
 }

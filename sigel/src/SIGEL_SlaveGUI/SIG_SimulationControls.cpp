@@ -34,6 +34,24 @@ namespace SIGEL_SlaveGUI
       mainWindow(mainWindow),
       simulationRunning( false )
   {
+    createActions();
+
+    connect( playAction,
+	     SIGNAL(triggered()),
+	     SLOT(slotPlayPressed()) );
+
+    connect( stopAction,
+	     SIGNAL(triggered()),
+	     SLOT(slotStopPressed()) );
+
+    QObject::connect( quitAction,
+		      SIGNAL(triggered()),
+		      qApp,
+		      SLOT(quit()) );
+  }
+
+  void SIG_SimulationControls::createActions()
+  {
     char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
 
     QString sigelRootString( sigelRootCString );
@@ -80,19 +98,6 @@ namespace SIGEL_SlaveGUI
     fForwardAction->setStatusTip( "Lets the simulation progress by 5 seconds." );
     alterMovieSettingsAction->setStatusTip( "Alters the movie settings." );
     quitAction->setStatusTip( "Closes the simulation visualization." );
-
-    connect( playAction,
-	     SIGNAL(triggered()),
-	     SLOT(slotPlayPressed()) );
-
-    connect( stopAction,
-	     SIGNAL(triggered()),
-	     SLOT(slotStopPressed()) );
-
-    QObject::connect( quitAction,
-		      SIGNAL(triggered()),
-		      qApp,
-		      SLOT(quit()) );
   }
 
   void SIG_SimulationControls::slotPlayPressed()
