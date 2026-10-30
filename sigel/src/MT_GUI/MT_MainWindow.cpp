@@ -4,20 +4,15 @@
 #include "MT_GUI/MT_MainWindow.h"
 #include "MT_Control/MT_Controller.h"
 
-MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, MT_EstimationState *estimationState, QWidget *parent, const char *name, Qt::WindowFlags f )
-	: QMainWindow( parent, f ), gpManager( manager ), estimationState( estimationState )
+MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, MT_EstimationState *estimationState, QWidget *parent, const char *name )
+	: QMainWindow( parent, Qt::Dialog ), gpManager( manager ), estimationState( estimationState )
 {
 	if( name )
 	{
 		setObjectName( QString::fromUtf8( name ) );
 	}
 
-	// The window TYPE is the masked value; Qt::Dialog also matches a plain
-	// Qt::Window without the mask.
-	if( ( f & Qt::WindowType_Mask ) == Qt::Dialog )
-	{
-		setWindowModality( Qt::ApplicationModal );
-	}
+	setWindowModality( Qt::ApplicationModal );
 	evolRunning = false;
 	this->controller = controller;
 	evolTimer = new QTimer( this );
