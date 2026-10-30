@@ -26,10 +26,29 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	oldPopSize = -1;
 	mainWindow = static_cast<MT_MainWindow*>(parent);
 
+	createActions();
+	createToolBar(parent);
+	createContextMenu();
+
+	// establish connections
+	individualListView->setContextMenuPolicy(Qt::CustomContextMenu);
+	QObject::connect(individualListView, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(slotRButtonClicked(const QPoint&)));
+	QObject::connect(individualListView, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), SLOT(slotCurrentChanged(QTreeWidgetItem*)));
+	QObject::connect(individualListView, SIGNAL(itemSelectionChanged()), SLOT(slotSelectionChanged()));
+	QObject::connect(addIndAction, SIGNAL(triggered()), SLOT(slotAddInd()));
+	QObject::connect(delIndAction, SIGNAL(triggered()), SLOT(slotDelInd()));
+	QObject::connect(impIndAction, SIGNAL(triggered()), SLOT(slotImpInd()));
+	QObject::connect(expIndAction, SIGNAL(triggered()), SLOT(slotExpInd()));
+	QObject::connect(loadPopAction, SIGNAL(triggered()), SLOT(slotLoadPop()));
+	QObject::connect(savePopAction, SIGNAL(triggered()), SLOT(slotSavePop()));
+	QObject::connect(this, SIGNAL(numChanged()), SLOT(slotNumChanged()));
+}
+
+void MT_PopulationWidget::createActions()
+{
 	QString pixPath = ::getenv("SIGEL_ROOT");
 	pixPath += "/pixmaps/";
 
-	// create the actions
 	QIcon icon_addIndAction(QPixmap(pixPath+"addIndividualsSmall.xpm"));
 	icon_addIndAction.addPixmap(QPixmap(pixPath+"addIndividualsLarge.xpm"));
 	addIndAction = new QAction(icon_addIndAction, "&Add...", parentWindow);
@@ -66,22 +85,6 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, 
 	savePopAction = new QAction(icon_savePopAction, "&Save Population", parentWindow);
 	savePopAction->setToolTip("Save Population");
 	savePopAction->setStatusTip("Saves the complete population to a file.");
-
-	createToolBar(parent);
-	createContextMenu();
-
-	// establish connections
-	individualListView->setContextMenuPolicy(Qt::CustomContextMenu);
-	QObject::connect(individualListView, SIGNAL(customContextMenuRequested(const QPoint&)), SLOT(slotRButtonClicked(const QPoint&)));
-	QObject::connect(individualListView, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), SLOT(slotCurrentChanged(QTreeWidgetItem*)));
-	QObject::connect(individualListView, SIGNAL(itemSelectionChanged()), SLOT(slotSelectionChanged()));
-	QObject::connect(addIndAction, SIGNAL(triggered()), SLOT(slotAddInd()));
-	QObject::connect(delIndAction, SIGNAL(triggered()), SLOT(slotDelInd()));
-	QObject::connect(impIndAction, SIGNAL(triggered()), SLOT(slotImpInd()));
-	QObject::connect(expIndAction, SIGNAL(triggered()), SLOT(slotExpInd()));
-	QObject::connect(loadPopAction, SIGNAL(triggered()), SLOT(slotLoadPop()));
-	QObject::connect(savePopAction, SIGNAL(triggered()), SLOT(slotSavePop()));
-	QObject::connect(this, SIGNAL(numChanged()), SLOT(slotNumChanged()));
 }
 
 void MT_PopulationWidget::createContextMenu()
