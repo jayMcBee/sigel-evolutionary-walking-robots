@@ -96,20 +96,17 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt
 	connect(edit17, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
 	connect(edit18, SIGNAL(textChanged(const QString&)), SLOT(slotChangeSlider(const QString&)));
 
-	// create context menu
-	constContextMenu = new QMenu(this);
-	constContextMenu->setObjectName("mtConstContextMenu");
 	delConstAction = new QAction("&Delete", this);
 	delConstAction->setToolTip("Delete Constant");
 	delConstAction->setStatusTip("Deletes the selected constants.");
 	delConstAction->setEnabled(false);
-	constContextMenu->addAction(delConstAction);
 
 	editConstAction = new QAction("&Edit", this);
 	editConstAction->setToolTip("Edit Constant");
 	editConstAction->setStatusTip("Edits the current constant.");
 	editConstAction->setEnabled(false);
-	constContextMenu->addAction(editConstAction);
+
+	createContextMenu();
 
 	connect(delConstAction, SIGNAL(triggered()), SLOT(slotDelConst()));
 	connect(editConstAction, SIGNAL(triggered()), SLOT(slotEditConst()));
@@ -131,6 +128,14 @@ MT_IndividualsWidget::MT_IndividualsWidget(QWidget* parent, const char* name, Qt
 	// create the editor
 	editor = new MT_Editor(constantsListBox);
 	connect(editor, SIGNAL(newText(const QString &)), SLOT(slotChangeConstant(const QString &)));
+}
+
+void MT_IndividualsWidget::createContextMenu()
+{
+	constContextMenu = new QMenu(this);
+	constContextMenu->setObjectName("mtConstContextMenu");
+	constContextMenu->addAction(delConstAction);
+	constContextMenu->addAction(editConstAction);
 }
 
 void MT_IndividualsWidget::onShow(MT_GPManager *manager, MT_EstimationState *estimationState)

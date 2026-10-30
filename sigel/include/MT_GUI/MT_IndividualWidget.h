@@ -51,6 +51,8 @@ private:
 	QAction	*editConstAction;
 	MT_Editor	*editor;
 
+	void createContextMenu();
+
 signals:
 	void numConstChanged();
 };
