@@ -84,6 +84,11 @@ public:
     QString sigelRoot;
 
     /**
+     * Loads the pixmaps and fills the command list and the spinboxes.
+     */
+    void createWidgets();
+
+    /**
      * Adds the command to the list if the experiment allows it.
      */
     void addCommandItem( const QString &command );

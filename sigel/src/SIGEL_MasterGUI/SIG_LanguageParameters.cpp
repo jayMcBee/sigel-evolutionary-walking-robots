@@ -48,8 +48,19 @@ namespace SIGEL_MasterGUI
 SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment )
   : SIG_LanguageParametersBase( parent, name, fl ), theExperiment( theExperiment ), sigelRoot( std::getenv( "SIGEL_ROOT" ) )
 {
+  createWidgets();
+
+  QObject::connect( listviewCommands,
+		    SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
+		    this,
+		    SLOT( slotCommandDoubleClicked( QTreeWidgetItem *) ) );
+}
+
+void SIG_LanguageParameters::createWidgets()
+{
   allow = QPixmap( sigelRoot + "/pixmaps/allow.xpm" );
   disallow = QPixmap( sigelRoot + "/pixmaps/disallow.xpm" );
+
   // get the language parameters out of the experiment
   SIGEL_Robot::SIG_LanguageParameters *languageParameters = theExperiment.robot.getLangParam();
 
@@ -60,11 +71,6 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
 
   spinboxNumberOfRegisters->setValue( languageParameters->getMemorySize() );
   spinboxRegisterWidth->setValue( languageParameters->getRegisterWidth() );
-
-  QObject::connect( listviewCommands,
-		    SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
-		    this,
-		    SLOT( slotCommandDoubleClicked( QTreeWidgetItem *) ) );
 }
 
 void SIG_LanguageParameters::addCommandItem( const QString &command )
