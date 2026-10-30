@@ -220,6 +220,9 @@ private:
 	 */
 	void createWidgets( const QString &sigelRoot );
 
+	/** Creates the actions and fills the two action lists. */
+	void createActions( const QString &sigelRoot );
+
 	/** Creates the menus and the menu bar and puts the actions into them. */
 	void createMenus();
 

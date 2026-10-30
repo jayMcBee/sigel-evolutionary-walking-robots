@@ -57,6 +57,37 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 
 	createWidgets( sigelRoot );
 
+	createActions( sigelRoot );
+
+	QObject::connect( experimentListView,
+			SIGNAL( currentExperimentChanged() ),
+			this,
+			SLOT( slotCurrentExperimentChanged() ) );
+
+	createMenus();
+
+	createToolBars();
+
+	QObject::connect( experimentListView,
+			SIGNAL( isNotEmpty( bool ) ),
+			this,
+			SLOT( slotEnableNoExperimentActions( bool ) ) );
+
+	QObject::connect( experimentListView,
+			SIGNAL( isNotEmpty( bool ) ),
+			this,
+			SLOT( slotShowEmpty( bool ) ) );
+
+	QObject::connect( experimentListView,
+			SIGNAL( evolutionNotRunning( bool ) ),
+			this,
+			SLOT( slotEnableEvolutionRunningActions( bool ) ) );
+
+	statusBar()->showMessage( "Ready.", 5000 );
+}
+
+void SIG_MainWindow::createActions( const QString &sigelRoot )
+{
 	// create the new experiment action
 	QIcon icon_newExperimentAction( QPixmap( sigelRoot + "/pixmaps/newExperimentSmall.xpm" ) );
 	icon_newExperimentAction.addPixmap( QPixmap( sigelRoot + "/pixmaps/newExperimentLarge.xpm" ) );
@@ -526,32 +557,6 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	evolutionRunningActions.append( mtConfigureAction );
 	evolutionRunningActions.append( mtChoiceEvaluatorAction );
 	evolutionRunningActions.append( mtChoiceClassifierAction );
-
-	QObject::connect( experimentListView,
-			SIGNAL( currentExperimentChanged() ),
-			this,
-			SLOT( slotCurrentExperimentChanged() ) );
-
-	createMenus();
-
-	createToolBars();
-
-	QObject::connect( experimentListView,
-			SIGNAL( isNotEmpty( bool ) ),
-			this,
-			SLOT( slotEnableNoExperimentActions( bool ) ) );
-
-	QObject::connect( experimentListView,
-			SIGNAL( isNotEmpty( bool ) ),
-			this,
-			SLOT( slotShowEmpty( bool ) ) );
-
-	QObject::connect( experimentListView,
-			SIGNAL( evolutionNotRunning( bool ) ),
-			this,
-			SLOT( slotEnableEvolutionRunningActions( bool ) ) );
-
-	statusBar()->showMessage( "Ready.", 5000 );
 }
 
 void SIG_MainWindow::createMenus()
