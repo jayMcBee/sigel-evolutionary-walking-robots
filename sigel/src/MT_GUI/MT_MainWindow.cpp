@@ -20,14 +20,30 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	// initialize variables
 	actWidgetID = -1;
 
-	QString pixPath = ::getenv( "SIGEL_ROOT" );
-	pixPath += "/pixmaps/";
-
 	resize( 680, 595 );
 	setWindowTitle( "SIGEL MetaGP" );
 
 	// add a statusbar and a tooltip group
 	statusBar();
+
+	createActions();
+	createToolBars();
+	createWidgets();
+
+	QObject::connect( mtAutoStopAction, SIGNAL( toggled( bool ) ), SLOT( slotAutoStop( bool ) ) );
+	QObject::connect( mtMin, SIGNAL( valueChanged( int ) ), SLOT( slotMinChanged( int ) ) );
+
+	createMenus();
+
+	QObject::connect( experimentWidget, SIGNAL( currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ) ), SLOT( slotRaiseWidget( QTreeWidgetItem * ) ) );
+
+	raiseWidget( 0 );
+}
+
+void MT_MainWindow::createActions()
+{
+	QString pixPath = ::getenv( "SIGEL_ROOT" );
+	pixPath += "/pixmaps/";
 
 	QIcon icon_mtStartEvolutionAction( QPixmap( pixPath + "mt_StartSmall.xpm" ) );
 	icon_mtStartEvolutionAction.addPixmap( QPixmap( pixPath + "mt_StartLarge.xpm" ) );
@@ -86,18 +102,6 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	mtExitAction->setShortcut( Qt::ALT | Qt::Key_F4 );
 	mtExitAction->setStatusTip( "Applies changes and closes the configuration window." );
 	QObject::connect( mtExitAction, SIGNAL( triggered() ), SLOT( close() ) );
-
-	createToolBars();
-	createWidgets();
-
-	QObject::connect( mtAutoStopAction, SIGNAL( toggled( bool ) ), SLOT( slotAutoStop( bool ) ) );
-	QObject::connect( mtMin, SIGNAL( valueChanged( int ) ), SLOT( slotMinChanged( int ) ) );
-
-	createMenus();
-
-	QObject::connect( experimentWidget, SIGNAL( currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ) ), SLOT( slotRaiseWidget( QTreeWidgetItem * ) ) );
-
-	raiseWidget( 0 );
 }
 
 void MT_MainWindow::createMenus()
