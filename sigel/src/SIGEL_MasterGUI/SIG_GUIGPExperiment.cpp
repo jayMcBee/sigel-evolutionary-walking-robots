@@ -43,28 +43,7 @@ namespace SIGEL_MasterGUI
 
   SIG_GUIGPExperiment::SIG_GUIGPExperiment( QString name, QStackedWidget *theWidgetStack, SIG_ExperimentItem *theExperimentItem ) : gpExperiment(), guiGPManager(nullptr), experimentName(name), widgetStack( theWidgetStack ), evolutionRunning(false), generationAtStart(0), experimentItem(theExperimentItem), experimentListView( static_cast<SIG_ExperimentListView *>( theExperimentItem->treeWidget() ) )
 {
-  // build the gp parameter menu
-  menuGPParameter = new QMenu( this );
-  menuGPParameter->addAction( "GP Parameters" );
-
-  // build the simulation parameter menu
-  menuSimulationParameter = new QMenu( this );
-  menuSimulationParameter->addAction( "Import...", this, SLOT( slotSimulationParameterImport() ) );
-  menuSimulationParameter->addAction( "Export...", this, SLOT( slotSimulationParameterExport() ) );
-
-  // build the environment view menu
-  menuEnvironmentView = new QMenu( this );
-  menuEnvironmentView->addAction( "Import...", this, SLOT( slotEnvironmentImport() ) );
-  menuEnvironmentView->addAction( "Export...", this, SLOT( slotEnvironmentExport() ) );
-
-  // build the robot view menu
-  menuRobotView = new QMenu( this );
-  menuRobotView->addAction( "RobotView" );
-
-  // build experiment view menu
-  menuExperimentView = new QMenu( this );
-  startEvolutionAction = menuExperimentView->addAction( "Start", this, SLOT( slotStartEvolution() ) );
-  stopEvolutionAction = menuExperimentView->addAction( "Stop", this, SLOT( slotStopEvolution() ) );
+  createMenus();
 
   gpParameter = new SIG_GPParameter( this , "GPParameter", Qt::WindowFlags(), gpExperiment );
   simulationParameter = new SIG_SimulationParameter( this, "SimulationParameter", Qt::WindowFlags(), gpExperiment);
@@ -92,13 +71,6 @@ namespace SIGEL_MasterGUI
   widgetDict.insert( "Individuals", allIndividualsView );
   widgetDict.insert( experimentName, experimentView );
 
-  // insert the widgets into the menu dictionary
-  menuDict.insert( "GP Parameters" , menuGPParameter );
-  menuDict.insert( "Simulation Parameters", menuSimulationParameter );
-  menuDict.insert( "Environment" , menuEnvironmentView );
-  menuDict.insert( "Robot" , menuRobotView );
-  menuDict.insert( experimentName, menuExperimentView );
-  
   // The bar counts the generation's finished tournaments. Before the first
   // tournaments exist both counts are 0, and the bar shows it is busy.
   QObject::connect( &progressTimer, &QTimer::timeout, this, [this]()
@@ -209,6 +181,39 @@ namespace SIGEL_MasterGUI
 		    this,
 		    SLOT( slotEvolutionNotRunning( bool ) ) );
   getAllOutOfExperiment();
+}
+
+void SIG_GUIGPExperiment::createMenus()
+{
+  // build the gp parameter menu
+  menuGPParameter = new QMenu( this );
+  menuGPParameter->addAction( "GP Parameters" );
+
+  // build the simulation parameter menu
+  menuSimulationParameter = new QMenu( this );
+  menuSimulationParameter->addAction( "Import...", this, SLOT( slotSimulationParameterImport() ) );
+  menuSimulationParameter->addAction( "Export...", this, SLOT( slotSimulationParameterExport() ) );
+
+  // build the environment view menu
+  menuEnvironmentView = new QMenu( this );
+  menuEnvironmentView->addAction( "Import...", this, SLOT( slotEnvironmentImport() ) );
+  menuEnvironmentView->addAction( "Export...", this, SLOT( slotEnvironmentExport() ) );
+
+  // build the robot view menu
+  menuRobotView = new QMenu( this );
+  menuRobotView->addAction( "RobotView" );
+
+  // build experiment view menu
+  menuExperimentView = new QMenu( this );
+  startEvolutionAction = menuExperimentView->addAction( "Start", this, SLOT( slotStartEvolution() ) );
+  stopEvolutionAction = menuExperimentView->addAction( "Stop", this, SLOT( slotStopEvolution() ) );
+
+  // insert the widgets into the menu dictionary
+  menuDict.insert( "GP Parameters" , menuGPParameter );
+  menuDict.insert( "Simulation Parameters", menuSimulationParameter );
+  menuDict.insert( "Environment" , menuEnvironmentView );
+  menuDict.insert( "Robot" , menuRobotView );
+  menuDict.insert( experimentName, menuExperimentView );
 }
 
 SIG_GUIGPExperiment::~SIG_GUIGPExperiment()

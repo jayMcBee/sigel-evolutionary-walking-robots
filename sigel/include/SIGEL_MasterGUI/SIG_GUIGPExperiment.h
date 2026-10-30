@@ -277,6 +277,11 @@ namespace SIGEL_MasterGUI
 
     private:
       /**
+       * Builds the popup menus and stores them in menuDict.
+       */
+      void createMenus();
+
+      /**
        * What to tell the user when the termination condition of this experiment
        * holds at the end of a run that completed no generation. Empty when the
        * condition does not hold.
