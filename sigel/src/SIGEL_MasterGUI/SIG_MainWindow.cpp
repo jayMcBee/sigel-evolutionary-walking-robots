@@ -820,8 +820,7 @@ void SIG_MainWindow::slotChangeFont()
 // make the experiment create the metaGP-System
 void SIG_MainWindow::slotMTUseMT( bool state )
 {
-	// The menu item is greyed during a run; this refuses anyway, because a greyed menu is one layer
-	// and a slot that checks for itself is another.
+	// toggled() also fires on setChecked(), which slotCurrentExperimentChanged calls during a run too.
 	if( experimentListView->isRunning() )
 	{
 		return;
