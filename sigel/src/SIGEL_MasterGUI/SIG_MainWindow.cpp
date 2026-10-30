@@ -570,10 +570,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 	evolutionRunningActions.append( resetAllFitnessValuesAction );
 	evolutionRunningActions.append( visualizeIndividualsAction );
 
-	/**
-	 * Meta-GP menu definition
-	 * begin
-	 **/
+	// Meta-GP menu definition begin
 
 	// create the menu
 	mtMenu = new QMenu( this );
@@ -639,10 +636,7 @@ SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFla
 			this,
 			SLOT( slotCurrentExperimentChanged() ) );
 
-	/**
-	 * Meta-GP menu definition
-	 * end
-	 **/
+	// Meta-GP menu definition end
 
 	fileMenu->setTitle( "&File" );
 	menuBar()->addMenu( fileMenu );
@@ -819,17 +813,15 @@ void SIG_MainWindow::slotChangeFont()
 	}
 }
 
-/********************************
- * MetaGP slots
- ********************************/
+// MetaGP slots
+
 // actual experiment should use the metaGP system
 // set the corresponding flag in actual experiment
 // make the experiment create the metaGP-System
 void SIG_MainWindow::slotMTUseMT( bool state )
 {
-	// The menu item is greyed during a run; this refuses
-	// anyway, because a greyed menu is one layer and a slot that checks for
-	// itself is another.
+	// The menu item is greyed during a run; this refuses anyway, because a greyed menu is one layer
+	// and a slot that checks for itself is another.
 	if( experimentListView->isRunning() )
 	{
 		return;
@@ -843,8 +835,7 @@ void SIG_MainWindow::slotMTUseMT( bool state )
 	}
 }
 
-// show the configuration window for the metaGP-System
-// used by the actual experiment
+// show the configuration window for the metaGP-System used by the actual experiment
 void SIG_MainWindow::slotMTConfigureSystem()
 {
 	// Refuse during a run, as well as greying the menu.
@@ -920,9 +911,8 @@ void SIG_MainWindow::slotCurrentExperimentChanged()
 
 	// currently selected experiment use meta gp-system
 	//
-	// NOT while a run is going. This slot fires one line after the
-	// tree-click emit that APPLIES the run lock
-	// (SIG_ExperimentListView::slotSelectionChanged), so without this
+	// NOT while a run is going. This slot fires one line after the tree-click emit that
+	// APPLIES the run lock (SIG_ExperimentListView::slotSelectionChanged), so without this
 	// check it would hand these two straight back.
 	if( !experimentListView->isRunning() )
 	{
@@ -948,9 +938,8 @@ void SIG_MainWindow::slotEnableNoExperimentActions( bool enable )
 		a->setEnabled( enable );
 	}
 
-	// Most of these actions are also in evolutionRunningActions. During a run,
-	// re-apply the lock after this loop rather than filtering the list, so the
-	// two lists cannot drift apart.
+	// Most of these actions are also in evolutionRunningActions. During a run, re-apply the lock
+	// after this loop rather than filtering the list, so the two lists cannot drift apart.
 	if( enable && experimentListView->isRunning() )
 	{
 		slotEnableEvolutionRunningActions( false );

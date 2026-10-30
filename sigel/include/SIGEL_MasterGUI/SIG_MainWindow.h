@@ -36,17 +36,13 @@
 
 #include "SIGEL_MasterGUI/SIG_ExperimentListView.h"
 
-/**
- * This is the namespace in which all GUI-elements live.
- */
+/** This is the namespace in which all GUI-elements live. */
 namespace SIGEL_MasterGUI
 {
 
 /**
- * The class of the main window of the application.
- *
- * This window contains the menubar, the toolbar and the statusbar.
- * Furthermore it contains the main widget, which is the splitter.
+ * The class of the main window of the application. This window contains the menubar, the toolbar
+ * and the statusbar. Furthermore it contains the main widget, which is the splitter.
  */
 class SIG_MainWindow : public QMainWindow
 {
@@ -55,51 +51,35 @@ class SIG_MainWindow : public QMainWindow
 public:
 
 	/**
-	 * The constructor of the main window.
-	 *
-	 * Here all menus are set up, as well as the splitter with the
-	 * SIG_ExperimentListView on one side and the QStackedWidget on the
-	 * other side.
-	 * @param parent The parent widget of SIG_MainWindow. If 0 (the normal case)
-	 * the widget will get its own window.
+	 * The constructor of the main window. Here all menus are set up, as well as the splitter with
+	 * the SIG_ExperimentListView on one side and the QStackedWidget on the other side.
+	 * @param parent The parent widget of SIG_MainWindow. If 0 (the normal case) the widget will
+	 * get its own window.
 	 * @param name Internal widget name for Qt.
 	 */
 	SIG_MainWindow( QWidget *parent = nullptr, const char *name = nullptr, Qt::WindowFlags f = Qt::Window );
 
 public slots:
-	/**
-	 * Enables or disables every action that requires an experiment.
-	 */
+	/** Enables or disables every action that requires an experiment. */
 	void slotEnableNoExperimentActions( bool enable );
 
-	/**
-	 * Enables or disables every action that must be off while the
-	 * evolution is running.
-	 */
+	/** Enables or disables every action that must be off while the evolution is running. */
 	void slotEnableEvolutionRunningActions( bool enable );
 
-	/**
-	 * This slot is called when the about box has to be shown.
-	 */
+	/** This slot is called when the about box has to be shown. */
 	void slotAbout();
 
 	/**
-	 * This slot is used by the main window to indicate whether there
-	 * are open experiments or not.
-	 *
-	 * If isNotEmpty is false some menu items and toolbar items will be
-	 * disabled. This is done via a QActionGroup.
+	 * This slot is used by the main window to indicate whether there are open experiments or not.
+	 * If isNotEmpty is false some menu items and toolbar items will be disabled. This is done via a
+	 * QActionGroup.
 	 */
 	void slotShowEmpty( bool isNotEmpty );
 
-	/**
-	 * This slot is called whenever the user is about to quit the application.
-	 */
+	/** This slot is called whenever the user is about to quit the application. */
 	void slotAboutToQuit();
 
-	/**
-	 * Asks whether to quit.
-	 */
+	/** Asks whether to quit. */
 	bool askBeforeQuitting();
 
 	void slotUseBigPixmaps();
@@ -109,111 +89,79 @@ public slots:
 	void slotChangeFont();
 
 protected:
-	/**
-	 * The file menu.
-	 *
-	 * Experiment can be created, deleted, loaded and saved here
-	 * for example.
-	 */
+	/** The file menu. Experiment can be created, deleted, loaded and saved here for example. */
 	QMenu *fileMenu;
 
-	/**
-	 * The help menu.
-	 */
+	/** The help menu. */
 	QMenu *helpMenu;
 
-	/**
-	 * The view menu.
-	 */
+	/** The view menu. */
 	QMenu *viewMenu;
 
-	/**
-	 * The optionsMenu;
-	 */
+	/** The optionsMenu; */
 	QMenu *optionsMenu;
 
-	/**
-	 * The actions menu
-	 */
+	/** The actions menu */
 	QMenu *individualsMenu;
 
-	/**
-	 * The toolbar which contains the file actions.
-	 */
+	/** The toolbar which contains the file actions. */
 	QToolBar *fileToolBar;
 
-	/**
-	 * The actions that are disabled when there is no experiment present.
-	 */
+	/** The actions that are disabled when there is no experiment present. */
 	// A plain list: a QAction belongs to at most one QActionGroup.
 	QList<QAction *> noExperimentActions;
 
-	/**
-	 * The actions that are disabled while the evolution is running.
-	 */
+	/** The actions that are disabled while the evolution is running. */
 	QList<QAction *> evolutionRunningActions;
 
 	/**
-	 * The MetaGP system that is checked. slotMTSwitchSystem compares against
-	 * it, because triggered(QAction*) fires on every click.
+	 * The MetaGP system that is checked. slotMTSwitchSystem compares against it, because
+	 * triggered(QAction*) fires on every click.
 	 */
 	QAction *mtSelectedSystem;
 
 protected:
 	/**
-	 * Closing this window quits SIGEL, also when an individual view is still
-	 * open. It refuses during a run and asks before it quits.
+	 * Closing this window quits SIGEL, also when an individual view is still open. It refuses
+	 * during a run and asks before it quits.
 	 */
 	void closeEvent( QCloseEvent *event ) override;
 
 	/**
-	 * The splitter which contains the two main widgets.
-	 *
-	 * The two main widgets are the SIG_ExperimentListView object
-	 * on the left side and the QStackedWidget on the right side
-	 * of the screen.
+	 * The splitter which contains the two main widgets. The two main widgets are the
+	 * SIG_ExperimentListView object on the left side and the QStackedWidget on the right side of
+	 * the screen.
 	 */
 	QSplitter *splitter;
 
 	/**
-	 * The widget stack onto which the widgets are packed.
-	 *
-	 * When a new experiment is created, all widgets belonging to
-	 * this experiment are packed onto this widget stack. Whenever
-	 * a widget is needed to be shown, it is first looked up in the
-	 * widget dictionary, and the displayed on the widget stack.
+	 * The widget stack onto which the widgets are packed. When a new experiment is created, all
+	 * widgets belonging to this experiment are packed onto this widget stack. Whenever a widget is
+	 * needed to be shown, it is first looked up in the widget dictionary, and the displayed on the
+	 * widget stack.
 	 */
 	QStackedWidget *widgetStack;
 
-	/**
-	 * The widget that is displayed if there are no other widgets on
-	 * the widget stack.
-	 */
+	/** The widget that is displayed if there are no other widgets on the widget stack. */
 	QLabel *widgetBase;
 
 	/**
-	 * Saves the menu item item for the menu item with which one can switch to
-	 * using big pixmaps or not.
+	 * Saves the menu item item for the menu item with which one can switch to using big pixmaps or
+	 * not.
 	 */
 	QAction *bigPixmapAction;
 
 	QAction *textLabelsAction;
 
-	/**
-	 * The experiment list view. All experiments are shown in this widget.
-	 */
+	/** The experiment list view. All experiments are shown in this widget. */
 	SIGEL_MasterGUI::SIG_ExperimentListView *experimentListView;
 
 private:
-	/**
-	 * The View and Individuals toolbars.
-	 */
+	/** The View and Individuals toolbars. */
 	QToolBar *viewToolBar;
 	QToolBar *individualsToolBar;
 
-	/**
-	 * The actions of the File menu.
-	 */
+	/** The actions of the File menu. */
 	QAction *newExperimentAction;
 	QAction *cloneExperimentAction;
 	QAction *renameExperimentAction;
@@ -223,9 +171,7 @@ private:
 	QAction *saveExperimentAsAction;
 	QAction *quitProgramAction;
 
-	/**
-	 * The actions of the Import menu.
-	 */
+	/** The actions of the Import menu. */
 	QAction *importGPParametersAction;
 	QAction *importSimulationParametersAction;
 	QAction *importLanguageParametersAction;
@@ -235,9 +181,7 @@ private:
 	QAction *importProgramAction;
 	QAction *importIndividualAction;
 
-	/**
-	 * The actions of the Export menu.
-	 */
+	/** The actions of the Export menu. */
 	QAction *exportGPParametersAction;
 	QAction *exportSimulationParametersAction;
 	QAction *exportLanguageParametersAction;
@@ -247,9 +191,7 @@ private:
 	QAction *exportIndividualAction;
 	QAction *exportToGNUPlotAction;
 
-	/**
-	 * The actions of the View menu.
-	 */
+	/** The actions of the View menu. */
 	QAction *viewPopulationAction;
 	QAction *viewRobotAction;
 	QAction *viewLanguageParametersAction;
@@ -257,17 +199,13 @@ private:
 	QAction *viewSimulationParametersAction;
 	QAction *viewEnvironmentAction;
 
-	/**
-	 * The actions of the Individuals menu.
-	 */
+	/** The actions of the Individuals menu. */
 	QAction *addIndividualsAction;
 	QAction *deleteIndividualsAction;
 	QAction *resetAllFitnessValuesAction;
 	QAction *visualizeIndividualsAction;
 
-	/**
-	 * The Meta-GP definitions
-	 */
+	/** The Meta-GP definitions */
 	QMenu *mtMenu;
 	QToolBar *mtToolBar;
 	QAction *mtUseAction;
@@ -277,15 +215,12 @@ private:
 	QActionGroup *mtChoiceTypeActionGroup;
 
 	/**
-	 * Builds the splitter with the experiment list view on the left and the
-	 * widget stack on the right, which shows the "no experiment" picture first.
+	 * Builds the splitter with the experiment list view on the left and the widget stack on the
+	 * right, which shows the "no experiment" picture first.
 	 */
 	void createWidgets( const QString &sigelRoot );
 
-	/**
-	 * Creates the File, View, Individuals and MetaGP toolbars and puts the
-	 * actions onto them.
-	 */
+	/** Creates the File, View, Individuals and MetaGP toolbars and puts the actions onto them. */
 	void createToolBars();
 
 public slots:
