@@ -654,7 +654,7 @@ void SIG_MainWindow::createMenus()
 
 	// create the action menu
 	individualsMenu = new QMenu( this );
-	individualsMenu->setObjectName( "actionsMenu" );
+	individualsMenu->setObjectName( "individualsMenu" );
 	individualsMenu->addAction( addIndividualsAction );
 	individualsMenu->addAction( deleteIndividualsAction );
 	individualsMenu->addAction( resetAllFitnessValuesAction );
@@ -665,7 +665,7 @@ void SIG_MainWindow::createMenus()
 
 	// create the Meta-GP menu
 	mtMenu = new QMenu( this );
-	mtMenu->setObjectName( "helpMenu" );
+	mtMenu->setObjectName( "mtMenu" );
 	mtMenu->addAction( mtUseAction );
 	mtMenu->addAction( mtConfigureAction );
 
