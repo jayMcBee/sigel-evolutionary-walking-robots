@@ -147,6 +147,9 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 4 · The interface
 
+- [ ] **182. Clean up the edit-command dialog,** `SIG_EditCommandDialog`, opened
+  from the language parameters.
+
 - [ ] **107. Review `SIG_GPPopulation::readFromFile` with the maintainer,**
   deciding each change before it is made. The method is long and hard to
   read.
