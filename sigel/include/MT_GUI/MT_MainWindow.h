@@ -33,40 +33,40 @@ class MT_MainWindow : public QMainWindow
 	friend class MT_Controller;
 
 public:
-	MT_MainWindow(MT_Controller *controller, MT_GPManager *manager, MT_EstimationState *estimationState, QWidget * parent = nullptr, const char * name = nullptr, Qt::WindowFlags f = Qt::Dialog );
+	MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, MT_EstimationState *estimationState, QWidget *parent = nullptr, const char *name = nullptr, Qt::WindowFlags f = Qt::Dialog );
 	~MT_MainWindow() override;
 
-	MT_GPManager* getManager();
-	void enforceUpdate(bool GUI);
-	int calculateTournamentSize(int pSize, int oSize, int oTSize);
+	MT_GPManager *getManager();
+	void enforceUpdate( bool GUI );
+	int calculateTournamentSize( int pSize, int oSize, int oTSize );
 
 public slots:
-	void slotRaiseWidget(QTreeWidgetItem *item);
-	void slotEvolutionStatus(bool running);
+	void slotRaiseWidget( QTreeWidgetItem *item );
+	void slotEvolutionStatus( bool running );
 
 private slots:
 	void slotStartEvolution();
 	void slotStopEvolution();
-	void slotAutoStop(bool on);
-	void slotMinChanged(int nvalue);
+	void slotAutoStop( bool on );
+	void slotMinChanged( int nvalue );
 
 private:
-	MT_WidgetBase* widgets[6];
+	MT_WidgetBase *widgets[6];
 	int actWidgetID;
-	QSplitter	*splitter;
-	QStackedWidget	*widgetStack;
-	MT_SearchWidget		*searchWidget;
-	MT_SelectionWidget	*selectionWidget;
-	MT_ExperimentWidget	*experimentWidget;
-	MT_EstimationWidget	*estimationWidget;
+	QSplitter *splitter;
+	QStackedWidget *widgetStack;
+	MT_SearchWidget *searchWidget;
+	MT_SelectionWidget *selectionWidget;
+	MT_ExperimentWidget *experimentWidget;
+	MT_EstimationWidget *estimationWidget;
 	MT_PopulationWidget *populationWidget;
-	MT_StatisticsWidget	*statisticsWidget;
+	MT_StatisticsWidget *statisticsWidget;
 	MT_IndividualsWidget *individualsWidget;
 	MT_Controller *controller;
 
-	QToolBar	*mainToolBar;
-	QMenu	*fileMenu;
-	QAction	*mtExitAction;
+	QToolBar *mainToolBar;
+	QMenu *fileMenu;
+	QAction *mtExitAction;
 	QAction *mtSaveAction;
 	QAction *mtLoadAction;
 	QAction *mtDefaultAction;
@@ -86,11 +86,11 @@ private:
 	MT_GPManager *gpManager;
 	MT_EstimationState *estimationState;
 
-	void raiseWidget(int pos);
+	void raiseWidget( int pos );
 
 protected:
-	void closeEvent(QCloseEvent *e) override;
-	void showEvent(QShowEvent *e) override;
+	void closeEvent( QCloseEvent *e ) override;
+	void showEvent( QShowEvent *e ) override;
 };
 
 #endif // MT_GUI_MT_MAINWINDOW_H
