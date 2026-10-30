@@ -54,158 +54,10 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
   SIGEL_Robot::SIG_LanguageParameters *languageParameters = theExperiment.robot.getLangParam();
 
   // update the list
-  QTreeWidgetItem *newItem;
+  const QStringList commands = { "SUB", "SENSE", "NOP", "MUL", "MOVE", "MOD", "MIN", "MAX", "LOAD", "JMP", "DIV", "DELAY", "COPY", "CMP", "ADD" };
+  for( const QString &command : commands )
+    addCommandItem( command );
 
-  if( languageParameters->hasCommand( "SUB" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "SUB" );
-      QString duration = QString::number( languageParameters->getCommand( "SUB" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-  
-  if( languageParameters->hasCommand( "SENSE" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "SENSE" );
-      QString duration = QString::number( languageParameters->getCommand( "SENSE" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-  
-  if( languageParameters->hasCommand( "NOP" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "NOP" );
-      QString duration = QString::number( languageParameters->getCommand( "NOP" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-  
-  if( languageParameters->hasCommand( "MUL" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "MUL" );
-      QString duration = QString::number( languageParameters->getCommand( "MUL" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-  
-  if( languageParameters->hasCommand( "MOVE" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "MOVE" );
-      QString duration = QString::number( languageParameters->getCommand( "MOVE" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-  
-  if( languageParameters->hasCommand( "MOD" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "MOD" );
-      QString duration = QString::number( languageParameters->getCommand( "MOD" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-  
-  if( languageParameters->hasCommand( "MIN" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "MIN" );
-      QString duration = QString::number( languageParameters->getCommand( "MIN" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-  
-  if( languageParameters->hasCommand( "MAX" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "MAX" );
-      QString duration = QString::number( languageParameters->getCommand( "MAX" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-  
-  if( languageParameters->hasCommand( "LOAD" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "LOAD" );
-      QString duration = QString::number( languageParameters->getCommand( "LOAD" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-
-  if( languageParameters->hasCommand( "JMP" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "JMP" );
-      QString duration = QString::number( languageParameters->getCommand( "JMP" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-
-  if( languageParameters->hasCommand( "DIV" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "DIV" );
-      QString duration = QString::number( languageParameters->getCommand( "DIV" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-
-  if( languageParameters->hasCommand( "DELAY" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "DELAY" );
-      QString duration = QString::number( languageParameters->getCommand( "DELAY" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-
-  if( languageParameters->hasCommand( "COPY" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "COPY" );
-      QString duration = QString::number( languageParameters->getCommand( "COPY" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-
-  if( languageParameters->hasCommand( "CMP" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "CMP" );
-      QString duration = QString::number( languageParameters->getCommand( "CMP" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-
-  if( languageParameters->hasCommand( "ADD" ) )
-    {
-      newItem  = new QTreeWidgetItem();
-      listviewCommands->insertTopLevelItem( 0, newItem );
-      newItem->setIcon( 0, QIcon( allow ) );
-      newItem->setText( 1, "ADD" );
-      QString duration = QString::number( languageParameters->getCommand( "ADD" )->getDuration(), 'g', 10 );
-      newItem->setText( 2, duration );
-    }
-  
   spinboxNumberOfRegisters->setValue( languageParameters->getMemorySize() );
   spinboxRegisterWidth->setValue( languageParameters->getRegisterWidth() );
 
@@ -213,6 +65,21 @@ SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* na
 		    SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
 		    this,
 		    SLOT( slotCommandDoubleClicked( QTreeWidgetItem *) ) );
+}
+
+void SIG_LanguageParameters::addCommandItem( const QString &command )
+{
+  SIGEL_Robot::SIG_LanguageParameters *languageParameters = theExperiment.robot.getLangParam();
+
+  if( !languageParameters->hasCommand( command ) )
+    return;
+
+  QTreeWidgetItem *newItem = new QTreeWidgetItem();
+  listviewCommands->insertTopLevelItem( 0, newItem );
+  newItem->setIcon( 0, QIcon( allow ) );
+  newItem->setText( 1, command );
+  QString duration = QString::number( languageParameters->getCommand( command )->getDuration(), 'g', 10 );
+  newItem->setText( 2, duration );
 }
 
 void SIG_LanguageParameters::putIntoExperiment()

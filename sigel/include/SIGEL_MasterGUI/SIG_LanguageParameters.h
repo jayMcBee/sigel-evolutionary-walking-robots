@@ -82,6 +82,11 @@ public:
     QPixmap allow;
     QPixmap disallow;
     QString sigelRoot;
+
+    /**
+     * Adds the command to the list if the experiment allows it.
+     */
+    void addCommandItem( const QString &command );
 };
 
 }
