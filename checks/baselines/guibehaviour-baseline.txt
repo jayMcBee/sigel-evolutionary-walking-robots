@@ -249,7 +249,7 @@
 #
 # ---------------------------------------------------------------------------
 #
-# WHY THE MetaGP WINDOW IS 680x654. MT_MainWindow asks for resize(680, 595) and
+# WHY THE MetaGP WINDOW IS 900x654. MT_MainWindow asks for resize(900, 600) and
 # does not get it on either version: the oracle measured 1.3 opening at 680x605
 # with a WM_NORMAL_HINTS minimum of 625x605, so Qt 2 already overrode the resize
 # to satisfy its own layout. 1.3 cannot be dragged shorter than it opens, and at
@@ -1561,7 +1561,7 @@ Do you want to replace it?]
   [modal] class=MT_MainWindow title=[SIGEL MetaGP]
   [modal on configure] MT_MainWindow [SIGEL MetaGP]
     (left open -- this is the window under test)
-  [window] class=MT_MainWindow title=[SIGEL MetaGP] 680x654 modal=1
+  [window] class=MT_MainWindow title=[SIGEL MetaGP] 900x654 modal=1
   [toolbar] mtFileToolBar          title=[MT File]
     action &Default               enabled=1 checkable=0 checked=0 icon=1 sizes=2
     ---

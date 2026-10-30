@@ -20,7 +20,7 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	// initialize variables
 	actWidgetID = -1;
 
-	resize( 680, 595 );
+	resize( 900, 600 );
 	setWindowTitle( "SIGEL MetaGP" );
 
 	// add a statusbar and a tooltip group
