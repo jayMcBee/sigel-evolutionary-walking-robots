@@ -29,21 +29,9 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	// add a statusbar and a tooltip group
 	statusBar();
 
-	// create tool- and menubar
+	// create the menu
 	fileMenu = new QMenu( this );
 	fileMenu->setObjectName( "mtFileMenu" );
-	mainToolBar = new QToolBar( this );
-	mainToolBar->setObjectName( "mtFileToolBar" );
-	mainToolBar->setWindowTitle( "MT File" );
-
-	// Without this an undocked toolbar floats at 0,0 over the central widget.
-	addToolBar( Qt::TopToolBarArea, mainToolBar );
-
-	// toolbar for evolution control
-	evolCtrlToolbar = new QToolBar( this );
-	evolCtrlToolbar->setObjectName( "mtEvolutionToolBar" );
-	addToolBar( Qt::TopToolBarArea, evolCtrlToolbar );
-	evolCtrlToolbar->setWindowTitle( "MT Evolution Control" );
 
 	QIcon icon_mtStartEvolutionAction( QPixmap( pixPath + "mt_StartSmall.xpm" ) );
 	icon_mtStartEvolutionAction.addPixmap( QPixmap( pixPath + "mt_StartLarge.xpm" ) );
@@ -51,7 +39,6 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	mtStartEvolutionAction->setToolTip( "Start evolution" );
 	mtStartEvolutionAction->setStatusTip( "Starts the evolution without running SIGEL." );
 	mtStartEvolutionAction->setEnabled( false );
-	evolCtrlToolbar->addAction( mtStartEvolutionAction );
 	QObject::connect( mtStartEvolutionAction, SIGNAL( triggered() ), SLOT( slotStartEvolution() ) );
 
 	QIcon icon_mtStopEvolutionAction( QPixmap( pixPath + "mt_StopSmall.xpm" ) );
@@ -60,8 +47,92 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	mtStopEvolutionAction->setToolTip( "Stop evolution" );
 	mtStopEvolutionAction->setStatusTip( "Stops the evolution." );
 	mtStopEvolutionAction->setEnabled( false );
-	evolCtrlToolbar->addAction( mtStopEvolutionAction );
 	QObject::connect( mtStopEvolutionAction, SIGNAL( triggered() ), SLOT( slotStopEvolution() ) );
+
+	QIcon icon_mtAutoStopAction( QPixmap( pixPath + "mt_AutoStopSmall.xpm" ) );
+	icon_mtAutoStopAction.addPixmap( QPixmap( pixPath + "mt_AutoStopLarge.xpm" ) );
+	mtAutoStopAction = new QAction( icon_mtAutoStopAction, "Manual/timed stop", this );
+	mtAutoStopAction->setToolTip( "Manual/timed stop" );
+	mtAutoStopAction->setCheckable( true );
+	mtAutoStopAction->setStatusTip( "If on, the evolution stops when the given time has run out." );
+	mtAutoStopAction->setChecked( false );
+
+	// create the actions for the menu and the toolbar
+	// - restore default settings
+	QIcon icon_mtDefaultAction( QPixmap( pixPath + "newExperimentSmall.xpm" ) );
+	icon_mtDefaultAction.addPixmap( QPixmap( pixPath + "newExperimentLarge.xpm" ) );
+	mtDefaultAction = new QAction( icon_mtDefaultAction, "&Default", this );
+	mtDefaultAction->setToolTip( "Default" );
+	mtDefaultAction->setShortcut( Qt::CTRL | Qt::Key_D );
+	mtDefaultAction->setStatusTip( "Restores the default settings." );
+	fileMenu->addAction( mtDefaultAction );
+	fileMenu->addSeparator();
+
+	// - load settings
+	QIcon icon_mtLoadAction( QPixmap( pixPath + "openExperimentSmall.xpm" ) );
+	icon_mtLoadAction.addPixmap( QPixmap( pixPath + "openExperimentLarge.xpm" ) );
+	mtLoadAction = new QAction( icon_mtLoadAction, "&Open...", this );
+	mtLoadAction->setToolTip( "Open" );
+	mtLoadAction->setShortcut( Qt::CTRL | Qt::Key_O );
+	mtLoadAction->setStatusTip( "Opens a settings file." );
+	fileMenu->addAction( mtLoadAction );
+
+	// - save settings
+	QIcon icon_mtSaveAction( QPixmap( pixPath + "saveExperimentSmall.xpm" ) );
+	icon_mtSaveAction.addPixmap( QPixmap( pixPath + "saveExperimentLarge.xpm" ) );
+	mtSaveAction = new QAction( icon_mtSaveAction, "&Save...", this );
+	mtSaveAction->setToolTip( "Save" );
+	mtSaveAction->setShortcut( Qt::CTRL | Qt::Key_S );
+	mtSaveAction->setStatusTip( "Saves the current settings to a file." );
+	fileMenu->addAction( mtSaveAction );
+	fileMenu->addSeparator();
+
+	// - close window
+	QIcon icon_mtExitAction( QPixmap( pixPath + "quitApplicationSmall.xpm" ) );
+	icon_mtExitAction.addPixmap( QPixmap( pixPath + "quitApplicationLarge.xpm" ) );
+	mtExitAction = new QAction( icon_mtExitAction, "E&xit", this );
+	mtExitAction->setToolTip( "Exit" );
+	mtExitAction->setShortcut( Qt::ALT | Qt::Key_F4 );
+	mtExitAction->setStatusTip( "Applies changes and closes the configuration window." );
+	fileMenu->addAction( mtExitAction );
+	QObject::connect( mtExitAction, SIGNAL( triggered() ), SLOT( close() ) );
+
+	createToolBars();
+	createWidgets();
+
+	QObject::connect( mtAutoStopAction, SIGNAL( toggled( bool ) ), SLOT( slotAutoStop( bool ) ) );
+	QObject::connect( mtMin, SIGNAL( valueChanged( int ) ), SLOT( slotMinChanged( int ) ) );
+
+	fileMenu->setTitle( "&File" );
+	menuBar()->addMenu( fileMenu );
+
+	QObject::connect( experimentWidget, SIGNAL( currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ) ), SLOT( slotRaiseWidget( QTreeWidgetItem * ) ) );
+
+	raiseWidget( 0 );
+}
+
+void MT_MainWindow::createToolBars()
+{
+	mainToolBar = new QToolBar( this );
+	mainToolBar->setObjectName( "mtFileToolBar" );
+	mainToolBar->setWindowTitle( "MT File" );
+
+	// Without this an undocked toolbar floats at 0,0 over the central widget.
+	addToolBar( Qt::TopToolBarArea, mainToolBar );
+	mainToolBar->addAction( mtDefaultAction );
+	mainToolBar->addSeparator();
+	mainToolBar->addAction( mtLoadAction );
+	mainToolBar->addAction( mtSaveAction );
+	mainToolBar->addSeparator();
+	mainToolBar->addAction( mtExitAction );
+
+	// toolbar for evolution control
+	evolCtrlToolbar = new QToolBar( this );
+	evolCtrlToolbar->setObjectName( "mtEvolutionToolBar" );
+	addToolBar( Qt::TopToolBarArea, evolCtrlToolbar );
+	evolCtrlToolbar->setWindowTitle( "MT Evolution Control" );
+	evolCtrlToolbar->addAction( mtStartEvolutionAction );
+	evolCtrlToolbar->addAction( mtStopEvolutionAction );
 
 	mtEvolutionStatus = new QLabel( evolCtrlToolbar );
 	mtEvolutionStatus->setObjectName( "mtEvolStatus" );
@@ -71,13 +142,6 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	evolCtrlToolbar->addWidget( mtEvolutionStatus );
 
 	evolCtrlToolbar->addSeparator();
-	QIcon icon_mtAutoStopAction( QPixmap( pixPath + "mt_AutoStopSmall.xpm" ) );
-	icon_mtAutoStopAction.addPixmap( QPixmap( pixPath + "mt_AutoStopLarge.xpm" ) );
-	mtAutoStopAction = new QAction( icon_mtAutoStopAction, "Manual/timed stop", this );
-	mtAutoStopAction->setToolTip( "Manual/timed stop" );
-	mtAutoStopAction->setCheckable( true );
-	mtAutoStopAction->setStatusTip( "If on, the evolution stops when the given time has run out." );
-	mtAutoStopAction->setChecked( false );
 	evolCtrlToolbar->addAction( mtAutoStopAction );
 
 	// max timed evolution duration is set to 24 days because the duration
@@ -101,63 +165,6 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	mtTime2->setText( "m " );
 	evolCtrlToolbar->addWidget( mtMin );
 	evolCtrlToolbar->addWidget( mtTime2 );
-	QObject::connect( mtAutoStopAction, SIGNAL( toggled( bool ) ), SLOT( slotAutoStop( bool ) ) );
-	QObject::connect( mtMin, SIGNAL( valueChanged( int ) ), SLOT( slotMinChanged( int ) ) );
-
-	createWidgets();
-
-	// create the actions for the menu and the toolbar
-	// - restore default settings
-	QIcon icon_mtDefaultAction( QPixmap( pixPath + "newExperimentSmall.xpm" ) );
-	icon_mtDefaultAction.addPixmap( QPixmap( pixPath + "newExperimentLarge.xpm" ) );
-	mtDefaultAction = new QAction( icon_mtDefaultAction, "&Default", this );
-	mtDefaultAction->setToolTip( "Default" );
-	mtDefaultAction->setShortcut( Qt::CTRL | Qt::Key_D );
-	mtDefaultAction->setStatusTip( "Restores the default settings." );
-	fileMenu->addAction( mtDefaultAction );
-	mainToolBar->addAction( mtDefaultAction );
-	fileMenu->addSeparator();
-	mainToolBar->addSeparator();
-
-	// - load settings
-	QIcon icon_mtLoadAction( QPixmap( pixPath + "openExperimentSmall.xpm" ) );
-	icon_mtLoadAction.addPixmap( QPixmap( pixPath + "openExperimentLarge.xpm" ) );
-	mtLoadAction = new QAction( icon_mtLoadAction, "&Open...", this );
-	mtLoadAction->setToolTip( "Open" );
-	mtLoadAction->setShortcut( Qt::CTRL | Qt::Key_O );
-	mtLoadAction->setStatusTip( "Opens a settings file." );
-	fileMenu->addAction( mtLoadAction );
-	mainToolBar->addAction( mtLoadAction );
-
-	// - save settings
-	QIcon icon_mtSaveAction( QPixmap( pixPath + "saveExperimentSmall.xpm" ) );
-	icon_mtSaveAction.addPixmap( QPixmap( pixPath + "saveExperimentLarge.xpm" ) );
-	mtSaveAction = new QAction( icon_mtSaveAction, "&Save...", this );
-	mtSaveAction->setToolTip( "Save" );
-	mtSaveAction->setShortcut( Qt::CTRL | Qt::Key_S );
-	mtSaveAction->setStatusTip( "Saves the current settings to a file." );
-	fileMenu->addAction( mtSaveAction );
-	mainToolBar->addAction( mtSaveAction );
-	fileMenu->addSeparator();
-	mainToolBar->addSeparator();
-
-	// - close window
-	QIcon icon_mtExitAction( QPixmap( pixPath + "quitApplicationSmall.xpm" ) );
-	icon_mtExitAction.addPixmap( QPixmap( pixPath + "quitApplicationLarge.xpm" ) );
-	mtExitAction = new QAction( icon_mtExitAction, "E&xit", this );
-	mtExitAction->setToolTip( "Exit" );
-	mtExitAction->setShortcut( Qt::ALT | Qt::Key_F4 );
-	mtExitAction->setStatusTip( "Applies changes and closes the configuration window." );
-	fileMenu->addAction( mtExitAction );
-	mainToolBar->addAction( mtExitAction );
-	QObject::connect( mtExitAction, SIGNAL( triggered() ), SLOT( close() ) );
-
-	fileMenu->setTitle( "&File" );
-	menuBar()->addMenu( fileMenu );
-
-	QObject::connect( experimentWidget, SIGNAL( currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ) ), SLOT( slotRaiseWidget( QTreeWidgetItem * ) ) );
-
-	raiseWidget( 0 );
 }
 
 void MT_MainWindow::createWidgets()
