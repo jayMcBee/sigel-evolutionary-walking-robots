@@ -35,6 +35,7 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	mainToolBar = new QToolBar( this );
 	mainToolBar->setObjectName( "mtFileToolBar" );
 	mainToolBar->setWindowTitle( "MT File" );
+
 	// Without this an undocked toolbar floats at 0,0 over the central widget.
 	addToolBar( Qt::TopToolBarArea, mainToolBar );
 
@@ -65,6 +66,7 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	mtEvolutionStatus = new QLabel( evolCtrlToolbar );
 	mtEvolutionStatus->setObjectName( "mtEvolStatus" );
 	mtEvolutionStatus->setText( " stopped " );
+
 	// A child parented to a toolbar is an overlay unless addWidget is called.
 	evolCtrlToolbar->addWidget( mtEvolutionStatus );
 
