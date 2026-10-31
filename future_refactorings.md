@@ -188,12 +188,6 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 5 · MetaGP
 
-- [ ] **142. Name the crossover points in `MT_Search::crossover`.** The list
-  `XPoints` from `MT_Randomizer::getRandomXPoints` is read by bare index:
-  `[0]` is the number of crossover points, `[1]` to `[6]` are the first,
-  second and third point in the first and the second individual. Only a
-  comment says so. Use an enum for the indices.
-
 - [ ] **143. Name the types of genesis of a MetaGP individual.**
   `MT_Individual::setTypOfGenesis` takes a bare number: 1, 2 and 3 for a
   crossover with that many points, 4 for reproduction, 5 for a parent that

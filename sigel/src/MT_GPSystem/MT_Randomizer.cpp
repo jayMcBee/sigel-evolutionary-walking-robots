@@ -10,8 +10,8 @@ MT_Randomizer::MT_Randomizer()
 // initialization
 	LastError = MT_ErrorCode::None;
 
-	RandomXPoints.resize(7);
-	for (int i=0; i<7; i++)
+	RandomXPoints.resize(CrossoverPointIndexCount);
+	for (int i=0; i<CrossoverPointIndexCount; i++)
 		RandomXPoints[i]=0;
 	
 	ParentSize =10;
@@ -45,8 +45,8 @@ MT_Randomizer::MT_Randomizer(QTextStream &File)
 	srand( static_cast<unsigned>(time( nullptr )) );
 
 	LastError = MT_ErrorCode::None;
-	RandomXPoints.resize(7);
-	for (int i=0; i<7; i++)
+	RandomXPoints.resize(CrossoverPointIndexCount);
+	for (int i=0; i<CrossoverPointIndexCount; i++)
 		RandomXPoints[i]=0;
 
 	QString Randomizer( "Randomizer:" );
@@ -493,38 +493,38 @@ QList<int> * MT_Randomizer::getRandomXPoints(int SizeIndi1, int SizeIndi2)
 	else 
 		NumberofXPoints =0; // Since the individuals are so small, only one crossover point is chosen
 
-	RandomXPoints[0]=NumberofXPoints;
+	RandomXPoints[AdditionalPointCount]=NumberofXPoints;
 
 	switch (NumberofXPoints)
 	{
 		case 0: 
 			{
 				// 1 XPoint
-				RandomXPoints[1]= getRandomInteger(SizeIndi1)+1;
-				RandomXPoints[2]= getRandomInteger(SizeIndi2)+1;
+				RandomXPoints[ParentOneFirstPoint]= getRandomInteger(SizeIndi1)+1;
+				RandomXPoints[ParentTwoFirstPoint]= getRandomInteger(SizeIndi2)+1;
 			}
 			break;
 		case 1: 
 			{
 				// 2 XPoints
-				RandomXPoints[1]= getRandomInteger(SizeIndi1-1)+1;
-				RandomXPoints[2]= getRandomInteger(SizeIndi2-1)+1;
+				RandomXPoints[ParentOneFirstPoint]= getRandomInteger(SizeIndi1-1)+1;
+				RandomXPoints[ParentTwoFirstPoint]= getRandomInteger(SizeIndi2-1)+1;
 
-				RandomXPoints[3]= RandomXPoints[1] + 1 + getRandomInteger(SizeIndi1-RandomXPoints[1]-1);
-				RandomXPoints[4]= RandomXPoints[2] + 1 + getRandomInteger(SizeIndi2-RandomXPoints[2]-1);
+				RandomXPoints[ParentOneSecondPoint]= RandomXPoints[ParentOneFirstPoint] + 1 + getRandomInteger(SizeIndi1-RandomXPoints[ParentOneFirstPoint]-1);
+				RandomXPoints[ParentTwoSecondPoint]= RandomXPoints[ParentTwoFirstPoint] + 1 + getRandomInteger(SizeIndi2-RandomXPoints[ParentTwoFirstPoint]-1);
 			}
 			break;
 		case 2:
 			{
 				// 3 XPoints
-				RandomXPoints[1]= getRandomInteger(SizeIndi1-2)+1;
-				RandomXPoints[2]= getRandomInteger(SizeIndi2-2)+1;
+				RandomXPoints[ParentOneFirstPoint]= getRandomInteger(SizeIndi1-2)+1;
+				RandomXPoints[ParentTwoFirstPoint]= getRandomInteger(SizeIndi2-2)+1;
 
-				RandomXPoints[3]= RandomXPoints[1] + 1 + getRandomInteger(SizeIndi1-RandomXPoints[1]-2);
-				RandomXPoints[4]= RandomXPoints[2] + 1 + getRandomInteger(SizeIndi2-RandomXPoints[2]-2);
+				RandomXPoints[ParentOneSecondPoint]= RandomXPoints[ParentOneFirstPoint] + 1 + getRandomInteger(SizeIndi1-RandomXPoints[ParentOneFirstPoint]-2);
+				RandomXPoints[ParentTwoSecondPoint]= RandomXPoints[ParentTwoFirstPoint] + 1 + getRandomInteger(SizeIndi2-RandomXPoints[ParentTwoFirstPoint]-2);
 
-				RandomXPoints[5]= RandomXPoints[3] + 1 + getRandomInteger(SizeIndi1-RandomXPoints[3]-1);
-				RandomXPoints[6]= RandomXPoints[4] + 1 + getRandomInteger(SizeIndi2-RandomXPoints[4]-1);
+				RandomXPoints[ParentOneThirdPoint]= RandomXPoints[ParentOneSecondPoint] + 1 + getRandomInteger(SizeIndi1-RandomXPoints[ParentOneSecondPoint]-1);
+				RandomXPoints[ParentTwoThirdPoint]= RandomXPoints[ParentTwoSecondPoint] + 1 + getRandomInteger(SizeIndi2-RandomXPoints[ParentTwoSecondPoint]-1);
 			}
 			break;
 	}

@@ -5,6 +5,7 @@
 #include <QList>
 #include "MT_GPSystem/MT_Operand.h"	
 #include "MT_GPSystem/MT_Instruction.h"
+#include "MT_GPSystem/MT_CrossoverPointIndex.h"
 #include "MT_GPSystem/MT_ErrorCode.h"
 
 #include <qstring.h>
