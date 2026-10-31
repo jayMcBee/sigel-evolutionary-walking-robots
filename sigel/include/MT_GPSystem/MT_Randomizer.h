@@ -3,7 +3,7 @@
 
 #include <QTextStream>
 #include <QList>
-#include "MT_GPSystem/MT_Operand.h"	
+#include "MT_GPSystem/MT_Operand.h"
 #include "MT_GPSystem/MT_Instruction.h"
 #include "MT_GPSystem/MT_CrossoverPointIndex.h"
 #include "MT_GPSystem/MT_ErrorCode.h"
@@ -14,80 +14,80 @@
 #include <time.h>
 #include <math.h>
 
-/* the Randomizer supply "correct" Coincidence to the whole GP-System 
-* it's contain a lot of GP parameters 
+/* the Randomizer supply "correct" Coincidence to the whole GP-System
+* it's contain a lot of GP parameters
 */
-class MT_Randomizer  
+class MT_Randomizer
 {
 public:
 
 	/******* administrative methods *******/
-	MT_Randomizer (QTextStream &File);
+	MT_Randomizer( QTextStream &File );
 	MT_Randomizer();
 	virtual ~MT_Randomizer() = default;
-	void writeToFileRandi (QTextStream &File);
-	void loadSetup (QTextStream &File);
-	
+	void writeToFileRandi( QTextStream &File );
+	void loadSetup( QTextStream &File );
+
 	/******* special method for supply random *******/
-	
+
 	/*supply a random search operator
 	* 1 indicate search per recombination (Crossover)
-	* 2 indicate search per mutation 
+	* 2 indicate search per mutation
 	* 3 indicate search per reproduction (Copy)
 	*/
 	int getRandomSOperator();
-	
+
 	/* supply a ppinter of the XPointarray, which contain the posistion for a crossover event
 	*/
-	QList<int>* getRandomXPoints (int SizeIndi1, int SizeIndi2);
-	
+	QList<int> * getRandomXPoints( int SizeIndi1, int SizeIndi2 );
+
 	/* serve the random mutate;
 	* supply an answer, if a program line or element of a line should mutate */
-	bool answerMutateLine ();
+	bool answerMutateLine();
 	bool answerMutateElement();
-	
+
 	/* method to yield random instruction, variable or a Operand
 	* for creating a randm program line or mutate a line  */
 	MT_Instruction getRandomInstruction();
 	MT_Operand * getRandomVariable();
-	MT_Operand * getRandomOperand ();
+	MT_Operand * getRandomOperand();
 
-	/*  supply the program Length for generating individuals*/	
+	/*  supply the program Length for generating individuals*/
 	int getProgLength();
 
 	/*serve the random creat of NumOfConstant Constnant
 	* of the type int if Type is true else double between lowerBound and upperBound */
-	void createConstant (int NumOfConstant, bool Type , double lowerBound, double upperBound);
-	
+	void createConstant( int NumOfConstant, bool Type, double lowerBound, double upperBound );
+
 	/* method for fitness proportional selection,
 	* supply the position of the winner*/
-	int getProportionalWinner (QList<int> * Players);
-	
+	int getProportionalWinner( QList<int> * Players );
+
 	/* supply a partition of the offspring into tournaments
 	* a entry (0-(num-1)) indicate in which tournament separate a individual form the offspring
 	*/
-	QList<int> * getRandomTournamentPartition(int NumberOfTournaments);
+	QList<int> * getRandomTournamentPartition( int NumberOfTournaments );
 
 	/******* normal set/ get method *******/
-	
+
 	/* method for changing information between GUI and Randomizer; this two method bend the given pointer
 	* to the private attribute; so the GUI can change (or get) direct information from the Randomizer
 	*/
-	void returnSearchValue(QList<double>  **ProbMPower, QList<double>  **ProbSOperator, QList<double> **ProbXPoints);
-	void returnIndividualsValue(int **Length, int **NumOfVar, QList<double> **Con, QList<double> **ProbOfFu);
+	void returnSearchValue( QList<double> **ProbMPower, QList<double> **ProbSOperator, QList<double> **ProbXPoints );
+	void returnIndividualsValue( int **Length, int **NumOfVar, QList<double> **Con, QList<double> **ProbOfFu );
 
 	/* change the Offspring Size*/
-	void setOffspringSize (int setOffSize);
-	
+	void setOffspringSize( int setOffSize );
+
 	/* ATTENTION: set ParentSize change TournamentNumber, TournamentSize and ParentSize !*/
-	void setParentSize (int SizeOfParent);
+	void setParentSize( int SizeOfParent );
 
 	int getNumOfVari();
 	int getProgramLengthMax();
 	MT_ErrorCode getLastError();
 
 	/* supply a random unsigned long in [0, upperBoundary)*/
-	unsigned long getRandomInteger(unsigned long upperBoundary);
+	unsigned long getRandomInteger( unsigned long upperBoundary );
 
 private:
 
@@ -106,7 +106,7 @@ private:
 
 	/* this array serve for indicate the tournament member of a tournament */
 	QList<int> TournamentPartition;
-	
+
 	/* a lot of size of variously GP object */
 	int NumberOfVariables;
 	int ProgramLengthMax;
@@ -123,7 +123,7 @@ private:
 	* ProbSearchOperator[2]= probability of Reproduction
 	*/
 	QList<double> ProbSearchOperator;
-		
+
 	/* contain the probability of occurrence of a mutation which are desired from the user,
 	* ProbMutationPower[0] = the probability, that a program line will choose for mutation.
 	* ProbMutationPower[1] = the probability, that a element of a program line will choose for mutation
@@ -137,13 +137,13 @@ private:
 	*ProbCrossOverPoints[2]= the probaility of 3 Crossover Point
 	*/
 	QList<double> ProbCrossOverPoints;
-	
+
 	/* contain all constant, which the GP-System allow to use. */
 	QList<double> Constant;
 
-	/* contain the probability for chosen a Instruction 
+	/* contain the probability for chosen a Instruction
 	* by the mutation or the generation of a program line
-	* ProbInstruction[0] = probability of SWT 
+	* ProbInstruction[0] = probability of SWT
 	* ProbInstruction[1] = probability of CPY  ;ProbInstruction[2]= probability of ADD
 	* ProbInstruction[3] = probability of SUB  ;ProbInstruction[4]= probability of MUL
 	* ProbInstruction[5] = probability of DIV  ;ProbInstruction[6]= probability of MOD
@@ -153,7 +153,7 @@ private:
 	* ProbInstruction[11] = probability of JLE  ;ProbInstruction[12]= probability of JEQ
 	* ProbInstruction[13]= probability of NOP
 	* ProbInstruction[14] = probability of LUI ;ProbInstruction[15]= probability of LUS
- 	* ProbInstruction[16] = probability of LUT ; ProbInstruction[17] = probability of LUM ;
+	* ProbInstruction[16] = probability of LUT ; ProbInstruction[17] = probability of LUM ;
 	*/
 	QList<double> ProbInstruction;
 };
