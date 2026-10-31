@@ -76,7 +76,7 @@ private:
 	* 3 = OneCrossoverPoint; 4= Reproduction; 5=Parent; 100+X = X Mutatuion have performed
 	* 6 = a loaded individual
 	*/
-	int TspOfGenesis;
+	MT_GenesisType TspOfGenesis;
 
 	// the name of the Trainingset on which the Individual training last time 
 	int TSetName;
