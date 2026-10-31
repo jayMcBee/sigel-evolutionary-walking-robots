@@ -71,11 +71,7 @@ private:
 	/* indicate the Fitness of a Parent; -1 = Parent not existing */
 	double FitnessOfParent;
 
-	/* indicate how the program were created
-	* -1= not defined  ; 0= Random; 1= OneCrossoverPoint; 2=OneCrossoverPointMutation;
-	* 3 = OneCrossoverPoint; 4= Reproduction; 5=Parent; 100+X = X Mutatuion have performed
-	* 6 = a loaded individual
-	*/
+	/* indicate how the program were created; a mutated individual holds Mutation + X, X mutated elements */
 	MT_GenesisType TypOfGenesis;
 
 	// the name of the Trainingset on which the Individual training last time 
