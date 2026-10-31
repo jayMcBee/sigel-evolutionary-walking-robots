@@ -10,7 +10,7 @@ MT_Individual::MT_Individual()
 	TSetName=-1;
 
 	FitnessOfParent =-1.0;
-	TypOfGenesis = MT_GenesisType::Undefined;
+	TypeOfGenesis = MT_GenesisType::Undefined;
 }
 
 MT_Individual::~MT_Individual()
@@ -27,7 +27,7 @@ MT_Individual::MT_Individual(int Na, MT_Randomizer *Randi)
 	Position =-1;
 	TSetName=-1;
 	FitnessOfParent =-1.0;
-	TypOfGenesis = MT_GenesisType::Random;
+	TypeOfGenesis = MT_GenesisType::Random;
 
 	Program = new MT_Program(Randi);
 }
@@ -47,7 +47,7 @@ MT_Individual::MT_Individual(QTextStream &File)
 		Position = (File.readLine()).toInt();
 		TSetName= (File.readLine()).toInt();
 		FitnessOfParent = (File.readLine()).toDouble();
-		TypOfGenesis = static_cast<MT_GenesisType>((File.readLine()).toInt());
+		TypeOfGenesis = static_cast<MT_GenesisType>((File.readLine()).toInt());
 
 		Program = new MT_Program(File);
 	}
@@ -65,7 +65,7 @@ MT_Individual::MT_Individual(MT_Program *Prog, bool copy)
 	TSetName=-1;
 	
 	FitnessOfParent = -1.0;
-	TypOfGenesis = MT_GenesisType::ThreePointCrossover;
+	TypeOfGenesis = MT_GenesisType::ThreePointCrossover;
 
 	Program =nullptr;
 	
@@ -89,7 +89,7 @@ void MT_Individual::writeToFileIndi(QTextStream &File)
 	File << Position << Qt::endl;
 	File << TSetName << Qt::endl;
 	File << FitnessOfParent << Qt::endl;
-	File << static_cast<int>(TypOfGenesis) << Qt::endl;
+	File << static_cast<int>(TypeOfGenesis) << Qt::endl;
 	File << Qt::endl;
 	
 	if (Program !=nullptr)
@@ -158,7 +158,7 @@ void MT_Individual::createProgram(MT_Randomizer *Randi)
 {
 	delete Program;
 	Program = new MT_Program(Randi); 
-	TypOfGenesis = MT_GenesisType::Random;
+	TypeOfGenesis = MT_GenesisType::Random;
 	FitnessOfParent= -1.0;
 }
 
@@ -184,7 +184,7 @@ void MT_Individual::setFitnessOfParent(double FitOfParent)
 
 MT_GenesisType MT_Individual::getTypOfGenesis()
 {
-	return TypOfGenesis;
+	return TypeOfGenesis;
 }
 
 MT_ErrorCode MT_Individual::getLastError()
@@ -194,7 +194,7 @@ MT_ErrorCode MT_Individual::getLastError()
 
 void MT_Individual::setTypOfGenesis(MT_GenesisType Typ)
 {
-	TypOfGenesis = Typ;
+	TypeOfGenesis = Typ;
 }
 
 void MT_Individual::setNewProgram(MT_Program *NewProg)

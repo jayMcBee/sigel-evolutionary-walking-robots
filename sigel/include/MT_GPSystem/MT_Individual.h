@@ -72,7 +72,7 @@ private:
 	double FitnessOfParent;
 
 	/* indicate how the program were created; a mutated individual holds Mutation + X, X mutated elements */
-	MT_GenesisType TypOfGenesis;
+	MT_GenesisType TypeOfGenesis;
 
 	// the name of the Trainingset on which the Individual training last time 
 	int TSetName;
