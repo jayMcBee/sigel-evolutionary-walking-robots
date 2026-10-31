@@ -567,10 +567,10 @@ void MT_GPManager::collectOffspringParameter(MT_StatisticsElement * SElement)
 {
 	for (int i=0; i<Offspring->getSize(); i++)
 	{
-		int TypOfGenesis = (Offspring->getIndividual(i))->getTypOfGenesis();
-		if (TypOfGenesis >= 100)
+		MT_GenesisType TypOfGenesis = (Offspring->getIndividual(i))->getTypOfGenesis();
+		if (TypOfGenesis >= MT_GenesisType::Mutation)
 		{
-			SElement->NumOfTotalElementMutation = SElement->NumOfTotalElementMutation +(TypOfGenesis-100);
+			SElement->NumOfTotalElementMutation = SElement->NumOfTotalElementMutation +(static_cast<int>(TypOfGenesis)-static_cast<int>(MT_GenesisType::Mutation));
 			SElement->NumOfMutateOffspring ++;
 			
 			if ( ((Offspring->getIndividual(i))->getFitness())>=((Offspring->getIndividual(i))->getFitnessOfParent()) )
@@ -580,35 +580,37 @@ void MT_GPManager::collectOffspringParameter(MT_StatisticsElement * SElement)
 		{
 			switch (TypOfGenesis)
 			{
-			case 1: 
+			case MT_GenesisType::OnePointCrossover:
 				{
 					SElement->CrossoverEventParent[0]++;
 					if ( ((Offspring->getIndividual(i))->getFitness()) >= ((Offspring->getIndividual(i))->getFitnessOfParent()))
 						SElement->CrossoverEventParent[1] ++;
 				}
 				break;
-			case 2: 
+			case MT_GenesisType::TwoPointCrossover:
 				{	SElement->CrossoverEventParent[2]++;
 					if ( ((Offspring->getIndividual(i))->getFitness())>=((Offspring->getIndividual(i))->getFitnessOfParent()))
 						SElement->CrossoverEventParent[3]++;
 				}
 				break;
-			case 3: 
+			case MT_GenesisType::ThreePointCrossover:
 				{	SElement->CrossoverEventParent[4]++;
 					if ( ((Offspring->getIndividual(i))->getFitness())>=((Offspring->getIndividual(i))->getFitnessOfParent()))
 						SElement->CrossoverEventParent[5]++;
 				}
 				break;
 
-			case 4: 
+			case MT_GenesisType::Reproduction:
 				{
 					SElement->NumOfSimpleCopyOffspring++;
 				}
 				break;
-			case 5: 
+			case MT_GenesisType::CarriedOverParent:
 				{
 					SElement->NumOfSimpleCopyOffspring++;
 				}
+				break;
+			default:
 				break;
 			}
 		}
@@ -621,18 +623,18 @@ void MT_GPManager::collectParentParameter(MT_StatisticsElement * SElement)
 	SElement->MaxFitness = (Parent->getBestIndividual())->getFitness();
 
 	int ParentSize = Parent->getSize();
-	int	TypOfGenesis;
+	MT_GenesisType TypOfGenesis;
 	
 	for (int i=0; i<ParentSize; i++)
 	{
 		TypOfGenesis = Parent->getIndividual(i)->getTypOfGenesis();
-		if (TypOfGenesis >= 100)
+		if (TypOfGenesis >= MT_GenesisType::Mutation)
 		{
 			SElement->NumOfMutateIndividuals++;
-			SElement->NumOfElementMutationParent = SElement->NumOfElementMutationParent + TypOfGenesis -100;		
+			SElement->NumOfElementMutationParent = SElement->NumOfElementMutationParent + static_cast<int>(TypOfGenesis) - static_cast<int>(MT_GenesisType::Mutation);		
 		}
 		else
-			if ((TypOfGenesis>0) &&(TypOfGenesis<4))
+			if ((TypOfGenesis>=MT_GenesisType::OnePointCrossover) &&(TypOfGenesis<=MT_GenesisType::ThreePointCrossover))
 				SElement->NumOfCrossoverEvent++;
 			else
 				SElement->NumOfSimpleCopyParent++;
