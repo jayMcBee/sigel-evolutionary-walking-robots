@@ -57,6 +57,10 @@ Paths are relative to `sigel/`, the source tree.
   general math among them, such as `rotationMatrix` and `tolerantACos`,
   goes into the helper class of item 144.
 
+- [ ] **183. Use proper English symbol names in MetaGP.** The German `Typ`
+  in `TypOfGenesis`, `setTypOfGenesis`, `getTypOfGenesis`, `getTyp` and `Typ`
+  becomes `Type`. One symbol per commit.
+
 ---
 
 ## 3 · Defects preserved by the port
