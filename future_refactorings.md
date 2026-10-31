@@ -193,8 +193,7 @@ touched, because changing one changes behaviour against the reference binary.
   crossover with that many points, 4 for reproduction, 5 for a parent that
   is carried over, and 100 plus the number of mutated elements for a
   mutation. `MT_Search` sets it and the statistics in `MT_GPManager` read
-  it. Use a scoped enum. The count of mutated elements is a second value
-  and needs its own member.
+  it. Use a scoped enum.
 
 - [ ] **148. Name the estimation strategies.** `EstimationStrategy` in
   `MT_Substitute` is a bare `int`. `MT_Evaluator::evaluationTactic` and
