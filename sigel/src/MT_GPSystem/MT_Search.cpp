@@ -5,64 +5,70 @@ MT_Search::MT_Search()
 {
 }
 
-MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_Randomizer *NewRandi)
+MT_Search::MT_Search( MT_Population *ParentPop, MT_Population *OffspringPop, MT_Randomizer *NewRandi )
 {
 	LastError = MT_ErrorCode::None;
 	TargetPop = OffspringPop;
 	SourcePop = ParentPop;
 	Randi = NewRandi;
-	ChildOne =nullptr;
-	ChildTwo =nullptr;
-	Parent=nullptr;
-	FirstXOverParent=nullptr;
+	ChildOne = nullptr;
+	ChildTwo = nullptr;
+	Parent = nullptr;
+	FirstXOverParent = nullptr;
 }
 
-MT_Search::MT_Search(MT_Population *ParentPop, MT_Population *OffspringPop, MT_Randomizer *NewRandi, QTextStream &File)
+MT_Search::MT_Search( MT_Population *ParentPop, MT_Population *OffspringPop, MT_Randomizer *NewRandi, QTextStream &File )
 {
 	LastError = MT_ErrorCode::None;
 	TargetPop = OffspringPop;
 	SourcePop = ParentPop;
 	Randi = NewRandi;
-	
-	ChildOne =nullptr;
-	ChildTwo =nullptr;
-	Parent=nullptr;
-	FirstXOverParent=nullptr;
 
-	QString BrutString ( "BrutSize:" );
-	QString PresentLine = File.readLine(); 
-	
-	while ( (PresentLine != BrutString) && !(File.atEnd()))
+	ChildOne = nullptr;
+	ChildTwo = nullptr;
+	Parent = nullptr;
+	FirstXOverParent = nullptr;
+
+	QString BrutString( "BrutSize:" );
+	QString PresentLine = File.readLine();
+
+	while( ( PresentLine != BrutString ) && !( File.atEnd() ) )
+	{
 		PresentLine = File.readLine();
-	
-	if ((PresentLine == BrutString) && !(File.atEnd()))
-		BrutSize = (File.readLine()).toInt();
+	}
+
+	if( ( PresentLine == BrutString ) && !( File.atEnd() ) )
+	{
+		BrutSize = ( File.readLine() ).toInt();
+	}
 	else
+	{
 		LastError = MT_ErrorCode::BroodSizeSectionMissing;
+	}
 }
 
 int MT_Search::getBrutSize()
 {
-	return BrutSize; 
+	return BrutSize;
 }
 
 MT_ErrorCode MT_Search::getLastError()
 {
-	return LastError; 
+	return LastError;
 }
 
-void MT_Search::setBrutSize(int SizeOfBrut)
+void MT_Search::setBrutSize( int SizeOfBrut )
 {
 	BrutSize = SizeOfBrut;
 }
 
-MT_Individual * MT_Search::mutate(MT_Individual * Progenitor)
+MT_Individual * MT_Search::mutate( MT_Individual * Progenitor )
 {
-	MT_Individual * Child = (new MT_Individual(Progenitor->getProgram(),true));
-	
+	MT_Individual * Child = ( new MT_Individual( Progenitor->getProgram(), true ) );
+
 	MT_Program * ChildProgram = Child->getProgram();
-	
-	int NumOfMutation =0;
+
+	int NumOfMutation = 0;
 
 	for( int i = 0; i < ChildProgram->getLength(); i++ )
 	{
@@ -92,102 +98,99 @@ MT_Individual * MT_Search::mutate(MT_Individual * Progenitor)
 		}
 	}
 
-	Child->setTypOfGenesis(static_cast<MT_GenesisType>(static_cast<int>(MT_GenesisType::Mutation)+NumOfMutation));
+	Child->setTypOfGenesis( static_cast<MT_GenesisType>( static_cast<int>( MT_GenesisType::Mutation ) + NumOfMutation ) );
 
 	return Child;
 }
 
-void MT_Search::crossover(MT_Individual * ParentOne, MT_Individual * ParentTwo)
+void MT_Search::crossover( MT_Individual * ParentOne, MT_Individual * ParentTwo )
 {
 /* ************************* Initialisations  **************************/
-
 	MT_Program * POneProgram = ParentOne->getProgram();
 	MT_Program * PTwoProgram = ParentTwo->getProgram();
 
 	int MaxLength = POneProgram->getMaxLength();
 
-	QList<int> XPoints = *(Randi->getRandomXPoints(POneProgram->getLength(),PTwoProgram->getLength()));
-	
+	QList<int> XPoints = *( Randi->getRandomXPoints( POneProgram->getLength(), PTwoProgram->getLength() ) );
+
 /* ************************* Create new individuals, each with the first part **************************/
+	MT_Program * ChildOneProgram = new MT_Program( POneProgram, 0, ( XPoints[ParentOneFirstPoint] - 1 ) );
+	MT_Program * ChildTwoProgram = new MT_Program( PTwoProgram, 0, ( XPoints[ParentTwoFirstPoint] - 1 ) );
 
-	MT_Program * ChildOneProgram = new MT_Program(POneProgram,0,(XPoints[ParentOneFirstPoint]-1));
-	MT_Program * ChildTwoProgram = new MT_Program(PTwoProgram,0,(XPoints[ParentTwoFirstPoint]-1));
-	
-	ChildOneProgram->changeMaxProgLen(MaxLength);
-	ChildTwoProgram->changeMaxProgLen(MaxLength);
+	ChildOneProgram->changeMaxProgLen( MaxLength );
+	ChildTwoProgram->changeMaxProgLen( MaxLength );
 
-	ChildOne = new MT_Individual(ChildOneProgram, false);
-	ChildTwo = new MT_Individual(ChildTwoProgram, false);
+	ChildOne = new MT_Individual( ChildOneProgram, false );
+	ChildTwo = new MT_Individual( ChildTwoProgram, false );
 
 /* ************************* The remaining program fragment(s) are appended to ChildOne and ChildTwo **************************/
-
-	switch (XPoints[AdditionalPointCount])
+	switch( XPoints[AdditionalPointCount] )
 	{
 	// Only 1 crossover point was chosen
 	case 0:
 		{
-			MT_Program SecondPartForChildOne(PTwoProgram, XPoints[ParentTwoFirstPoint], (PTwoProgram->getLength()-1));
-			MT_Program SecondPartForChildTwo(POneProgram, XPoints[ParentOneFirstPoint], (POneProgram->getLength()-1));
-		
-			ChildOneProgram->insertProg(&SecondPartForChildOne);
-			ChildTwoProgram->insertProg(&SecondPartForChildTwo);
+			MT_Program SecondPartForChildOne( PTwoProgram, XPoints[ParentTwoFirstPoint], ( PTwoProgram->getLength() - 1 ) );
+			MT_Program SecondPartForChildTwo( POneProgram, XPoints[ParentOneFirstPoint], ( POneProgram->getLength() - 1 ) );
 
-			ChildOne->setTypOfGenesis(MT_GenesisType::OnePointCrossover);
-			ChildTwo->setTypOfGenesis(MT_GenesisType::OnePointCrossover);
+			ChildOneProgram->insertProg( &SecondPartForChildOne );
+			ChildTwoProgram->insertProg( &SecondPartForChildTwo );
+
+			ChildOne->setTypOfGenesis( MT_GenesisType::OnePointCrossover );
+			ChildTwo->setTypOfGenesis( MT_GenesisType::OnePointCrossover );
 		}
 		break;
-	
+
 	// 2 crossover points are used
-	case 1: 
+	case 1:
 		{
-			MT_Program SecondPartForChildOne(PTwoProgram, XPoints[ParentTwoFirstPoint], (XPoints[ParentTwoSecondPoint]-1));
-			MT_Program SecondPartForChildTwo(POneProgram, XPoints[ParentOneFirstPoint], (XPoints[ParentOneSecondPoint]-1));
-			
-			ChildOneProgram->insertProg(&SecondPartForChildOne);
-			ChildTwoProgram->insertProg(&SecondPartForChildTwo);
+			MT_Program SecondPartForChildOne( PTwoProgram, XPoints[ParentTwoFirstPoint], ( XPoints[ParentTwoSecondPoint] - 1 ) );
+			MT_Program SecondPartForChildTwo( POneProgram, XPoints[ParentOneFirstPoint], ( XPoints[ParentOneSecondPoint] - 1 ) );
 
-			MT_Program ThirdPartForChildOne(POneProgram, XPoints[ParentOneSecondPoint], (POneProgram->getLength()-1));
-			MT_Program ThirdPartForChildTwo(PTwoProgram, XPoints[ParentTwoSecondPoint], (PTwoProgram->getLength()-1));
-			
-			ChildOneProgram->insertProg(&ThirdPartForChildOne);
-			ChildTwoProgram->insertProg(&ThirdPartForChildTwo);
+			ChildOneProgram->insertProg( &SecondPartForChildOne );
+			ChildTwoProgram->insertProg( &SecondPartForChildTwo );
 
-			ChildOne->setTypOfGenesis(MT_GenesisType::TwoPointCrossover);
-			ChildTwo->setTypOfGenesis(MT_GenesisType::TwoPointCrossover);
+			MT_Program ThirdPartForChildOne( POneProgram, XPoints[ParentOneSecondPoint], ( POneProgram->getLength() - 1 ) );
+			MT_Program ThirdPartForChildTwo( PTwoProgram, XPoints[ParentTwoSecondPoint], ( PTwoProgram->getLength() - 1 ) );
+
+			ChildOneProgram->insertProg( &ThirdPartForChildOne );
+			ChildTwoProgram->insertProg( &ThirdPartForChildTwo );
+
+			ChildOne->setTypOfGenesis( MT_GenesisType::TwoPointCrossover );
+			ChildTwo->setTypOfGenesis( MT_GenesisType::TwoPointCrossover );
 		}
 		break;
 
 	// 3 crossover points are used
 	case 2:
 		{
-			MT_Program SecondPartForChildOne(PTwoProgram, XPoints[ParentTwoFirstPoint], (XPoints[ParentTwoSecondPoint]-1));
-			MT_Program SecondPartForChildTwo(POneProgram, XPoints[ParentOneFirstPoint], (XPoints[ParentOneSecondPoint]-1));
-			
-			ChildOneProgram->insertProg(&SecondPartForChildOne);
-			ChildTwoProgram->insertProg(&SecondPartForChildTwo);
+			MT_Program SecondPartForChildOne( PTwoProgram, XPoints[ParentTwoFirstPoint], ( XPoints[ParentTwoSecondPoint] - 1 ) );
+			MT_Program SecondPartForChildTwo( POneProgram, XPoints[ParentOneFirstPoint], ( XPoints[ParentOneSecondPoint] - 1 ) );
 
-			MT_Program ThirdPartForChildOne(POneProgram, XPoints[ParentOneSecondPoint], (XPoints[ParentOneThirdPoint]-1));
-			MT_Program ThirdPartForChildTwo(PTwoProgram, XPoints[ParentTwoSecondPoint], (XPoints[ParentTwoThirdPoint]-1));
+			ChildOneProgram->insertProg( &SecondPartForChildOne );
+			ChildTwoProgram->insertProg( &SecondPartForChildTwo );
 
-			ChildOneProgram->insertProg(&ThirdPartForChildOne);
-			ChildTwoProgram->insertProg(&ThirdPartForChildTwo);
+			MT_Program ThirdPartForChildOne( POneProgram, XPoints[ParentOneSecondPoint], ( XPoints[ParentOneThirdPoint] - 1 ) );
+			MT_Program ThirdPartForChildTwo( PTwoProgram, XPoints[ParentTwoSecondPoint], ( XPoints[ParentTwoThirdPoint] - 1 ) );
 
-			MT_Program FourthPartForChildOne(PTwoProgram, XPoints[ParentTwoThirdPoint], (PTwoProgram->getLength()-1));
-			MT_Program FourthPartForChildTwo(POneProgram, XPoints[ParentOneThirdPoint], (POneProgram->getLength()-1));
-			
-			ChildOneProgram->insertProg(&FourthPartForChildOne);
-			ChildTwoProgram->insertProg(&FourthPartForChildTwo);
+			ChildOneProgram->insertProg( &ThirdPartForChildOne );
+			ChildTwoProgram->insertProg( &ThirdPartForChildTwo );
 
-			ChildOne->setTypOfGenesis(MT_GenesisType::ThreePointCrossover);
-			ChildTwo->setTypOfGenesis(MT_GenesisType::ThreePointCrossover);
+			MT_Program FourthPartForChildOne( PTwoProgram, XPoints[ParentTwoThirdPoint], ( PTwoProgram->getLength() - 1 ) );
+			MT_Program FourthPartForChildTwo( POneProgram, XPoints[ParentOneThirdPoint], ( POneProgram->getLength() - 1 ) );
+
+			ChildOneProgram->insertProg( &FourthPartForChildOne );
+			ChildTwoProgram->insertProg( &FourthPartForChildTwo );
+
+			ChildOne->setTypOfGenesis( MT_GenesisType::ThreePointCrossover );
+			ChildTwo->setTypOfGenesis( MT_GenesisType::ThreePointCrossover );
 		}
 		break;
 	}
 }
 
-MT_Individual*  MT_Search::reproduce(MT_Individual * Progenitor)
+MT_Individual * MT_Search::reproduce( MT_Individual * Progenitor )
 {
-	return (new MT_Individual(Progenitor->getProgram(), true));
+	return ( new MT_Individual( Progenitor->getProgram(), true ) );
 }
 
 MT_ErrorCode MT_Search::startMatingProcess()
@@ -195,143 +198,161 @@ MT_ErrorCode MT_Search::startMatingProcess()
 /* ************************* Initialisations  **************************/
 	int ParentSize = SourcePop->getSize();
 	int OffspringSize = TargetPop->getSize();
-	int FreePos =0; 
-	int ParentPos = Randi->getRandomInteger(ParentSize); // the parent under consideration 
+	int FreePos = 0;
+	int ParentPos = Randi->getRandomInteger( ParentSize ); // the parent under consideration
 
-	ChildOne =nullptr;
-	ChildTwo =nullptr;
-	Parent=nullptr;
-	FirstXOverParent=nullptr;
+	ChildOne = nullptr;
+	ChildTwo = nullptr;
+	Parent = nullptr;
+	FirstXOverParent = nullptr;
 
 	bool CrossOver = false;
 
 /* ************************* Copy parent pointers into the offspring **************************/
 	TargetPop->flush();
-	TargetPop->setFreePos(OffspringSize);
-	
-	int RandomPos =0;
-	
-	for(FreePos=0; FreePos<ParentSize; FreePos++)
-	{
-		Parent = SourcePop->getIndividual(FreePos);
-		Parent->setTypOfGenesis(MT_GenesisType::CarriedOverParent);
+	TargetPop->setFreePos( OffspringSize );
 
-		RandomPos = Randi->getRandomInteger(OffspringSize);
-	
-		while (TargetPop->getIndividual(RandomPos)!= nullptr)
+	int RandomPos = 0;
+
+	for( FreePos = 0; FreePos < ParentSize; FreePos++ )
+	{
+		Parent = SourcePop->getIndividual( FreePos );
+		Parent->setTypOfGenesis( MT_GenesisType::CarriedOverParent );
+
+		RandomPos = Randi->getRandomInteger( OffspringSize );
+
+		while( TargetPop->getIndividual( RandomPos ) != nullptr )
 		{
-			RandomPos ++;
-			if (RandomPos>=OffspringSize)
-				RandomPos =0;
+			RandomPos++;
+			if( RandomPos >= OffspringSize )
+			{
+				RandomPos = 0;
+			}
 		}
 
-		Parent->setPosition(RandomPos);
-		TargetPop->insertAtPos(Parent,RandomPos);
+		Parent->setPosition( RandomPos );
+		TargetPop->insertAtPos( Parent, RandomPos );
 	}
-	
+
 /* ************************** Insert the newly created individuals ****************** */
-	for (FreePos=0;FreePos<OffspringSize;)
+	for( FreePos = 0; FreePos < OffspringSize; )
 	{
-		switch (Randi->getRandomSOperator())
+		switch( Randi->getRandomSOperator() )
 		{
 		/* Reproduction of the parent*/
-		case 3 :
+		case 3:
 			{
-				ChildOne= reproduce(SourcePop->getIndividual(ParentPos));
-				ChildOne->setTypOfGenesis(MT_GenesisType::Reproduction);
-				ChildOne->setFitnessOfParent((SourcePop->getIndividual(ParentPos))->getFitness());
-		
-				while(TargetPop->getIndividual(FreePos)!= nullptr)
-					FreePos++;
-								
-				if (FreePos < OffspringSize)
-				{
-					ChildOne->setPosition(FreePos);
-					TargetPop->insertAtPos(ChildOne,FreePos);
-					ChildOne = nullptr;
-					FreePos++;
-				}
-			}
-			break;
-		
-		/* Mutation of the parent */
-		case 2 :
-			{
-				ChildOne = mutate(SourcePop->getIndividual(ParentPos));
-				ChildOne->setFitnessOfParent((SourcePop->getIndividual(ParentPos))->getFitness());
-				
-				while(TargetPop->getIndividual(FreePos)!= nullptr)
-					FreePos++;
-				
-				if (FreePos < OffspringSize)
-				{
-					ChildOne->setPosition(FreePos);
-					TargetPop->insertAtPos(ChildOne,FreePos);
-					ChildOne = nullptr;
-					FreePos++;
-				}
-			}
-			break;
-		
-		/*Recombination with the parent, if a "partner" is available */
-		case 1 :
-			{
-				if (CrossOver==true)
-				{
-					crossover(FirstXOverParent, SourcePop->getIndividual(ParentPos));
+				ChildOne = reproduce( SourcePop->getIndividual( ParentPos ) );
+				ChildOne->setTypOfGenesis( MT_GenesisType::Reproduction );
+				ChildOne->setFitnessOfParent( ( SourcePop->getIndividual( ParentPos ) )->getFitness() );
 
-					while(TargetPop->getIndividual(FreePos)!= nullptr)
-						FreePos++;
-					
-					if (FreePos <OffspringSize)
+				while( TargetPop->getIndividual( FreePos ) != nullptr )
+				{
+					FreePos++;
+				}
+
+				if( FreePos < OffspringSize )
+				{
+					ChildOne->setPosition( FreePos );
+					TargetPop->insertAtPos( ChildOne, FreePos );
+					ChildOne = nullptr;
+					FreePos++;
+				}
+			}
+			break;
+
+		/* Mutation of the parent */
+		case 2:
+			{
+				ChildOne = mutate( SourcePop->getIndividual( ParentPos ) );
+				ChildOne->setFitnessOfParent( ( SourcePop->getIndividual( ParentPos ) )->getFitness() );
+
+				while( TargetPop->getIndividual( FreePos ) != nullptr )
+				{
+					FreePos++;
+				}
+
+				if( FreePos < OffspringSize )
+				{
+					ChildOne->setPosition( FreePos );
+					TargetPop->insertAtPos( ChildOne, FreePos );
+					ChildOne = nullptr;
+					FreePos++;
+				}
+			}
+			break;
+
+		/*Recombination with the parent, if a "partner" is available */
+		case 1:
+			{
+				if( CrossOver == true )
+				{
+					crossover( FirstXOverParent, SourcePop->getIndividual( ParentPos ) );
+
+					while( TargetPop->getIndividual( FreePos ) != nullptr )
 					{
-						ChildOne->setFitnessOfParent(FirstXOverParent->getFitness());
-						ChildOne->setPosition(FreePos);
-						TargetPop->insertAtPos(ChildOne,FreePos);
-						ChildOne =nullptr;
 						FreePos++;
 					}
 
-					if (FreePos<OffspringSize)
+					if( FreePos < OffspringSize )
 					{
-						while(TargetPop->getIndividual(FreePos)!= nullptr)
-							FreePos++;
-					
-						if(FreePos<OffspringSize)
+						ChildOne->setFitnessOfParent( FirstXOverParent->getFitness() );
+						ChildOne->setPosition( FreePos );
+						TargetPop->insertAtPos( ChildOne, FreePos );
+						ChildOne = nullptr;
+						FreePos++;
+					}
+
+					if( FreePos < OffspringSize )
+					{
+						while( TargetPop->getIndividual( FreePos ) != nullptr )
 						{
-							ChildTwo->setFitnessOfParent((SourcePop->getIndividual(ParentPos))->getFitness());
-							ChildTwo->setPosition(FreePos);
-							TargetPop->insertAtPos(ChildTwo,FreePos);
-							ChildTwo =nullptr;
+							FreePos++;
+						}
+
+						if( FreePos < OffspringSize )
+						{
+							ChildTwo->setFitnessOfParent( ( SourcePop->getIndividual( ParentPos ) )->getFitness() );
+							ChildTwo->setPosition( FreePos );
+							TargetPop->insertAtPos( ChildTwo, FreePos );
+							ChildTwo = nullptr;
 							FreePos++;
 						}
 					}
-				
+
 					CrossOver = false;
 				}
-				else    // no crossover partner found so far
+				else // no crossover partner found so far
 				{
 					CrossOver = true;
-					FirstXOverParent = SourcePop->getIndividual(ParentPos);
+					FirstXOverParent = SourcePop->getIndividual( ParentPos );
 				}
 			}
 			break;
 		} // end of switch
-		
+
 		ParentPos++;
-		if (ParentPos == ParentSize)
-			ParentPos =0;
+		if( ParentPos == ParentSize )
+		{
+			ParentPos = 0;
+		}
 	} // end of for over offspring
 
-	if (ChildOne != nullptr)
+	if( ChildOne != nullptr )
+	{
 		delete ChildOne;
-	if (ChildTwo != nullptr)
+	}
+	if( ChildTwo != nullptr )
+	{
 		delete ChildTwo;
+	}
 
 	SourcePop->flush();
-		
-	if (TargetPop->getLastError() != MT_ErrorCode::None)
+
+	if( TargetPop->getLastError() != MT_ErrorCode::None )
+	{
 		return TargetPop->getLastError();
+	}
 
 	return MT_ErrorCode::None;
 }

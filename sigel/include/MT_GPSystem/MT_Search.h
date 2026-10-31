@@ -3,7 +3,7 @@
 
 #include <QTextStream>
 #include "MT_GPSystem/MT_Population.h"
-#include "MT_GPSystem/MT_Randomizer.h"	
+#include "MT_GPSystem/MT_Randomizer.h"
 #include "MT_GPSystem/MT_ErrorCode.h"
 
 
@@ -11,40 +11,43 @@
 * another search points in the search space were determinate.
 * the offspring will new create from the parent.
 */
-class MT_Search  
+class MT_Search
 {
 public:
 
-	/*start the search process, it's determinate or 
+	/*start the search process, it's determinate or
 	* create new individuals with regard to the search parameters.
 	* @pre: there are a corrcet parent, offspring population
-	* @pre: there are a correct randinomizer, which have the necessary 
+	* @pre: there are a correct randinomizer, which have the necessary
 	* search parameters
 	* @param: return value indicate an error; MT_ErrorCode::None := it was a correct search
-	*/ 
+	*/
 	MT_ErrorCode startMatingProcess();
 
 	/* set/get functions used to update the GUI or the GP system*/
-	void setBrutSize(int  SizeOfBrut);
+	void setBrutSize( int SizeOfBrut );
 	int getBrutSize();
 	MT_ErrorCode getLastError();
 
-	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * NewRandi, QTextStream & File);
-	MT_Search(MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * NewRandi);
+	MT_Search( MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * NewRandi, QTextStream & File );
+	MT_Search( MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * NewRandi );
 	MT_Search();
 	virtual ~MT_Search() = default;
 
 private:
-	
+
 	/* generate a exact copy of the individuals*/
-	MT_Individual * reproduce(MT_Individual * Progenitor);
+	MT_Individual * reproduce( MT_Individual * Progenitor );
+
 	/* generate two new individuals form two parents */
-	void crossover(MT_Individual *ParentOne, MT_Individual *ParentTwo);
+	void crossover( MT_Individual *ParentOne, MT_Individual *ParentTwo );
+
 	/* generate a mutated copy from a parent*/
-	MT_Individual * mutate(MT_Individual * Progenitor);
+	MT_Individual * mutate( MT_Individual * Progenitor );
 
 	/*pointer of the offspring population*/
 	MT_Population * TargetPop;
+
 	/* pointer of the parent*/
 	MT_Population * SourcePop;
 	MT_Randomizer * Randi;
@@ -54,7 +57,7 @@ private:
 	MT_ErrorCode LastError;
 
 	MT_Individual * ChildOne;
-	MT_Individual *ChildTwo;
+	MT_Individual * ChildTwo;
 	MT_Individual * Parent;
 	MT_Individual * FirstXOverParent;
 };
