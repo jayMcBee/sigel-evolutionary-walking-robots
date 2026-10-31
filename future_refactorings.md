@@ -192,13 +192,6 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 5 · MetaGP
 
-- [ ] **143. Name the types of genesis of a MetaGP individual.**
-  `MT_Individual::setTypOfGenesis` takes a bare number: 1, 2 and 3 for a
-  crossover with that many points, 4 for reproduction, 5 for a parent that
-  is carried over, and 100 plus the number of mutated elements for a
-  mutation. `MT_Search` sets it and the statistics in `MT_GPManager` read
-  it. Use a scoped enum.
-
 - [ ] **148. Name the estimation strategies.** `EstimationStrategy` in
   `MT_Substitute` is a bare `int`. `MT_Evaluator::evaluationTactic` and
   `MT_Classifier::evaluationTactic` switch on its numbers, and only the
