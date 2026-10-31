@@ -8,6 +8,7 @@
 #include "MT_GPSystem/MT_Program.h"
 #include "MT_GPSystem/MT_Randomizer.h"	
 #include "MT_GPSystem/MT_ErrorCode.h"
+#include "MT_GPSystem/MT_GenesisType.h"
 
 /*This class represent a Meta Individual, which contain especially the program 
 * for Interpreting  
@@ -37,7 +38,7 @@ public:
 	void setFitness(double NewFitness);
 	void setPosition(int Pos);
 	void setMaxProgLen(int NewLen);
-	void setTypOfGenesis(int Typ);
+	void setTypOfGenesis(MT_GenesisType Typ);
 	void setFitnessOfParent (double FitOfParent);
 	void setNewProgram(MT_Program * NewProg);
 	void setNewAge(int NewAge);

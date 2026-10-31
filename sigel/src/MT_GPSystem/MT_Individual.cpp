@@ -192,9 +192,9 @@ MT_ErrorCode MT_Individual::getLastError()
 	return LastError;
 }
 
-void MT_Individual::setTypOfGenesis(int Typ)
+void MT_Individual::setTypOfGenesis(MT_GenesisType Typ)
 {
-	TspOfGenesis = Typ;
+	TspOfGenesis = static_cast<int>(Typ);
 }
 
 void MT_Individual::setNewProgram(MT_Program *NewProg)
