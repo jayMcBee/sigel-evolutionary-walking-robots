@@ -1,6 +1,6 @@
-#include <QLocale>
 #include <QValidator>
 #include "MT_GUI/MT_AddConstantsWidget.h"
+#include "SIGEL_CommonGUI/SIG_WidgetUtils.h"
 
 #include <QLineEdit>
 #include <QButtonGroup>
@@ -124,16 +124,9 @@ MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const
 	minValueEdit->setText(tr("%1").arg(individualsWidget->minValue));
 	maxValueEdit->setValidator(maxValidator);
 	maxValueEdit->setText(tr("%1").arg(individualsWidget->maxValue));
-	// The C locale for both validators -- see MT_IndividualWidget.cpp. Applied
-	// at BOTH creation sites: the type radio deletes and rebuilds them, so a
-	// constructor-only pinning would be undone the first time a user switches
-	// between integer and float constants.
-	{
-		QLocale cLocale = QLocale::c();
-		cLocale.setNumberOptions(QLocale::RejectGroupSeparator);
-		for (QValidator *v : findChildren<QValidator *>())
-			v->setLocale(cLocale);
-	}
+
+	// Also called in slotClicked: the type radio deletes and rebuilds both validators.
+	SIGEL_CommonGUI::SIG_WidgetUtils::useDotDecimalNumberFormat(this);
 	numConstantsSpinBox->setValue(individualsWidget->numToCreate);
 	
 	// slotClicked compares only the objectName, so the ids only have to differ.
@@ -167,12 +160,7 @@ void MT_AddConstantsWidget::slotClicked(int id)
 			maxValueEdit->setValidator(maxValidator);
 			minValueEdit->setText(tr("%1").arg(static_cast<int>(minValueEdit->text().toDouble())));
 			maxValueEdit->setText(tr("%1").arg(static_cast<int>(maxValueEdit->text().toDouble())));
-					{
-				QLocale cLocale = QLocale::c();
-				cLocale.setNumberOptions(QLocale::RejectGroupSeparator);
-				for (QValidator *v : findChildren<QValidator *>())
-					v->setLocale(cLocale);
-	}
+			SIGEL_CommonGUI::SIG_WidgetUtils::useDotDecimalNumberFormat(this);
 		}
 	} else {
 		if(selectedType != floatType){
@@ -185,12 +173,7 @@ void MT_AddConstantsWidget::slotClicked(int id)
 			maxValueEdit->setValidator(maxValidator);
 			minValueEdit->setText(tr("%1").arg(static_cast<double>(minValueEdit->text().toInt())));
 			maxValueEdit->setText(tr("%1").arg(static_cast<double>(maxValueEdit->text().toInt())));
-					{
-				QLocale cLocale = QLocale::c();
-				cLocale.setNumberOptions(QLocale::RejectGroupSeparator);
-				for (QValidator *v : findChildren<QValidator *>())
-					v->setLocale(cLocale);
-	}
+			SIGEL_CommonGUI::SIG_WidgetUtils::useDotDecimalNumberFormat(this);
 		}
 	} 		
 }
