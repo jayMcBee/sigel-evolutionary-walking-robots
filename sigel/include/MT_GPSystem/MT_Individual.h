@@ -38,7 +38,7 @@ public:
 	void setFitness(double NewFitness);
 	void setPosition(int Pos);
 	void setMaxProgLen(int NewLen);
-	void setTypeOfGenesis(MT_GenesisType Typ);
+	void setTypeOfGenesis(MT_GenesisType Type);
 	void setFitnessOfParent (double FitOfParent);
 	void setNewProgram(MT_Program * NewProg);
 	void setNewAge(int NewAge);
