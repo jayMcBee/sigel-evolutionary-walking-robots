@@ -567,10 +567,10 @@ void MT_GPManager::collectOffspringParameter(MT_StatisticsElement * SElement)
 {
 	for (int i=0; i<Offspring->getSize(); i++)
 	{
-		MT_GenesisType TypOfGenesis = (Offspring->getIndividual(i))->getTypOfGenesis();
-		if (TypOfGenesis >= MT_GenesisType::Mutation)
+		MT_GenesisType TypeOfGenesis = (Offspring->getIndividual(i))->getTypOfGenesis();
+		if (TypeOfGenesis >= MT_GenesisType::Mutation)
 		{
-			SElement->NumOfTotalElementMutation = SElement->NumOfTotalElementMutation +(static_cast<int>(TypOfGenesis)-static_cast<int>(MT_GenesisType::Mutation));
+			SElement->NumOfTotalElementMutation = SElement->NumOfTotalElementMutation +(static_cast<int>(TypeOfGenesis)-static_cast<int>(MT_GenesisType::Mutation));
 			SElement->NumOfMutateOffspring ++;
 			
 			if ( ((Offspring->getIndividual(i))->getFitness())>=((Offspring->getIndividual(i))->getFitnessOfParent()) )
@@ -578,7 +578,7 @@ void MT_GPManager::collectOffspringParameter(MT_StatisticsElement * SElement)
 		}
 		else 
 		{
-			switch (TypOfGenesis)
+			switch (TypeOfGenesis)
 			{
 			case MT_GenesisType::OnePointCrossover:
 				{
@@ -623,18 +623,18 @@ void MT_GPManager::collectParentParameter(MT_StatisticsElement * SElement)
 	SElement->MaxFitness = (Parent->getBestIndividual())->getFitness();
 
 	int ParentSize = Parent->getSize();
-	MT_GenesisType TypOfGenesis;
+	MT_GenesisType TypeOfGenesis;
 	
 	for (int i=0; i<ParentSize; i++)
 	{
-		TypOfGenesis = Parent->getIndividual(i)->getTypOfGenesis();
-		if (TypOfGenesis >= MT_GenesisType::Mutation)
+		TypeOfGenesis = Parent->getIndividual(i)->getTypOfGenesis();
+		if (TypeOfGenesis >= MT_GenesisType::Mutation)
 		{
 			SElement->NumOfMutateIndividuals++;
-			SElement->NumOfElementMutationParent = SElement->NumOfElementMutationParent + static_cast<int>(TypOfGenesis) - static_cast<int>(MT_GenesisType::Mutation);		
+			SElement->NumOfElementMutationParent = SElement->NumOfElementMutationParent + static_cast<int>(TypeOfGenesis) - static_cast<int>(MT_GenesisType::Mutation);		
 		}
 		else
-			if ((TypOfGenesis>=MT_GenesisType::OnePointCrossover) &&(TypOfGenesis<=MT_GenesisType::ThreePointCrossover))
+			if ((TypeOfGenesis>=MT_GenesisType::OnePointCrossover) &&(TypeOfGenesis<=MT_GenesisType::ThreePointCrossover))
 				SElement->NumOfCrossoverEvent++;
 			else
 				SElement->NumOfSimpleCopyParent++;
