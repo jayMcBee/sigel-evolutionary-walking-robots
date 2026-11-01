@@ -23,7 +23,7 @@ DISpinBox::DISpinBox( int decimals, QWidget *parent ) : QSpinBox( parent )
 	if( decimals != 0 )
 	{
 		// create a DoubleSpinBox
-		typ = MT_SpinBoxValueType::Double;
+		valueType = MT_SpinBoxValueType::Double;
 		precision = pow( 10, decimals );
 		dValidator->setRange( 0.0, 100.0, decimals );
 		lineEdit()->setValidator( dValidator );
@@ -33,7 +33,7 @@ DISpinBox::DISpinBox( int decimals, QWidget *parent ) : QSpinBox( parent )
 	else
 	{
 		// create an IntSpinBox
-		typ = MT_SpinBoxValueType::Integer;
+		valueType = MT_SpinBoxValueType::Integer;
 		precision = 1;
 		iValidator->setRange( 0, 100 );
 		lineEdit()->setValidator( iValidator );
@@ -50,8 +50,8 @@ DISpinBox::~DISpinBox()
 
 QValidator::State DISpinBox::validate( QString &input, int &pos ) const
 {
-	const QValidator *v = ( typ == MT_SpinBoxValueType::Integer ) ? static_cast<const QValidator*>( iValidator )
-	                                                              : static_cast<const QValidator*>( dValidator );
+	const QValidator *v = ( valueType == MT_SpinBoxValueType::Integer ) ? static_cast<const QValidator*>( iValidator )
+	                                                                    : static_cast<const QValidator*>( dValidator );
 	return v ? v->validate( input, pos ) : QValidator::Acceptable;
 }
 
@@ -62,7 +62,7 @@ void DISpinBox::fixup( QString & ) const
 
 int DISpinBox::valueFromText( const QString &t ) const
 {
-	if( typ == MT_SpinBoxValueType::Integer )
+	if( valueType == MT_SpinBoxValueType::Integer )
 	{
 		return t.toInt();
 	}
@@ -74,7 +74,7 @@ int DISpinBox::valueFromText( const QString &t ) const
 
 QString DISpinBox::textFromValue( int value ) const
 {
-	if( typ == MT_SpinBoxValueType::Integer )
+	if( valueType == MT_SpinBoxValueType::Integer )
 	{
 		return QString( "%1" ).arg( value );
 	}
@@ -106,7 +106,7 @@ int DISpinBox::intValue()
 
 void DISpinBox::setRange( int minVal, int maxVal )
 {
-	typ = MT_SpinBoxValueType::Integer;
+	valueType = MT_SpinBoxValueType::Integer;
 	precision = 1;
 
 	setSingleStep( 1 );
@@ -117,7 +117,7 @@ void DISpinBox::setRange( int minVal, int maxVal )
 
 void DISpinBox::setRange( int decimals, double minVal, double maxVal )
 {
-	typ = MT_SpinBoxValueType::Double;
+	valueType = MT_SpinBoxValueType::Double;
 	iDecimals = decimals;
 	precision = pow( 10, decimals );
 
@@ -129,5 +129,5 @@ void DISpinBox::setRange( int decimals, double minVal, double maxVal )
 
 MT_SpinBoxValueType DISpinBox::getType()
 {
-	return typ;
+	return valueType;
 }

@@ -31,7 +31,7 @@ private:
 	QValidator::State validate( QString &input, int &pos ) const override;
 	void fixup( QString &input ) const override;
 
-	MT_SpinBoxValueType typ;
+	MT_SpinBoxValueType valueType;
 	int precision;
 	int iDecimals;
 	QIntValidator *iValidator;
