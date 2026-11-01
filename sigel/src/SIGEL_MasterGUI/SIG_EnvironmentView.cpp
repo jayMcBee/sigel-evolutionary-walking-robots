@@ -21,7 +21,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <qvalidator.h>
-#include <QLocale>
 #include <QValidator>
 #include <qlineedit.h>
 #include <qradiobutton.h>
@@ -32,6 +31,7 @@
 #include <qmenu.h>
 
 #include "SIGEL_MasterGUI/SIG_EnvironmentView.h"
+#include "SIGEL_CommonGUI/SIG_WidgetUtils.h"
 
 #include "SIGEL_Environment/SIG_Terrain.h"
 #include "SIGEL_Tools/SIG_Vector.h"
@@ -68,12 +68,7 @@ SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent,  const char* name, Qt
 	lineeditStaticFrictionCoefficient->setValidator( new QDoubleValidator(lineeditStaticFrictionCoefficient) );
 	lineeditKineticFrictionCoefficient->setValidator( new QDoubleValidator(lineeditKineticFrictionCoefficient) );
 
-	// The read-back is QString::toDouble(), which always wants '.'. The C locale
-	// alone still takes "0,375" as grouped, so the group separator is rejected.
-	QLocale cLocale = QLocale::c();
-	cLocale.setNumberOptions( QLocale::RejectGroupSeparator );
-	for ( QValidator *v : findChildren<QValidator *>() )
-		v->setLocale( cLocale );
+	SIGEL_CommonGUI::SIG_WidgetUtils::useDotDecimalNumberFormat( this );
 
 	QMenu *functionPresetMenu = new QMenu( pushbuttonFunctionPresets );
 	for ( SIGEL_Environment::SIG_TerrainPreset const &preset : SIGEL_Environment::SIG_Terrain::presets() )
