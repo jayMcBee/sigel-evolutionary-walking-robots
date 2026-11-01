@@ -201,7 +201,7 @@ touched, because changing one changes behaviour against the reference binary.
   its value; "save best", now the sign, becomes a `bool` of its own in
   memory. Only with the unit tests of item 180 in place first.
 
-- [ ] **132. Save the `.exp` file with `QSaveFile`.** The `.mexp` file
+- [ ] **186. Save the `.exp` file with `QSaveFile`.** The `.mexp` file
   already saves this way. The `.exp` saves still open the file with `QFile`,
   which empties it first, so a crash or a full disk during a save loses the
   experiment.
