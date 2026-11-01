@@ -192,7 +192,7 @@ MT_ErrorCode MT_Individual::getLastError()
 	return LastError;
 }
 
-void MT_Individual::setTypOfGenesis(MT_GenesisType Typ)
+void MT_Individual::setTypeOfGenesis(MT_GenesisType Typ)
 {
 	TypeOfGenesis = Typ;
 }

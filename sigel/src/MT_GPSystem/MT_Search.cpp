@@ -98,7 +98,7 @@ MT_Individual * MT_Search::mutate( MT_Individual * Progenitor )
 		}
 	}
 
-	Child->setTypOfGenesis( static_cast<MT_GenesisType>( static_cast<int>( MT_GenesisType::Mutation ) + NumOfMutation ) );
+	Child->setTypeOfGenesis( static_cast<MT_GenesisType>( static_cast<int>( MT_GenesisType::Mutation ) + NumOfMutation ) );
 
 	return Child;
 }
@@ -135,8 +135,8 @@ void MT_Search::crossover( MT_Individual * ParentOne, MT_Individual * ParentTwo 
 			ChildOneProgram->insertProg( &SecondPartForChildOne );
 			ChildTwoProgram->insertProg( &SecondPartForChildTwo );
 
-			ChildOne->setTypOfGenesis( MT_GenesisType::OnePointCrossover );
-			ChildTwo->setTypOfGenesis( MT_GenesisType::OnePointCrossover );
+			ChildOne->setTypeOfGenesis( MT_GenesisType::OnePointCrossover );
+			ChildTwo->setTypeOfGenesis( MT_GenesisType::OnePointCrossover );
 		}
 		break;
 
@@ -155,8 +155,8 @@ void MT_Search::crossover( MT_Individual * ParentOne, MT_Individual * ParentTwo 
 			ChildOneProgram->insertProg( &ThirdPartForChildOne );
 			ChildTwoProgram->insertProg( &ThirdPartForChildTwo );
 
-			ChildOne->setTypOfGenesis( MT_GenesisType::TwoPointCrossover );
-			ChildTwo->setTypOfGenesis( MT_GenesisType::TwoPointCrossover );
+			ChildOne->setTypeOfGenesis( MT_GenesisType::TwoPointCrossover );
+			ChildTwo->setTypeOfGenesis( MT_GenesisType::TwoPointCrossover );
 		}
 		break;
 
@@ -181,8 +181,8 @@ void MT_Search::crossover( MT_Individual * ParentOne, MT_Individual * ParentTwo 
 			ChildOneProgram->insertProg( &FourthPartForChildOne );
 			ChildTwoProgram->insertProg( &FourthPartForChildTwo );
 
-			ChildOne->setTypOfGenesis( MT_GenesisType::ThreePointCrossover );
-			ChildTwo->setTypOfGenesis( MT_GenesisType::ThreePointCrossover );
+			ChildOne->setTypeOfGenesis( MT_GenesisType::ThreePointCrossover );
+			ChildTwo->setTypeOfGenesis( MT_GenesisType::ThreePointCrossover );
 		}
 		break;
 	}
@@ -217,7 +217,7 @@ MT_ErrorCode MT_Search::startMatingProcess()
 	for( FreePos = 0; FreePos < ParentSize; FreePos++ )
 	{
 		Parent = SourcePop->getIndividual( FreePos );
-		Parent->setTypOfGenesis( MT_GenesisType::CarriedOverParent );
+		Parent->setTypeOfGenesis( MT_GenesisType::CarriedOverParent );
 
 		RandomPos = Randi->getRandomInteger( OffspringSize );
 
@@ -243,7 +243,7 @@ MT_ErrorCode MT_Search::startMatingProcess()
 		case 3:
 			{
 				ChildOne = reproduce( SourcePop->getIndividual( ParentPos ) );
-				ChildOne->setTypOfGenesis( MT_GenesisType::Reproduction );
+				ChildOne->setTypeOfGenesis( MT_GenesisType::Reproduction );
 				ChildOne->setFitnessOfParent( ( SourcePop->getIndividual( ParentPos ) )->getFitness() );
 
 				while( TargetPop->getIndividual( FreePos ) != nullptr )
