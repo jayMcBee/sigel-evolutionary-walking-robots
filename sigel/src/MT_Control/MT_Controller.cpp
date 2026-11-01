@@ -585,14 +585,16 @@ bool MT_Controller::writeToFile( QTextStream &file, QString name )
 	}
 
 	// save the meta system
-	if( !saveSystem( name ) )
-	{
-		return false;  // oops, something went wrong
-	}
+	bool saved = saveSystem( name );
 
 	if( gpManager )
 	{
 		pthread_mutex_unlock( &gpManager->evolutionMutex );
+	}
+
+	if( !saved )
+	{
+		return false;  // oops, something went wrong
 	}
 
 	file << "MetaInUse\n";     // write the file name for the meta experiment

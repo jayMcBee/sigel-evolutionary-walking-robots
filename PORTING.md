@@ -911,6 +911,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-01 — DONE: A FAILED METAGP SAVE RELEASES `evolutionMutex`.**
+
+- `MT_Controller::writeToFile` unlocks before it looks at the result of
+  `saveSystem`, so a cancelled or failed save no longer blocks MetaGP's evolution
+  thread and the next save.
+
 **2026-11-01 — DONE: EVERY `.exp` SAVE GOES THROUGH `SIG_GPExperiment::saveToFile`.**
 
 - `saveToFile` writes through `QSaveFile`, so a crash or a full disk during a
