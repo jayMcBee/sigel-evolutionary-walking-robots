@@ -1,4 +1,5 @@
 #include "MT_GUI/DoubleSpinBox.h"
+#include "SIGEL_CommonGUI/SIG_WidgetUtils.h"
 
 #include <QLineEdit>
 #include <cmath>
@@ -13,12 +14,7 @@ DISpinBox::DISpinBox( int decimals, QWidget *parent ) : QSpinBox( parent )
 	dValidator = new QDoubleValidator( this );
 	iValidator = new QIntValidator( this );
 
-	// Pinned to the C locale, and the group separator rejected: C's group
-	// separator is ',' so "0,375" would validate and read back as 0.
-	QLocale cLocale = QLocale::c();
-	cLocale.setNumberOptions( QLocale::RejectGroupSeparator );
-	dValidator->setLocale( cLocale );
-	iValidator->setLocale( cLocale );
+	SIGEL_CommonGUI::SIG_WidgetUtils::useDotDecimalNumberFormat( this );
 
 	// valueChanged comes only from setValue or when editing ends, not on
 	// every keystroke.

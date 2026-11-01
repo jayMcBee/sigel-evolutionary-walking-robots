@@ -3,7 +3,6 @@
 
 #include <QSpinBox>
 #include <QValidator>
-#include <QLocale>
 #include "MT_GUI/MT_SpinBoxValueType.h"
 
 class DISpinBox : public QSpinBox
