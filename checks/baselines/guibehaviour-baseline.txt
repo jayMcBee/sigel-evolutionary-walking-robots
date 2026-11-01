@@ -1342,8 +1342,8 @@ Do you want to replace it?]
     label  [Command: <b>MOVE</b>]
     label  [Duration:]
     edit   [] text=[0.01] selected=[] focus=1
-    button [&OK         ] default=1 enabled=1 focus=0
-    button [&Cancel     ] default=0 enabled=1 focus=0
+    button [OK          ] default=1 enabled=1 focus=0
+    button [Cancel      ] default=0 enabled=1 focus=0
     radio  [Allow] checked=1
     radio  [Disallow] checked=0
     group  [Availability]

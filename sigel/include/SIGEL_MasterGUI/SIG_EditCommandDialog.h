@@ -40,7 +40,6 @@ class QGridLayout;
 class QButtonGroup;
 class QLabel;
 class QLineEdit;
-class QPushButton;
 class QRadioButton;
 
 namespace SIGEL_MasterGUI
@@ -62,14 +61,11 @@ public:
     QRadioButton* radiobuttonDisallow;
     QLabel* textlabelDuration;
     QLineEdit* lineeditDuration;
-    QPushButton* pushbuttonOK;
-    QPushButton* pushbuttonCancel;
 
 protected:
     QVBoxLayout* SIG_EditCommandDialogLayout;
     QVBoxLayout* buttongroupAllowDisallowLayout;
     QHBoxLayout* Layout2;
-    QHBoxLayout* Layout1;
 };
 
 }

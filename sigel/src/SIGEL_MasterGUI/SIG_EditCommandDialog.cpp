@@ -35,7 +35,7 @@
 #include <QValidator>
 #include <qlabel.h>
 #include <qlineedit.h>
-#include <qpushbutton.h>
+#include <QDialogButtonBox>
 #include <qradiobutton.h>
 #include <qlayout.h>
 #include <qvariant.h>
@@ -101,25 +101,10 @@ SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent,  const char* name
     Layout2->addWidget( lineeditDuration );
     SIG_EditCommandDialogLayout->addLayout( Layout2 );
 
-    Layout1 = new QHBoxLayout; 
-    Layout1->setSpacing( 12 );
-    Layout1->setContentsMargins( 0, 0, 0, 0 );
-    QSpacerItem* spacer = new QSpacerItem( 20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
-    Layout1->addItem( spacer );
-
-    pushbuttonOK = new QPushButton( this );
-    pushbuttonOK->setText( tr( "&OK" ) );
-    pushbuttonOK->setDefault( true );
-    Layout1->addWidget( pushbuttonOK );
-
-    pushbuttonCancel = new QPushButton( this );
-    pushbuttonCancel->setText( tr( "&Cancel" ) );
-    Layout1->addWidget( pushbuttonCancel );
-    SIG_EditCommandDialogLayout->addLayout( Layout1 );
-
-    // signals and slots connections
-    connect( pushbuttonOK, SIGNAL( clicked() ), this, SLOT( accept() ) );
-    connect( pushbuttonCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
+    QDialogButtonBox *buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this );
+    connect( buttons, &QDialogButtonBox::accepted, this, &QDialog::accept );
+    connect( buttons, &QDialogButtonBox::rejected, this, &QDialog::reject );
+    SIG_EditCommandDialogLayout->addWidget( buttons );
 
   SIGEL_CommonGUI::SIG_WidgetUtils::useDotDecimalNumberFormat( this );
 }
