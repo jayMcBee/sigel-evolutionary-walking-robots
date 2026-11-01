@@ -21,13 +21,13 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include <qvalidator.h>
-#include <QLocale>
 #include <QValidator>
 #include <qlineedit.h>
 #include <qspinbox.h>
 #include <qcombobox.h>
 
 #include "SIGEL_MasterGUI/SIG_SimulationParameter.h"
+#include "SIGEL_CommonGUI/SIG_WidgetUtils.h"
 
 #include "SIGEL_Tools/SIG_IO.h" // only for DEBUG!
 
@@ -42,12 +42,7 @@ SIG_SimulationParameter::SIG_SimulationParameter( QWidget* parent,  const char* 
   lineeditJointlimitsDamperConstant->setValidator( new QDoubleValidator( lineeditJointlimitsDamperConstant ) );
   lineeditJointfrictionConstant->setValidator( new QDoubleValidator( lineeditJointfrictionConstant ) );
 
-  // The read-back is QString::toDouble(), which always wants '.'. The C locale
-  // alone still takes "0,375" as grouped, so the group separator is rejected.
-  QLocale cLocale = QLocale::c();
-  cLocale.setNumberOptions( QLocale::RejectGroupSeparator );
-  for ( QValidator *v : findChildren<QValidator *>() )
-    v->setLocale( cLocale );
+  SIGEL_CommonGUI::SIG_WidgetUtils::useDotDecimalNumberFormat( this );
 }
 
 void SIG_SimulationParameter::putIntoExperiment()
