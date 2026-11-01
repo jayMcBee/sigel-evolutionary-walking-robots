@@ -31,7 +31,7 @@
 #include "SIGEL_MasterGUI/SIG_AddIndividualsDialog.h"
 
 #include <qlabel.h>
-#include <qpushbutton.h>
+#include <QDialogButtonBox>
 #include <qspinbox.h>
 #include <qlayout.h>
 #include <qvariant.h>
@@ -56,7 +56,7 @@ SIG_AddIndividualsDialog::SIG_AddIndividualsDialog( QWidget* parent,  const char
 
     if ( !name )
 	setObjectName( "SIG_AddIndividualsDialogBase" );
-    resize( 222, 92 ); 
+    resize( 300, 95 ); 
     setSizePolicy( QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum ) );
     setWindowTitle( tr( "Add Individuals" ) );
     SIG_AddIndividualsDialogBaseLayout = new QVBoxLayout( this ); 
@@ -78,25 +78,10 @@ SIG_AddIndividualsDialog::SIG_AddIndividualsDialog( QWidget* parent,  const char
     Layout4->addWidget( spinboxNumber );
     SIG_AddIndividualsDialogBaseLayout->addLayout( Layout4 );
 
-    Layout1 = new QHBoxLayout; 
-    Layout1->setSpacing( 6 );
-    Layout1->setContentsMargins( 0, 0, 0, 0 );
-    QSpacerItem* spacer = new QSpacerItem( 20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
-    Layout1->addItem( spacer );
-
-    pushbuttonOK = new QPushButton( this );
-    pushbuttonOK->setText( tr( "&OK" ) );
-    pushbuttonOK->setDefault( true );
-    Layout1->addWidget( pushbuttonOK );
-
-    pushbuttonCancel = new QPushButton( this );
-    pushbuttonCancel->setText( tr( "&Cancel" ) );
-    Layout1->addWidget( pushbuttonCancel );
-    SIG_AddIndividualsDialogBaseLayout->addLayout( Layout1 );
-
-    // signals and slots connections
-    connect( pushbuttonOK, SIGNAL( clicked() ), this, SLOT( accept() ) );
-    connect( pushbuttonCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
+    QDialogButtonBox *buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this );
+    connect( buttons, &QDialogButtonBox::accepted, this, &QDialog::accept );
+    connect( buttons, &QDialogButtonBox::rejected, this, &QDialog::reject );
+    SIG_AddIndividualsDialogBaseLayout->addWidget( buttons );
 }
 
 }

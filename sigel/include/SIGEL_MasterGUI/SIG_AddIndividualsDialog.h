@@ -37,7 +37,6 @@ class QVBoxLayout;
 class QHBoxLayout; 
 class QGridLayout; 
 class QLabel;
-class QPushButton;
 class QSpinBox;
 
 namespace SIGEL_MasterGUI
@@ -55,13 +54,10 @@ public:
 
     QLabel* textlabelNumber;
     QSpinBox* spinboxNumber;
-    QPushButton* pushbuttonOK;
-    QPushButton* pushbuttonCancel;
 
 protected:
     QVBoxLayout* SIG_AddIndividualsDialogBaseLayout;
     QHBoxLayout* Layout4;
-    QHBoxLayout* Layout1;
 };
 
 }

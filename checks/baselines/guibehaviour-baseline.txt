@@ -437,8 +437,8 @@ order=Ascending
   [modal] class=SIGEL_MasterGUI::SIG_AddIndividualsDialog title=[Add Individuals]
 dialog [Add Individuals]
   spin default=1 min=1 max=9999
-  button [&OK] default=1
-  button [&Cancel] default=0
+  button [OK] default=1
+  button [Cancel] default=0
 rows=105
   new 17219 | -1 | 0
   new 17218 | -1 | 0
@@ -1443,8 +1443,8 @@ Do you want to replace it?]
     label  [Number to add:]
     spin   [] value=1 min=1 max=9999
     edit   [qt_spinbox_lineedit] text=[1] selected=[] focus=1
-    button [&OK         ] default=1 enabled=1 focus=0
-    button [&Cancel     ] default=0 enabled=1 focus=0
+    button [OK          ] default=1 enabled=1 focus=0
+    button [Cancel      ] default=0 enabled=1 focus=0
     prefill=[1] selected=[]; typing "2" gives [12] value=12  (1.3 appends -> 12)
     spin                                        v=1         [1..9999] step=1 pre=[] suf=[] up=2         dn2=1         typed(max+1)=[1000]->1000 commits=not-pressed(in a dialog) enabled=1
     [still open before Cancel] visible=1
