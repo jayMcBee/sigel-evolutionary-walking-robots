@@ -4,9 +4,7 @@
 #include <QSpinBox>
 #include <QValidator>
 #include <QLocale>
-
-#define INTTYP 0
-#define DBLTYP 1
+#include "MT_GUI/MT_SpinBoxValueType.h"
 
 class DISpinBox : public QSpinBox  
 {
@@ -14,7 +12,7 @@ public:
 	DISpinBox(int decimals, QWidget *parent=nullptr, const char *name=nullptr);
 	~DISpinBox() override;
 
-	int getType();
+	MT_SpinBoxValueType getType();
 
 	void setDoubleValue(double value);
 	double doubleValue();
@@ -34,7 +32,7 @@ private:
 	QValidator::State validate(QString &input, int &pos) const override;
 	void fixup(QString &input) const override;
 
-	int typ;
+	MT_SpinBoxValueType typ;
 	int precision;
 	int iDecimals;
 	QIntValidator *iValidator;

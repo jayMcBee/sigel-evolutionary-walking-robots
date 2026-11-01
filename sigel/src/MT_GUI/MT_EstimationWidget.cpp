@@ -23,7 +23,7 @@ MT_EstimationWidget::MT_EstimationWidget(QWidget* parent, const char* name, Qt::
 void MT_EstimationWidget::slotStrategyChanged(int index)
 {
 	// remember the last set value
-	if(toleranceSpinBox->getType() == INTTYP){
+	if(toleranceSpinBox->getType() == MT_SpinBoxValueType::Integer){
 		switch(lastIndex){
 		case 0 : tol0 = toleranceSpinBox->doubleValue(); break;
 		case 1 : tol1 = toleranceSpinBox->doubleValue(); break;
@@ -122,7 +122,7 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, MT_EstimationState *esti
 
 	refInt = intervalSpinBox->value();
 
-	if(toleranceSpinBox->getType() == INTTYP)
+	if(toleranceSpinBox->getType() == MT_SpinBoxValueType::Integer)
 		tolerance = static_cast<double>(toleranceSpinBox->intValue());
 	else
 		tolerance = toleranceSpinBox->doubleValue();
@@ -230,7 +230,7 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, MT_EstimationState *esti
 
 	// set the values
 	intervalSpinBox->setValue(refInt);
-	if(toleranceSpinBox->getType() == INTTYP)
+	if(toleranceSpinBox->getType() == MT_SpinBoxValueType::Integer)
 		toleranceSpinBox->setIntValue(static_cast<int>(tolerance));
 	else
 		toleranceSpinBox->setDoubleValue(tolerance);
