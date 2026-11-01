@@ -29,9 +29,9 @@
 ** WARNING! All changes made in this file will be lost!
 ****************************************************************************/
 #include "SIGEL_MasterGUI/SIG_EditCommandDialog.h"
+#include "SIGEL_CommonGUI/SIG_WidgetUtils.h"
 
 #include <QGroupBox>
-#include <QLocale>
 #include <QValidator>
 #include <qlabel.h>
 #include <qlineedit.h>
@@ -121,12 +121,7 @@ SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent,  const char* name
     connect( pushbuttonOK, SIGNAL( clicked() ), this, SLOT( accept() ) );
     connect( pushbuttonCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
 
-  // The read-back is QString::toDouble(), which always wants '.'. The C locale
-  // alone still takes "0,375" as grouped, so the group separator is rejected.
-  QLocale cLocale = QLocale::c();
-  cLocale.setNumberOptions( QLocale::RejectGroupSeparator );
-  for ( QValidator *v : findChildren<QValidator *>() )
-    v->setLocale( cLocale );
+  SIGEL_CommonGUI::SIG_WidgetUtils::useDotDecimalNumberFormat( this );
 }
 
 }
