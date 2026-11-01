@@ -272,10 +272,9 @@ $(OBJ)/sigel/%.o: $(SRC)/src/%.cpp $(STAMP) | $(UI_HDRS)
 MOC_HDRS := $(patsubst $(SRC)/include/%,%,$(shell grep -rl Q_OBJECT \
               $(addprefix $(SRC)/include/,$(CORE) $(GUI)) 2>/dev/null | sort))
 MOC_OBJS := $(patsubst %.h,$(OBJ)/moc/%.o,$(MOC_HDRS))
-# The slave, coredrive, sigel_tests and pvm_link get no MT_Control meta-object:
-# the one of MT_Controller pulls in the master GUI. coredrive and pvm_link link
-# no GUI module, and sigel_tests links SIGEL_CommonGUI for a class without a
-# meta-object, so they get no GUI meta-objects either.
+# The slave, coredrive and pvm_link get no MT_Control meta-object: the one of
+# MT_Controller pulls in the master GUI. coredrive and pvm_link link no GUI
+# module, so they get no GUI meta-objects either.
 MOC_OBJS_CORE  := $(patsubst %.h,$(OBJ)/moc/%.o,\
                     $(filter $(addsuffix /%,$(filter-out MT_Control,$(CORE))),$(MOC_HDRS)))
 
@@ -316,9 +315,9 @@ $(B)/coredrive: checks/programs/coredrive.cpp $(MOC_OBJS_CORE) $(CORE_LIBS) $(VE
 	  -Wl,--start-group $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
 	  -L$(QTLIB) -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
 
-# The unit tests, with Qt Test, linked like coredrive plus PVM, which
-# SIG_GPPVMData calls, and SIGEL_CommonGUI for SIG_WidgetUtils. Each test class
-# has a Q_OBJECT header. main.cpp names the classes by hand, so `make test' stops
+# The unit tests, with Qt Test, linked like sigel: TST_MT_Controller needs
+# MT_Controller, which pulls in the master GUI and PVM. Each test class has a
+# Q_OBJECT header. main.cpp names the classes by hand, so `make test' stops
 # if it misses one: that class would be built and never run.
 test: $(B)/sigel_tests
 	@for h in $(TEST_HDRS); do c=`basename $$h .h`; \
@@ -347,11 +346,10 @@ $(OBJ)/tests/%.o: $(SRC)/tests/%.cpp $(STAMP) | $(UI_HDRS)
 	@mkdir -p $(dir $@)
 	$(SIGCXX) -MMD -MP $(TESTINC) -c $< -o $@
 
-$(B)/sigel_tests: $(TEST_OBJS) $(MOC_OBJS_CORE) $(LIB)/libSIGEL_CommonGUI.a $(CORE_LIBS) $(VENDOR_LIBS) $(PVM_LIB)
-	$(SIGCXX) $(TEST_OBJS) $(MOC_OBJS_CORE) -o $@ \
-	  -Wl,--start-group $(LIB)/libSIGEL_CommonGUI.a $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
-	  $(PVM_LIB) -ltirpc \
-	  -L$(QTLIB) -lQt6Test -lQt6OpenGLWidgets -lQt6OpenGL -lQt6Widgets -lQt6Gui -lQt6Core -lGL -lGLU -lm
+$(B)/sigel_tests: $(TEST_OBJS) $(MOC_OBJS) $(GUI_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) $(PVM_LIB)
+	$(SIGCXX) $(TEST_OBJS) $(MOC_OBJS) -o $@ \
+	  -Wl,--start-group $(GUI_LIBS) $(CORE_LIBS) $(VENDOR_LIBS) -Wl,--end-group \
+	  -lQt6Test $(SIGLIBS)
 
 # ---------------------------------------------------------------------------
 # pvm_link: SIGEL's PVM code against real PVM; checks/pvm-check.sh runs it.
