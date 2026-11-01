@@ -46,24 +46,24 @@ void MT_EstimationWidget::slotStrategyChanged(int index)
 		switch(index){
 		case 0 : 
 			toleranceSpinBox->setRange(3, 0.0, 100.0);
-			toleranceSpinBox->setDblValue(tol0);
+			toleranceSpinBox->setDoubleValue(tol0);
 			break;
 		case 1 :
 			toleranceSpinBox->setRange(3, 0.0, 100.0);
-			toleranceSpinBox->setDblValue(tol1);
+			toleranceSpinBox->setDoubleValue(tol1);
 			break;
 		case 2 : 
 			toleranceSpinBox->setRange(3, 0.0, 100.0);
-			toleranceSpinBox->setDblValue(tol2);
+			toleranceSpinBox->setDoubleValue(tol2);
 			break;
 		case 3 :
 			toleranceSpinBox->setRange(3, 0.0, 100.0);
-			toleranceSpinBox->setDblValue(tol3);
+			toleranceSpinBox->setDoubleValue(tol3);
 			break;
 		case 4 :
 		default:
 			toleranceSpinBox->setRange(3, 0.0, 100.0);
-			toleranceSpinBox->setDblValue(tol4);
+			toleranceSpinBox->setDoubleValue(tol4);
 			break;
 		}
 	} else {
@@ -233,5 +233,5 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, MT_EstimationState *esti
 	if(toleranceSpinBox->getType() == INTTYP)
 		toleranceSpinBox->setIntValue(static_cast<int>(tolerance));
 	else
-		toleranceSpinBox->setDblValue(tolerance);
+		toleranceSpinBox->setDoubleValue(tolerance);
 }

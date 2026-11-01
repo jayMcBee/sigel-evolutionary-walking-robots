@@ -16,7 +16,7 @@ public:
 
 	int getType();
 
-	void setDblValue(double value);
+	void setDoubleValue(double value);
 	double dblValue();
 
 	void setIntValue(int value);
