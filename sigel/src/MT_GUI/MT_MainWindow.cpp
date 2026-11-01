@@ -120,12 +120,9 @@ void MT_MainWindow::createMenus()
 
 void MT_MainWindow::createToolBars()
 {
-	mainToolBar = new QToolBar( this );
-	mainToolBar->setObjectName( "mtFileToolBar" );
-	mainToolBar->setWindowTitle( "MT File" );
-
 	// Without this an undocked toolbar floats at 0,0 over the central widget.
-	addToolBar( Qt::TopToolBarArea, mainToolBar );
+	mainToolBar = addToolBar( "MT File" );
+	mainToolBar->setObjectName( "mtFileToolBar" );
 	mainToolBar->addAction( mtDefaultAction );
 	mainToolBar->addSeparator();
 	mainToolBar->addAction( mtLoadAction );
@@ -134,10 +131,8 @@ void MT_MainWindow::createToolBars()
 	mainToolBar->addAction( mtExitAction );
 
 	// toolbar for evolution control
-	evolCtrlToolbar = new QToolBar( this );
+	evolCtrlToolbar = addToolBar( "MT Evolution Control" );
 	evolCtrlToolbar->setObjectName( "mtEvolutionToolBar" );
-	addToolBar( Qt::TopToolBarArea, evolCtrlToolbar );
-	evolCtrlToolbar->setWindowTitle( "MT Evolution Control" );
 	evolCtrlToolbar->addAction( mtStartEvolutionAction );
 	evolCtrlToolbar->addAction( mtStopEvolutionAction );
 
