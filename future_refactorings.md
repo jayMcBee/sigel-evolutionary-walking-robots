@@ -206,6 +206,10 @@ touched, because changing one changes behaviour against the reference binary.
   which empties it first, so a crash or a full disk during a save loses the
   experiment.
 
+- [ ] **185. Unlock `evolutionMutex` when a MetaGP save fails.**
+  `MT_Controller::writeToFile` returns with the mutex locked if `saveSystem`
+  fails. MetaGP's evolution thread and the next save then wait for ever.
+
 - [ ] **122. Destroy MetaGP's mutexes instead of unlocking them.**
   `MT_Substitute::~MT_Substitute` and `MT_GPManager::~MT_GPManager` call
   `pthread_mutex_unlock` on mutexes the destroying thread does not hold, which
