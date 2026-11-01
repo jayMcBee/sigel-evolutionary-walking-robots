@@ -1875,10 +1875,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
   marks test code: `TST_SIG_Randomizer`,
   `TST_SIG_LanguageParameters`, `TST_SIG_Link`, `TST_SIG_Robot`,
   `TST_SIG_Material`, `TST_SIG_GPPopulation` and `TST_MT_Search`. A test
-  uses public methods only, and nothing in `sigel/src/` changed for the
-  tests. `main.cpp` runs each class with `QTest::qExec`, prints one summary
-  line and has no application object, because with one
-  `SIG_GPPopulation::addRandomIndividuals` makes a progress dialog.
+  uses public methods, and nothing in `sigel/src/` changed for the tests.
+  The exception is `TST_MT_Controller`, which also calls the private slots
+  of `MT_Controller` through the meta-object system. `main.cpp` runs each
+  class with `QTest::qExec`, prints one summary line and has no application
+  object, because with one `SIG_GPPopulation::addRandomIndividuals` makes a
+  progress dialog. `TST_MT_Controller` makes its own `QApplication` on the
+  offscreen platform for its own run and deletes it at the end.
   `make test` stops if `main.cpp` does not name a test class.
   `-selfcheck` and `-metamating` are deleted from `coredrive.cpp`; every
   rule, seed and value of both is in the test classes.
