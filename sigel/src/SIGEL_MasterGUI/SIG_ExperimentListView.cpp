@@ -270,16 +270,10 @@ void SIG_ExperimentListView::slotCloneExperiment()
   qDeleteAll( fresh.experimentHistory );
   fresh.experimentHistory.clear();
 
-  QFile file( fileName );
-  if( !file.open(QIODevice::WriteOnly) ) {
-      QMessageBox::warning( this, "File Could Not Be Written", "The file " + fileName + " could not be opened for writing." );
+  if( !fresh.saveToFile( fileName ) ) {
+      QMessageBox::warning( this, "File Could Not Be Written", "The file " + fileName + " could not be written." );
       return;
   }
-  {
-    QTextStream theStream( &file );
-    fresh.saveExperiment( theStream );
-  }
-  file.close();
 
   setCurrentItem( openExperimentFile( fileName ) );
 }
@@ -293,10 +287,8 @@ void SIG_ExperimentListView::slotSaveExperiment()
       return;
   }
   theExperiment->putAllIntoExperiment();
-  QFile file( theExperiment->gpExperiment.getPath() );
-  if( file.open(QIODevice::WriteOnly) ) {
-      QTextStream theStream( &file );
-      theExperiment->gpExperiment.saveExperiment( theStream );
+  if( !theExperiment->gpExperiment.saveToFile( theExperiment->gpExperiment.getPath() ) ) {
+      QMessageBox::warning( this, "File Could Not Be Written", "The file " + theExperiment->gpExperiment.getPath() + " could not be written." );
   }
 }
 
@@ -309,12 +301,10 @@ void SIG_ExperimentListView::slotSaveExperimentAs()
       QString fileName = QFileDialog::getSaveFileName( this, "Save Experiment As", theExperiment->getName(), "Experiment Files (*.exp);;All Files (*)" );
       if( !fileName.isEmpty() ) {
 	  fileName = theExperiment->checkEnding( fileName, "exp" );
-	  QFile file( fileName );
-	  if( file.open(QIODevice::WriteOnly) ) {
-	      QTextStream theStream( &file );
-	      theExperiment->gpExperiment.saveExperiment( theStream );
+	  if( !theExperiment->gpExperiment.saveToFile( fileName ) ) {
+	      QMessageBox::warning( this, "File Could Not Be Written", "The file " + fileName + " could not be written." );
+	      return;
 	  }
-	  file.close();
 
 	  QFileInfo fileInfo( fileName );
 

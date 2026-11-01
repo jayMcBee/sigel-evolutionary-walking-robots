@@ -911,6 +911,15 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-01 — DONE: EVERY `.exp` SAVE GOES THROUGH `SIG_GPExperiment::saveToFile`.**
+
+- `saveToFile` writes through `QSaveFile`, so a crash or a full disk during a
+  save leaves the previous file intact. The two autosaves, Save, Save As, Clone
+  and the save at the end of `sigel -evolve` all use it.
+- `saveExperiment` and `MT_Controller::writeToFile` return `bool`. A failed or
+  cancelled MetaGP save skips the commit.
+- Save and Save As now warn when a save fails, and Save As keeps the old name.
+
 **2026-11-01 — DONE: THE METAGP SAVE HAS NO ROTATION AND WRITES THE `.mexp` SAFELY.**
 
 - The three-file autosave rotation never worked: the counter stayed at 0, so

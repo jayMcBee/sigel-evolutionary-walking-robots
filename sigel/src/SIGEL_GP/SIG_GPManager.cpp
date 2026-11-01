@@ -894,14 +894,7 @@ void SIGEL_GP::SIG_GPManager::run()
 		if (currentExperiment.environment.getAutosaveIntervalGenerations()!=0
 		    && (currentExperiment.population.poolGeneration%currentExperiment.environment.getAutosaveIntervalGenerations())==0)
 		{
-			QFile file( currentExperiment.getPath() );
-			if (file.open(QIODeviceBase::WriteOnly))
-			{
-				QTextStream stream(&file);
-				currentExperiment.saveExperiment(stream);
-				file.close();
-			}
-			else
+			if (!currentExperiment.saveToFile(currentExperiment.getPath()))
 			{
 				std::cerr << "could not autosave the experiment!" << endl;
 			}
@@ -1091,14 +1084,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 		if (currentExperiment.environment.getAutosaveIntervalGenerations()!=0
 		    && (currentExperiment.population.poolGeneration%currentExperiment.environment.getAutosaveIntervalGenerations())==0)
 		{
-			QFile file( currentExperiment.getPath() );
-			if (file.open(QIODeviceBase::WriteOnly))
-			{
-				QTextStream stream(&file);
-				currentExperiment.saveExperiment(stream);
-				file.close();
-			}
-			else
+			if (!currentExperiment.saveToFile(currentExperiment.getPath()))
 			{
 				std::cerr << "could not autosave the experiment!" << endl;
 			}

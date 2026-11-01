@@ -43,7 +43,7 @@ public:
 	bool startEvolution();
 	void startTimedEvolution(int minutes);
 	bool readFromFile(QString fileName);
-	void writeToFile(QTextStream &file, QString name);
+	bool writeToFile(QTextStream &file, QString name);
 	bool IsEnabled();
 	MT_SubstituteKind UsedSystem();
 	MT_Substitute* getFitnessTrainer();

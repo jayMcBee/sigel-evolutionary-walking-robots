@@ -65,7 +65,7 @@ namespace SIGEL_GP
 		 * @param file
 		 *  The stream that receives the experiment.
 		 */
-		void saveExperiment( QTextStream &file ) override;
+		bool saveExperiment( QTextStream &file ) override;
 
 		/**
 		 * The controller of the MetaGP system. It is destroyed before the members

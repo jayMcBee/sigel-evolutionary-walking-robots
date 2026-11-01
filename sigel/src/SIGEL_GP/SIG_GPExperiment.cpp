@@ -23,6 +23,7 @@
 #include "SIGEL_GP/SIG_GPExperiment.h"
 
 #include <qfile.h>
+#include <QSaveFile>
 #include <qtextstream.h>
 
 #include "SIGEL_Tools/SIG_IO.h"
@@ -83,7 +84,25 @@ void SIGEL_GP::SIG_GPExperiment::loadBlocks( QString simulationParameterBlock, Q
 	comment = file.readAll();
 }
 
-void SIGEL_GP::SIG_GPExperiment::saveExperiment( QTextStream &file )
+bool SIGEL_GP::SIG_GPExperiment::saveToFile( const QString &fileName )
+{
+	QSaveFile file( fileName );
+	if( !file.open( QIODevice::WriteOnly ) )
+	{
+		return false;
+	}
+
+	QTextStream stream( &file );
+	if( !saveExperiment( stream ) )
+	{
+		return false;
+	}
+
+	stream.flush();
+	return file.commit();
+}
+
+bool SIGEL_GP::SIG_GPExperiment::saveExperiment( QTextStream &file )
 {
 	QString const fiveHashesLine( "\n#####\n" );
 
@@ -101,6 +120,7 @@ void SIGEL_GP::SIG_GPExperiment::saveExperiment( QTextStream &file )
 	file << fiveHashesLine;
 
 	file << comment;
+	return true;
 }
 
 void SIGEL_GP::SIG_GPExperiment::writeHistoryToFileTransfer( QTextStream &file )

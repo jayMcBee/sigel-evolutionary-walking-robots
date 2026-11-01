@@ -225,19 +225,15 @@ int main( int argc, char *argv[] ) {
 		gpManager.start();
 	}
 
-      // A signal during the save would leave the file cut short.
+      // A signal during the save would lose the run.
       std::signal( SIGINT, SIG_IGN );
       std::signal( SIGTERM, SIG_IGN );
 
-      if (!experimentFile.open( QIODevice::WriteOnly )) {
-        SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentName << "!" << Qt::endl;
+      if (!experiment.saveToFile( experimentName )) {
+        SIGEL_Tools::SIG_IO::cerr << "Error saving " << experimentName << "!" << Qt::endl;
         pvm_halt();
         return 1;
       }
-
-      QTextStream experimentSaveStream( &experimentFile );
-      experiment.saveExperiment( experimentSaveStream );
-      experimentFile.close();
     }
     catch (SIGEL_Tools::SIG_Exception &e) {
       // The manager no longer exists; the signal handler must not use it.

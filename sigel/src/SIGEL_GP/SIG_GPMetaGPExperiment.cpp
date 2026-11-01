@@ -62,12 +62,12 @@ void SIGEL_GP::SIG_GPMetaGPExperiment::loadExperiment( QTextStream &file )
 	loadBlocks( simParString, file );
 }
 
-void SIGEL_GP::SIG_GPMetaGPExperiment::saveExperiment( QTextStream &file )
+bool SIGEL_GP::SIG_GPMetaGPExperiment::saveExperiment( QTextStream &file )
 {
-	if( mtController->IsEnabled() )
+	if( mtController->IsEnabled() && !mtController->writeToFile( file, experimentName ) )
 	{
-		mtController->writeToFile( file, experimentName );
+		return false;
 	}
 
-	SIG_GPExperiment::saveExperiment( file );
+	return SIG_GPExperiment::saveExperiment( file );
 }

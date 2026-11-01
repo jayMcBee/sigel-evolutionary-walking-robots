@@ -73,8 +73,13 @@ namespace SIGEL_GP
 		 * Writes the experiment to a text stream.
 		 * @param file
 		 *  The stream that receives the experiment.
+		 * @return
+		 *  False if a part of the experiment could not be saved.
 		 */
-		virtual void saveExperiment( QTextStream &file );
+		virtual bool saveExperiment( QTextStream &file );
+
+		/** Saves the experiment to fileName. A failed save leaves the previous file intact. */
+		bool saveToFile( const QString &fileName );
 
 		/**
 		 * Calculates nothing.

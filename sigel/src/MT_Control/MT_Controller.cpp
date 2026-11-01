@@ -570,11 +570,11 @@ bool MT_Controller::readFromFile( QString fileName )
  * save the meta system if sigel saves the experiment
  * called from SIG_GPMetaGPExperiment::saveExperiment(QTextStream & file)
  ***/
-void MT_Controller::writeToFile( QTextStream &file, QString name )
+bool MT_Controller::writeToFile( QTextStream &file, QString name )
 {
 	if( !metaOn )
 	{
-		return;
+		return true;
 	}
 
 	// wait for the evolution to end before saving the system
@@ -587,7 +587,7 @@ void MT_Controller::writeToFile( QTextStream &file, QString name )
 	// save the meta system
 	if( !saveSystem( name ) )
 	{
-		return;  // oops, something went wrong
+		return false;  // oops, something went wrong
 	}
 
 	if( gpManager )
@@ -598,6 +598,7 @@ void MT_Controller::writeToFile( QTextStream &file, QString name )
 	file << "MetaInUse\n";     // write the file name for the meta experiment
 	file << "fileName=" << saveName << "\n";// into the sigel experiment file
 	file << "#####\n";
+	return true;
 }
 
 /***
