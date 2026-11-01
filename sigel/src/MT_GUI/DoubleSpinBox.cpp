@@ -122,7 +122,7 @@ void DISpinBox::setRange(int decimals, double minVal, double maxVal)
 	QSpinBox::setRange(minVal, static_cast<int>(maxVal * precision));
 }
 
-int DISpinBox::getTyp()
+int DISpinBox::getType()
 {
 	return typ;
 }

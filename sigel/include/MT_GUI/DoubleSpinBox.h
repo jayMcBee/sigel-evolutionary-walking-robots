@@ -14,7 +14,7 @@ public:
 	DISpinBox(int decimals, QWidget *parent=nullptr, const char *name=nullptr);
 	~DISpinBox() override;
 
-	int getTyp();
+	int getType();
 
 	void setDblValue(double value);
 	double dblValue();
