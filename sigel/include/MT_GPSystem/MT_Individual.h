@@ -44,7 +44,7 @@ public:
 	void setNewAge(int NewAge);
 	void setNewName(int NewName);
 
-	MT_GenesisType getTypOfGenesis();
+	MT_GenesisType getTypeOfGenesis();
 	double getFitnessOfParent ();
 	int getPosition();
 	double getFitness();

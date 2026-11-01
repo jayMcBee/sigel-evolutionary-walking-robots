@@ -567,7 +567,7 @@ void MT_GPManager::collectOffspringParameter(MT_StatisticsElement * SElement)
 {
 	for (int i=0; i<Offspring->getSize(); i++)
 	{
-		MT_GenesisType TypeOfGenesis = (Offspring->getIndividual(i))->getTypOfGenesis();
+		MT_GenesisType TypeOfGenesis = (Offspring->getIndividual(i))->getTypeOfGenesis();
 		if (TypeOfGenesis >= MT_GenesisType::Mutation)
 		{
 			SElement->NumOfTotalElementMutation = SElement->NumOfTotalElementMutation +(static_cast<int>(TypeOfGenesis)-static_cast<int>(MT_GenesisType::Mutation));
@@ -627,7 +627,7 @@ void MT_GPManager::collectParentParameter(MT_StatisticsElement * SElement)
 	
 	for (int i=0; i<ParentSize; i++)
 	{
-		TypeOfGenesis = Parent->getIndividual(i)->getTypOfGenesis();
+		TypeOfGenesis = Parent->getIndividual(i)->getTypeOfGenesis();
 		if (TypeOfGenesis >= MT_GenesisType::Mutation)
 		{
 			SElement->NumOfMutateIndividuals++;

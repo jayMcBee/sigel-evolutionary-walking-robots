@@ -182,7 +182,7 @@ void MT_Individual::setFitnessOfParent(double FitOfParent)
 	FitnessOfParent = FitOfParent;
 }
 
-MT_GenesisType MT_Individual::getTypOfGenesis()
+MT_GenesisType MT_Individual::getTypeOfGenesis()
 {
 	return TypeOfGenesis;
 }

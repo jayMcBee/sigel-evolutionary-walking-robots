@@ -241,7 +241,7 @@ MT_MatingResult TST_MT_Search::mate( unsigned seed, const int searchOperator[3],
           continue;
         }
       result.childLines << programLines( individual->getProgram() );
-      result.childGenesis << static_cast<int>( individual->getTypOfGenesis() );
+      result.childGenesis << static_cast<int>( individual->getTypeOfGenesis() );
       result.childParent << ( individual->getFitnessOfParent() == 1.0 ? 0 : 1 );
     }
 
