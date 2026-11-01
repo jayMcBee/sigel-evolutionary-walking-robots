@@ -1,8 +1,8 @@
-#include <QLocale>
 #include <QValidator>
 #include "MT_GUI/MT_IndividualWidget.h"
 #include "MT_GUI/MT_AddConstantsWidget.h"
 #include "MT_GPSystem/MT_Randomizer.h"
+#include "SIGEL_CommonGUI/SIG_WidgetUtils.h"
 
 #include <QSlider>
 #include <QSpinBox>
@@ -118,16 +118,7 @@ void MT_IndividualsWidget::createWidgets()
 	editLUD->setValidator( validator );
 	editLUM->setValidator( validator );
 
-	// Pinned to the C locale: unpinned, "1,000" is ACCEPTABLE while text().toInt()
-	// returns 0.
-	{
-		QLocale cLocale = QLocale::c();
-		cLocale.setNumberOptions( QLocale::RejectGroupSeparator );
-		for( QValidator *v : findChildren<QValidator *>() )
-		{
-			v->setLocale( cLocale );
-		}
-	}
+	SIGEL_CommonGUI::SIG_WidgetUtils::useDotDecimalNumberFormat( this );
 
 	// create the editor
 	editor = new MT_Editor( constantsListBox );
