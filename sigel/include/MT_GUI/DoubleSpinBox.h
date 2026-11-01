@@ -9,7 +9,7 @@
 class DISpinBox : public QSpinBox
 {
 public:
-	DISpinBox( int decimals, QWidget *parent = nullptr, const char *name = nullptr );
+	DISpinBox( int decimals, QWidget *parent = nullptr );
 	~DISpinBox() override;
 
 	MT_SpinBoxValueType getType();

@@ -12,8 +12,8 @@
 MT_SearchWidget::MT_SearchWidget(QWidget* parent, const char* name, Qt::WindowFlags fl)
 : MT_SearchWidgetBase(parent, name, fl), MT_WidgetBase(parent)
 {
-    powerSpinBox = new DISpinBox( 1, GroupBox12, "powerSpinBox" );
-    lineProbSpinBox = new DISpinBox( 1, GroupBox12, "lineProbSpinBox" );
+    powerSpinBox = new DISpinBox( 1, GroupBox12 );
+    lineProbSpinBox = new DISpinBox( 1, GroupBox12 );
     Layout44->addWidget( powerSpinBox, 1, 1 );
     Layout44->addWidget( lineProbSpinBox, 0, 1 );
 	powerSpinBox->setRange(1, 0.0, 100.0);

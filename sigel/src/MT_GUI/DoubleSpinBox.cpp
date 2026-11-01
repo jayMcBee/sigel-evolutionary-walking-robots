@@ -3,13 +3,8 @@
 #include <QLineEdit>
 #include <cmath>
 
-DISpinBox::DISpinBox( int decimals, QWidget *parent, const char *name ) : QSpinBox( parent )
+DISpinBox::DISpinBox( int decimals, QWidget *parent ) : QSpinBox( parent )
 {
-	if( name )
-	{
-		setObjectName( QString::fromUtf8( name ) );
-	}
-
 	precision = 0;
 	dValidator = nullptr;
 	iValidator = nullptr;

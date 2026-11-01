@@ -14,7 +14,7 @@ MT_EstimationWidget::MT_EstimationWidget(QWidget* parent, const char* name, Qt::
 	tol0 = tol1 = 0.0;
 	usedSys = MT_SubstituteKind::Evaluator;
 
-	toleranceSpinBox = new DISpinBox(3, estimationGroupBox, "toleranceSpinBox");
+	toleranceSpinBox = new DISpinBox(3, estimationGroupBox);
 	Layout61->addWidget(toleranceSpinBox, 1, 2);
 
 	QObject::connect(strategyComboBox, SIGNAL(activated(int)), SLOT(slotStrategyChanged(int)));

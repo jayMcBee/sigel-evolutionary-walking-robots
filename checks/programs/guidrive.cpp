@@ -132,6 +132,7 @@ extern "C" {
 #include "SIGEL_MasterGUI/SIG_ExperimentListView.h"
 #include "SIGEL_MasterGUI/SIG_GUIGPExperiment.h"
 #include "MT_GUI/MT_Editor.h"
+#include "MT_GUI/DoubleSpinBox.h"
 #include "SIGEL_MasterGUI/SIG_AllIndividualsView.h"
 #include "SIGEL_MasterGUI/SIG_IndividualListItem.h"
 #include "SIGEL_MasterGUI/SIG_IndividualView.h"
@@ -156,6 +157,22 @@ static std::map<QString, bool> prevEnabled;
 static int stepNo = 0;
 
 // ---------------------------------------------------------------- utilities
+// A DISpinBox carries no object name, and this record tells widgets apart by
+// that name. Named here in findChildren order, to match the baseline.
+static void nameDISpinBoxes(QWidget *window)
+{
+    const QStringList names = { "powerSpinBox", "lineProbSpinBox", "toleranceSpinBox" };
+    QList<DISpinBox *> boxes;
+    for (QSpinBox *sp : window->findChildren<QSpinBox *>())
+        if (DISpinBox *box = dynamic_cast<DISpinBox *>(sp)) boxes << box;
+    if (boxes.count() != names.count()) {
+        printf("  !! expected %d DISpinBoxes, found %d\n",
+               static_cast<int>(names.count()), static_cast<int>(boxes.count()));
+        return;
+    }
+    for (int i = 0; i < boxes.count(); ++i) boxes[i]->setObjectName(names[i]);
+}
+
 static QString actKey(QAction *a, const QString &path)
 {
     return path + "/" + (a->objectName().isEmpty() ? a->text() : a->objectName());
@@ -2882,6 +2899,7 @@ static int guidriveMain(int argc, char **argv)
             fflush(stdout);
             return 0;
         }
+        nameDISpinBoxes(mt);
         printf("  [window] class=%s title=[%s] %dx%d modal=%d\n",
                mt->metaObject()->className(), qPrintable(mt->windowTitle()),
                mt->width(), mt->height(), mt->isModal() ? 1 : 0);
@@ -3030,6 +3048,7 @@ static int guidriveMain(int argc, char **argv)
         for (QWidget *w : QApplication::topLevelWidgets())
             if (w->windowTitle() == "SIGEL MetaGP") { mt = w; break; }
         if (!mt) { printf("\n!! no MetaGP window appeared\n"); return 1; }
+        nameDISpinBoxes(mt);
         // The control for the fix above: if this reads 0 the handler has
         // closed the window again and everything below is measuring a corpse.
         printf("  [window] visible=%d hidden=%d\n",
