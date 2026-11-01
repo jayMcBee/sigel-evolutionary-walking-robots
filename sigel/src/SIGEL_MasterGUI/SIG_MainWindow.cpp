@@ -689,10 +689,8 @@ void SIG_MainWindow::createMenus()
 
 void SIG_MainWindow::createToolBars()
 {
-	fileToolBar = new QToolBar( this );
+	fileToolBar = addToolBar( "File" );
 	fileToolBar->setObjectName( "fileToolbar" );
-	addToolBar( Qt::TopToolBarArea, fileToolBar );
-	fileToolBar->setWindowTitle( "File" );
 
 	fileToolBar->addAction( newExperimentAction );
 	fileToolBar->addAction( deleteExperimentAction );
@@ -702,10 +700,8 @@ void SIG_MainWindow::createToolBars()
 	fileToolBar->addSeparator();
 	fileToolBar->addAction( quitProgramAction );
 
-	viewToolBar = new QToolBar( this );
+	viewToolBar = addToolBar( "View" );
 	viewToolBar->setObjectName( "viewToolBar" );
-	addToolBar( Qt::TopToolBarArea, viewToolBar );
-	viewToolBar->setWindowTitle( "View" );
 
 	viewToolBar->addAction( viewPopulationAction );
 	viewToolBar->addAction( viewRobotAction );
@@ -714,19 +710,16 @@ void SIG_MainWindow::createToolBars()
 	viewToolBar->addAction( viewSimulationParametersAction );
 	viewToolBar->addAction( viewEnvironmentAction );
 
-	individualsToolBar = new QToolBar( this );
+	individualsToolBar = addToolBar( "Individuals" );
 	individualsToolBar->setObjectName( "individualsToolBar" );
-	addToolBar( Qt::TopToolBarArea, individualsToolBar );
-	individualsToolBar->setWindowTitle( "Individuals" );
 
 	individualsToolBar->addAction( addIndividualsAction );
 	individualsToolBar->addAction( deleteIndividualsAction );
 	individualsToolBar->addSeparator();
 	individualsToolBar->addAction( visualizeIndividualsAction );
 
-	mtToolBar = new QToolBar( this );
+	mtToolBar = addToolBar( QString() );
 	mtToolBar->setObjectName( "mtToolbar" );
-	addToolBar( Qt::TopToolBarArea, mtToolBar );
 
 	mtToolBar->addAction( mtUseAction );
 	mtToolBar->addAction( mtConfigureAction );
