@@ -310,18 +310,8 @@ bool MT_Controller::useMeta( bool state )
 				}
 
 			case QMessageBox::Ignore: // disables the system and keeps it in memory
-				// switch to normal fitness calculation / tournament
-				metaOn = state;
-				usedSystem = MT_SubstituteKind::NoMetaGP;
 				break;
 			}
-		}
-		else
-		{
-			// disables the system and keeps it in memory
-			// switch to normal fitness calculation / tournament
-			metaOn = state;
-			usedSystem = MT_SubstituteKind::NoMetaGP;
 		}
 	}
 
