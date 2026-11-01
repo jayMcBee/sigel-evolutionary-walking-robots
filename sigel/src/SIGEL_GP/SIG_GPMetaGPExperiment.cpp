@@ -66,7 +66,7 @@ void SIGEL_GP::SIG_GPMetaGPExperiment::saveExperiment( QTextStream &file )
 {
 	if( mtController->IsEnabled() )
 	{
-		mtController->writeToFile( file, experimentName, environment.getAutosaveIntervalGenerations() );
+		mtController->writeToFile( file, experimentName );
 	}
 
 	SIG_GPExperiment::saveExperiment( file );

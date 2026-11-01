@@ -8,6 +8,7 @@
 #include <qmessagebox.h>
 #include <QAbstractButton>
 #include <qfiledialog.h>
+#include <QSaveFile>
 #include <qbuffer.h>
 #include <pvm3.h>
 
@@ -32,7 +33,6 @@ void StartMetaEvolution( void *inRawSubst )
 
 MT_Controller::MT_Controller( SIGEL_GP::SIG_GPMetaGPExperiment &exp )
 	: QObject(),
-	  autoSaveCnt( 0 ),
 	  evolTimer( nullptr ),
 	  gpManager( nullptr ),
 	  mainWindow( nullptr ),
@@ -516,17 +516,6 @@ bool MT_Controller::readFromFile( QString fileName )
 	// the data determined for the controller
 	bool error = false;
 
-	int idx = saveName.lastIndexOf( ".mexp" );
-	if( idx == -1 )
-	{
-		baseName = saveName;
-	}
-	else
-	{
-		baseName = saveName.left( idx );
-		baseName.append( ".mexp" );
-	}
-
 	confStrm.setDevice( &confFile );
 	QString tmpStr = confStrm.readLine();
 	if( stdConf == true )
@@ -581,7 +570,7 @@ bool MT_Controller::readFromFile( QString fileName )
  * save the meta system if sigel saves the experiment
  * called from SIG_GPMetaGPExperiment::saveExperiment(QTextStream & file)
  ***/
-void MT_Controller::writeToFile( QTextStream &file, QString name, int autoSave )
+void MT_Controller::writeToFile( QTextStream &file, QString name )
 {
 	if( !metaOn )
 	{
@@ -596,23 +585,9 @@ void MT_Controller::writeToFile( QTextStream &file, QString name, int autoSave )
 	}
 
 	// save the meta system
-	if( autoSave )
+	if( !saveSystem( name ) )
 	{
-		if( !baseName.isEmpty() )
-		{
-			saveName = baseName + QString( "%1" ).arg( autoSaveCnt = autoSaveCnt++ % 3 );
-		}
-		if( !saveSystem( name ) )
-		{
-			return;  // oops, something went wrong
-		}
-	}
-	else
-	{
-		if( !saveSystem( name ) )
-		{
-			return;  // oops, something went wrong
-		}
+		return;  // oops, something went wrong
 	}
 
 	if( gpManager )
@@ -662,8 +637,6 @@ bool MT_Controller::saveSystem( QString sigExpName )
 		{
 			saveName.append( ".mexp" );
 		}
-
-		baseName = saveName;
 	}
 
 	// open the file, create a filestream and save the system
@@ -672,7 +645,8 @@ bool MT_Controller::saveSystem( QString sigExpName )
 		return true;    // --> no need to save anything
 	}
 
-	QFile file( saveName );
+	// a failed or interrupted save leaves the previous file intact
+	QSaveFile file( saveName );
 	if( file.open( QIODevice::WriteOnly ) )
 	{
 		QTextStream fileStr( &file );
@@ -717,20 +691,19 @@ bool MT_Controller::saveSystem( QString sigExpName )
 			  // therefore there's no need to save it
 		}
 
-		file.close();  // finished - close everything
-		file.open( QIODevice::ReadOnly );
-	}
-	else
-	{
-		// oops, something went wrong
-		if( guiEnabled )
+		fileStr.flush();
+		if( file.commit() )
 		{
-			SIGEL_Tools::SIG_IO::cerr << "Saving experiment: couldn't save the experiment." << Qt::endl;
+			return true;
 		}
-		return false;
 	}
 
-	return true;
+	// oops, something went wrong
+	if( guiEnabled )
+	{
+		SIGEL_Tools::SIG_IO::cerr << "Saving experiment: couldn't save the experiment." << Qt::endl;
+	}
+	return false;
 }
 
 MT_SubstituteKind MT_Controller::UsedSystem()

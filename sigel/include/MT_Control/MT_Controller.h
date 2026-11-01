@@ -43,7 +43,7 @@ public:
 	bool startEvolution();
 	void startTimedEvolution(int minutes);
 	bool readFromFile(QString fileName);
-	void writeToFile(QTextStream &file, QString name, int autoSave);
+	void writeToFile(QTextStream &file, QString name);
 	bool IsEnabled();
 	MT_SubstituteKind UsedSystem();
 	MT_Substitute* getFitnessTrainer();
@@ -52,7 +52,6 @@ public:
 private:
 	bool withGUI;
 	MT_SubstituteKind selectedSystem;
-	int autoSaveCnt;
 	QTimer *evolTimer;
 	MT_GPManager *gpManager;
 	MT_MainWindow *mainWindow;
@@ -75,7 +74,6 @@ private:
 	QTextStream estimationSettingsStream;
 
 	QString saveName;
-	QString baseName;
 	MT_EstimationState estimationState;
 
 	bool createGPSystem();

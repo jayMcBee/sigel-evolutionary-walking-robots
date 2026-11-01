@@ -911,6 +911,16 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-01 — DONE: THE METAGP SAVE HAS NO ROTATION AND WRITES THE `.mexp` SAFELY.**
+
+- The three-file autosave rotation never worked: the counter stayed at 0, so
+  every autosave went to `foo.mexp0`. Nothing read older copies, so the
+  rotation is gone, with `autoSaveCnt`, `baseName` and the `autoSave` parameter
+  of `MT_Controller::writeToFile`.
+- `MT_Controller::saveSystem` always saves to `saveName`, through `QSaveFile`. A
+  failed or interrupted save leaves the previous file intact. An old `.exp` with
+  `fileName=foo.mexp0` still loads and keeps saving to that name.
+
 **2026-10-29 — DONE: `MT_SubstituteKind` NAMES THE KIND OF METAGP SUBSTITUTE.**
 
 - **Changed:** the scoped enum (`MT_Control/MT_SubstituteKind.h`) holds
