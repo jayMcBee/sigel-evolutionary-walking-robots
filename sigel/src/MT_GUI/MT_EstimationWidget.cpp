@@ -25,11 +25,11 @@ void MT_EstimationWidget::slotStrategyChanged(int index)
 	// remember the last set value
 	if(toleranceSpinBox->getType() == INTTYP){
 		switch(lastIndex){
-		case 0 : tol0 = toleranceSpinBox->dblValue(); break;
-		case 1 : tol1 = toleranceSpinBox->dblValue(); break;
-		case 2 : tol2 = toleranceSpinBox->dblValue(); break;
-		case 3 : tol3 = toleranceSpinBox->dblValue(); break;
-		case 4 : tol4 = toleranceSpinBox->dblValue(); break;
+		case 0 : tol0 = toleranceSpinBox->doubleValue(); break;
+		case 1 : tol1 = toleranceSpinBox->doubleValue(); break;
+		case 2 : tol2 = toleranceSpinBox->doubleValue(); break;
+		case 3 : tol3 = toleranceSpinBox->doubleValue(); break;
+		case 4 : tol4 = toleranceSpinBox->doubleValue(); break;
 		}
 	} else {
 		switch(lastIndex){
@@ -125,7 +125,7 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, MT_EstimationState *esti
 	if(toleranceSpinBox->getType() == INTTYP)
 		tolerance = static_cast<double>(toleranceSpinBox->intValue());
 	else
-		tolerance = toleranceSpinBox->dblValue();
+		tolerance = toleranceSpinBox->doubleValue();
 
 	if(saveBestCheckBox->isChecked())
 		strategy *= -1;

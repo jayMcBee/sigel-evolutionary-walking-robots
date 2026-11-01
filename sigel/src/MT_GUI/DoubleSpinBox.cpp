@@ -89,7 +89,7 @@ void DISpinBox::setIntValue(int value)
 	setValue(value);
 }
 
-double DISpinBox::dblValue()
+double DISpinBox::doubleValue()
 {
 	return static_cast<double>(value()) / static_cast<double>(precision);
 }
