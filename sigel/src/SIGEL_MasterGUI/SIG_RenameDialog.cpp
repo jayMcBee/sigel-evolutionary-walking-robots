@@ -32,7 +32,7 @@
 
 #include <qlabel.h>
 #include <qlineedit.h>
-#include <qpushbutton.h>
+#include <QDialogButtonBox>
 #include <qlayout.h>
 #include <qvariant.h>
 #include <qtooltip.h>
@@ -56,7 +56,7 @@ SIG_RenameDialog::SIG_RenameDialog( QWidget* parent,  const char* name, bool mod
 
     if ( !name )
 	setObjectName( "SIG_RenameDialog" );
-    resize( 226, 92 ); 
+    resize( 400, 95 ); 
     setWindowTitle( tr( "Rename" ) );
     SIG_RenameDialogLayout = new QVBoxLayout( this ); 
     SIG_RenameDialogLayout->setSpacing( 6 );
@@ -74,25 +74,10 @@ SIG_RenameDialog::SIG_RenameDialog( QWidget* parent,  const char* name, bool mod
     Layout2->addWidget( lineeditNewName );
     SIG_RenameDialogLayout->addLayout( Layout2 );
 
-    Layout3 = new QHBoxLayout; 
-    Layout3->setSpacing( 6 );
-    Layout3->setContentsMargins( 0, 0, 0, 0 );
-    QSpacerItem* spacer = new QSpacerItem( 20, 20, QSizePolicy::Expanding, QSizePolicy::Minimum );
-    Layout3->addItem( spacer );
-
-    pushbuttonOK = new QPushButton( this );
-    pushbuttonOK->setText( tr( "&OK" ) );
-    pushbuttonOK->setDefault( true );
-    Layout3->addWidget( pushbuttonOK );
-
-    pushbuttonCancel = new QPushButton( this );
-    pushbuttonCancel->setText( tr( "&Cancel" ) );
-    Layout3->addWidget( pushbuttonCancel );
-    SIG_RenameDialogLayout->addLayout( Layout3 );
-
-    // signals and slots connections
-    connect( pushbuttonOK, SIGNAL( clicked() ), this, SLOT( accept() ) );
-    connect( pushbuttonCancel, SIGNAL( clicked() ), this, SLOT( reject() ) );
+    QDialogButtonBox *buttons = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this );
+    connect( buttons, &QDialogButtonBox::accepted, this, &QDialog::accept );
+    connect( buttons, &QDialogButtonBox::rejected, this, &QDialog::reject );
+    SIG_RenameDialogLayout->addWidget( buttons );
 }
 
 }

@@ -38,7 +38,6 @@ class QHBoxLayout;
 class QGridLayout; 
 class QLabel;
 class QLineEdit;
-class QPushButton;
 
 namespace SIGEL_MasterGUI
 {
@@ -55,13 +54,10 @@ public:
 
     QLabel* textlabelNewName;
     QLineEdit* lineeditNewName;
-    QPushButton* pushbuttonOK;
-    QPushButton* pushbuttonCancel;
 
 protected:
     QVBoxLayout* SIG_RenameDialogLayout;
     QHBoxLayout* Layout2;
-    QHBoxLayout* Layout3;
 };
 
 }
