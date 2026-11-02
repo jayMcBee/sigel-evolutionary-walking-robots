@@ -56,7 +56,16 @@ SIG_Material::SIG_Material( SIG_Robot *par, QTextStream &tx )
 		tx >> fval;
 
 		// For the following, see my paper. - Holger
-		fother = parent->lookupMaterial( fname );
+		// The robot holds this material only after it is read, so a pair with
+		// itself is not found by lookupMaterial.
+		if( fname == name )
+		{
+			fother = this;
+		}
+		else
+		{
+			fother = parent->lookupMaterial( fname );
+		}
 		if( fother != nullptr )
 		{
 			setFrictionValue( fother, fval );

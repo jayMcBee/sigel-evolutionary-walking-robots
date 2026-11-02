@@ -38,11 +38,27 @@ namespace SIGEL_Robot
 
   private slots:
 
+    void aPairNotSetReadsTheDefaultFriction();
+
     void setFrictionValueSetsAndUpdatesBothPartners();
 
-    void materialReadFromStreamKeepsOnlyALoadedPartner();
+    void anUpdateFromThePartnersSideReachesThisMaterial();
 
     void setFrictionValueOnItselfKeepsOnePartner();
+
+    void constructorWithANameGivesTheDefaultMaterial();
+
+    void eachSetterChangesOnlyItsOwnValue();
+
+    void writeToFileTransferWritesTheWholeRecord();
+
+    void streamConstructorReadsARecordWithoutPartners();
+
+    void streamConstructorPairsALoadedPartnerAndDropsOneNotYetLoaded();
+
+    void aPairSurvivesWritingAndReadingBothMaterials();
+
+    void aPairOfAMaterialWithItselfSurvivesWritingAndReading();
   };
 
 }
