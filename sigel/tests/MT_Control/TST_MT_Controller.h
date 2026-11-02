@@ -170,6 +170,14 @@ private slots:
 
 	void substituteGetsTheLoadedEstimation();
 
+	void substituteKeepsEachStrategy_data();
+
+	void substituteKeepsEachStrategy();
+
+	void negativeStrategyFromAFileIsReadAsPositive_data();
+
+	void negativeStrategyFromAFileIsReadAsPositive();
+
 	void getFitnessTrainerOnlyForAnEvaluator();
 
 	void getClassifierOnlyForAClassifier();

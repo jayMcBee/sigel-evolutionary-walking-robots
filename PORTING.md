@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-02 — DONE: THE "SAVE THE BEST" BOX IS GONE FROM THE METAGP WINDOW.**
+
+- Ticking it made the strategy number negative. Nothing read the sign as "save
+  the best", and a negative number matched no strategy of `MT_Evaluator` or
+  `MT_Classifier`, so MetaGP never estimated. The box is removed, and a negative
+  strategy in a MetaGP file is read as its positive value.
+
 **2026-11-01 — DONE: `MT_Controller` HOLDS THE KIND OF SUBSTITUTE IN ONE MEMBER.**
 
 - `selectedSystem` is gone. `usedSystem` keeps the kind while MetaGP is off,

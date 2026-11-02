@@ -5,7 +5,6 @@
 #include <QComboBox>
 #include <QLayout>
 #include <QGroupBox>
-#include <QCheckBox>
 
 MT_EstimationWidget::MT_EstimationWidget(QWidget* parent, const char* name, Qt::WindowFlags fl )
 	 : MT_EstimationWidgetBase( parent, name, fl), MT_WidgetBase(parent)
@@ -127,9 +126,6 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, MT_EstimationState *esti
 	else
 		tolerance = toleranceSpinBox->doubleValue();
 
-	if(saveBestCheckBox->isChecked())
-		strategy *= -1;
-
 	if(estimationState){
 		estimationState->strategy = strategy;
 		estimationState->tolerance = tolerance;
@@ -158,18 +154,11 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, MT_EstimationState *esti
 		return;
 	}
 
-	if(strategy < 0){
-		saveBestCheckBox->setChecked(true);
-		strategy *= -1;
-	} else {
-		saveBestCheckBox->setChecked(false);
-	}
-
 	// build new dropdownlist depending on the used substituter
 	strategyComboBox->clear();
 
 	// The evaluator strategies are 1, 2, 9, 10 and 13, the classifier strategies
-	// 3 to 6 and 8; the sign for "save best" is already removed here.
+	// 3 to 6 and 8.
 	if(strategy < 3 ||
 		strategy > 8)
 	{

@@ -1,6 +1,7 @@
 #include <QList>
 #include <QString>
 #include <QTextStream>
+#include <cstdlib>
 #include <memory>
 #include "MT_Control/MT_Evaluator.h"
 
@@ -27,7 +28,7 @@ MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPMetaGPExperiment& exp, QTextStream &F
 		PresentLine = File.readLine();
 	if ((PresentLine == Evaluator) && !(File.atEnd()))
 	{
-		EstimationStrategy = (File.readLine()).toInt();
+		EstimationStrategy = std::abs( (File.readLine()).toInt() );
 		Tolerance = (File.readLine()).toDouble();
 		RefreshInterval = (File.readLine()).toInt();
 		GenerationNumber = (File.readLine()).toUInt();
@@ -92,7 +93,7 @@ void MT_Evaluator::loadSetup(QTextStream &File)
 		PresentLine = File.readLine();
 	if ((PresentLine == Evaluator) && !(File.atEnd()))
 	{
-		EstimationStrategy = (File.readLine()).toInt();
+		EstimationStrategy = std::abs( (File.readLine()).toInt() );
 		Tolerance = (File.readLine()).toDouble();
 		RefreshInterval = (File.readLine()).toInt();
 	}

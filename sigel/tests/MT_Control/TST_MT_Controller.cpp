@@ -797,6 +797,54 @@ void TST_MT_Controller::substituteGetsTheLoadedEstimation()
 	QCOMPARE( substituteLines( substitute() ), estimationLines( estimation ) );
 }
 
+void TST_MT_Controller::substituteKeepsEachStrategy_data()
+{
+	QTest::addColumn<int>( "usedSystem" );
+	QTest::addColumn<QString>( "estimation" );
+
+	for( int strategy : { 1, 2, 9, 10, 13 } )
+	{
+		QTest::addRow( "Evaluator %d", strategy ) << 1 << QString( "Evaluator:\n%1\n0.25\n7\n0\n\n" ).arg( strategy );
+	}
+
+	for( int strategy : { 3, 4, 5, 6, 8 } )
+	{
+		QTest::addRow( "Classifier %d", strategy ) << 2 << QString( "Classifier:\n%1\n60\n5\n0\n\n" ).arg( strategy );
+	}
+}
+
+void TST_MT_Controller::substituteKeepsEachStrategy()
+{
+	QFETCH( int, usedSystem );
+	QFETCH( QString, estimation );
+
+	QVERIFY( controller().readFromFile( writeFile( "run.mexp", configuration( usedSystem, estimation ) ) ) );
+
+	QCOMPARE( substituteLines( substitute() ), estimationLines( estimation ) );
+}
+
+void TST_MT_Controller::negativeStrategyFromAFileIsReadAsPositive_data()
+{
+	QTest::addColumn<int>( "usedSystem" );
+	QTest::addColumn<QString>( "estimation" );
+	QTest::addColumn<QString>( "expected" );
+
+	QTest::newRow( "Evaluator" ) << 1 << "Evaluator:\n-2\n0.25\n7\n0\n\n" << "Evaluator:\n2\n0.25\n7\n0\n\n";
+	QTest::newRow( "Classifier" ) << 2 << "Classifier:\n-4\n60\n5\n0\n\n" << "Classifier:\n4\n60\n5\n0\n\n";
+}
+
+// A negative strategy matches no strategy of the substitute, so MetaGP would never estimate.
+void TST_MT_Controller::negativeStrategyFromAFileIsReadAsPositive()
+{
+	QFETCH( int, usedSystem );
+	QFETCH( QString, estimation );
+	QFETCH( QString, expected );
+
+	QVERIFY( controller().readFromFile( writeFile( "run.mexp", configuration( usedSystem, estimation ) ) ) );
+
+	QCOMPARE( substituteLines( substitute() ), estimationLines( expected ) );
+}
+
 void TST_MT_Controller::getFitnessTrainerOnlyForAnEvaluator()
 {
 	QVERIFY( controller().readFromFile( writeFile( "run.mexp", configuration( 2, loadedClassifierEstimation ) ) ) );

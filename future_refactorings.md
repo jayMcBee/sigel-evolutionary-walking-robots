@@ -198,8 +198,7 @@ touched, because changing one changes behaviour against the reference binary.
   `MT_Classifier::evaluationTactic` switch on its numbers, and only the
   list in `MT_EstimationWidget` gives them names. Use a scoped enum. The
   number is written into the saved MetaGP file, so each enumerator keeps
-  its value; "save best", now the sign, becomes a `bool` of its own in
-  memory. Only with the unit tests of `MT_Controller` in place first.
+  its value. Only with the unit tests of `MT_Controller` in place first.
 
 - [ ] **122. Destroy MetaGP's mutexes instead of unlocking them.**
   `MT_Substitute::~MT_Substitute` and `MT_GPManager::~MT_GPManager` call

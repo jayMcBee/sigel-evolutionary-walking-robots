@@ -1617,7 +1617,6 @@ Do you want to replace it?]
       item4  [Don't use MetaGP]
       5 Down clamps at current=4 [Don't use MetaGP]
       5 Up   clamps at current=0 [Mean error]
-    check  saveBestCheckBox                     text=[Save the best] checkable=1 0->1 enabled=1
 
 == METAGP PAGE 1: clicked [Individual] ==
   [page] index=1 class=MT_IndividualsWidget objectName=[MTIndividualsWidget]

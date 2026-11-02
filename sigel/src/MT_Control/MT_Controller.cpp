@@ -11,6 +11,7 @@
 #include <QSaveFile>
 #include <qbuffer.h>
 #include <pvm3.h>
+#include <cstdlib>
 
 extern bool guiEnabled;
 
@@ -772,7 +773,7 @@ void MT_Controller::loadEstimationState( QTextStream &File )
 	estimationState.estimationCounts = nullptr;
 	if( usedSystem == savedSystem )
 	{
-		estimationState.strategy = ( File.readLine() ).toInt();
+		estimationState.strategy = std::abs( ( File.readLine() ).toInt() );
 		estimationState.tolerance = ( File.readLine() ).toDouble();
 		estimationState.refreshInterval = ( File.readLine() ).toInt();
 		estimationState.generationCount = ( File.readLine() ).toUInt();
@@ -807,7 +808,7 @@ void MT_Controller::loadEstimationState( QTextStream &File )
 			}
 			if( ( PresentLine == Classifier ) && !( defStrm.atEnd() ) )
 			{
-				estimationState.strategy = ( defStrm.readLine() ).toInt();
+				estimationState.strategy = std::abs( ( defStrm.readLine() ).toInt() );
 				estimationState.tolerance = ( defStrm.readLine() ).toDouble();
 				estimationState.refreshInterval = ( defStrm.readLine() ).toInt();
 				estimationState.generationCount = ( defStrm.readLine() ).toUInt();
@@ -823,7 +824,7 @@ void MT_Controller::loadEstimationState( QTextStream &File )
 			}
 			if( ( PresentLine == Evaluator ) && !( defStrm.atEnd() ) )
 			{
-				estimationState.strategy = ( defStrm.readLine() ).toInt();
+				estimationState.strategy = std::abs( ( defStrm.readLine() ).toInt() );
 				estimationState.tolerance = ( defStrm.readLine() ).toDouble();
 				estimationState.refreshInterval = ( defStrm.readLine() ).toInt();
 				estimationState.generationCount = ( defStrm.readLine() ).toUInt();

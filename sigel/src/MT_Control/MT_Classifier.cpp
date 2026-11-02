@@ -1,6 +1,7 @@
 #include <QList>
 #include <QString>
 #include <QTextStream>
+#include <cstdlib>
 #include <memory>
 #include "MT_Control/MT_Classifier.h"
 
@@ -21,7 +22,7 @@ MT_Classifier::MT_Classifier(QTextStream &File) : MT_Substitute()
 	}
 	if (PresentLine == Classifier)
 	{
-		EstimationStrategy = (File.readLine()).toInt();
+		EstimationStrategy = std::abs( (File.readLine()).toInt() );
 		Tolerance = (File.readLine()).toDouble();
 		RefreshInterval = (File.readLine()).toInt();
 		GenerationNumber = (File.readLine()).toUInt();
@@ -63,7 +64,7 @@ void MT_Classifier::loadSetup(QTextStream &File)
 	}
 	if (PresentLine == Classifier)
 	{
-		EstimationStrategy = (File.readLine()).toInt();
+		EstimationStrategy = std::abs( (File.readLine()).toInt() );
 		Tolerance = (File.readLine()).toDouble();
 		RefreshInterval = (File.readLine()).toInt();
 	}

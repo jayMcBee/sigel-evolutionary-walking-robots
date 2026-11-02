@@ -23,6 +23,7 @@
 */
 #include "MT_Control/TST_MT_Controller.h"
 #include "MT_GPSystem/TST_MT_Search.h"
+#include "MT_GUI/TST_MT_EstimationWidget.h"
 #include "SIGEL_CommonGUI/TST_SIG_WidgetUtils.h"
 #include "SIGEL_Environment/TST_SIG_Terrain.h"
 #include "SIGEL_GP/TST_SIG_GPExperiment.h"
@@ -56,11 +57,13 @@
 // Runs each test class. Returns 1 if a test function failed, else 0.
 //
 // main makes no application object: with one, SIG_GPPopulation::addRandomIndividuals
-// makes a progress dialog. TST_MT_Controller has one of its own during its run only.
+// makes a progress dialog. TST_MT_Controller and TST_MT_EstimationWidget have one
+// of their own during their run only.
 int main( int argc, char *argv[] ) {
   std::vector<std::unique_ptr<QObject>> testClasses;
   testClasses.push_back( std::make_unique<TST_MT_Controller>() );
   testClasses.push_back( std::make_unique<TST_MT_Search>() );
+  testClasses.push_back( std::make_unique<TST_MT_EstimationWidget>() );
   testClasses.push_back( std::make_unique<SIGEL_CommonGUI::TST_SIG_WidgetUtils>() );
   testClasses.push_back( std::make_unique<SIGEL_Environment::TST_SIG_Terrain>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPExperiment>() );

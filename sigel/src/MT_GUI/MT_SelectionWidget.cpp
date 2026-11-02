@@ -120,8 +120,8 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	fitnessFunctionComboBox->clear();
 
 	// The evaluator strategies are 1, 2, 9, 10 and 13, the classifier strategies
-	// 3 to 6 and 8; "save best" makes the number negative.
-	const int strategy = abs( estimationState->strategy );
+	// 3 to 6 and 8.
+	const int strategy = estimationState->strategy;
 	if( ( strategy < 3 ) || ( strategy > 8 ) )		// of type evaluator */
 	{
 		fitnessFunctionComboBox->addItem("Simple error");
@@ -156,8 +156,8 @@ bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *estim
 	selMethod = selectionMethodComboBox->currentIndex() + 1;
 
 	// The evaluator strategies are 1, 2, 9, 10 and 13, the classifier strategies
-	// 3 to 6 and 8; "save best" makes the number negative.
-	const int strategy = abs( estimationState->strategy );
+	// 3 to 6 and 8.
+	const int strategy = estimationState->strategy;
 	if( ( strategy < 3 ) || ( strategy > 8 ) )		// of type evaluator */
 	{
 		fitFunc = fitnessFunctionComboBox->currentIndex() == 1 ? MT_FitnessFunction::EvaluatorSquareError : MT_FitnessFunction::EvaluatorSimpleError;
