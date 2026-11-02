@@ -22,6 +22,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "MT_Control/TST_MT_Controller.h"
+#include "MT_GPSystem/TST_MT_Randomizer.h"
 #include "MT_GPSystem/TST_MT_Search.h"
 #include "MT_GUI/TST_MT_EstimationWidget.h"
 #include "SIGEL_CommonGUI/TST_SIG_WidgetUtils.h"
@@ -62,6 +63,7 @@
 int main( int argc, char *argv[] ) {
   std::vector<std::unique_ptr<QObject>> testClasses;
   testClasses.push_back( std::make_unique<TST_MT_Controller>() );
+  testClasses.push_back( std::make_unique<TST_MT_Randomizer>() );
   testClasses.push_back( std::make_unique<TST_MT_Search>() );
   testClasses.push_back( std::make_unique<TST_MT_EstimationWidget>() );
   testClasses.push_back( std::make_unique<SIGEL_CommonGUI::TST_SIG_WidgetUtils>() );

@@ -1,5 +1,7 @@
 #include "MT_GPSystem/MT_Randomizer.h"
 
+#include <algorithm>
+
 // administrative methods
 
 
@@ -341,8 +343,9 @@ int MT_Randomizer::getProgLength()
 
 void MT_Randomizer::createConstant( int NumOfConstant, bool Integer, double lowerBound, double upperBound )
 {
-	double RangeDouble = upperBound - lowerBound;
-	int RangeInt = upperBound - lowerBound;
+	// An upper bound below the lower bound gives constants at the lower bound.
+	double RangeDouble = std::max( upperBound - lowerBound, 0.0 );
+	int RangeInt = RangeDouble;
 
 	Constant.resize( NumOfConstant );
 

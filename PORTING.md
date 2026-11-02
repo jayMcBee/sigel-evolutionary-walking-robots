@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-02 — DONE: METAGP CONSTANTS ARE AT THE LOWER BOUND WHEN THE UPPER BOUND IS BELOW IT.**
+
+- `MT_Randomizer::createConstant` takes a range of 0 when the upper bound of
+  the Add Constants dialog is below the lower bound. The negative range became
+  a huge unsigned number, and the integer constants came out far above both
+  bounds. `TST_MT_Randomizer` is the first test class of `MT_Randomizer`.
+
 **2026-11-02 — DONE: `SIG_Randomizer` USES `std::mt19937_64`.**
 
 - The hand-written generator gave 15 bits per number and took `%` of them, so
