@@ -183,6 +183,11 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_MovieSettingsDialog` still build their own OK and Cancel row, so their
   button order differs from the dialogs that use `QDialogButtonBox`.
 
+- [ ] **185. The GP Parameters page keeps the minimum length at or below the
+  maximum.** Its two spin boxes are not checked against each other, so a
+  maximum below the minimum can be set. New programs then have the maximum
+  length, which is not what the user meant.
+
 ---
 
 ## 5 · MetaGP
