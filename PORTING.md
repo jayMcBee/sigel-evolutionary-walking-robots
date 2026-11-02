@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-02 — DONE: METAGP TAKES ITS RANDOM NUMBERS FROM `SIG_Randomizer`.**
+
+- `MT_Randomizer` holds a `SIG_Randomizer` instead of calling `srand( time() )`
+  and `rand()`. Each MetaGP randomizer has its own stream, seeded from
+  `std::random_device`, and `getRandomInteger` has no modulo bias.
+  `MT_Randomizer::setNewSeed` gives `TST_MT_Search` a fixed stream.
+
 **2026-11-02 — DONE: METAGP CONSTANTS ARE AT THE LOWER BOUND WHEN THE UPPER BOUND IS BELOW IT.**
 
 - `MT_Randomizer::createConstant` takes a range of 0 when the upper bound of

@@ -7,11 +7,11 @@
 #include "MT_GPSystem/MT_Instruction.h"
 #include "MT_GPSystem/MT_CrossoverPointIndex.h"
 #include "MT_GPSystem/MT_ErrorCode.h"
+#include "SIGEL_Tools/SIG_Randomizer.h"
 
 #include <qstring.h>
 #include <qtextstream.h>
 #include <stdlib.h>
-#include <time.h>
 #include <math.h>
 
 /* the Randomizer supply "correct" Coincidence to the whole GP-System
@@ -89,7 +89,12 @@ public:
 	/* supply a random unsigned long in [0, upperBoundary)*/
 	unsigned long getRandomInteger( unsigned long upperBoundary );
 
+	/* restart the random numbers with seed; 0 takes a new seed from std::random_device */
+	void setNewSeed( int seed );
+
 private:
+
+	SIGEL_Tools::SIG_Randomizer randomizer;
 
 	MT_ErrorCode LastError;
 

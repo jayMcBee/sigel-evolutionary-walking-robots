@@ -7,8 +7,6 @@
 
 MT_Randomizer::MT_Randomizer()
 {
-	srand( static_cast<unsigned>( time( nullptr ) ) );
-
 	// initialization
 	LastError = MT_ErrorCode::None;
 
@@ -53,9 +51,6 @@ MT_Randomizer::MT_Randomizer()
 
 MT_Randomizer::MT_Randomizer( QTextStream &File )
 {
-	// set seed for the random method
-	srand( static_cast<unsigned>( time( nullptr ) ) );
-
 	LastError = MT_ErrorCode::None;
 	RandomXPoints.resize( CrossoverPointIndexCount );
 	for( int i = 0; i < CrossoverPointIndexCount; i++ )
@@ -319,18 +314,12 @@ int MT_Randomizer::getProgramLengthMax()
 
 unsigned long MT_Randomizer::getRandomInteger( unsigned long upperBoundary )
 {
-	unsigned long Random;
+	return randomizer.getRandomLong( static_cast<long>( upperBoundary ) );
+}
 
-	if( upperBoundary > 0 )
-	{
-		Random = fabs( rand() % upperBoundary );
-	}
-	else
-	{
-		Random = 0;
-	}
-
-	return Random;
+void MT_Randomizer::setNewSeed( int seed )
+{
+	randomizer.setNewSeed( seed );
 }
 
 int MT_Randomizer::getProgLength()

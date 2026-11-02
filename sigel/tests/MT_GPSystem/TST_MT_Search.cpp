@@ -32,8 +32,6 @@
 
 #include <QtTest>
 
-#include <cstdlib>
-
 void TST_MT_Search::crossoverKeepsTheLinesOfTheParents_data()
 {
   addCrossoverPointRows();
@@ -207,9 +205,7 @@ MT_MatingResult TST_MT_Search::mate( unsigned seed, const int searchOperator[3],
   QString text = randomizerText( searchOperator, mutationPower, crossoverPoints, startLength );
   QTextStream stream( &text );
   MT_Randomizer randomizer( stream );
-
-  // MT_Randomizer seeds rand() from the clock in its constructor.
-  srand( seed );
+  randomizer.setNewSeed( static_cast<int>( seed ) );
 
   MT_Population parents( &randomizer, 2 );
   parents.setMaxProgLen( maxProgramLength );
