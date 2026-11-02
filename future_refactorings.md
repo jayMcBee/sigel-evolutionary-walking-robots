@@ -330,6 +330,8 @@ problem; the choice is made before any code is written.
   such programs are selected away. In the same pass, give the robot models
   less saturated colours. To decide: the name of the second set and where the two sets live.
   Item 160 waits for this item.
+  The second set has GP seed 0. With the shipped seed 1, every evolution and
+  every restart begins with the same random draws.
 
 ---
 
