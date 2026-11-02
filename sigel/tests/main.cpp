@@ -34,6 +34,7 @@
 #include "SIGEL_GP/TST_SIG_GPPopulation.h"
 #include "SIGEL_GP/TST_SIG_GPPVMData.h"
 #include "SIGEL_GP/TST_SIG_GPPVMHost.h"
+#include "SIGEL_MasterGUI/TST_SIG_GPParameter.h"
 #include "SIGEL_Program/TST_SIG_Program.h"
 #include "SIGEL_Program/TST_SIG_ProgramLine.h"
 #include "SIGEL_Robot/TST_SIG_Body.h"
@@ -58,8 +59,8 @@
 // Runs each test class. Returns 1 if a test function failed, else 0.
 //
 // main makes no application object: with one, SIG_GPPopulation::addRandomIndividuals
-// makes a progress dialog. TST_MT_Controller and TST_MT_EstimationWidget have one
-// of their own during their run only.
+// makes a progress dialog. TST_MT_Controller, TST_MT_EstimationWidget and
+// TST_SIG_GPParameter have one of their own during their run only.
 int main( int argc, char *argv[] ) {
   std::vector<std::unique_ptr<QObject>> testClasses;
   testClasses.push_back( std::make_unique<TST_MT_Controller>() );
@@ -75,6 +76,7 @@ int main( int argc, char *argv[] ) {
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPPopulation>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPPVMData>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPPVMHost>() );
+  testClasses.push_back( std::make_unique<SIGEL_MasterGUI::TST_SIG_GPParameter>() );
   testClasses.push_back( std::make_unique<SIGEL_Program::TST_SIG_Program>() );
   testClasses.push_back( std::make_unique<SIGEL_Program::TST_SIG_ProgramLine>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Body>() );

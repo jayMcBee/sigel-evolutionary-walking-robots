@@ -72,6 +72,10 @@ SIG_GPParameter::SIG_GPParameter( QWidget* parent,  const char* name, Qt::Window
 	                  SIGNAL( itemDoubleClicked( QTreeWidgetItem *, int ) ),
 	                  SLOT( slotItemDoubleClicked( QTreeWidgetItem * ) ) );
 
+	// The maximum length cannot go below the minimum: a higher minimum raises the maximum with it.
+	spinboxMaxIndLength->setMinimum( spinboxMinIndLength->value() );
+	QObject::connect( spinboxMinIndLength, &QSpinBox::valueChanged, spinboxMaxIndLength, &QSpinBox::setMinimum );
+
 	// Each instruction's slider drives its counter. These are connected here,
 	// not in the .ui: QLCDNumber::display is overloaded, and some uic versions
 	// write the connection without choosing an overload, which does not compile.

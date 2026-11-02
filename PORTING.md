@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-02 — DONE: ITEM 185, THE GP PARAMETERS PAGE KEEPS THE MAXIMUM LENGTH AT OR ABOVE THE MINIMUM.**
+
+- `SIG_GPParameter` makes the minimum length the lowest value of the maximum
+  length spin box. A maximum below the minimum cannot be set, and a higher
+  minimum raises the maximum with it. `TST_SIG_GPParameter` in
+  `SIGEL_MasterGUI` is the first test class of the page.
+
 **2026-11-02 — DONE: THE METAGP FITNESS-PROPORTIONAL SELECTION IS PROPORTIONAL.**
 
 - `MT_Randomizer::getProportionalWinner` compared its draw from 0 to total - 1

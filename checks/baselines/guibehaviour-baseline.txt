@@ -617,7 +617,7 @@ we do with the system?]
     group  [Probabilities] enabled=1 checkable=0
     group  [Fitness function] enabled=1 checkable=0
   [drive]
-    spin   spinboxMaxIndLength                  v=1024      [2..32000] step=1 pre=[] suf=[] up=1025      dn2=1023      typed(max+1)=[3200]->3200 commits=3200 enabled=1
+    spin   spinboxMaxIndLength                  v=1024      [10..32000] step=1 pre=[] suf=[] up=1025      dn2=1023      typed(max+1)=[3200]->3200 commits=3200 enabled=1
     spin   spinboxMaxAge                        v=50        [1..32000] step=1 pre=[] suf=[] up=51        dn2=49        typed(max+1)=[3200]->3200 commits=3200 enabled=1
     spin   spinboxRandomSeed                    v=0         [0..32000] step=1 pre=[] suf=[] up=1         dn2=0         typed(max+1)=[3200]->3200 commits=3200 enabled=1
     spin   spinboxMinIndLength                  v=10        [5..32000] step=1 pre=[] suf=[] up=11        dn2=9         typed(max+1)=[3200]->3200 commits=3200 enabled=1
