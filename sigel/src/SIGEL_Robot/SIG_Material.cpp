@@ -22,119 +22,134 @@
 */
 #include "SIGEL_Robot/SIG_Material.h"
 
-namespace SIGEL_Robot {
+namespace SIGEL_Robot
+{
 
-        SIG_Material::SIG_Material (SIG_Robot *par, QString n)
-                : parent (par),
-                  name (n),
-                  elasticity (1.0),
-                  density (1.0),
-                  friction (),
-                  colour (1.0, 1.0, 1.0)
-        {
-        }
+SIG_Material::SIG_Material( SIG_Robot *par, QString n )
+	: parent( par ),
+	  name( n ),
+	  elasticity( 1.0 ),
+	  density( 1.0 ),
+	  friction(),
+	  colour( 1.0, 1.0, 1.0 )
+{
+}
 
-        SIG_Material::SIG_Material (SIG_Robot *par, QTextStream & tx)
-                : parent (par)
-        {
-                QString tmpstr;
-                int frictionCount;
+SIG_Material::SIG_Material( SIG_Robot *par, QTextStream &tx )
+	: parent( par )
+{
+	int frictionCount;
 
-                // "Material" has already been read by SIG_Robot.
-                tx >> name
-                   >> elasticity
-                   >> density;
-                
-                tx >> frictionCount;
-                for (int i = 0; i < frictionCount; i++) {
-                        QString fname;
-                        double fval;
-                        SIG_Material *fother;
+	// "Material" has already been read by SIG_Robot.
+	tx >> name
+	   >> elasticity
+	   >> density;
 
-                        tx >> fname;
-                        tx >> fval;
-                        // For the following, see my paper. - Holger
-                        fother = parent->lookupMaterial (fname);
-                        if (fother != nullptr)
-                                setFrictionValue (fother, fval);
-                }
-                colour = SIG_Robot::streamToVector (tx);
-        }
+	tx >> frictionCount;
+	for( int i = 0; i < frictionCount; i++ )
+	{
+		QString fname;
+		double fval;
+		SIG_Material *fother;
 
-        QString SIG_Material::getName () const
-        {
-                return name;
-        }
+		tx >> fname;
+		tx >> fval;
 
-        void SIG_Material::setDensity (double dens)
-        {
-                density = dens;
-        }
+		// For the following, see my paper. - Holger
+		fother = parent->lookupMaterial( fname );
+		if( fother != nullptr )
+		{
+			setFrictionValue( fother, fval );
+		}
+	}
+	colour = SIG_Robot::streamToVector( tx );
+}
 
-        double SIG_Material::getDensity () const
-        {
-                return density;
-        }
+QString SIG_Material::getName() const
+{
+	return name;
+}
 
-        void SIG_Material::setElasticity (double elas)
-        {
-                elasticity = elas;
-        }
+void SIG_Material::setDensity( double dens )
+{
+	density = dens;
+}
 
-        double SIG_Material::getElasticity () const
-        {
-                return elasticity;
-        }
+double SIG_Material::getDensity() const
+{
+	return density;
+}
 
-        void SIG_Material::setColour (SIG_Vector col)
-        {
-                colour = col;
-        }
+void SIG_Material::setElasticity( double elas )
+{
+	elasticity = elas;
+}
 
-        SIG_Vector SIG_Material::getColour () const
-        {
-                return colour;
-        }
+double SIG_Material::getElasticity() const
+{
+	return elasticity;
+}
 
-        void SIG_Material::setFrictionValue (SIG_Material *otherObj,
-                                             double fricval,
-                                             bool negotiate)
-        {
-                bool found = false;
-                for (FrictionValue &fv : friction)
-                        if (fv.otherSide == otherObj) {
-                                fv.value = fricval;
-                                found = true;
-                                break;
-                        }
+void SIG_Material::setColour( SIG_Vector col )
+{
+	colour = col;
+}
 
-                if (!found)
-                        friction.append (FrictionValue{ otherObj, fricval });
+SIG_Vector SIG_Material::getColour() const
+{
+	return colour;
+}
 
-                if ((negotiate) && (otherObj != this))
-                        otherObj->setFrictionValue (this, fricval, false);
-        }
+void SIG_Material::setFrictionValue( SIG_Material *otherObj, double fricval, bool negotiate )
+{
+	bool found = false;
+	for( FrictionValue &fv : friction )
+	{
+		if( fv.otherSide == otherObj )
+		{
+			fv.value = fricval;
+			found = true;
+			break;
+		}
+	}
 
-        double SIG_Material::getFrictionValue (SIG_Material *otherObj) const
-        {
-                for (const FrictionValue &fv : friction)
-                        if (fv.otherSide == otherObj)
-                                return fv.value;
-                return 0.6;
-        }
+	if( !found )
+	{
+		friction.append( FrictionValue{ otherObj, fricval } );
+	}
 
-        void SIG_Material::writeToFileTransfer (QTextStream & tx) const
-        {
-                tx << "Material" << ' '
-                   << getName () << ' '
-                   << elasticity << ' '
-                   << density << ' '
-                   << friction.count () << ' ';
-                for (const FrictionValue &fv : friction)
-                        tx << fv.otherSide->getName () << ' '
-                           << fv.value << ' ';
-                SIG_Robot::vectorToStream (tx, colour);
-                tx << '\n';
-        }
+	if( ( negotiate ) && ( otherObj != this ) )
+	{
+		otherObj->setFrictionValue( this, fricval, false );
+	}
+}
+
+double SIG_Material::getFrictionValue( SIG_Material *otherObj ) const
+{
+	for( const FrictionValue &fv : friction )
+	{
+		if( fv.otherSide == otherObj )
+		{
+			return fv.value;
+		}
+	}
+	return 0.6;
+}
+
+void SIG_Material::writeToFileTransfer( QTextStream &tx ) const
+{
+	tx << "Material" << ' '
+	   << getName() << ' '
+	   << elasticity << ' '
+	   << density << ' '
+	   << friction.count() << ' ';
+	for( const FrictionValue &fv : friction )
+	{
+		tx << fv.otherSide->getName() << ' '
+		   << fv.value << ' ';
+	}
+	SIG_Robot::vectorToStream( tx, colour );
+	tx << '\n';
+}
 
 }

@@ -34,96 +34,108 @@ namespace SIGEL_Robot { class SIG_Material; }
 namespace SIGEL_Robot
 {
 
-  /**
-   * SIG_Material models properties of the material
-   * used to form links.
-   *
-   * Objects instantiated from this class contain
-   * information about the density, the elasticity, and the
-   * colour of the material.
-   */
-  class SIG_Material {
-  private:
-          struct FrictionValue {
-                  SIG_Material *otherSide;
-                  double value;
-          };
-          
-          SIG_Robot *parent;
-          QString name;
-          double elasticity, density;
-          QList<FrictionValue> friction;
-          SIG_Vector colour;
-  public:
-          /**
-           * Kind of a standard constructor.
-           *
-           * Sets all material values to a default value.
-           */
-          SIG_Material (SIG_Robot *par, QString n);
-          /**
-           * Reads the material attributes from a stream.
-           */
-          SIG_Material (SIG_Robot *par, QTextStream & tx);
-          /**
-           * Returns the name of the material.
-           */
-          QString getName () const;
-          /**
-           * Sets the density of the material.
-           *
-           * According to the SI system, this has to be in
-           * kilograms per cubic meter.
-           */
-          void setDensity (double dens);
-          /**
-           * Returns the density of the material.
-           *
-           * This value denotes the kilograms per cubic meter.
-           */
-          double getDensity () const;
-          /**
-           * Sets the elasticity value from the robot file.
-           * Nothing in the simulation reads it.
-           */
-          void setElasticity (double elas);
-          /**
-           * Returns the elasticity of the material.
-           */
-          double getElasticity () const;
-          /**
-           * Sets the colour of the material.
-           */
-          void setColour (SIG_Vector col);
-          /**
-           * Returns the colour of the material.
-           */
-          SIG_Vector getColour () const;
-          /**
-           * setFrictionValue sets or adds a friction constant to the material.
-           * @param otherObj the opposite material to which the constant
-           *                 will be set
-           * @param fricval  the actual constant
-           * @param negotiate DO NOT TOUCH! If set to true (default) the
-           *                 constant will also be set in the opposite
-           *                 material object.
-           */
-          void setFrictionValue (SIG_Material *otherObj,
-                                 double fricval,
-                                 bool negotiate = true);
-          /**
-           * Returns the friction constant between this material
-           * and the material otherObj.
-           *
-           * otherObj->getFrictionValue (this) returns the
-           * same value.
-           */
-          double getFrictionValue (SIG_Material *otherObj) const;
-          /**
-           * Writes the material object into a stream.
-           */
-          void writeToFileTransfer (QTextStream & tx) const;
-  };
+	/**
+	 * SIG_Material models properties of the material
+	 * used to form links.
+	 *
+	 * Objects instantiated from this class contain
+	 * information about the density, the elasticity, and the
+	 * colour of the material.
+	 */
+	class SIG_Material
+	{
+	private:
+		struct FrictionValue
+		{
+			SIG_Material *otherSide;
+			double value;
+		};
+
+		SIG_Robot *parent;
+		QString name;
+		double elasticity, density;
+		QList<FrictionValue> friction;
+		SIG_Vector colour;
+
+	public:
+		/**
+		 * Kind of a standard constructor.
+		 *
+		 * Sets all material values to a default value.
+		 */
+		SIG_Material( SIG_Robot *par, QString n );
+
+		/**
+		 * Reads the material attributes from a stream.
+		 */
+		SIG_Material( SIG_Robot *par, QTextStream &tx );
+
+		/**
+		 * Returns the name of the material.
+		 */
+		QString getName() const;
+
+		/**
+		 * Sets the density of the material.
+		 *
+		 * According to the SI system, this has to be in
+		 * kilograms per cubic meter.
+		 */
+		void setDensity( double dens );
+
+		/**
+		 * Returns the density of the material.
+		 *
+		 * This value denotes the kilograms per cubic meter.
+		 */
+		double getDensity() const;
+
+		/**
+		 * Sets the elasticity value from the robot file.
+		 * Nothing in the simulation reads it.
+		 */
+		void setElasticity( double elas );
+
+		/**
+		 * Returns the elasticity of the material.
+		 */
+		double getElasticity() const;
+
+		/**
+		 * Sets the colour of the material.
+		 */
+		void setColour( SIG_Vector col );
+
+		/**
+		 * Returns the colour of the material.
+		 */
+		SIG_Vector getColour() const;
+
+		/**
+		 * setFrictionValue sets or adds a friction constant to the material.
+		 * @param otherObj the opposite material to which the constant
+		 *                 will be set
+		 * @param fricval  the actual constant
+		 * @param negotiate DO NOT TOUCH! If set to true (default) the
+		 *                 constant will also be set in the opposite
+		 *                 material object.
+		 */
+		void setFrictionValue( SIG_Material *otherObj, double fricval, bool negotiate = true );
+
+		/**
+		 * Returns the friction constant between this material
+		 * and the material otherObj.
+		 *
+		 * otherObj->getFrictionValue( this ) returns the
+		 * same value.
+		 */
+		double getFrictionValue( SIG_Material *otherObj ) const;
+
+		/**
+		 * Writes the material object into a stream.
+		 */
+		void writeToFileTransfer( QTextStream &tx ) const;
+	};
 
 }
 
