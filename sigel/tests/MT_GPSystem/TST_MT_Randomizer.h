@@ -37,6 +37,8 @@ private slots:
 
   void createConstantWithTheUpperBoundBelowTheLowerBoundGivesTheLowerBound_data();
   void createConstantWithTheUpperBoundBelowTheLowerBoundGivesTheLowerBound();
+
+  void proportionalWinnerWinsInProportionToTheWeight();
 };
 
 #endif // MT_GPSYSTEM_TST_MT_RANDOMIZER_H

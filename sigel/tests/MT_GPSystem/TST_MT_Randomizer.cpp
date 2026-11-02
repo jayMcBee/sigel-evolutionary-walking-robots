@@ -49,3 +49,20 @@ void TST_MT_Randomizer::createConstantWithTheUpperBoundBelowTheLowerBoundGivesTh
   randomizer.returnIndividualsValue( &length, &numberOfVariables, &constants, &instructionProbabilities );
   QCOMPARE( *constants, QList<double>( 20, 10.0 ) );
 }
+
+// With the weights 1 and 3, the second player wins three times in four.
+void TST_MT_Randomizer::proportionalWinnerWinsInProportionToTheWeight()
+{
+  MT_Randomizer randomizer;
+  randomizer.setNewSeed( 42 );
+  QList<int> weights = { 1, 3 };
+  const int draws = 40000;
+  int secondPlayerWins = 0;
+
+  for ( int i = 0; i < draws; i++ )
+    if ( randomizer.getProportionalWinner( &weights ) == 1 )
+      secondPlayerWins++;
+
+  const double share = static_cast<double>( secondPlayerWins ) / draws;
+  QVERIFY2( share > 0.74 && share < 0.76, qPrintable( QString::number( share ) ) );
+}

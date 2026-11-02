@@ -450,7 +450,7 @@ int MT_Randomizer::getProportionalWinner( QList<int> * Players )
 
 	for( int i = 0; i < ( *Players ).size(); i++ )
 	{
-		if( Winner <= PlayersProportional[i] )
+		if( Winner < PlayersProportional[i] )
 		{
 			Winner = i;
 			break;

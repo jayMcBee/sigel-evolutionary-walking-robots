@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-02 — DONE: THE METAGP FITNESS-PROPORTIONAL SELECTION IS PROPORTIONAL.**
+
+- `MT_Randomizer::getProportionalWinner` compared its draw from 0 to total - 1
+  with `<=` against the running sums. The first player won one draw too many
+  and the last one too few, so a last player of weight 1 never won. It compares
+  with `<` now.
+
 **2026-11-02 — DONE: METAGP TAKES ITS RANDOM NUMBERS FROM `SIG_Randomizer`.**
 
 - `MT_Randomizer` holds a `SIG_Randomizer` instead of calling `srand( time() )`
