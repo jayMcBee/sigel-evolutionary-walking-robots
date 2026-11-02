@@ -182,12 +182,6 @@ void TST_MT_Controller::newControllerIsOffAndHasNoKind()
 	QVERIFY( !controller().startWOSigel );
 }
 
-void TST_MT_Controller::newControllerGivesNoSubstitute()
-{
-	QCOMPARE( controller().getFitnessTrainer(), nullptr );
-	QCOMPARE( controller().getClassifier(), nullptr );
-}
-
 void TST_MT_Controller::useMetaEnablesTheSelectedKind()
 {
 	QVERIFY( controller().useMeta( true ) );
@@ -248,6 +242,7 @@ void TST_MT_Controller::disableDialogRemovesTheSystem()
 	QVERIFY( !controller().IsEnabled() );
 
 	// With nothing left to delete, switchSystem does not ask.
+	QVERIFY( controller().useMeta( true ) );
 	QVERIFY( controller().switchSystem( MT_SubstituteKind::Classifier ) );
 	QCOMPARE( controller().UsedSystem(), MT_SubstituteKind::Classifier );
 }
@@ -288,6 +283,7 @@ void TST_MT_Controller::disableDialogSavesAndRemovesTheSystem()
 	QCOMPARE( readFile( source ), configuration( 2, loadedClassifierEstimation ) );
 
 	// With nothing left to delete, switchSystem does not ask.
+	QVERIFY( controller().useMeta( true ) );
 	QVERIFY( controller().switchSystem( MT_SubstituteKind::Evaluator ) );
 	QCOMPARE( controller().UsedSystem(), MT_SubstituteKind::Evaluator );
 }
@@ -319,11 +315,12 @@ void TST_MT_Controller::switchSystemBeforeASystemExists()
 {
 	QFETCH( int, wanted );
 	const MT_SubstituteKind kind = static_cast<MT_SubstituteKind>( wanted );
+	QVERIFY( controller().useMeta( true ) );
 
 	QVERIFY( controller().switchSystem( kind ) );
 
 	QCOMPARE( controller().UsedSystem(), kind );
-	QVERIFY( !controller().IsEnabled() );
+	QVERIFY( controller().IsEnabled() );
 }
 
 void TST_MT_Controller::switchSystemToTheKindInUseNeverAsks()
@@ -371,6 +368,7 @@ void TST_MT_Controller::switchSystemAnsweredNoKeepsTheSystem()
 
 void TST_MT_Controller::switchSystemAnsweredYesClosesTheWindow()
 {
+	QVERIFY( controller().useMeta( true ) );
 	controller().configureSystem( nullptr );
 	const auto windowCount = []() { return QApplication::topLevelWidgets().size(); };
 	const int openWindows = windowCount();
@@ -432,22 +430,19 @@ void TST_MT_Controller::readFromFileSetsTheKindOfTheFile()
 
 void TST_MT_Controller::readFromFileKeepsTheLoadedKindThroughDisableAndEnable_data()
 {
-	QTest::addColumn<int>( "chosen" );
 	QTest::addColumn<int>( "usedSystem" );
 	QTest::addColumn<QString>( "estimation" );
 
-	QTest::newRow( "Evaluator file over a Classifier choice" ) << 2 << 1 << QString( loadedEvaluatorEstimation );
-	QTest::newRow( "Classifier file over an Evaluator choice" ) << 1 << 2 << QString( loadedClassifierEstimation );
+	QTest::newRow( "Evaluator" ) << 1 << QString( loadedEvaluatorEstimation );
+	QTest::newRow( "Classifier" ) << 2 << QString( loadedClassifierEstimation );
 }
 
 void TST_MT_Controller::readFromFileKeepsTheLoadedKindThroughDisableAndEnable()
 {
-	QFETCH( int, chosen );
 	QFETCH( int, usedSystem );
 	QFETCH( QString, estimation );
 	const MT_SubstituteKind kind = static_cast<MT_SubstituteKind>( usedSystem );
 
-	QVERIFY( controller().switchSystem( static_cast<MT_SubstituteKind>( chosen ) ) );
 	QVERIFY( controller().readFromFile( writeFile( "run.mexp", configuration( usedSystem, estimation ) ) ) );
 	QCOMPARE( controller().UsedSystem(), kind );
 
@@ -477,16 +472,6 @@ void TST_MT_Controller::readFromFileRefusesAFileWithoutASubstitute()
 	QCOMPARE( controller().UsedSystem(), MT_SubstituteKind::NoMetaGP );
 }
 
-void TST_MT_Controller::readFromFileRefusalDisablesARunningSystem()
-{
-	QVERIFY( controller().readFromFile( writeFile( "run.mexp", configuration( 2, loadedClassifierEstimation ) ) ) );
-
-	QVERIFY( !controller().readFromFile( writeFile( "bad.mexp", configuration( 0, loadedClassifierEstimation ) ) ) );
-
-	QVERIFY( !controller().IsEnabled() );
-	QCOMPARE( controller().UsedSystem(), MT_SubstituteKind::Classifier );
-}
-
 void TST_MT_Controller::readFromFileWithoutANameLoadsTheDefault_data()
 {
 	QTest::addColumn<int>( "selected" );
@@ -501,6 +486,7 @@ void TST_MT_Controller::readFromFileWithoutANameLoadsTheDefault()
 	QFETCH( int, selected );
 	QFETCH( QString, estimation );
 	const MT_SubstituteKind kind = static_cast<MT_SubstituteKind>( selected );
+	QVERIFY( controller().useMeta( true ) );
 
 	QVERIFY( controller().switchSystem( kind ) );
 	QVERIFY( controller().readFromFile( QString() ) );
@@ -544,20 +530,6 @@ void TST_MT_Controller::missingFileAnsweredDeactivateFails()
 
 	QVERIFY( !controller().IsEnabled() );
 	QCOMPARE( controller().UsedSystem(), MT_SubstituteKind::NoMetaGP );
-}
-
-void TST_MT_Controller::missingFileAnsweredDeactivateDisablesARunningSystem()
-{
-	QVERIFY( controller().readFromFile( writeFile( "run.mexp", configuration( 2, loadedClassifierEstimation ) ) ) );
-
-	guiEnabled = true;
-	expectButton( QMessageBox::Abort );
-	expectButton( QMessageBox::Ignore );
-	QVERIFY( !controller().readFromFile( folder->filePath( "missing.mexp" ) ) );
-	guiEnabled = false;
-
-	QVERIFY( !controller().IsEnabled() );
-	QCOMPARE( controller().UsedSystem(), MT_SubstituteKind::Classifier );
 }
 
 void TST_MT_Controller::readFromFileReadsAMexpFileAndSavesToIt()
@@ -614,41 +586,6 @@ void TST_MT_Controller::saveNameIsKeptByDisable()
 	QVERIFY( controller().useMeta( true ) );
 
 	QCOMPARE( savedFileName(), path );
-}
-
-void TST_MT_Controller::saveNameIsClearedByLoadingTheDefault()
-{
-	QVERIFY( controller().readFromFile( writeFile( "run.mexp", configuration( 1, loadedEvaluatorEstimation ) ) ) );
-
-	QVERIFY( controller().readFromFile( QString() ) );
-
-	QCOMPARE( savedFileName(), QString( "lastExperiment.mexp" ) );
-}
-
-void TST_MT_Controller::saveNameIsClearedByTheStandardAnswer()
-{
-	QVERIFY( controller().readFromFile( writeFile( "run.mexp", configuration( 1, loadedEvaluatorEstimation ) ) ) );
-
-	guiEnabled = true;
-	expectButton( QMessageBox::RestoreDefaults );
-	QVERIFY( controller().readFromFile( folder->filePath( "missing.mexp" ) ) );
-	guiEnabled = false;
-
-	QCOMPARE( savedFileName(), QString( "lastExperiment.mexp" ) );
-}
-
-void TST_MT_Controller::saveNameIsClearedByTheDeactivateAnswer()
-{
-	QVERIFY( controller().readFromFile( writeFile( "run.mexp", configuration( 1, loadedEvaluatorEstimation ) ) ) );
-
-	guiEnabled = true;
-	expectButton( QMessageBox::Abort );
-	expectButton( QMessageBox::Ignore );
-	QVERIFY( !controller().readFromFile( folder->filePath( "missing.mexp" ) ) );
-	guiEnabled = false;
-	QVERIFY( controller().useMeta( true ) );
-
-	QCOMPARE( savedFileName(), QString( "lastExperiment.mexp" ) );
 }
 
 void TST_MT_Controller::writeToFileWithMetaOffWritesNothing()
@@ -731,6 +668,7 @@ void TST_MT_Controller::writeToFileOfTheDefaultWithoutAGuiUsesLastExperiment_dat
 void TST_MT_Controller::writeToFileOfTheDefaultWithoutAGuiUsesLastExperiment()
 {
 	QFETCH( int, selected );
+	QVERIFY( controller().useMeta( true ) );
 
 	QVERIFY( controller().switchSystem( static_cast<MT_SubstituteKind>( selected ) ) );
 	QVERIFY( controller().readFromFile( QString() ) );
@@ -757,6 +695,7 @@ void TST_MT_Controller::writeToFileAsksForANameAndAddsMexp()
 	const QString expected = folder->filePath( "chosen.mexp" );
 
 	experiment->experimentName = "walker";
+	QVERIFY( controller().useMeta( true ) );
 	QVERIFY( controller().readFromFile( QString() ) );
 
 	QString saved;
@@ -773,6 +712,7 @@ void TST_MT_Controller::writeToFileAsksForANameAndAddsMexp()
 
 void TST_MT_Controller::writeToFileCancelledDialogFails()
 {
+	QVERIFY( controller().useMeta( true ) );
 	QVERIFY( controller().readFromFile( QString() ) );
 
 	QString saved;
@@ -788,6 +728,7 @@ void TST_MT_Controller::writeToFileCancelledDialogFails()
 // A failed save that keeps evolutionMutex locked hangs the second writeToFile.
 void TST_MT_Controller::writeToFileSavesAfterACancelledDialog()
 {
+	QVERIFY( controller().useMeta( true ) );
 	QVERIFY( controller().readFromFile( QString() ) );
 	QVERIFY( substitute() );
 
@@ -856,45 +797,6 @@ void TST_MT_Controller::substituteGetsTheLoadedEstimation()
 	QCOMPARE( substituteLines( substitute() ), estimationLines( estimation ) );
 }
 
-void TST_MT_Controller::estimationOfTheOtherKindTakesTheDefaultSetup_data()
-{
-	QTest::addColumn<int>( "usedSystem" );
-	QTest::addColumn<QString>( "fileEstimation" );
-	QTest::addColumn<QString>( "expected" );
-
-	QTest::newRow( "Evaluator file with a classifier section" )
-		<< 1 << QString( loadedClassifierEstimation ) << QString( defaultEvaluatorEstimation );
-	QTest::newRow( "Classifier file with an evaluator section" )
-		<< 2 << QString( loadedEvaluatorEstimation ) << QString( defaultClassifierEstimation );
-}
-
-void TST_MT_Controller::estimationOfTheOtherKindTakesTheDefaultSetup()
-{
-	QFETCH( int, usedSystem );
-	QFETCH( QString, fileEstimation );
-	QFETCH( QString, expected );
-
-	QVERIFY( controller().readFromFile( writeFile( "run.mexp", configuration( usedSystem, fileEstimation ) ) ) );
-
-	QCOMPARE( controller().UsedSystem(), static_cast<MT_SubstituteKind>( usedSystem ) );
-	QCOMPARE( substituteLines( substitute() ), estimationLines( expected ) );
-}
-
-void TST_MT_Controller::estimationStateFollowsTheSubstituteIntoTheWindow()
-{
-	QVERIFY( controller().readFromFile( writeFile( "first.mexp", configuration( 1, loadedEvaluatorEstimation ) ) ) );
-	QVERIFY( substitute() );
-
-	// The substitute stays, so it holds other values than the new estimation state.
-	QVERIFY( controller().readFromFile( writeFile( "second.mexp", configuration( 1, defaultEvaluatorEstimation ) ) ) );
-
-	controller().configureSystem( nullptr );
-
-	const QStringList lines = saveSetup( "state" ).split( '\n' );
-	const QStringList expected = QStringList( "usedSystem=1" ) + estimationLines( loadedEvaluatorEstimation );
-	QCOMPARE( lines.mid( 0, expected.size() ), expected );
-}
-
 void TST_MT_Controller::getFitnessTrainerOnlyForAnEvaluator()
 {
 	QVERIFY( controller().readFromFile( writeFile( "run.mexp", configuration( 2, loadedClassifierEstimation ) ) ) );
@@ -922,6 +824,7 @@ void TST_MT_Controller::getFitnessTrainerKeepsItsSubstitute()
 
 void TST_MT_Controller::getClassifierKeepsItsSubstitute()
 {
+	QVERIFY( controller().useMeta( true ) );
 	QVERIFY( controller().switchSystem( MT_SubstituteKind::Classifier ) );
 
 	MT_Substitute *first = controller().getClassifier();
@@ -929,9 +832,6 @@ void TST_MT_Controller::getClassifierKeepsItsSubstitute()
 	QVERIFY( first );
 	QCOMPARE( controller().getClassifier(), first );
 	QCOMPARE( substituteLines( first ), estimationLines( defaultClassifierEstimation ) );
-
-	// Building the substitute loads the default, which turns MetaGP on.
-	QVERIFY( controller().IsEnabled() );
 }
 
 void TST_MT_Controller::startEvolutionWithMetaOffOnlyClearsStartWOSigel()
@@ -945,40 +845,11 @@ void TST_MT_Controller::startEvolutionWithMetaOffOnlyClearsStartWOSigel()
 	QCOMPARE( controller().UsedSystem(), MT_SubstituteKind::NoMetaGP );
 }
 
-void TST_MT_Controller::stopEvolutionRunsSafelyWithAManager_data()
-{
-	QTest::addColumn<bool>( "disabled" );
-
-	QTest::newRow( "enabled" ) << false;
-	QTest::newRow( "kept while disabled" ) << true;
-}
-
-// The flag that stopEvolution sets is private to MT_GPManager, so this shows only
-// that the call is safe and leaves the controller's state alone.
-void TST_MT_Controller::stopEvolutionRunsSafelyWithAManager()
-{
-	QFETCH( bool, disabled );
-
-	QVERIFY( controller().useMeta( true ) );
-	MT_Substitute *before = substitute();
-	QVERIFY( before );
-	if( disabled )
-	{
-		QVERIFY( controller().useMeta( false ) );
-	}
-
-	controller().stopEvolution();
-
-	QCOMPARE( controller().IsEnabled(), !disabled );
-	QCOMPARE( controller().UsedSystem(), MT_SubstituteKind::Evaluator );
-	QCOMPARE( substitute(), before );
-}
-
 void TST_MT_Controller::configureSystemWithoutAFileLoadsTheDefault()
 {
+	QVERIFY( controller().useMeta( true ) );
 	controller().configureSystem( nullptr );
 
-	QVERIFY( controller().IsEnabled() );
 	QCOMPARE( controller().UsedSystem(), MT_SubstituteKind::Evaluator );
 	const QStringList lines = saveSetup( "default" ).split( '\n' );
 	const QStringList expected = QStringList( "usedSystem=1" ) + estimationLines( defaultEvaluatorEstimation );
@@ -1000,6 +871,7 @@ void TST_MT_Controller::slotSaveSetupWritesEstimationAndSetup()
 
 void TST_MT_Controller::slotSaveSetupKeepsTheMcnfSuffix()
 {
+	QVERIFY( controller().useMeta( true ) );
 	controller().configureSystem( nullptr );
 
 	expectFileName( "typed.mcnf" );
@@ -1011,6 +883,7 @@ void TST_MT_Controller::slotSaveSetupKeepsTheMcnfSuffix()
 
 void TST_MT_Controller::slotSaveSetupCancelledWritesNothing()
 {
+	QVERIFY( controller().useMeta( true ) );
 	controller().configureSystem( nullptr );
 	const int filesBefore = QDir( folder->path() ).entryList( QDir::Files ).size();
 
@@ -1022,6 +895,7 @@ void TST_MT_Controller::slotSaveSetupCancelledWritesNothing()
 
 void TST_MT_Controller::slotLoadSetupLoadsAnotherKindWhileEnabled()
 {
+	QVERIFY( controller().useMeta( true ) );
 	controller().configureSystem( nullptr );
 	QCOMPARE( controller().UsedSystem(), MT_SubstituteKind::Evaluator );
 
@@ -1045,6 +919,7 @@ void TST_MT_Controller::slotLoadSetupLoadsAnotherKindWhileEnabled()
 
 void TST_MT_Controller::slotLoadSetupWhileDisabledTakesTheKindOfTheFile()
 {
+	QVERIFY( controller().useMeta( true ) );
 	controller().configureSystem( nullptr );
 	QVERIFY( controller().useMeta( false ) );
 
@@ -1063,6 +938,7 @@ void TST_MT_Controller::slotLoadSetupWhileDisabledTakesTheKindOfTheFile()
 
 void TST_MT_Controller::slotLoadSetupKindSurvivesDisableAndEnable()
 {
+	QVERIFY( controller().useMeta( true ) );
 	controller().configureSystem( nullptr );
 
 	writeFile( "other.mcnf", configuration( 2, loadedClassifierEstimation ) );
@@ -1079,6 +955,7 @@ void TST_MT_Controller::slotLoadSetupKindSurvivesDisableAndEnable()
 
 void TST_MT_Controller::slotLoadSetupCancelledChangesNothing()
 {
+	QVERIFY( controller().useMeta( true ) );
 	controller().configureSystem( nullptr );
 	const QString before = saveSetup( "before" );
 

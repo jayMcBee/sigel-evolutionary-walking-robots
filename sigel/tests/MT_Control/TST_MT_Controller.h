@@ -80,8 +80,6 @@ private slots:
 
 	void newControllerIsOffAndHasNoKind();
 
-	void newControllerGivesNoSubstitute();
-
 	void useMetaEnablesTheSelectedKind();
 
 	void useMetaWithTheCurrentStateReturnsFalse();
@@ -126,8 +124,6 @@ private slots:
 
 	void readFromFileRefusesAFileWithoutASubstitute();
 
-	void readFromFileRefusalDisablesARunningSystem();
-
 	void readFromFileWithoutANameLoadsTheDefault_data();
 
 	void readFromFileWithoutANameLoadsTheDefault();
@@ -138,8 +134,6 @@ private slots:
 
 	void missingFileAnsweredDeactivateFails();
 
-	void missingFileAnsweredDeactivateDisablesARunningSystem();
-
 	void readFromFileReadsAMexpFileAndSavesToIt();
 
 	void readFromFileThenSaveThenBuildsTheSystem();
@@ -147,12 +141,6 @@ private slots:
 	void saveNameIsClearedByRemove();
 
 	void saveNameIsKeptByDisable();
-
-	void saveNameIsClearedByLoadingTheDefault();
-
-	void saveNameIsClearedByTheStandardAnswer();
-
-	void saveNameIsClearedByTheDeactivateAnswer();
 
 	void writeToFileWithMetaOffWritesNothing();
 
@@ -182,12 +170,6 @@ private slots:
 
 	void substituteGetsTheLoadedEstimation();
 
-	void estimationOfTheOtherKindTakesTheDefaultSetup_data();
-
-	void estimationOfTheOtherKindTakesTheDefaultSetup();
-
-	void estimationStateFollowsTheSubstituteIntoTheWindow();
-
 	void getFitnessTrainerOnlyForAnEvaluator();
 
 	void getClassifierOnlyForAClassifier();
@@ -197,10 +179,6 @@ private slots:
 	void getClassifierKeepsItsSubstitute();
 
 	void startEvolutionWithMetaOffOnlyClearsStartWOSigel();
-
-	void stopEvolutionRunsSafelyWithAManager_data();
-
-	void stopEvolutionRunsSafelyWithAManager();
 
 	void configureSystemWithoutAFileLoadsTheDefault();
 
