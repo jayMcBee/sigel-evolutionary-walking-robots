@@ -178,11 +178,6 @@ touched, because changing one changes behaviour against the reference binary.
   `SIG_IndividualView::SIG_IndividualView`,
   `SIG_AllIndividualsView::slotSelectionChanged`.
 
-- [ ] **184. Use `QDialogButtonBox` in the Designer forms.** The forms of
-  `SIG_EditHostDialog`, `MT_AddConstantsWidget`, `MT_AddIndividualsWidget` and
-  `SIG_MovieSettingsDialog` still build their own OK and Cancel row, so their
-  button order differs from the dialogs that use `QDialogButtonBox`.
-
 ---
 
 ## 5 · MetaGP
