@@ -693,23 +693,3 @@ void SIGEL_Program::TST_SIG_ProgramLine::sameSeedGivesTheSameInstructions()
       QCOMPARE( firstShownText, secondShownText );
     }
 }
-
-void SIGEL_Program::TST_SIG_ProgramLine::seedOneGivesKnownInstructions()
-{
-  SIGEL_Robot::SIG_LanguageParameters languageParameters;
-  QList<int> probabilities( 15, 1 );
-  SIGEL_Tools::SIG_Randomizer randomizer( 1 );
-
-  // The known lines fix the order in which a random instruction takes its numbers from the randomizer.
-  const QStringList expectedShownTexts = { "LOAD -16838,-5758\n", "MOD -5627,23010\n", "DIV 2749,12767\n" };
-
-  for ( const QString &expectedShownText : expectedShownTexts )
-    {
-      SIG_ProgramLine programLine( randomizer, languageParameters, probabilities );
-      QString shownText;
-
-      programLine.printToString( shownText );
-
-      QCOMPARE( shownText, expectedShownText );
-    }
-}

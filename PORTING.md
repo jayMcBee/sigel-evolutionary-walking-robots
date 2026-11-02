@@ -911,6 +911,22 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-02 — DONE: `SIG_Randomizer` USES `std::mt19937_64`.**
+
+- The hand-written generator gave 15 bits per number and took `%` of them, so
+  low numbers came more often: with 10400, the instruction-weight total of six
+  shipped experiments, the first 1568 values were 4/3 as likely as the rest.
+  `std::uniform_int_distribution` has no such bias, and `getRandomLong` now
+  covers the whole `long` range.
+- Seed 0 takes its seed from `std::random_device`, not from the seconds since
+  midnight. Any other seed still gives a fixed stream, but not the stream of
+  before, so a saved seed gives another run.
+- A negative maximum throws `SIG_Exception`. A maximum of 0 gives 0 and takes
+  no number.
+- `TST_SIG_Randomizer` states rules instead of recorded numbers, and
+  `TST_SIG_ProgramLine::seedOneGivesKnownInstructions` is gone; the two tests
+  that replay the draws on a second randomizer pin the draw order.
+
 **2026-11-02 — DONE: A NEW PROGRAM HAS THE MINIMUM LENGTH WHEN THE MAXIMUM IS BELOW IT.**
 
 - `SIG_Program::generateRandomProgram` takes the larger of the maximum and the

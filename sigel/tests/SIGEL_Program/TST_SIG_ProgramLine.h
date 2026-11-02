@@ -103,8 +103,6 @@ namespace SIGEL_Program
     void randomInstructionIsChosenByTheWeightsOfTheAllowedCommands();
 
     void sameSeedGivesTheSameInstructions();
-
-    void seedOneGivesKnownInstructions();
   };
 
 }

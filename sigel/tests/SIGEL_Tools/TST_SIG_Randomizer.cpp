@@ -24,9 +24,11 @@
 #include "SIGEL_Tools/TST_SIG_Randomizer.h"
 
 #include "SIGEL_Tools/SIG_Randomizer.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 
-#include <QTime>
 #include <QtTest>
+
+#include <limits>
 
 void SIGEL_Tools::TST_SIG_Randomizer::sameSeedGivesSameNumbers()
 {
@@ -57,39 +59,42 @@ void SIGEL_Tools::TST_SIG_Randomizer::setNewSeedStartsTheNumbersAgain()
   QCOMPARE( randomizer.getRandomInt( 1000 ), secondNumber );
 }
 
-// The default constructor takes its seed from the time of day.
 void SIGEL_Tools::TST_SIG_Randomizer::setNewSeedAfterTheDefaultConstructorGivesTheNumbersOfTheSeed()
 {
   SIG_Randomizer randomizer;
+  SIG_Randomizer expected( 1 );
 
   randomizer.setNewSeed( 1 );
 
-  QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), 16838 );
+  for ( int i = 0; i < 4; i++ )
+    QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), expected.getRandomInt( SIG_Randomizer::fullRandomIntRange ) );
 }
 
-void SIGEL_Tools::TST_SIG_Randomizer::defaultConstructorTakesTheSecondsSinceMidnightAsSeed()
+// Four numbers: two equal first numbers alone can happen by chance.
+void SIGEL_Tools::TST_SIG_Randomizer::defaultConstructorGivesOtherNumbersEachTime()
 {
-  for ( int attempt = 0; attempt < 20; attempt++ )
-    {
-      int secondsBefore = QTime( 0, 0 ).secsTo( QTime::currentTime() );
-      SIG_Randomizer randomizer;
-      int secondsAfter = QTime( 0, 0 ).secsTo( QTime::currentTime() );
+  SIG_Randomizer first;
+  SIG_Randomizer second;
+  bool numbersDiffer = false;
 
-      // The second changes between the two readings, or it is midnight,
-      // where the seed 0 means the time of day again.
-      if ( secondsBefore != secondsAfter || secondsBefore == 0 )
-        {
-          QTest::qSleep( 100 );
-          continue;
-        }
+  for ( int i = 0; i < 4; i++ )
+    if ( first.getRandomInt( SIG_Randomizer::fullRandomIntRange ) != second.getRandomInt( SIG_Randomizer::fullRandomIntRange ) )
+      numbersDiffer = true;
 
-      SIG_Randomizer expected( secondsBefore );
-      QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), expected.getRandomInt( SIG_Randomizer::fullRandomIntRange ) );
-      QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), expected.getRandomInt( SIG_Randomizer::fullRandomIntRange ) );
-      return;
-    }
+  QVERIFY( numbersDiffer );
+}
 
-  QFAIL( "The clock gives no two equal readings." );
+void SIGEL_Tools::TST_SIG_Randomizer::seedZeroGivesOtherNumbersEachTime()
+{
+  SIG_Randomizer first( 0 );
+  SIG_Randomizer second( 0 );
+  bool numbersDiffer = false;
+
+  for ( int i = 0; i < 4; i++ )
+    if ( first.getRandomInt( SIG_Randomizer::fullRandomIntRange ) != second.getRandomInt( SIG_Randomizer::fullRandomIntRange ) )
+      numbersDiffer = true;
+
+  QVERIFY( numbersDiffer );
 }
 
 void SIGEL_Tools::TST_SIG_Randomizer::numberIsBelowMaximum()
@@ -104,24 +109,38 @@ void SIGEL_Tools::TST_SIG_Randomizer::numberIsBelowMaximum()
     }
 }
 
+void SIGEL_Tools::TST_SIG_Randomizer::everyNumberBelowMaximumComes()
+{
+  SIG_Randomizer randomizer( 42 );
+  QList<bool> numberSeen( 10, false );
+
+  for ( int i = 0; i < 1000; i++ )
+    numberSeen[ randomizer.getRandomInt( 10 ) ] = true;
+
+  QCOMPARE( numberSeen, QList<bool>( 10, true ) );
+}
+
+// With 30000 numbers, the first 2768 have the share 2768 / 30000 = 0.0923.
+// A remainder of 32768 divided by 30000 would give them nearly twice that share.
+void SIGEL_Tools::TST_SIG_Randomizer::numbersBelowMaximumAreEquallyLikely()
+{
+  SIG_Randomizer randomizer( 42 );
+  const int draws = 300000;
+  int lowNumbers = 0;
+
+  for ( int i = 0; i < draws; i++ )
+    if ( randomizer.getRandomInt( 30000 ) < 2768 )
+      lowNumbers++;
+
+  const double share = static_cast<double>( lowNumbers ) / draws;
+  QVERIFY2( share > 0.0873 && share < 0.0973, qPrintable( QString::number( share ) ) );
+}
+
 void SIGEL_Tools::TST_SIG_Randomizer::maximumZeroGivesZero()
 {
   SIG_Randomizer randomizer( 42 );
 
   QCOMPARE( randomizer.getRandomInt( 0 ), 0 );
-}
-
-// A change here gives each seed another run.
-void SIGEL_Tools::TST_SIG_Randomizer::maximumZeroMovesTheGeneratorOn()
-{
-  SIG_Randomizer reference( 42 );
-  reference.getRandomInt( 1000 );
-  int secondNumber = reference.getRandomInt( 1000 );
-  SIG_Randomizer randomizer( 42 );
-
-  randomizer.getRandomInt( 0 );
-
-  QCOMPARE( randomizer.getRandomInt( 1000 ), secondNumber );
 }
 
 // A change here gives each seed another run.
@@ -140,27 +159,28 @@ void SIGEL_Tools::TST_SIG_Randomizer::getRandomLongWithMaximumZeroGivesZero()
   QCOMPARE( randomizer.getRandomLong( 0 ), 0L );
 }
 
-// Four numbers: the first one alone does not show a small change of the
-// multiplier or the increment. A change here gives each seed another run.
-void SIGEL_Tools::TST_SIG_Randomizer::seedOneGivesKnownNumbers()
-{
-  SIG_Randomizer randomizer( 1 );
-
-  QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), 16838 );
-  QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), 5758 );
-  QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), 10113 );
-  QCOMPARE( randomizer.getRandomInt( SIG_Randomizer::fullRandomIntRange ), 17515 );
-}
-
-// A maximum that is not a power of two: the numbers also depend on the mask
-// and on the remainder of the division by the maximum. A change here gives
-// each seed another run.
-void SIGEL_Tools::TST_SIG_Randomizer::seedFortyTwoGivesKnownNumbersBelowOneThousand()
+void SIGEL_Tools::TST_SIG_Randomizer::negativeMaximumThrows()
 {
   SIG_Randomizer randomizer( 42 );
 
-  QCOMPARE( randomizer.getRandomInt( 1000 ), 81 );
-  QCOMPARE( randomizer.getRandomInt( 1000 ), 33 );
-  QCOMPARE( randomizer.getRandomInt( 1000 ), 269 );
-  QCOMPARE( randomizer.getRandomInt( 1000 ), 461 );
+  QVERIFY_THROWS_EXCEPTION( SIG_Exception, randomizer.getRandomInt( -1 ) );
+  QVERIFY_THROWS_EXCEPTION( SIG_Exception, randomizer.getRandomLong( -1 ) );
+}
+
+void SIGEL_Tools::TST_SIG_Randomizer::getRandomLongGivesNumbersAboveTheIntRange()
+{
+  SIG_Randomizer randomizer( 42 );
+  const long maximum = 1L << 40;
+  bool numberAboveTheIntRangeSeen = false;
+
+  for ( int i = 0; i < 100; i++ )
+    {
+      long number = randomizer.getRandomLong( maximum );
+      QVERIFY( number >= 0 );
+      QVERIFY( number < maximum );
+      if ( number > std::numeric_limits<int>::max() )
+        numberAboveTheIntRangeSeen = true;
+    }
+
+  QVERIFY( numberAboveTheIntRangeSeen );
 }

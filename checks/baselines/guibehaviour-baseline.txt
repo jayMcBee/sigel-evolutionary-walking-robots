@@ -2507,10 +2507,10 @@ Do you want to replace it?]
   individuals after Add=5
   [modal] class=QFileDialog title=[Save Experiment As]
   [savedialog] parentIsTheMainWindow=1
-  programs=5  instructionLines=1785
-  perProgramLengths=[53,490,670,133,439]
-  sha256(instructions)=f415346f8ec2cee375d1946b67f34e5896eb7e691d894ac3471c224f8c86b021
-  first 6 of individual 0: LOAD 9988,-22117 / MOVE 19741 / ADD -5659,-9758 / MAX -26233,15212 / NOP / JMP -23212
+  programs=5  instructionLines=3005
+  perProgramLengths=[369,601,872,206,957]
+  sha256(instructions)=a421b3d2abfd111d6b31e9586bf79d4cc88b82d825ca28736bccf4e68d0a8a67
+  first 6 of individual 0: SUB -13121,-22589 / COPY 939,22574 / MOD -426,-13776 / COPY 8544,875 / MOVE -30804 / NOP
   RANDOMSEED at line 10 = 0
   RANDOMSEED at line 83 = 12345
 == SCENARIO openfocus ==

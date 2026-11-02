@@ -21,17 +21,14 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_Tools/SIG_Randomizer.h"
-
-#include <qdatetime.h>
+#include "SIGEL_Tools/SIG_Exception.h"
 
 SIGEL_Tools::SIG_Randomizer::SIG_Randomizer()
-  : next( 0 )
 {
   setNewSeed( 0 );
 }
 
 SIGEL_Tools::SIG_Randomizer::SIG_Randomizer(int seed)
-  : next( 0 )
 {
   setNewSeed( seed );
 }
@@ -39,26 +36,23 @@ SIGEL_Tools::SIG_Randomizer::SIG_Randomizer(int seed)
 void SIGEL_Tools::SIG_Randomizer::setNewSeed(int seed)
 {
   if (seed == 0)
-    {
-      QTime midNight( 0, 0 );
-      next = midNight.secsTo( QTime::currentTime() );
-    }
+    engine.seed( std::random_device()() );
   else
-    next = seed;
+    engine.seed( seed );
 }
 
 int SIGEL_Tools::SIG_Randomizer::getRandomInt(int maximum)
 {
-  next = next*1103515245 + 12345;
-  int randomNumber = static_cast<unsigned int>( next / 65536 ) % fullRandomIntRange;
-
-  if (maximum == 0)
-    return 0;
-  else
-    return randomNumber % maximum;
+  return static_cast<int>( getRandomLong( maximum ) );
 }
 
 long SIGEL_Tools::SIG_Randomizer::getRandomLong(long maximum)
 {
-  return getRandomInt( static_cast<int>(maximum) );
+  if (maximum < 0)
+    throw SIG_Exception( __FILE__, __LINE__, "A random number below a negative maximum was asked for." );
+
+  if (maximum == 0)
+    return 0;
+
+  return std::uniform_int_distribution<long>( 0, maximum - 1 )( engine );
 }

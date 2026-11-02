@@ -46,21 +46,25 @@ namespace SIGEL_Tools
 
     void setNewSeedAfterTheDefaultConstructorGivesTheNumbersOfTheSeed();
 
-    void defaultConstructorTakesTheSecondsSinceMidnightAsSeed();
+    void defaultConstructorGivesOtherNumbersEachTime();
+
+    void seedZeroGivesOtherNumbersEachTime();
 
     void numberIsBelowMaximum();
 
-    void maximumZeroGivesZero();
+    void everyNumberBelowMaximumComes();
 
-    void maximumZeroMovesTheGeneratorOn();
+    void numbersBelowMaximumAreEquallyLikely();
+
+    void maximumZeroGivesZero();
 
     void getRandomLongGivesTheNumberOfGetRandomInt();
 
     void getRandomLongWithMaximumZeroGivesZero();
 
-    void seedOneGivesKnownNumbers();
+    void negativeMaximumThrows();
 
-    void seedFortyTwoGivesKnownNumbersBelowOneThousand();
+    void getRandomLongGivesNumbersAboveTheIntRange();
   };
 
 }

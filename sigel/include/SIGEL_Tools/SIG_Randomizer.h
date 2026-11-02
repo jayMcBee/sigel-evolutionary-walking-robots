@@ -23,6 +23,8 @@
 #ifndef SIGEL_TOOLS_SIG_RANDOMIZER_H
 #define SIGEL_TOOLS_SIG_RANDOMIZER_H
 
+#include <random>
+
 namespace SIGEL_Tools
 {
 
@@ -57,7 +59,8 @@ public:
    SIG_Randomizer(int seed);
 
     /**
-     * This operation returns a randomly generated integer number between 0 and maximum.
+     * This operation returns a randomly generated integer number from 0 to maximum - 1.
+     * A maximum of 0 gives 0; a negative maximum throws a SIG_Exception.
      * @param maximum
      * maximum defines the maximum range of the generated numbers.
      */
@@ -65,7 +68,8 @@ public:
    int getRandomInt(int maximum);
 
     /**
-     * This operation returns a randomly generated long integer number between 0 and maximum.
+     * This operation returns a randomly generated long integer number from 0 to maximum - 1.
+     * A maximum of 0 gives 0; a negative maximum throws a SIG_Exception.
      * @param maximum
      * maximum defines the maximum range of the generated numbers.
      */
@@ -74,6 +78,7 @@ public:
 
    /**
     * Sets a new seed. The randomizer will be reinitialized."
+    * The seed 0 takes a new seed from std::random_device.
     * @post
     * The randomizer is reinitialized due to the new seed."
     */
@@ -81,7 +86,7 @@ public:
    void setNewSeed(int seed);
 
  private:
-   unsigned long int next;
+   std::mt19937_64 engine;
 };
 
 }
