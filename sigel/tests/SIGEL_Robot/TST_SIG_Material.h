@@ -41,6 +41,8 @@ namespace SIGEL_Robot
     void setFrictionValueSetsAndUpdatesBothPartners();
 
     void materialReadFromStreamKeepsOnlyALoadedPartner();
+
+    void setFrictionValueOnItselfKeepsOnePartner();
   };
 
 }

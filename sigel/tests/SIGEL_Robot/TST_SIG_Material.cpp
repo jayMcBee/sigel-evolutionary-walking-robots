@@ -82,4 +82,27 @@ void SIGEL_Robot::TST_SIG_Material::materialReadFromStreamKeepsOnlyALoadedPartne
 
   // 0.6 is the value for a pair that is not set: the pair is dropped.
   QCOMPARE( early->getFrictionValue( known ), 0.6 );
+
+  // "Material early <elasticity> <density> <number of partners> <colour>"
+  QString written;
+  QTextStream stream( &written );
+  early->writeToFileTransfer( stream );
+  QCOMPARE( written.split( ' ' ).value( 4 ), QString( "0" ) );
+}
+
+void SIGEL_Robot::TST_SIG_Material::setFrictionValueOnItselfKeepsOnePartner()
+{
+  SIG_Robot robot;
+  SIG_Material a( &robot, "a" );
+
+  a.setFrictionValue( &a, 0.25 );
+  a.setFrictionValue( &a, 0.75 );
+  QCOMPARE( a.getFrictionValue( &a ), 0.75 );
+
+  // "Material a <elasticity> <density> <number of partners> a 0.75 <colour>"
+  QString written;
+  QTextStream stream( &written );
+  a.writeToFileTransfer( stream );
+  QCOMPARE( written.split( ' ' ).value( 4 ), QString( "1" ) );
+  QVERIFY( written.contains( "a 0.75" ) );
 }
