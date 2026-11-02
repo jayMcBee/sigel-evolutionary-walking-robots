@@ -322,16 +322,15 @@ problem; the choice is made before any code is written.
 ## 8 · Experiments and robot models
 
 - [ ] **166. Ship a second set of experiments that fits today's instructions.**
-  The fixes to the robot instructions change how a saved program runs, so the
-  stored fitness values in the shipped experiments no longer match, and some
-  programs depend on a result that is now fixed. Keep the shipped files as the
-  original 1.3 set. Add a second set: each experiment loaded and evolved for
-  10 to 25 generations, so that the fitness values come from today's code and
-  such programs are selected away. In the same pass, give the robot models
-  less saturated colours. To decide: the name of the second set and where the two sets live.
+  The instruction fixes change how saved programs run: the shipped fitness
+  values no longer match, and some programs rely on a result that is now
+  fixed. The shipped files stay as the 1.3 set. The second set is each
+  experiment loaded and evolved for 10 to 25 generations, so its fitness
+  values come from today's code and those programs are selected away. It has
+  GP seed 0; with the shipped seed 1, every evolution and every restart begins
+  with the same random draws. Same pass: less saturated robot colours.
+  To decide: the second set's name, and where the two sets live.
   Item 160 waits for this item.
-  The second set has GP seed 0. With the shipped seed 1, every evolution and
-  every restart begins with the same random draws.
 
 ---
 
