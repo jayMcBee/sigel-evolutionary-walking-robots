@@ -61,12 +61,6 @@ namespace SIGEL_Robot {
                 colour = SIG_Robot::streamToVector (tx);
         }
 
-        SIG_Material::~SIG_Material ()
-        {
-                qDeleteAll (friction);
-                friction.clear ();
-        }
-
         QString SIG_Material::getName () const
         {
                 return name;
@@ -106,20 +100,16 @@ namespace SIGEL_Robot {
                                              double fricval,
                                              bool negotiate)
         {
-                FrictionValue *found = nullptr;
-                for (FrictionValue *fv : friction)
-                        if (fv->otherSide == otherObj) {
-                                fv->value = fricval;
-                                found = fv;
+                bool found = false;
+                for (FrictionValue &fv : friction)
+                        if (fv.otherSide == otherObj) {
+                                fv.value = fricval;
+                                found = true;
                                 break;
                         }
 
-                if (!found) {
-                        FrictionValue *fv = new FrictionValue;
-                        fv->otherSide = otherObj;
-                        fv->value = fricval;
-                        friction.append (fv);
-                }
+                if (!found)
+                        friction.append (FrictionValue{ otherObj, fricval });
 
                 if ((negotiate) && (otherObj != this))
                         otherObj->setFrictionValue (this, fricval, false);
@@ -127,9 +117,9 @@ namespace SIGEL_Robot {
 
         double SIG_Material::getFrictionValue (SIG_Material *otherObj) const
         {
-                for (const FrictionValue *fv : friction)
-                        if (fv->otherSide == otherObj)
-                                return fv->value;
+                for (const FrictionValue &fv : friction)
+                        if (fv.otherSide == otherObj)
+                                return fv.value;
                 return 0.6;
         }
 
@@ -140,9 +130,9 @@ namespace SIGEL_Robot {
                    << elasticity << ' '
                    << density << ' '
                    << friction.count () << ' ';
-                for (const FrictionValue *fv : friction)
-                        tx << fv->otherSide->getName () << ' '
-                           << fv->value << ' ';
+                for (const FrictionValue &fv : friction)
+                        tx << fv.otherSide->getName () << ' '
+                           << fv.value << ' ';
                 SIG_Robot::vectorToStream (tx, colour);
                 tx << '\n';
         }

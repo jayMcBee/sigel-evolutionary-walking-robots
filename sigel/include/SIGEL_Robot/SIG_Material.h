@@ -52,7 +52,7 @@ namespace SIGEL_Robot
           SIG_Robot *parent;
           QString name;
           double elasticity, density;
-          QList<FrictionValue *> friction;
+          QList<FrictionValue> friction;
           SIG_Vector colour;
   public:
           /**
@@ -65,10 +65,6 @@ namespace SIGEL_Robot
            * Reads the material attributes from a stream.
            */
           SIG_Material (SIG_Robot *par, QTextStream & tx);
-          /**
-           * Destructor.
-           */
-          ~SIG_Material ();
           /**
            * Returns the name of the material.
            */
