@@ -365,6 +365,25 @@ void SIGEL_Program::TST_SIG_Program::generateRandomProgramWithMaximumZeroGivesTh
   }
 }
 
+void SIGEL_Program::TST_SIG_Program::generateRandomProgramWithMaximumBelowTheMinimumGivesTheMinimumLength()
+{
+  SIGEL_GP::SIG_GPParameter gpParameter;
+  gpParameter.setMinIndLength( 10 );
+  gpParameter.setMaxIndLength( 2 );
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+
+  for ( int seed = 1; seed <= seeds; seed++ )
+  {
+    QByteArray const message = "seed " + QByteArray::number( seed );
+    SIGEL_Tools::SIG_Randomizer randomizer( seed );
+    SIG_Program program;
+
+    program.generateRandomProgram( gpParameter, languageParameters, randomizer );
+
+    QVERIFY2( program.getProgramLength() == 10, message.constData() );
+  }
+}
+
 void SIGEL_Program::TST_SIG_Program::generateRandomProgramReplacesTheOldLines()
 {
   SIGEL_GP::SIG_GPParameter gpParameter;

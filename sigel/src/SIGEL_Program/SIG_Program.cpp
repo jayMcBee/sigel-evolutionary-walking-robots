@@ -27,6 +27,8 @@
 #include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
+#include <algorithm>
+
 SIGEL_Program::SIG_Program::SIG_Program()
 	: lines()
 {
@@ -221,10 +223,14 @@ void SIGEL_Program::SIG_Program::generateRandomProgram( SIGEL_GP::SIG_GPParamete
 {
 	lines.clear();
 
-	long programLength = gpParameter.getMinIndLength();
+	long const minimumLength = gpParameter.getMinIndLength();
+
+	// A maximum below the minimum gives the minimum length.
+	long const maximumLength = std::max<long>( gpParameter.getMaxIndLength(), minimumLength );
+	long programLength       = minimumLength;
 
 	if( gpParameter.isMaxIndLengthLimited() )
-		programLength += randomizer.getRandomInt( gpParameter.getMaxIndLength() - gpParameter.getMinIndLength() + 1 );
+		programLength += randomizer.getRandomInt( maximumLength - minimumLength + 1 );
 
 	for( long x=0; x<programLength; x++ )
 	{

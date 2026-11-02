@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-02 — DONE: A NEW PROGRAM HAS THE MINIMUM LENGTH WHEN THE MAXIMUM IS BELOW IT.**
+
+- `SIG_Program::generateRandomProgram` takes the larger of the maximum and the
+  minimum length as its maximum. It asked the randomizer for a number below a
+  negative maximum, and the programs came out at random lengths above the
+  minimum.
+
 **2026-11-02 — DONE: THE ESTIMATION STRATEGIES HAVE NAMES.**
 
 - `MT_EstimationStrategy` names the ten strategies and keeps their numbers, which

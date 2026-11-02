@@ -91,6 +91,8 @@ namespace SIGEL_Program
 
     void generateRandomProgramWithMaximumZeroGivesTheMinimumLength();
 
+    void generateRandomProgramWithMaximumBelowTheMinimumGivesTheMinimumLength();
+
     void generateRandomProgramReplacesTheOldLines();
 
     void generateRandomProgramUsesTheInstructionProbabilities();
