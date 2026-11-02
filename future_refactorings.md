@@ -19,12 +19,6 @@ Paths are relative to `sigel/`, the source tree.
   constructor throws. Review its design, and decide whether a standard
   C++20 construct does the same job.
 
-- [ ] **36. `SIG_Material::FrictionValue` could be a value type.**
-  `FrictionValue` values would drop the `new` and the `qDeleteAll`, as D8 did
-  for `SIG_Register`; tidiness only. D11 left it as it was, by decision,
-  because the port moved the Qt API and nothing else; that was a port-scope
-  rule, not a refusal.
-
 ---
 
 ## 2 · Renames and translation
