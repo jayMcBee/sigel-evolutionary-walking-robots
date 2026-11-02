@@ -22,7 +22,7 @@ MT_Classifier::MT_Classifier(QTextStream &File) : MT_Substitute()
 	}
 	if (PresentLine == Classifier)
 	{
-		EstimationStrategy = std::abs( (File.readLine()).toInt() );
+		EstimationStrategy = static_cast<MT_EstimationStrategy>( std::abs( (File.readLine()).toInt() ) );
 		Tolerance = (File.readLine()).toDouble();
 		RefreshInterval = (File.readLine()).toInt();
 		GenerationNumber = (File.readLine()).toUInt();
@@ -64,7 +64,7 @@ void MT_Classifier::loadSetup(QTextStream &File)
 	}
 	if (PresentLine == Classifier)
 	{
-		EstimationStrategy = std::abs( (File.readLine()).toInt() );
+		EstimationStrategy = static_cast<MT_EstimationStrategy>( std::abs( (File.readLine()).toInt() ) );
 		Tolerance = (File.readLine()).toDouble();
 		RefreshInterval = (File.readLine()).toInt();
 	}
@@ -73,7 +73,7 @@ void MT_Classifier::loadSetup(QTextStream &File)
 void MT_Classifier::writeToFile(QTextStream &File)
 {
 	File << ("Classifier:\n");
-	File << EstimationStrategy <<Qt::endl;
+	File << static_cast<int>(EstimationStrategy) <<Qt::endl;
 	File << Tolerance <<Qt::endl;
 	File << RefreshInterval <<Qt::endl;
 	File << GenerationNumber <<Qt::endl;
@@ -88,7 +88,7 @@ void MT_Classifier::writeToFile(QTextStream &File)
 void MT_Classifier::writeToFileSetup(QTextStream &File)
 {
 	File << ("Evaluator:\n");
-	File << EstimationStrategy <<Qt::endl;
+	File << static_cast<int>(EstimationStrategy) <<Qt::endl;
 	File << Tolerance <<Qt::endl;
 	File << RefreshInterval <<Qt::endl;
 	int GenNum =0;
@@ -134,7 +134,7 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 
 	switch (EstimationStrategy)
 	{
-	case 3:
+	case MT_EstimationStrategy::ErrorPercentage:
 		{
 			if(MetaProgError == -1.0)
 			{
@@ -159,7 +159,7 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 		}
 		break;
 
-	case 4:
+	case MT_EstimationStrategy::AdaptiveByGeneration:
 		{
 			// Evaluation strategy weighted by SIGEL generation count
 			double ToleranceNew = Tolerance;
@@ -195,7 +195,7 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 			}
 		}
 		break;
-	case 5:
+	case MT_EstimationStrategy::AdaptiveByFitness:
 		{
 			// Evaluation strategy weighted by SIGEL fitness
 
@@ -234,13 +234,13 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 			}
 		}
 		break;
-	case 8:
+	case MT_EstimationStrategy::ClassifierWithoutMetaGP:
 		{
 			NumOfClassi =0;
 		}
 		break;
 
-	case 6:
+	case MT_EstimationStrategy::SaveTheBest:
 		{
 			if(MetaProgError == -1.0)
 			{
@@ -256,6 +256,9 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 				NumOfClassi =-1;
 		}
 		break;
+
+	// an evaluator strategy: MetaGP runs no tournament
+	default: break;
 	}
 
 	return NumOfClassi;

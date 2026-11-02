@@ -911,6 +911,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-02 — DONE: THE ESTIMATION STRATEGIES HAVE NAMES.**
+
+- `MT_EstimationStrategy` names the ten strategies and keeps their numbers, which
+  MetaGP files store. `MT_Substitute::kindOfStrategy` says which kind of substitute
+  a strategy belongs to; the MetaGP window used number ranges for that.
+
 **2026-11-02 — DONE: THE "SAVE THE BEST" BOX IS GONE FROM THE METAGP WINDOW.**
 
 - Ticking it made the strategy number negative. Nothing read the sign as "save

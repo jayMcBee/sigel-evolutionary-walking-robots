@@ -24,6 +24,8 @@
 #ifndef MT_CONTROL_MT_ESTIMATIONSTATE_H
 #define MT_CONTROL_MT_ESTIMATIONSTATE_H
 
+#include "MT_Control/MT_EstimationStrategy.h"
+
 #include <QList>
 
 /**
@@ -35,7 +37,7 @@ struct MT_EstimationState
 	// True while the controller holds loaded data.
 	bool inUse;
 
-	int strategy;
+	MT_EstimationStrategy strategy;
 	int refreshInterval;
 	double tolerance;
 

@@ -114,18 +114,34 @@ QQueue<MT_TrainingCase *> *MT_Substitute::changeTCases()
 	return &TCaseBuffer;
 }
 
-void MT_Substitute::setEstimationParameter( int EStrategy, double Tol, int ReInterval )
+void MT_Substitute::setEstimationParameter( MT_EstimationStrategy EStrategy, double Tol, int ReInterval )
 {
 	EstimationStrategy = EStrategy;
 	Tolerance = Tol;
 	RefreshInterval = ReInterval;
 }
 
-void MT_Substitute::getEstimationParameter( int *EStrategy, double *Tol, int *ReInterval )
+void MT_Substitute::getEstimationParameter( MT_EstimationStrategy *EStrategy, double *Tol, int *ReInterval )
 {
 	*EStrategy = EstimationStrategy;
 	*Tol = Tolerance;
 	*ReInterval = RefreshInterval;
+}
+
+MT_SubstituteKind MT_Substitute::kindOfStrategy( MT_EstimationStrategy strategy )
+{
+	switch( strategy )
+	{
+	case MT_EstimationStrategy::ErrorPercentage:
+	case MT_EstimationStrategy::AdaptiveByGeneration:
+	case MT_EstimationStrategy::AdaptiveByFitness:
+	case MT_EstimationStrategy::SaveTheBest:
+	case MT_EstimationStrategy::ClassifierWithoutMetaGP:
+		return MT_SubstituteKind::Classifier;
+
+	default:
+		return MT_SubstituteKind::Evaluator;
+	}
 }
 
 void MT_Substitute::getNumOfEstimation( QList<unsigned int> *MetaEstimation, QList<unsigned int> *CorrectEstimation )

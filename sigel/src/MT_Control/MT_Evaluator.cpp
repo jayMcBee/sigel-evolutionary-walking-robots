@@ -28,7 +28,7 @@ MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPMetaGPExperiment& exp, QTextStream &F
 		PresentLine = File.readLine();
 	if ((PresentLine == Evaluator) && !(File.atEnd()))
 	{
-		EstimationStrategy = std::abs( (File.readLine()).toInt() );
+		EstimationStrategy = static_cast<MT_EstimationStrategy>( std::abs( (File.readLine()).toInt() ) );
 		Tolerance = (File.readLine()).toDouble();
 		RefreshInterval = (File.readLine()).toInt();
 		GenerationNumber = (File.readLine()).toUInt();
@@ -62,7 +62,7 @@ MT_Evaluator::MT_Evaluator(SIGEL_GP::SIG_GPMetaGPExperiment& exp, QTextStream &F
 void MT_Evaluator::writeToFile(QTextStream & File)
 {
 	File << ("Evaluator:\n");
-	File << EstimationStrategy <<Qt::endl;
+	File << static_cast<int>(EstimationStrategy) <<Qt::endl;
 	File << Tolerance <<Qt::endl;
 	File << RefreshInterval <<Qt::endl;
 	File << GenerationNumber <<Qt::endl;
@@ -77,7 +77,7 @@ void MT_Evaluator::writeToFile(QTextStream & File)
 void MT_Evaluator::writeToFileSetup(QTextStream & File)
 {
 	File << ("Evaluator:\n");
-	File << EstimationStrategy <<Qt::endl;
+	File << static_cast<int>(EstimationStrategy) <<Qt::endl;
 	File << Tolerance <<Qt::endl;
 	File << RefreshInterval <<Qt::endl;
 	int GenNum =0;
@@ -93,7 +93,7 @@ void MT_Evaluator::loadSetup(QTextStream &File)
 		PresentLine = File.readLine();
 	if ((PresentLine == Evaluator) && !(File.atEnd()))
 	{
-		EstimationStrategy = std::abs( (File.readLine()).toInt() );
+		EstimationStrategy = static_cast<MT_EstimationStrategy>( std::abs( (File.readLine()).toInt() ) );
 		Tolerance = (File.readLine()).toDouble();
 		RefreshInterval = (File.readLine()).toInt();
 	}
@@ -120,7 +120,7 @@ bool MT_Evaluator::evaluationTactic()
 
 	switch (EstimationStrategy)
 	{
-	case 1:
+	case MT_EstimationStrategy::MeanError:
 		{
 			if(MetaProgError == -1.0)
 			{
@@ -153,7 +153,7 @@ bool MT_Evaluator::evaluationTactic()
 		}
 		break;
 
-	case 2: 
+	case MT_EstimationStrategy::CleanedMeanError:
 		{
 			if(MetaProgError == -1.0)
 			{
@@ -218,7 +218,7 @@ bool MT_Evaluator::evaluationTactic()
 		}
 		break;
 		
-	case 9:
+	case MT_EstimationStrategy::AdaptiveError:
 		{
 			if(MetaProgError == -1.0)
 			{
@@ -267,7 +267,7 @@ bool MT_Evaluator::evaluationTactic()
 		}
 		break;
 
-	case 10:
+	case MT_EstimationStrategy::AdaptiveCleanedError:
 		{
 		if(MetaProgError == -1.0)
 			{
@@ -314,7 +314,10 @@ bool MT_Evaluator::evaluationTactic()
 		}
 		break;
 
-	case 13: UseMeta=false; break;
+	case MT_EstimationStrategy::EvaluatorWithoutMetaGP: UseMeta=false; break;
+
+	// a classifier strategy: MetaGP does not estimate
+	default: break;
 	}
 
 	return UseMeta;

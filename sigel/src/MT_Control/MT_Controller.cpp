@@ -51,7 +51,7 @@ MT_Controller::MT_Controller( SIGEL_GP::SIG_GPMetaGPExperiment &exp )
 	estimationState.simulationCounts = nullptr;
 	estimationState.estimationCounts = nullptr;
 	estimationState.refreshInterval = 0;
-	estimationState.strategy = -1;
+	estimationState.strategy = MT_EstimationStrategy::MeanError;
 	estimationState.tolerance = 0;
 
 	defConfFileName = std::getenv( "SIGEL_ROOT" );
@@ -773,7 +773,7 @@ void MT_Controller::loadEstimationState( QTextStream &File )
 	estimationState.estimationCounts = nullptr;
 	if( usedSystem == savedSystem )
 	{
-		estimationState.strategy = std::abs( ( File.readLine() ).toInt() );
+		estimationState.strategy = static_cast<MT_EstimationStrategy>( std::abs( ( File.readLine() ).toInt() ) );
 		estimationState.tolerance = ( File.readLine() ).toDouble();
 		estimationState.refreshInterval = ( File.readLine() ).toInt();
 		estimationState.generationCount = ( File.readLine() ).toUInt();
@@ -808,7 +808,7 @@ void MT_Controller::loadEstimationState( QTextStream &File )
 			}
 			if( ( PresentLine == Classifier ) && !( defStrm.atEnd() ) )
 			{
-				estimationState.strategy = std::abs( ( defStrm.readLine() ).toInt() );
+				estimationState.strategy = static_cast<MT_EstimationStrategy>( std::abs( ( defStrm.readLine() ).toInt() ) );
 				estimationState.tolerance = ( defStrm.readLine() ).toDouble();
 				estimationState.refreshInterval = ( defStrm.readLine() ).toInt();
 				estimationState.generationCount = ( defStrm.readLine() ).toUInt();
@@ -824,7 +824,7 @@ void MT_Controller::loadEstimationState( QTextStream &File )
 			}
 			if( ( PresentLine == Evaluator ) && !( defStrm.atEnd() ) )
 			{
-				estimationState.strategy = std::abs( ( defStrm.readLine() ).toInt() );
+				estimationState.strategy = static_cast<MT_EstimationStrategy>( std::abs( ( defStrm.readLine() ).toInt() ) );
 				estimationState.tolerance = ( defStrm.readLine() ).toDouble();
 				estimationState.refreshInterval = ( defStrm.readLine() ).toInt();
 				estimationState.generationCount = ( defStrm.readLine() ).toUInt();
@@ -853,7 +853,7 @@ void MT_Controller::saveEstimationState( QTextStream &File )
 	case MT_SubstituteKind::NoMetaGP:
 		break;
 	}
-	File << estimationState.strategy << Qt::endl;
+	File << static_cast< int >( estimationState.strategy ) << Qt::endl;
 	File << estimationState.tolerance << Qt::endl;
 	File << estimationState.refreshInterval << Qt::endl;
 	File << estimationState.generationCount << Qt::endl;
@@ -877,7 +877,7 @@ void MT_Controller::writeEstimationSettings()
 	{
 		estimationSettingsText = "Classifier:\n";
 	}
-	estimationSettingsText.append( QString( "%1\n" ).arg( estimationState.strategy ) );
+	estimationSettingsText.append( QString( "%1\n" ).arg( static_cast< int >( estimationState.strategy ) ) );
 	estimationSettingsText.append( QString( "%1\n" ).arg( estimationState.tolerance ) );
 	estimationSettingsText.append( QString( "%1\n" ).arg( estimationState.refreshInterval ) );
 	estimationSettingsText.append( QString( "%1\n" ).arg( estimationState.generationCount ) );

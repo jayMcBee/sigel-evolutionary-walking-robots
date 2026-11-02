@@ -3,6 +3,8 @@
 
 #include <QQueue>
 #include <memory>
+#include "MT_Control/MT_EstimationStrategy.h"
+#include "MT_Control/MT_SubstituteKind.h"
 #include "MT_GPSystem/MT_Program.h"
 #include "MT_GPSystem/MT_Interpreter.h"
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
@@ -21,8 +23,11 @@ class MT_Substitute
 {
 public:
 	// get/set method for Parameter update
-	void getEstimationParameter( int *EStrategy, double *Tol, int *ReInterval );
-	void setEstimationParameter( int EStrategy, double Tol, int ReInterval );
+	void getEstimationParameter( MT_EstimationStrategy *EStrategy, double *Tol, int *ReInterval );
+	void setEstimationParameter( MT_EstimationStrategy EStrategy, double Tol, int ReInterval );
+
+	// The kind of substitute that uses the strategy.
+	static MT_SubstituteKind kindOfStrategy( MT_EstimationStrategy strategy );
 	void setInterpreter( int NumOfVariable, int TimeToInter );
 	void getNumOfEstimation( QList<unsigned int> *MetaEstimation, QList<unsigned int> *CorrectEstimation );
 
@@ -83,17 +88,8 @@ protected:
 	// to interpret a SigelProgram on the BestMETAProgram
 	MT_Interpreter Interpreter;
 
-	/* Prescribes the strategy for deciding whether meta or simulation is used to
-	* determine the SIGEL fitness.
-	* For the evaluator:
-	* EstimationStrategy = 1 := average deviation from the fitness < Tolerance; Tolerance >= 0;
-	* EstimationStrategy = 2 := average deviation from the fitness excluding (***) < Tolerance;
-	* (***) := the (number of fitness cases)/10 largest deviations
-	* EstimationStrategy = 3 := percentage of wrong decisions: 0% < Tolerance < 100%
-	* EstimationStrategy = 4 :=
-	* EstimationStrategy otherwise :=
-	*/
-	int EstimationStrategy;
+	// Decides when MetaGP estimates instead of SIGEL; it compares an error against Tolerance.
+	MT_EstimationStrategy EstimationStrategy;
 
 	// for EstimationStrategy:
 	double Tolerance;

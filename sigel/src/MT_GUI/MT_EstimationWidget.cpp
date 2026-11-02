@@ -1,4 +1,5 @@
 #include "MT_GUI/MT_EstimationWidget.h"
+#include "MT_Control/MT_Substitute.h"
 
 #include <QMessageBox>
 #include <QSpinBox>
@@ -94,28 +95,29 @@ void MT_EstimationWidget::slotStrategyChanged(int index)
 
 bool MT_EstimationWidget::onHide(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
-	int strategy, refInt;
+	MT_EstimationStrategy strategy;
+	int refInt;
 	double tolerance;
 
 	if(usedSys == MT_SubstituteKind::Evaluator){
 		switch(strategyComboBox->currentIndex()){
-		case 0 : strategy = 1; break;
-		case 1 : strategy = 2; break;
-		case 2 : strategy = 9; break;
-		case 3 : strategy = 10; break;
+		case 0 : strategy = MT_EstimationStrategy::MeanError; break;
+		case 1 : strategy = MT_EstimationStrategy::CleanedMeanError; break;
+		case 2 : strategy = MT_EstimationStrategy::AdaptiveError; break;
+		case 3 : strategy = MT_EstimationStrategy::AdaptiveCleanedError; break;
 		case 4 : 
-		default: strategy = 13;
+		default: strategy = MT_EstimationStrategy::EvaluatorWithoutMetaGP;
 		}
 	}
 	else
 	{
 		switch(strategyComboBox->currentIndex()){
-		case 0 : strategy = 3; break;
-		case 1 : strategy = 4; break;
-		case 2 : strategy = 5; break;
-		case 3 : strategy = 6; break;
+		case 0 : strategy = MT_EstimationStrategy::ErrorPercentage; break;
+		case 1 : strategy = MT_EstimationStrategy::AdaptiveByGeneration; break;
+		case 2 : strategy = MT_EstimationStrategy::AdaptiveByFitness; break;
+		case 3 : strategy = MT_EstimationStrategy::SaveTheBest; break;
 		case 4 : 
-		default: strategy = 8;
+		default: strategy = MT_EstimationStrategy::ClassifierWithoutMetaGP;
 		}
 	}
 
@@ -139,7 +141,7 @@ bool MT_EstimationWidget::onHide(MT_GPManager *manager, MT_EstimationState *esti
 
 void MT_EstimationWidget::onShow(MT_GPManager *manager, MT_EstimationState *estimationState)
 {
-	int strategy = 0;
+	MT_EstimationStrategy strategy = MT_EstimationStrategy::MeanError;
 	int refInt = 0;
 	double tolerance = 0.0;
 
@@ -157,10 +159,7 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, MT_EstimationState *esti
 	// build new dropdownlist depending on the used substituter
 	strategyComboBox->clear();
 
-	// The evaluator strategies are 1, 2, 9, 10 and 13, the classifier strategies
-	// 3 to 6 and 8.
-	if(strategy < 3 ||
-		strategy > 8)
+	if(MT_Substitute::kindOfStrategy(strategy) == MT_SubstituteKind::Evaluator)
 	{
 		// of type evaluator */
 		estimationGroupBox->setTitle("Evaluation");
@@ -172,15 +171,15 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, MT_EstimationState *esti
 		strategyComboBox->addItem("Don't use MetaGP");
 
 		switch(strategy){
-		case 1 : strategyComboBox->setCurrentIndex(0);
+		case MT_EstimationStrategy::MeanError : strategyComboBox->setCurrentIndex(0);
 			break;
-		case 2 : strategyComboBox->setCurrentIndex(1);
+		case MT_EstimationStrategy::CleanedMeanError : strategyComboBox->setCurrentIndex(1);
 			break;
-		case 9 : strategyComboBox->setCurrentIndex(2);
+		case MT_EstimationStrategy::AdaptiveError : strategyComboBox->setCurrentIndex(2);
 			break;
-		case 10 : strategyComboBox->setCurrentIndex(3);
+		case MT_EstimationStrategy::AdaptiveCleanedError : strategyComboBox->setCurrentIndex(3);
 			break;
-		case 13 :
+		case MT_EstimationStrategy::EvaluatorWithoutMetaGP :
 		default:
 			strategyComboBox->setCurrentIndex(4);
 		}
@@ -195,15 +194,15 @@ void MT_EstimationWidget::onShow(MT_GPManager *manager, MT_EstimationState *esti
 		strategyComboBox->addItem("Don't use MetaGP");
 
 		switch(strategy){
-		case 3 : strategyComboBox->setCurrentIndex(0); break;
-		case 4 : strategyComboBox->setCurrentIndex(1); break;
-		case 5 : strategyComboBox->setCurrentIndex(2); break;
-		case 6 : strategyComboBox->setCurrentIndex(3); break;
-		case 8 :
+		case MT_EstimationStrategy::ErrorPercentage : strategyComboBox->setCurrentIndex(0); break;
+		case MT_EstimationStrategy::AdaptiveByGeneration : strategyComboBox->setCurrentIndex(1); break;
+		case MT_EstimationStrategy::AdaptiveByFitness : strategyComboBox->setCurrentIndex(2); break;
+		case MT_EstimationStrategy::SaveTheBest : strategyComboBox->setCurrentIndex(3); break;
+		case MT_EstimationStrategy::ClassifierWithoutMetaGP :
 		default: strategyComboBox->setCurrentIndex(4);
 		}
 	}
-	slotStrategyChanged(strategy);
+	slotStrategyChanged(strategyComboBox->currentIndex());
 	lastIndex = strategyComboBox->currentIndex();
 
 	// remember the value been set

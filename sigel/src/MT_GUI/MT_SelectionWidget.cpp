@@ -1,4 +1,5 @@
 #include "MT_GUI/MT_SelectionWidget.h"
+#include "MT_Control/MT_Substitute.h"
 
 #include <QComboBox>
 #include <QMessageBox>
@@ -119,10 +120,7 @@ void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estim
 	// set the fitness function
 	fitnessFunctionComboBox->clear();
 
-	// The evaluator strategies are 1, 2, 9, 10 and 13, the classifier strategies
-	// 3 to 6 and 8.
-	const int strategy = estimationState->strategy;
-	if( ( strategy < 3 ) || ( strategy > 8 ) )		// of type evaluator */
+	if( MT_Substitute::kindOfStrategy( estimationState->strategy ) == MT_SubstituteKind::Evaluator )
 	{
 		fitnessFunctionComboBox->addItem("Simple error");
 		fitnessFunctionComboBox->addItem("Square error");
@@ -155,10 +153,7 @@ bool MT_SelectionWidget::onHide(MT_GPManager *manager, MT_EstimationState *estim
 	tournamentSize = tournamentSizeComboBox->currentText().toInt();
 	selMethod = selectionMethodComboBox->currentIndex() + 1;
 
-	// The evaluator strategies are 1, 2, 9, 10 and 13, the classifier strategies
-	// 3 to 6 and 8.
-	const int strategy = estimationState->strategy;
-	if( ( strategy < 3 ) || ( strategy > 8 ) )		// of type evaluator */
+	if( MT_Substitute::kindOfStrategy( estimationState->strategy ) == MT_SubstituteKind::Evaluator )
 	{
 		fitFunc = fitnessFunctionComboBox->currentIndex() == 1 ? MT_FitnessFunction::EvaluatorSquareError : MT_FitnessFunction::EvaluatorSimpleError;
 	}

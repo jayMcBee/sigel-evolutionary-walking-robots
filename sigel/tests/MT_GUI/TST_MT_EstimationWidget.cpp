@@ -74,7 +74,7 @@ void TST_MT_EstimationWidget::eachStrategyShowsItsNameAndIsStoredUnchanged()
 	QFETCH( QString, title );
 
 	MT_EstimationState state {};
-	state.strategy = strategy;
+	state.strategy = static_cast<MT_EstimationStrategy>( strategy );
 	state.tolerance = 10;
 	state.refreshInterval = 5;
 
@@ -88,7 +88,8 @@ void TST_MT_EstimationWidget::eachStrategyShowsItsNameAndIsStoredUnchanged()
 	QCOMPARE( strategies->currentText(), name );
 	QCOMPARE( group->title(), title );
 
-	state.strategy = 0;
+	// 0 is no strategy, so the value can only come from onHide.
+	state.strategy = static_cast<MT_EstimationStrategy>( 0 );
 	QVERIFY( widget.onHide( nullptr, &state ) );
-	QCOMPARE( state.strategy, strategy );
+	QCOMPARE( static_cast<int>( state.strategy ), strategy );
 }

@@ -193,13 +193,6 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 5 · MetaGP
 
-- [ ] **148. Name the estimation strategies.** `EstimationStrategy` in
-  `MT_Substitute` is a bare `int`. `MT_Evaluator::evaluationTactic` and
-  `MT_Classifier::evaluationTactic` switch on its numbers, and only the
-  list in `MT_EstimationWidget` gives them names. Use a scoped enum. The
-  number is written into the saved MetaGP file, so each enumerator keeps
-  its value. Only with the unit tests of `MT_Controller` in place first.
-
 - [ ] **122. Destroy MetaGP's mutexes instead of unlocking them.**
   `MT_Substitute::~MT_Substitute` and `MT_GPManager::~MT_GPManager` call
   `pthread_mutex_unlock` on mutexes the destroying thread does not hold, which
