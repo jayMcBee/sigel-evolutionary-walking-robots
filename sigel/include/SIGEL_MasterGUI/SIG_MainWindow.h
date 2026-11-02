@@ -157,6 +157,9 @@ protected:
 	SIGEL_MasterGUI::SIG_ExperimentListView *experimentListView;
 
 private:
+	/** Checks the MetaGP kind that the current experiment uses in the menu. */
+	void showMetaGPKind();
+
 	/** The View and Individuals toolbars. */
 	QToolBar *viewToolBar;
 	QToolBar *individualsToolBar;

@@ -51,7 +51,6 @@ public:
 
 private:
 	bool withGUI;
-	MT_SubstituteKind selectedSystem;
 	QTimer *evolTimer;
 	MT_GPManager *gpManager;
 	MT_MainWindow *mainWindow;

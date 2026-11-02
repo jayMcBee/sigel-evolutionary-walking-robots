@@ -199,7 +199,7 @@ touched, because changing one changes behaviour against the reference binary.
   list in `MT_EstimationWidget` gives them names. Use a scoped enum. The
   number is written into the saved MetaGP file, so each enumerator keeps
   its value; "save best", now the sign, becomes a `bool` of its own in
-  memory. Only with the unit tests of item 180 in place first.
+  memory. Only with the unit tests of `MT_Controller` in place first.
 
 - [ ] **122. Destroy MetaGP's mutexes instead of unlocking them.**
   `MT_Substitute::~MT_Substitute` and `MT_GPManager::~MT_GPManager` call
@@ -225,14 +225,6 @@ touched, because changing one changes behaviour against the reference binary.
   page, Add does not add individuals, so the population can only be filled by
   loading one. Found in use; the cause is not known yet
   (`MT_PopulationWidget::slotAddInd` and its dialog look complete).
-
-- [ ] **180. One member for the kind of substitute in `MT_Controller`.**
-  `selectedSystem` and `usedSystem` hold the same thing, the chosen kind;
-  whether MetaGP runs is `metaOn`. `useMeta` ends with `usedSystem =
-  selectedSystem`, so a disabled system does not stay `NoMetaGP`, and a kind
-  that `slotLoadDefault` or `slotLoadSetup` loads while MetaGP is off is
-  replaced by the old choice. Only with unit tests for `MT_Controller`'s
-  switching, loading and enabling in place first.
 
 - [ ] **181. Put the copyright banner in every source file.** Most MetaGP
   files and some others have none, and the repository is public, so the

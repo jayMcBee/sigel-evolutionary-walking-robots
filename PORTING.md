@@ -911,6 +911,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-01 — DONE: `MT_Controller` HOLDS THE KIND OF SUBSTITUTE IN ONE MEMBER.**
+
+- `selectedSystem` is gone. `usedSystem` keeps the kind while MetaGP is off,
+  `metaOn` says whether MetaGP runs, and the first enable with no kind takes the
+  Evaluator. A kind that `slotLoadSetup` or `slotLoadDefault` loads now stays, with
+  MetaGP on or off.
+
 **2026-11-01 — DONE: A FAILED METAGP SAVE RELEASES `evolutionMutex`.**
 
 - `MT_Controller::writeToFile` unlocks before it looks at the result of

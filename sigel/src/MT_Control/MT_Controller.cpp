@@ -43,7 +43,6 @@ MT_Controller::MT_Controller( SIGEL_GP::SIG_GPMetaGPExperiment &exp )
 	withGUI = true;
 	saveName = QString();
 	usedSystem = MT_SubstituteKind::NoMetaGP;
-	selectedSystem = MT_SubstituteKind::Evaluator;
 	metaOn = false;
 
 	estimationState.inUse = false;
@@ -238,7 +237,6 @@ bool MT_Controller::switchSystem( MT_SubstituteKind wantedSystem )
 	}
 
 	// now really switch the systems
-	selectedSystem = wantedSystem;
 	usedSystem = wantedSystem;
 
 	// that's it; new systems are created by the time they are needed
@@ -316,7 +314,10 @@ bool MT_Controller::useMeta( bool state )
 	}
 
 	metaOn = state;
-	usedSystem = selectedSystem;
+	if( usedSystem == MT_SubstituteKind::NoMetaGP )
+	{
+		usedSystem = MT_SubstituteKind::Evaluator;
+	}
 
 	return true;
 }
@@ -510,7 +511,6 @@ bool MT_Controller::readFromFile( QString fileName )
 	QString tmpStr = confStrm.readLine();
 	if( stdConf == true )
 	{
-		usedSystem = selectedSystem;
 		useMeta( true );
 	}
 	else if( int index = tmpStr.indexOf( "usedSystem=" ) != -1 )
@@ -519,13 +519,11 @@ bool MT_Controller::readFromFile( QString fileName )
 		{
 		case MT_SubstituteKind::Evaluator:
 			usedSystem = MT_SubstituteKind::Evaluator;
-			selectedSystem = usedSystem;
 			useMeta( true );
 			break;
 
 		case MT_SubstituteKind::Classifier:
 			usedSystem = MT_SubstituteKind::Classifier;
-			selectedSystem = usedSystem;
 			useMeta( true );
 			break;
 

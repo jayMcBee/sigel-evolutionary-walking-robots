@@ -212,9 +212,15 @@ private slots:
 
 	void slotLoadSetupLoadsAnotherKindWhileEnabled();
 
+	void slotLoadSetupWhileDisabledTakesTheKindOfTheFile();
+
+	void slotLoadSetupKindSurvivesDisableAndEnable();
+
 	void slotLoadSetupCancelledChangesNothing();
 
 	void slotLoadDefaultRestoresTheDefaultSetup();
+
+	void slotLoadDefaultWhileDisabledTakesTheKindOfTheFile();
 
 	void slotLoadDefaultWithoutTheFileChangesNothing();
 

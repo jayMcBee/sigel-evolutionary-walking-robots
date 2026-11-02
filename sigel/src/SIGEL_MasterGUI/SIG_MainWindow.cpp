@@ -838,6 +838,10 @@ void SIG_MainWindow::slotMTUseMT( bool state )
 	{
 		mtConfigureAction->setEnabled( state );
 		mtChoiceTypeActionGroup->setEnabled( state );
+		if( state )
+		{
+			showMetaGPKind();
+		}
 	}
 }
 
@@ -927,14 +931,27 @@ void SIG_MainWindow::slotCurrentExperimentChanged()
 	}
 
 	mtUseAction->setChecked( true );
+	showMetaGPKind();
+}
+
+void SIG_MainWindow::showMetaGPKind()
+{
+	SIG_GUIGPExperiment *currentExperiment = experimentListView->currentlySelectedExperiment();
+	if( !currentExperiment )
+	{
+		return;
+	}
+
 	if( currentExperiment->gpExperiment.mtController->UsedSystem() == MT_SubstituteKind::Evaluator )
 	{
-		mtChoiceEvaluatorAction->setChecked( true );
+		mtSelectedSystem = mtChoiceEvaluatorAction;
 	}
 	else
 	{
-		mtChoiceClassifierAction->setChecked( true );
+		mtSelectedSystem = mtChoiceClassifierAction;
 	}
+
+	mtSelectedSystem->setChecked( true );
 }
 
 void SIG_MainWindow::slotEnableNoExperimentActions( bool enable )

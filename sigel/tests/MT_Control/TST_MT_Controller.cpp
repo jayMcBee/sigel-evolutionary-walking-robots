@@ -1043,6 +1043,40 @@ void TST_MT_Controller::slotLoadSetupLoadsAnotherKindWhileEnabled()
 	QCOMPARE( savedSystem.mid( 0, expected.size() ), expected );
 }
 
+void TST_MT_Controller::slotLoadSetupWhileDisabledTakesTheKindOfTheFile()
+{
+	controller().configureSystem( nullptr );
+	QVERIFY( controller().useMeta( false ) );
+
+	writeFile( "other.mcnf", configuration( 2, loadedClassifierEstimation, 14 ) );
+	expectFileName( "other.mcnf" );
+	QVERIFY( QMetaObject::invokeMethod( &controller(), "slotLoadSetup" ) );
+
+	QVERIFY( controller().IsEnabled() );
+	QCOMPARE( controller().UsedSystem(), MT_SubstituteKind::Classifier );
+
+	const QString saved = saveSetup( "after" );
+	const QStringList expected = QStringList( "usedSystem=2" ) + estimationLines( loadedClassifierEstimation );
+	QCOMPARE( saved.split( '\n' ).mid( 0, expected.size() ), expected );
+	QVERIFY( saved.contains( "Population:\n14\n" ) );
+}
+
+void TST_MT_Controller::slotLoadSetupKindSurvivesDisableAndEnable()
+{
+	controller().configureSystem( nullptr );
+
+	writeFile( "other.mcnf", configuration( 2, loadedClassifierEstimation ) );
+	expectFileName( "other.mcnf" );
+	QVERIFY( QMetaObject::invokeMethod( &controller(), "slotLoadSetup" ) );
+
+	QVERIFY( controller().useMeta( false ) );
+	QVERIFY( controller().useMeta( true ) );
+
+	QCOMPARE( controller().UsedSystem(), MT_SubstituteKind::Classifier );
+	QCOMPARE( controller().getFitnessTrainer(), nullptr );
+	QVERIFY( controller().getClassifier() );
+}
+
 void TST_MT_Controller::slotLoadSetupCancelledChangesNothing()
 {
 	controller().configureSystem( nullptr );
@@ -1059,6 +1093,23 @@ void TST_MT_Controller::slotLoadDefaultRestoresTheDefaultSetup()
 {
 	QVERIFY( controller().readFromFile( writeFile( "run.mexp", configuration( 2, loadedClassifierEstimation, 14 ) ) ) );
 	controller().configureSystem( nullptr );
+
+	QVERIFY( QMetaObject::invokeMethod( &controller(), "slotLoadDefault" ) );
+
+	QVERIFY( controller().IsEnabled() );
+	QCOMPARE( controller().UsedSystem(), MT_SubstituteKind::Evaluator );
+
+	const QString saved = saveSetup( "after" );
+	const QStringList expected = QStringList( "usedSystem=1" ) + estimationLines( defaultEvaluatorEstimation );
+	QCOMPARE( saved.split( '\n' ).mid( 0, expected.size() ), expected );
+	QVERIFY( saved.contains( QString( "Population:\n%1\n" ).arg( defaultPopulationSize ) ) );
+}
+
+void TST_MT_Controller::slotLoadDefaultWhileDisabledTakesTheKindOfTheFile()
+{
+	QVERIFY( controller().readFromFile( writeFile( "run.mexp", configuration( 2, loadedClassifierEstimation, 14 ) ) ) );
+	controller().configureSystem( nullptr );
+	QVERIFY( controller().useMeta( false ) );
 
 	QVERIFY( QMetaObject::invokeMethod( &controller(), "slotLoadDefault" ) );
 
