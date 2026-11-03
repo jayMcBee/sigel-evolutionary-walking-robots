@@ -125,9 +125,9 @@ bool SIGEL_GP::SIG_GPExperiment::saveExperiment( QTextStream &file )
 
 void SIGEL_GP::SIG_GPExperiment::writeHistoryToFileTransfer( QTextStream &file )
 {
-	for( const SIG_GPExperimentHistoryEntry *actEntry : experimentHistory )
+	for( const SIG_GPExperimentHistoryEntry *currentEntry : experimentHistory )
 	{
-		file << actEntry->print();
+		file << currentEntry->print();
 	}
 }
 
@@ -180,15 +180,15 @@ void SIGEL_GP::SIG_GPExperiment::exportExperimentHistoryToGNUPlot( QString fileN
 
 	QTextStream gnuPlotStream( &gnuPlotFile );
 
-	for( const SIG_GPExperimentHistoryEntry *actEntry : experimentHistory )
+	for( const SIG_GPExperimentHistoryEntry *currentEntry : experimentHistory )
 	{
-		gnuPlotStream << actEntry->getGenerationNo()
+		gnuPlotStream << currentEntry->getGenerationNo()
 		              << " "
-		              << actEntry->getMaxFitness()
+		              << currentEntry->getMaxFitness()
 		              << " "
-		              << actEntry->getMinFitness()
+		              << currentEntry->getMinFitness()
 		              << " "
-		              << actEntry->getAverageFitness()
+		              << currentEntry->getAverageFitness()
 		              << "\n";
 	}
 

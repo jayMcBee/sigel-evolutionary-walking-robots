@@ -84,31 +84,31 @@ void SIG_ExperimentView::streamToGnuPlot( QTextStream &stream ) {
 
   stream << "plot '-' title 'Maximum fitness', '-' title 'Minimum fitness', '-' title 'Average fitness'\n";
 
-  for ( SIGEL_GP::SIG_GPExperimentHistoryEntry *actEntry : theExperiment.experimentHistory )
+  for ( SIGEL_GP::SIG_GPExperimentHistoryEntry *currentEntry : theExperiment.experimentHistory )
     {
-      stream << actEntry->getGenerationNo()
+      stream << currentEntry->getGenerationNo()
 		 << " "
-		 << actEntry->getMaxFitness()
+		 << currentEntry->getMaxFitness()
 		 << "\n";
     }
 
   stream << "e\n";
 
-  for ( SIGEL_GP::SIG_GPExperimentHistoryEntry *actEntry : theExperiment.experimentHistory )
+  for ( SIGEL_GP::SIG_GPExperimentHistoryEntry *currentEntry : theExperiment.experimentHistory )
     {
-      stream << actEntry->getGenerationNo()
+      stream << currentEntry->getGenerationNo()
 		 << " "
-		 << actEntry->getMinFitness()
+		 << currentEntry->getMinFitness()
 		 << "\n";
     }
 
   stream << "e\n";
 
-  for ( SIGEL_GP::SIG_GPExperimentHistoryEntry *actEntry : theExperiment.experimentHistory )
+  for ( SIGEL_GP::SIG_GPExperimentHistoryEntry *currentEntry : theExperiment.experimentHistory )
     {
-      stream << actEntry->getGenerationNo()
+      stream << currentEntry->getGenerationNo()
 		 << " "
-		 << actEntry->getAverageFitness()
+		 << currentEntry->getAverageFitness()
 		 << "\n";
     }
 
