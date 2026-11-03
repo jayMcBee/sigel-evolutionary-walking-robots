@@ -481,7 +481,7 @@ void SIG_SimulationVisualisationWidget::slotNavigateForward()
 	double const distance = 0.1;
 
 	double currentXPosition = visualisation->viewSettings.lookPoint.get( 0 );
-	double actZPos = visualisation->viewSettings.lookPoint.get( 2 );
+	double currentZPosition = visualisation->viewSettings.lookPoint.get( 2 );
 
 	double viewDirectionAngle = yaw + 180;
 	if (viewDirectionAngle > 360)
@@ -490,7 +490,7 @@ void SIG_SimulationVisualisationWidget::slotNavigateForward()
 	double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
 
 	double newXPos = currentXPosition + ( std::sin( radViewDirectionAngle ) * distance );
-	double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
+	double newZPos = currentZPosition + ( std::cos( radViewDirectionAngle ) * distance );
 
 	visualisation->viewSettings.lookPoint.set( 0 , newXPos );
 	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
@@ -507,12 +507,12 @@ void SIG_SimulationVisualisationWidget::slotNavigateBackward()
 	double const distance = 0.1;
 
 	double currentXPosition = visualisation->viewSettings.lookPoint.get( 0 );
-	double actZPos = visualisation->viewSettings.lookPoint.get( 2 );
+	double currentZPosition = visualisation->viewSettings.lookPoint.get( 2 );
 
 	double radViewDirectionAngle = qDegreesToRadians( yaw );
 
 	double newXPos = currentXPosition + ( std::sin( radViewDirectionAngle ) * distance );
-	double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
+	double newZPos = currentZPosition + ( std::cos( radViewDirectionAngle ) * distance );
 
 	visualisation->viewSettings.lookPoint.set( 0 , newXPos );
 	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
@@ -530,7 +530,7 @@ void SIG_SimulationVisualisationWidget::slotNavigateRight()
 
 	double currentXPosition = visualisation->viewSettings.lookPoint.get( 0 );
 
-	double actZPos = visualisation->viewSettings.lookPoint.get( 2 );
+	double currentZPosition = visualisation->viewSettings.lookPoint.get( 2 );
 
 	double viewDirectionAngle = yaw + 90;
 	if (viewDirectionAngle > 360)
@@ -539,7 +539,7 @@ void SIG_SimulationVisualisationWidget::slotNavigateRight()
 	double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
 
 	double newXPos = currentXPosition + ( std::sin( radViewDirectionAngle ) * distance );
-	double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
+	double newZPos = currentZPosition + ( std::cos( radViewDirectionAngle ) * distance );
 
 	visualisation->viewSettings.lookPoint.set( 0 , newXPos );
 	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
@@ -556,7 +556,7 @@ void SIG_SimulationVisualisationWidget::slotNavigateLeft()
 	double const distance = 0.1;
 
 	double currentXPosition = visualisation->viewSettings.lookPoint.get( 0 );
-	double actZPos = visualisation->viewSettings.lookPoint.get( 2 );
+	double currentZPosition = visualisation->viewSettings.lookPoint.get( 2 );
 
 	double viewDirectionAngle = yaw - 90;
 	if (viewDirectionAngle < 360)
@@ -565,7 +565,7 @@ void SIG_SimulationVisualisationWidget::slotNavigateLeft()
 	double radViewDirectionAngle = qDegreesToRadians( viewDirectionAngle );
 
 	double newXPos = currentXPosition + ( std::sin( radViewDirectionAngle ) * distance );
-	double newZPos = actZPos + ( std::cos( radViewDirectionAngle ) * distance );
+	double newZPos = currentZPosition + ( std::cos( radViewDirectionAngle ) * distance );
 
 	visualisation->viewSettings.lookPoint.set( 0 , newXPos );
 	visualisation->viewSettings.lookPoint.set( 2 , newZPos );
