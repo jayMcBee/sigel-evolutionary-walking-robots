@@ -18,7 +18,7 @@ MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, 
 	evolTimer = new QTimer( this );
 
 	// initialize variables
-	actWidgetID = -1;
+	currentWidgetID = -1;
 
 	resize( 900, 600 );
 	setWindowTitle( "SIGEL MetaGP" );
@@ -250,7 +250,7 @@ void MT_MainWindow::showEvent( QShowEvent *e )
 
 void MT_MainWindow::closeEvent( QCloseEvent *e )
 {
-	int topID = ( actWidgetID == -1 ) ? 0 : actWidgetID; // get widget position of the widget on top of the widgetstack
+	int topID = ( currentWidgetID == -1 ) ? 0 : currentWidgetID; // get widget position of the widget on top of the widgetstack
 	MT_WidgetBase *topWidget = widgets[topID]; // get the top widget
 
 	if( topWidget->onHide( gpManager, estimationState ) ) // can we close the window savely ?
@@ -291,15 +291,15 @@ void MT_MainWindow::slotRaiseWidget( QTreeWidgetItem *item )
 
 	if( nextWidget )
 	{
-		if( actWidgetID != -1 )
+		if( currentWidgetID != -1 )
 		{
-			currentWidget = widgets[actWidgetID];
+			currentWidget = widgets[currentWidgetID];
 			if( currentWidget->onHide( gpManager, estimationState ) )
 			{
 				nextWidget->onShow( gpManager, estimationState );
 				widgetStack->setCurrentIndex( pos );
 				experimentWidget->slotCurrentChanged( item );
-				actWidgetID = pos;
+				currentWidgetID = pos;
 			}
 			else
 			{
@@ -310,7 +310,7 @@ void MT_MainWindow::slotRaiseWidget( QTreeWidgetItem *item )
 		{
 			nextWidget->onShow( gpManager, estimationState );
 			widgetStack->setCurrentIndex( pos );
-			actWidgetID = pos;
+			currentWidgetID = pos;
 		}
 	}
 }
@@ -327,14 +327,14 @@ void MT_MainWindow::raiseWidget( int pos )
 
 	if( nextWidget )
 	{
-		if( actWidgetID != -1 )
+		if( currentWidgetID != -1 )
 		{
-			currentWidget = widgets[actWidgetID];
+			currentWidget = widgets[currentWidgetID];
 			if( currentWidget->onHide( gpManager, estimationState ) )
 			{
 				nextWidget->onShow( gpManager, estimationState );
 				widgetStack->setCurrentIndex( pos );
-				actWidgetID = pos;
+				currentWidgetID = pos;
 			}
 			else
 			{
@@ -345,7 +345,7 @@ void MT_MainWindow::raiseWidget( int pos )
 		{
 			nextWidget->onShow( gpManager, estimationState );
 			widgetStack->setCurrentIndex( pos );
-			actWidgetID = pos;
+			currentWidgetID = pos;
 		}
 	}
 }
@@ -359,9 +359,9 @@ void MT_MainWindow::enforceUpdate( bool GUI )
 {
 	MT_WidgetBase *currentWidget = nullptr;
 
-	if( actWidgetID != -1 )
+	if( currentWidgetID != -1 )
 	{
-		currentWidget = widgets[actWidgetID];
+		currentWidget = widgets[currentWidgetID];
 		if( GUI )
 		{
 			currentWidget->onShow( gpManager, estimationState );

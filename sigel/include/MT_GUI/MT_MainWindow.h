@@ -52,7 +52,7 @@ private slots:
 
 private:
 	MT_WidgetBase *widgets[6];
-	int actWidgetID;
+	int currentWidgetID;
 	QSplitter *splitter;
 	QStackedWidget *widgetStack;
 	MT_SearchWidget *searchWidget;
