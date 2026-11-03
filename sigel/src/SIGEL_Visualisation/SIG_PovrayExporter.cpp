@@ -252,8 +252,8 @@ namespace SIGEL_Visualisation
 			       << actLink.getName()
 			       << " = mesh {\n";
 
-			SIGEL_Robot::SIG_Geometry const *actGeometry = actLink.getGeometry();
-			SIGEL_Robot::SIG_GeometryIterator currentGeometryIterator(actGeometry);
+			SIGEL_Robot::SIG_Geometry const *currentGeometry = actLink.getGeometry();
+			SIGEL_Robot::SIG_GeometryIterator currentGeometryIterator(currentGeometry);
 
 			while (currentGeometryIterator.valid())
 			{

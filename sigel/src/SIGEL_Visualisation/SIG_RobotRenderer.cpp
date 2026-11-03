@@ -65,8 +65,8 @@ namespace SIGEL_Visualisation
 
 	glNewList(actListIndex, GL_COMPILE);
 
-	SIGEL_Robot::SIG_Geometry const *actGeometry = actLink.getGeometry();
-	SIGEL_Robot::SIG_GeometryIterator currentGeometryIterator(actGeometry);
+	SIGEL_Robot::SIG_Geometry const *currentGeometry = actLink.getGeometry();
+	SIGEL_Robot::SIG_GeometryIterator currentGeometryIterator(currentGeometry);
 
 	glFrontFace( GL_CCW );
 
