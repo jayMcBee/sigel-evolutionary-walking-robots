@@ -72,9 +72,9 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPMetaGPExper
       delete pvmHosts[ hostCounter ];
       pvmHosts[ hostCounter ] = new SIG_GPActivePVMHost( *currentHost );
 
-      const QByteArray actHostNameByteArray = currentHost->name.toUtf8();
+      const QByteArray currentHostNameByteArray = currentHost->name.toUtf8();
 
-      char const *actHostNameCString = actHostNameByteArray.constData();
+      char const *actHostNameCString = currentHostNameByteArray.constData();
 
       int singleInfo = 0;
 
@@ -97,9 +97,9 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   for (unsigned int i=0; i<pvmHosts.size(); i++) {
       SIG_GPActivePVMHost *currentHost = pvmHosts[i];
 
-      const QByteArray actHostNameByteArray = currentHost->name.toUtf8();
+      const QByteArray currentHostNameByteArray = currentHost->name.toUtf8();
 
-      char const *actHostNameCString = actHostNameByteArray.constData();
+      char const *actHostNameCString = currentHostNameByteArray.constData();
 
       int singleInfo = 0;
 
