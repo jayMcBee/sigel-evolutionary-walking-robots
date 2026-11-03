@@ -75,8 +75,8 @@ namespace SIGEL_GP
     void setIndividualName( QString name );
     double getIndividualFitness();
     void setIndividualFitness( double fitness );
-    void setActGeneration( int newActGeneration) { actGeneration = newActGeneration; }
-    int getActGeneration() { return actGeneration; }
+    void setActGeneration( int newActGeneration) { currentGeneration = newActGeneration; }
+    int getActGeneration() { return currentGeneration; }
     void setFitnessResetInterval(int newFitnessResetInterval) { fitnessResetInterval = newFitnessResetInterval; }
     int getFitnessResetInterval() { return fitnessResetInterval; }
 
@@ -97,7 +97,7 @@ namespace SIGEL_GP
     bool visualize;
 
     /** The pool generation and the reset interval are sent, but no slave code reads them. */
-    int actGeneration;
+    int currentGeneration;
     int fitnessResetInterval;
 
     /** The name of the experiment, only for a displayed simulation. */
