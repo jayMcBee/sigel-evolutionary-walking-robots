@@ -332,12 +332,12 @@ namespace SIGEL_Visualisation
 			// One cylinder from each point to the next.
 			for ( qsizetype i = 1; i < robotPathPoints.size(); i++ )
 			{
-				SIG_Vector *prevPoint = robotPathPoints.at( i - 1 );
-				SIG_Vector *actPoint  = robotPathPoints.at( i );
+				SIG_Vector *prevPoint    = robotPathPoints.at( i - 1 );
+				SIG_Vector *currentPoint = robotPathPoints.at( i );
 				NEWMAT::ColumnVector base =   SIG_TypeConverter::sigelToPovray()
 				                            * SIG_TypeConverter::toColumnVector( *prevPoint );
 				NEWMAT::ColumnVector cap =   SIG_TypeConverter::sigelToPovray()
-				                           * SIG_TypeConverter::toColumnVector( *actPoint );
+				                           * SIG_TypeConverter::toColumnVector( *currentPoint );
 
 				stream << "sigelPathSegment( "
 				       << vectorToPovray( base )

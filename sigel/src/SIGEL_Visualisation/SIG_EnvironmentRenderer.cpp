@@ -168,10 +168,10 @@ namespace SIGEL_Visualisation
 			glBegin( GL_LINE_STRIP );
 			for ( qsizetype i = 0; i < robotPathPoints.size(); i++ )
 			{
-				SIG_Vector *actPoint = robotPathPoints.at( i );
-				glVertex3d( GLdouble( actPoint->x ),
-				            GLdouble( actPoint->y ),
-				            GLdouble( actPoint->z ) );
+				SIG_Vector *currentPoint = robotPathPoints.at( i );
+				glVertex3d( GLdouble( currentPoint->x ),
+				            GLdouble( currentPoint->y ),
+				            GLdouble( currentPoint->z ) );
 			};
 			glEnd();
 
