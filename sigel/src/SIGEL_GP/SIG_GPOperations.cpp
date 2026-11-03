@@ -127,7 +127,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	SIGEL_Tools::SIG_IO::cerr << "Crossover children have " << newProgram1.getProgramLength() << " and " << newProgram2.getProgramLength() << " lines." << Qt::endl;
 #endif
 
-	QDateTime actTime = QDateTime::currentDateTime();
+	QDateTime currentTime = QDateTime::currentDateTime();
 
 	newProgram1.clampLengthToLimits( gpParameter,
 	                                 randomizer,
@@ -135,9 +135,9 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	                                 historyInfo );
 
 	if( historyInfo > 0 )
-		crossoverInd1->addLengthIncreasedInfo( actTime, historyInfo );
+		crossoverInd1->addLengthIncreasedInfo( currentTime, historyInfo );
 	if( historyInfo < 0 )
-		crossoverInd1->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
+		crossoverInd1->addLengthDecreasedInfo( currentTime, (-1) * historyInfo );
 
 	newProgram2.clampLengthToLimits( gpParameter,
 	                                 randomizer,
@@ -145,13 +145,13 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 	                                 historyInfo );
 
 	if( historyInfo > 0 )
-		crossoverInd2->addLengthIncreasedInfo( actTime, historyInfo );
+		crossoverInd2->addLengthIncreasedInfo( currentTime, historyInfo );
 	if( historyInfo < 0 )
-		crossoverInd2->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
+		crossoverInd2->addLengthDecreasedInfo( currentTime, (-1) * historyInfo );
 
 	crossoverInd1->addCrossOverInfo( winner1.getName(),
 	                                 winner2.getName(),
-	                                 actTime,
+	                                 currentTime,
 	                                 crossPoint1,
 	                                 crossPoint2,
 	                                 fitness1,
@@ -159,7 +159,7 @@ QList<SIGEL_GP::SIG_GPIndividual *> SIGEL_GP::SIG_GPOperations::crossOver( SIGEL
 
 	crossoverInd2->addCrossOverInfo( winner1.getName(),
 	                                 winner2.getName(),
-	                                 actTime,
+	                                 currentTime,
 	                                 crossPoint1,
 	                                 crossPoint2,
 	                                 fitness1,
@@ -333,14 +333,14 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::mutation( SIGEL_GP::SIG_
 		}
 	}
 
-	QDateTime const actTime = QDateTime::currentDateTime();
+	QDateTime const currentTime = QDateTime::currentDateTime();
 
 	if( historyInfo > 0 )
-		mutatedInd->addLengthIncreasedInfo( actTime, historyInfo );
+		mutatedInd->addLengthIncreasedInfo( currentTime, historyInfo );
 	if( historyInfo < 0 )
-		mutatedInd->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
+		mutatedInd->addLengthDecreasedInfo( currentTime, (-1) * historyInfo );
 
-	mutatedInd->addMutationInfo( winner.getName(), actTime, mutPoint, winnerFitness );
+	mutatedInd->addMutationInfo( winner.getName(), currentTime, mutPoint, winnerFitness );
 
 	return *mutatedInd;
 }
@@ -494,14 +494,14 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPOperations::reproduction( SIGEL_GP::
 	                                                    languageParameters,
 	                                                    historyInfo );
 
-	QDateTime actTime = QDateTime::currentDateTime();
+	QDateTime currentTime = QDateTime::currentDateTime();
 
 	if( historyInfo > 0 )
-		reproducedInd->addLengthIncreasedInfo( actTime, historyInfo );
+		reproducedInd->addLengthIncreasedInfo( currentTime, historyInfo );
 	if( historyInfo < 0 )
-		reproducedInd->addLengthDecreasedInfo( actTime, (-1) * historyInfo );
+		reproducedInd->addLengthDecreasedInfo( currentTime, (-1) * historyInfo );
 
-	reproducedInd->addReproductionInfo( winner.getName(), actTime );
+	reproducedInd->addReproductionInfo( winner.getName(), currentTime );
 
 	// The reproduced individual is returned
 	return *reproducedInd;
