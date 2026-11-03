@@ -72,9 +72,9 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPMetaGPExper
       delete pvmHosts[ hostCounter ];
       pvmHosts[ hostCounter ] = new SIG_GPActivePVMHost( *actHost );
 
-      const QByteArray actHostNameQCString = actHost->name.toUtf8();
+      const QByteArray actHostNameByteArray = actHost->name.toUtf8();
 
-      char const *actHostNameCString = actHostNameQCString.constData();
+      char const *actHostNameCString = actHostNameByteArray.constData();
 
       int singleInfo = 0;
 
@@ -97,9 +97,9 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   for (unsigned int i=0; i<pvmHosts.size(); i++) {
       SIG_GPActivePVMHost *actHost = pvmHosts[i];
 
-      const QByteArray actHostNameQCString = actHost->name.toUtf8();
+      const QByteArray actHostNameByteArray = actHost->name.toUtf8();
 
-      char const *actHostNameCString = actHostNameQCString.constData();
+      char const *actHostNameCString = actHostNameByteArray.constData();
 
       int singleInfo = 0;
 
@@ -163,8 +163,8 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
   if (hostNumber != -1) {
       SIG_GPActivePVMHost *usedHost = pvmHosts[ hostNumber ];
 
-      const QByteArray hostNameQCString = usedHost->name.toUtf8();
-      char const *hostNameCString = hostNameQCString.constData();
+      const QByteArray hostNameByteArray = usedHost->name.toUtf8();
+      char const *hostNameCString = hostNameByteArray.constData();
 
       QString executableName;
 		// "." asks PVM to find sigel_slave on its own search path.
@@ -172,9 +172,9 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
 			executableName = "sigel_slave";
 		else
 			executableName = usedHost->executableDir.path() + "/sigel_slave";
-      const QByteArray executableNameQCString = executableName.toUtf8();
+      const QByteArray executableNameByteArray = executableName.toUtf8();
 
-      char const *executableNameCString = executableNameQCString.constData();
+      char const *executableNameCString = executableNameByteArray.constData();
 
       int taskId = 0;
       int spawnInfo = pvm_spawn( const_cast< char* >( executableNameCString ),
@@ -240,7 +240,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
           default:
             errorText = QString::asprintf("Unknown error occurred.");
         };
-        SIGEL_Tools::SIG_IO::cerr << "pvm_spawn() failed for individual \"" << ind.getName() << "\" on \"" << hostNameQCString << "\"   (" << spawnInfo << "/" << taskId << ") - " << errorText.toUtf8() << Qt::endl;
+        SIGEL_Tools::SIG_IO::cerr << "pvm_spawn() failed for individual \"" << ind.getName() << "\" on \"" << hostNameByteArray << "\"   (" << spawnInfo << "/" << taskId << ") - " << errorText.toUtf8() << Qt::endl;
       }
   };
 
@@ -412,8 +412,8 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 	{
 	  SIG_GPActivePVMHost *usedHost = pvmHosts[ hostNumber ];
 
-	  const QByteArray usedHostNameQCString = usedHost->name.toUtf8();
-	  char const *usedHostNameCString = usedHostNameQCString.constData();
+	  const QByteArray usedHostNameByteArray = usedHost->name.toUtf8();
+	  char const *usedHostNameCString = usedHostNameByteArray.constData();
 
 	  QString executableName;
 	  // "." asks PVM to find sigel_slave on its own search path.
@@ -421,9 +421,9 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 		executableName = "sigel_slave";
 	  else
 		executableName = usedHost->executableDir.path() + "/sigel_slave";
-	  const QByteArray executableNameQCString = executableName.toUtf8();
+	  const QByteArray executableNameByteArray = executableName.toUtf8();
 
-	  char const *executableNameCString = executableNameQCString.constData();
+	  char const *executableNameCString = executableNameByteArray.constData();
 
 	  int taskId = 0;
 	  int spawnInfo = pvm_spawn( const_cast< char* >( executableNameCString ),
@@ -482,8 +482,8 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
     // get the next new host to be added to our pvmHost list
     freshHost = freshDynHosts.at(i);
 
-    const QByteArray freshHostNameQCString = freshHost->name.toLatin1();
-    char const *freshHostNameCString = freshHostNameQCString.constData();
+    const QByteArray freshHostNameByteArray = freshHost->name.toLatin1();
+    char const *freshHostNameCString = freshHostNameByteArray.constData();
 
     int singleInfo = 0;
     int info = pvm_addhosts( const_cast< char** >(&freshHostNameCString), 1, &singleInfo );

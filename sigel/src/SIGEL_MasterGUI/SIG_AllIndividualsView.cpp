@@ -328,8 +328,8 @@ namespace SIGEL_MasterGUI
 				QString sigelRootString( sigelRootCString );
 
 				QString executableName = sigelRootString + "/sigel_slave";
-				QByteArray executableNameQCString = executableName.toUtf8();
-				char const *executableNameCString = executableNameQCString;
+				QByteArray executableNameByteArray = executableName.toUtf8();
+				char const *executableNameCString = executableNameByteArray;
 
 				int taskId = 0;
 				int spawnInfo = pvm_spawn( const_cast< char* >(executableNameCString),

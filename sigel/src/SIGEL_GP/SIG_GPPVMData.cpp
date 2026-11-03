@@ -54,13 +54,13 @@ void SIGEL_GP::SIG_GPPVMData::sendQStringToPVM(QString str, int taskId, int mess
   // Bytes, not characters: pvm_upkstr writes into a buffer of this size.
   // The + 2 is not a typo: one byte for the NUL it writes, and one spare.
   // A null string must be sent as empty -- pvm_pkstr does strlen unguarded.
-  const QByteArray qCStringBuffer = str.toUtf8();
-  int finalLength = qCStringBuffer.size() + 2;
+  const QByteArray byteArrayBuffer = str.toUtf8();
+  int finalLength = byteArrayBuffer.size() + 2;
 
   pvm_initsend(PvmDataDefault);
   pvm_pkint(&finalLength,1,1);
 
-  char const *cStringBuffer = qCStringBuffer.constData();
+  char const *cStringBuffer = byteArrayBuffer.constData();
   pvm_pkstr( const_cast<char*>( cStringBuffer ) );
   pvm_send(taskId, messageId);
 }
