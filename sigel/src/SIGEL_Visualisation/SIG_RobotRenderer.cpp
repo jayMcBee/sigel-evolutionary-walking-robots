@@ -61,9 +61,9 @@ namespace SIGEL_Visualisation
 
 	int linkNumber = currentLink.getNumber();
 	GLuint linkIndex = static_cast<GLuint>(linkNumber);
-	GLuint actListIndex = linkIndex + displayListsOffset;
+	GLuint currentListIndex = linkIndex + displayListsOffset;
 
-	glNewList(actListIndex, GL_COMPILE);
+	glNewList(currentListIndex, GL_COMPILE);
 
 	SIGEL_Robot::SIG_Geometry const *currentGeometry = currentLink.getGeometry();
 	SIGEL_Robot::SIG_GeometryIterator currentGeometryIterator(currentGeometry);
@@ -111,11 +111,11 @@ namespace SIGEL_Visualisation
 	  {
 	    GLuint pointIndex = static_cast<GLuint>( nextPointIndex );
 
-	    GLuint actListIndex = pointIndex + displayListsOffset;
+	    GLuint currentListIndex = pointIndex + displayListsOffset;
 
 	    SIG_Vector pointPosition = *pointEntry.value;
 
-	    glNewList( actListIndex, GL_COMPILE );
+	    glNewList( currentListIndex, GL_COMPILE );
 	    glPointSize( 5 );
 	    glBegin( GL_POINTS );
 	    glVertex3d( static_cast<GLdouble>(pointPosition.get(0)),
