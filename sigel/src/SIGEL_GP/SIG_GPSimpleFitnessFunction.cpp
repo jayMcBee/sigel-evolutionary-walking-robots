@@ -32,41 +32,47 @@
 double SIGEL_GP::SIG_GPSimpleFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
                                                            SIGEL_Robot::SIG_Robot &rob,
                                                            SIGEL_Environment::SIG_Environment &environment,
-                                                           SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const {
-  SIGEL_GP::SIG_GPSimpleRecorder recorder;
+                                                           SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const
+{
+	SIGEL_GP::SIG_GPSimpleRecorder recorder;
 
-  SIGEL_Simulation::SIG_Simulation simulation( rob,
-      environment,
-      program,
-      simparameter,
-      recorder );
+	SIGEL_Simulation::SIG_Simulation simulation( rob,
+	                                             environment,
+	                                             program,
+	                                             simparameter,
+	                                             recorder );
 
-  double fitness = 0;
+	double fitness = 0;
 
-  try {
-    simulation.start();
-  }
-  catch (SIGEL_Tools::SIG_Exception &e) {
-    SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
-  };
+	try
+	{
+		simulation.start();
+	}
+	catch( SIGEL_Tools::SIG_Exception &e )
+	{
+		SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+	}
 
-  SIG_Vector startPosition = normalizeRobotPosition( recorder.start, recorder.startRotation, rob );
+	SIG_Vector startPosition = normalizeRobotPosition( recorder.start, recorder.startRotation, rob );
 
-  SIG_Vector endPosition = normalizeRobotPosition( recorder.end, recorder.endRotation, rob );
+	SIG_Vector endPosition = normalizeRobotPosition( recorder.end, recorder.endRotation, rob );
 
-  if (isValid( endPosition.x ) && isValid( endPosition.y ) && isValid( endPosition.z )) {
-    SIG_Vector distanceVector = endPosition;
+	if( isValid( endPosition.x ) && isValid( endPosition.y ) && isValid( endPosition.z ) )
+	{
+		SIG_Vector distanceVector = endPosition;
 
-    distanceVector.minusis( &startPosition );
+		distanceVector.minusis( &startPosition );
 
-    double distance = distanceVector.norm();
+		double distance = distanceVector.norm();
 
-    int simulatedSeconds = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
+		int simulatedSeconds = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
 
-    fitness = distance / simulatedSeconds;
-  }
-  else
-    fitness = 0;
+		fitness = distance / simulatedSeconds;
+	}
+	else
+	{
+		fitness = 0;
+	}
 
-  return fitness;
+	return fitness;
 }

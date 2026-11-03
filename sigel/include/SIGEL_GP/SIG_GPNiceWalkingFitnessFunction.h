@@ -28,19 +28,18 @@
 namespace SIGEL_GP
 {
 
-  class SIG_GPNiceWalkingFitnessFunction : public SIG_GPFitnessFunction
-    {
-    public: 
+	class SIG_GPNiceWalkingFitnessFunction : public SIG_GPFitnessFunction
+	{
+	public:
+		double evalFitness( SIGEL_Program::SIG_Program &program,
+		                    SIGEL_Robot::SIG_Robot &rob,
+		                    SIGEL_Environment::SIG_Environment &environment,
+		                    SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const override;
 
-      double evalFitness( SIGEL_Program::SIG_Program &program,
-                          SIGEL_Robot::SIG_Robot &rob,
-                          SIGEL_Environment::SIG_Environment &environment,
-                          SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const override;
-
-      QString serializedId() const override { return "NiceWalkingFitnessFunction"; }
-      QString name() const override { return "Nice Walking"; }
-      QString description() const override { return "Average speed from start to end; 0 once the body leaves a fixed band of ±0.5 units around its start height."; }
-    };
+		QString serializedId() const override { return "NiceWalkingFitnessFunction"; }
+		QString name() const override { return "Nice Walking"; }
+		QString description() const override { return "Average speed from start to end; 0 once the body leaves a fixed band of ±0.5 units around its start height."; }
+	};
 
 }
 

@@ -28,28 +28,27 @@
 namespace SIGEL_GP
 {
 
-/**
- * The 'SIG_GPAdaptiveWalkingFitnessFunction' calculates the fitness by averaging
- * the height of the torso joint throughout the evolution and using the average
- * height to weight the raw fitness-value (distance travelled).
- *
- * Requires the physical ZORC robot prototype, a biped built at the Department
- * of Computer Science, University of Dortmund.
- */
-  class SIG_GPAdaptiveWalkingFitnessFunction : public SIG_GPFitnessFunction
-    {
-    public:
+	/**
+	 * The 'SIG_GPAdaptiveWalkingFitnessFunction' calculates the fitness by averaging
+	 * the height of the torso joint throughout the evolution and using the average
+	 * height to weight the raw fitness-value (distance travelled).
+	 *
+	 * Requires the physical ZORC robot prototype, a biped built at the Department
+	 * of Computer Science, University of Dortmund.
+	 */
+	class SIG_GPAdaptiveWalkingFitnessFunction : public SIG_GPFitnessFunction
+	{
+	public:
+		double evalFitness( SIGEL_Program::SIG_Program &program,
+		                    SIGEL_Robot::SIG_Robot &rob,
+		                    SIGEL_Environment::SIG_Environment &environment,
+		                    SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const override;
 
-      double evalFitness( SIGEL_Program::SIG_Program &program,
-                          SIGEL_Robot::SIG_Robot &rob,
-                          SIGEL_Environment::SIG_Environment &environment,
-                          SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const override;
-
-      // Experiment files store this ID for Adaptive Walking.
-      QString serializedId() const override { return "ZorcWalkingFitnessFunction"; }
-      QString name() const override { return "Adaptive Walking"; }
-      QString description() const override { return "Average speed from start to end, weighted by how high the body stays compared with its start height."; }
-    };
+		// Experiment files store this ID for Adaptive Walking.
+		QString serializedId() const override { return "ZorcWalkingFitnessFunction"; }
+		QString name() const override { return "Adaptive Walking"; }
+		QString description() const override { return "Average speed from start to end, weighted by how high the body stays compared with its start height."; }
+	};
 
 }
 

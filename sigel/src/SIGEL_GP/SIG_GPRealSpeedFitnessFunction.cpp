@@ -29,82 +29,88 @@
 namespace SIGEL_GP
 {
 
-  double SIG_GPRealSpeedFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
-                                                      SIGEL_Robot::SIG_Robot &rob,
-                                                      SIGEL_Environment::SIG_Environment &environment,
-                                                      SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const {
-    double const recordingRate = 0.5;
+double SIG_GPRealSpeedFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
+                                                    SIGEL_Robot::SIG_Robot &rob,
+                                                    SIGEL_Environment::SIG_Environment &environment,
+                                                    SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const
+{
+	double const recordingRate = 0.5;
 
-    int const recordingFrequency = int( recordingRate / simparameter.getStepSize() );
+	int const recordingFrequency = int( recordingRate / simparameter.getStepSize() );
 
-    SIGEL_GP::SIG_GPFullDataRecorder recorder( recordingFrequency );
+	SIGEL_GP::SIG_GPFullDataRecorder recorder( recordingFrequency );
 
-    SIGEL_Simulation::SIG_Simulation simulation( rob,
-         environment,
-         program,
-         simparameter,
-         recorder );
+	SIGEL_Simulation::SIG_Simulation simulation( rob,
+	                                             environment,
+	                                             program,
+	                                             simparameter,
+	                                             recorder );
 
-    double fitness = 0;
+	double fitness = 0;
 
-    try {
-      simulation.start();
-    }
-    catch (SIGEL_Tools::SIG_Exception &e) {
-      SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
-    };
+	try
+	{
+		simulation.start();
+	}
+	catch( SIGEL_Tools::SIG_Exception &e )
+	{
+		SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+	}
 
-    SIG_Vector *endPosition = new SIG_Vector();
-    *endPosition = recorder.endPosition;
+	SIG_Vector *endPosition = new SIG_Vector();
+	*endPosition = recorder.endPosition;
 
-    SIG_Matrix *endRotation = new SIG_Matrix();
-    *endRotation = recorder.endRotation;
+	SIG_Matrix *endRotation = new SIG_Matrix();
+	*endRotation = recorder.endRotation;
 
-    recorder.positions.append( endPosition );
-    recorder.rotations.append( endRotation );
+	recorder.positions.append( endPosition );
+	recorder.rotations.append( endRotation );
 
-    double totalDistance = 0;
+	double totalDistance = 0;
 
-    qsizetype recIdx = 0;
-    SIG_Vector *currentPosition = recorder.positions.value( recIdx );
-    SIG_Matrix *currentRotation = recorder.rotations.value( recIdx );
+	qsizetype recIdx = 0;
+	SIG_Vector *currentPosition = recorder.positions.value( recIdx );
+	SIG_Matrix *currentRotation = recorder.rotations.value( recIdx );
 
-    SIG_Vector lastRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
+	SIG_Vector lastRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
 
-    while (currentPosition) {
-      SIG_Vector currentRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
+	while( currentPosition )
+	{
+		SIG_Vector currentRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
 
-      if (isValid( currentRealPosition.x ) && isValid( currentRealPosition.y ) && isValid( currentRealPosition.z )) {
-        SIG_Vector localDistanceVector = currentRealPosition;
-        localDistanceVector.minusis( &lastRealPosition );
+		if( isValid( currentRealPosition.x ) && isValid( currentRealPosition.y ) && isValid( currentRealPosition.z ) )
+		{
+			SIG_Vector localDistanceVector = currentRealPosition;
+			localDistanceVector.minusis( &lastRealPosition );
 
-        double localDistance = localDistanceVector.norm();
+			double localDistance = localDistanceVector.norm();
 
 #ifdef SIG_DEBUG
-        SIGEL_Tools::SIG_IO::cerr << "localDistance: "
-          << localDistance
-          << Qt::endl;
+			SIGEL_Tools::SIG_IO::cerr << "localDistance: "
+			                          << localDistance
+			                          << Qt::endl;
 #endif
 
-        totalDistance += localDistance;
+			totalDistance += localDistance;
 
-        lastRealPosition = currentRealPosition;
-      }
-      else {
-        totalDistance = 0;
-        break;
-      };
+			lastRealPosition = currentRealPosition;
+		}
+		else
+		{
+			totalDistance = 0;
+			break;
+		}
 
-      ++recIdx;
-      currentPosition = recorder.positions.value( recIdx );
-      currentRotation = recorder.rotations.value( recIdx );
-    };
+		++recIdx;
+		currentPosition = recorder.positions.value( recIdx );
+		currentRotation = recorder.rotations.value( recIdx );
+	}
 
-    int simulatedSeconds = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
+	int simulatedSeconds = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
 
-    fitness = totalDistance / simulatedSeconds;
+	fitness = totalDistance / simulatedSeconds;
 
-    return fitness;
-  }
+	return fitness;
+}
 
 }

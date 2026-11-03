@@ -28,34 +28,34 @@
 namespace SIGEL_GP
 {
 
-/**
- * This abstract class represents the structure of the different fitnessclasses
- * which computes the fitness of an robot controll program.
- *
- */
-class SIG_GPForceFitnessFunction : public SIG_GPFitnessFunction
-{
-/**
- * This operation activates the computation of the fitnessvalue. It is virtual, this means
- * that the implemantation is for every fitnessfunction different.
- * @pre
- * Everything is ready to run.
- * @post
- * The fitnessvalue is computed and returned.
- * @return
- * A double is returned, which represents the fitnessvalue. If an error has occurred, the returnvalue of
- * the double is -1.
- */
-public:
-double evalFitness( SIGEL_Program::SIG_Program &program,
-                    SIGEL_Robot::SIG_Robot &rob,
-                    SIGEL_Environment::SIG_Environment &environment,
-                    SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const override;
+	/**
+	 * This abstract class represents the structure of the different fitnessclasses
+	 * which computes the fitness of an robot controll program.
+	 *
+	 */
+	class SIG_GPForceFitnessFunction : public SIG_GPFitnessFunction
+	{
+		/**
+		 * This operation activates the computation of the fitnessvalue. It is virtual, this means
+		 * that the implemantation is for every fitnessfunction different.
+		 * @pre
+		 * Everything is ready to run.
+		 * @post
+		 * The fitnessvalue is computed and returned.
+		 * @return
+		 * A double is returned, which represents the fitnessvalue. If an error has occurred, the returnvalue of
+		 * the double is -1.
+		 */
+	public:
+		double evalFitness( SIGEL_Program::SIG_Program &program,
+		                    SIGEL_Robot::SIG_Robot &rob,
+		                    SIGEL_Environment::SIG_Environment &environment,
+		                    SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const override;
 
-QString serializedId() const override { return "ForceFitnessFunction"; }
-QString name() const override { return "Force"; }
-QString description() const override { return "Average speed from start to end, divided by how unevenly the joints share the load; 0 once the body leaves a fixed band of ±0.5 units around its start height."; }
-};
+		QString serializedId() const override { return "ForceFitnessFunction"; }
+		QString name() const override { return "Force"; }
+		QString description() const override { return "Average speed from start to end, divided by how unevenly the joints share the load; 0 once the body leaves a fixed band of ±0.5 units around its start height."; }
+	};
 
 }
 

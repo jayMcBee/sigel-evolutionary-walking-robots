@@ -26,22 +26,22 @@
 
 bool SIGEL_GP::SIG_GPFitnessFunction::isValid( double value ) const
 {
-  return std::isfinite( value );
+	return std::isfinite( value );
 }
 
 SIG_Vector SIGEL_GP::SIG_GPFitnessFunction::normalizeRobotPosition( SIG_Vector originalPosition,
-								   SIG_Matrix actualRobotRotation,
-								   const SIGEL_Robot::SIG_Robot &rob ) const
+                                                                    SIG_Matrix actualRobotRotation,
+                                                                    const SIGEL_Robot::SIG_Robot &rob ) const
 {
-  SIG_Vector robotsRealOrigin = rob.initialLocation;
-  robotsRealOrigin.timesis( -1 );
+	SIG_Vector robotsRealOrigin = rob.initialLocation;
+	robotsRealOrigin.timesis( -1 );
 
-  SIG_Vector normalizedPosition;
+	SIG_Vector normalizedPosition;
 
-  actualRobotRotation.times( &robotsRealOrigin,
-			     &normalizedPosition );
+	actualRobotRotation.times( &robotsRealOrigin,
+	                           &normalizedPosition );
 
-  normalizedPosition.plusis( &originalPosition );
+	normalizedPosition.plusis( &originalPosition );
 
-  return normalizedPosition;
+	return normalizedPosition;
 }

@@ -35,130 +35,146 @@
 double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
                                                           SIGEL_Robot::SIG_Robot &rob,
                                                           SIGEL_Environment::SIG_Environment &environment,
-                                                          SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const {
-  SIGEL_GP::SIG_GPFullDataRecorder recorder(1);
+                                                          SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const
+{
+	SIGEL_GP::SIG_GPFullDataRecorder recorder( 1 );
 
-  SIGEL_Simulation::SIG_Simulation simulation( rob, environment, program, simparameter, recorder );
+	SIGEL_Simulation::SIG_Simulation simulation( rob, environment, program, simparameter, recorder );
 
-  // For the NiceWalkingFitnessFunction
-  double const toleranceBandWidth = 0.5;
+	// For the NiceWalkingFitnessFunction
+	double const toleranceBandWidth = 0.5;
 
-  double fitness = 0;
-  vector<double> absDeviations;
-  unsigned int frames;
-  double momentX, momentY, momentZ;
+	double fitness = 0;
+	vector<double> absDeviations;
+	unsigned int frames;
+	double momentX, momentY, momentZ;
 
-  // start the simulation
-  try {
-    simulation.start();
-  }
-  catch (SIGEL_Tools::SIG_Exception &e) {
-    SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
-  };
+	// start the simulation
+	try
+	{
+		simulation.start();
+	}
+	catch( SIGEL_Tools::SIG_Exception &e )
+	{
+		SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+	}
 
-    SIG_Vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),  *recorder.rotations.value( 0 ), rob );
-    SIG_Vector realEndPosition = normalizeRobotPosition( recorder.endPosition, recorder.endRotation, rob );
+	SIG_Vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ), *recorder.rotations.value( 0 ), rob );
+	SIG_Vector realEndPosition = normalizeRobotPosition( recorder.endPosition, recorder.endRotation, rob );
 
-    double const optimalHeight = realStartPosition.y;
-    double const minimalHeight = optimalHeight - toleranceBandWidth;
-    double const maximalHeight = optimalHeight + toleranceBandWidth;
+	double const optimalHeight = realStartPosition.y;
+	double const minimalHeight = optimalHeight - toleranceBandWidth;
+	double const maximalHeight = optimalHeight + toleranceBandWidth;
 
-    SIG_Vector distanceVector = realStartPosition;
-    distanceVector.minusis( &realEndPosition );
+	SIG_Vector distanceVector = realStartPosition;
+	distanceVector.minusis( &realEndPosition );
 
-    double distance = distanceVector.norm();
+	double distance = distanceVector.norm();
 
-    int simulatedSeconds = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
+	int simulatedSeconds = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
 
-    double fitnessGes = distance / simulatedSeconds;
+	double fitnessGes = distance / simulatedSeconds;
 
-      // The list listForces runs over the individual frames
-      // the list holds arrays containing the 6-dimensional vector for each individual joint
-      qsizetype forceIdx = 0;
-      vector<double*>* usedForce = recorder.listForces.value( forceIdx );
+	// The list listForces runs over the individual frames
+	// the list holds arrays containing the 6-dimensional vector for each individual joint
+	qsizetype forceIdx = 0;
+	vector<double *> *usedForce = recorder.listForces.value( forceIdx );
 
-      // count() was uint and is now qsizetype, so this narrows where it did
-      // not. The value is identical either way -- empty gives 4294967295 in
-      // both, n>=1 gives n-1 -- and the cast says the narrowing is meant.
-      frames = static_cast< unsigned int >( recorder.listForces.count() ) - 1;
+	// count() was uint and is now qsizetype, so this narrows where it did
+	// not. The value is identical either way -- empty gives 4294967295 in
+	// both, n>=1 gives n-1 -- and the cast says the narrowing is meant.
+	frames = static_cast<unsigned int>( recorder.listForces.count() ) - 1;
 
-      // The first value is always garbage, so take the second from the list straight away
-      // The while loop always fetches the next frame
-      while ( (usedForce = recorder.listForces.value( ++forceIdx )) != nullptr ) {
-        double momentMagnitude = 0;
-        double averageMomentPerJoint = 0;
-        vector<double> momentMagnitudes;
-        // usedForce.size() gives the number of joints
-        for (unsigned int i=0;i<(*usedForce).size();++i) {
-          momentX = (*usedForce)[i][0];
-          momentY = (*usedForce)[i][1];
-          momentZ = (*usedForce)[i][2];
-          momentMagnitude = sqrt( pow(momentX,2) + pow(momentY,2) + pow(momentZ,2) );
-          momentMagnitudes.push_back(momentMagnitude);
+	// The first value is always garbage, so take the second from the list straight away
+	// The while loop always fetches the next frame
+	while( ( usedForce = recorder.listForces.value( ++forceIdx ) ) != nullptr )
+	{
+		double momentMagnitude = 0;
+		double averageMomentPerJoint = 0;
+		vector<double> momentMagnitudes;
 
-          // Compute the average force per joint
-          averageMomentPerJoint += momentMagnitude/((*usedForce).size());
-        } // end of for loop
+		// usedForce.size() gives the number of joints
+		for( unsigned int i = 0; i < ( *usedForce ).size(); ++i )
+		{
+			momentX = ( *usedForce )[i][0];
+			momentY = ( *usedForce )[i][1];
+			momentZ = ( *usedForce )[i][2];
+			momentMagnitude = sqrt( pow( momentX, 2 ) + pow( momentY, 2 ) + pow( momentZ, 2 ) );
+			momentMagnitudes.push_back( momentMagnitude );
 
-        double absDeviationSum = 0;
-        for (unsigned int i=0;i<(*usedForce).size();++i) {
-          absDeviationSum += fabs(momentMagnitudes[i]-averageMomentPerJoint);
-        }
-        absDeviations.push_back(absDeviationSum);
-      } // end of while loop [fetch next frame]
+			// Compute the average force per joint
+			averageMomentPerJoint += momentMagnitude / ( ( *usedForce ).size() );
+		} // end of for loop
 
-      // The mean over all frames, divided by the average speed
-      for (unsigned int i=0;i<(absDeviations.size());++i) {
-        fitness += absDeviations[i]/(frames*distance)*simulatedSeconds;
-      }
+		double absDeviationSum = 0;
+		for( unsigned int i = 0; i < ( *usedForce ).size(); ++i )
+		{
+			absDeviationSum += fabs( momentMagnitudes[i] - averageMomentPerJoint );
+		}
+		absDeviations.push_back( absDeviationSum );
+	} // end of while loop [fetch next frame]
 
-     if (finite(fitness)!=0) {
-        // Compute the reciprocal (guarding against division by zero), since this is a maximisation problem
-        fitness!=0 ? fitness = 1/fitness : fitness=0;
-      }
-      else {
-        // If the force is infinite or NaN, the fitness value is zero
-        fitness = 0;
-      }
+	// The mean over all frames, divided by the average speed
+	for( unsigned int i = 0; i < ( absDeviations.size() ); ++i )
+	{
+		fitness += absDeviations[i] / ( frames * distance ) * simulatedSeconds;
+	}
 
-    SIG_Vector *endPosition = new SIG_Vector();
-    *endPosition = recorder.endPosition;
+	if( finite( fitness ) != 0 )
+	{
+		// Compute the reciprocal (guarding against division by zero), since this is a maximisation problem
+		fitness != 0 ? fitness = 1 / fitness : fitness = 0;
+	}
+	else
+	{
+		// If the force is infinite or NaN, the fitness value is zero
+		fitness = 0;
+	}
 
-    SIG_Matrix *endRotation = new SIG_Matrix();
-    *endRotation = recorder.endRotation;
+	SIG_Vector *endPosition = new SIG_Vector();
+	*endPosition = recorder.endPosition;
 
-    recorder.positions.append( endPosition );
-    recorder.rotations.append( endRotation );
+	SIG_Matrix *endRotation = new SIG_Matrix();
+	*endRotation = recorder.endRotation;
 
-    qsizetype recIdx = 0;
-    SIG_Vector *currentPosition = recorder.positions.value( recIdx );
-    SIG_Matrix *currentRotation = recorder.rotations.value( recIdx );
+	recorder.positions.append( endPosition );
+	recorder.rotations.append( endRotation );
 
-    while (currentPosition) {
-      SIG_Vector currentRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
+	qsizetype recIdx = 0;
+	SIG_Vector *currentPosition = recorder.positions.value( recIdx );
+	SIG_Matrix *currentRotation = recorder.rotations.value( recIdx );
 
-      if ( !(isValid( currentRealPosition.x ) && isValid( currentRealPosition.y ) && isValid( currentRealPosition.z )) ) {
-        fitness = 0;
-        break;
-      };
+	while( currentPosition )
+	{
+		SIG_Vector currentRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
 
-      if ((currentRealPosition.y < minimalHeight) || (currentRealPosition.y > maximalHeight)) {
-        fitness = 0;
-        break;
-      };
+		if( !( isValid( currentRealPosition.x ) && isValid( currentRealPosition.y ) && isValid( currentRealPosition.z ) ) )
+		{
+			fitness = 0;
+			break;
+		}
 
-      ++recIdx;
-      currentPosition = recorder.positions.value( recIdx );
-      currentRotation = recorder.rotations.value( recIdx );
-    };
+		if( ( currentRealPosition.y < minimalHeight ) || ( currentRealPosition.y > maximalHeight ) )
+		{
+			fitness = 0;
+			break;
+		}
 
-  // now we have to clean up the memory
-  // the forces-Array are created with "new" in dmArticulation::getForces()
-  for (vector<double*> *usedForceLoes : recorder.listForces) {
-    for (unsigned int i=0; i<usedForceLoes->size(); ++i)
-      delete[] (*usedForceLoes)[i];
-    delete usedForceLoes;
-  }
+		++recIdx;
+		currentPosition = recorder.positions.value( recIdx );
+		currentRotation = recorder.rotations.value( recIdx );
+	}
 
-  return fitness;
+	// now we have to clean up the memory
+	// the forces-Array are created with "new" in dmArticulation::getForces()
+	for( vector<double *> *usedForceLoes : recorder.listForces )
+	{
+		for( unsigned int i = 0; i < usedForceLoes->size(); ++i )
+		{
+			delete[] ( *usedForceLoes )[i];
+		}
+		delete usedForceLoes;
+	}
+
+	return fitness;
 }

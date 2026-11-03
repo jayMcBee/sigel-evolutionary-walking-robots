@@ -45,7 +45,6 @@ namespace SIGEL_GP
 	class SIG_GPRemoteZORCFitnessFunction : public SIG_GPFitnessFunction
 	{
 	public:
-
 		/**
 		 * Evaluate fitness of the current program.
 		 * This central method is transferring the current program to ZORC over
@@ -57,38 +56,38 @@ namespace SIGEL_GP
 		 * actually connected. Lot's of additional checks should help to locate errors
 		 * when something else goes wrong.
 		 */
-		double   evalFitness( SIGEL_Program::SIG_Program &program,
-		                      SIGEL_Robot::SIG_Robot &rob,
-		                      SIGEL_Environment::SIG_Environment &environment,
-		                      SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const override;
+		double evalFitness( SIGEL_Program::SIG_Program &program,
+		                    SIGEL_Robot::SIG_Robot &rob,
+		                    SIGEL_Environment::SIG_Environment &environment,
+		                    SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const override;
 
-		QString  serializedId() const override { return "RemoteZORCFitnessFunction"; }
-		QString  name() const override { return "Remote ZORC"; }
-		QString  description() const override { return "Runs the program on the real ZORC robot; the user enters the distance it travels, which is divided by the simulated time."; }
+		QString serializedId() const override { return "RemoteZORCFitnessFunction"; }
+		QString name() const override { return "Remote ZORC"; }
+		QString description() const override { return "Runs the program on the real ZORC robot; the user enters the distance it travels, which is divided by the simulated time."; }
 
 		/**
 		 * This method sends all data contained in the QString object over the
 		 * serial interface specified by the 'serIF' file descriptor.
 		 * The method returns when all data has been sent and the serial buffer is empty.
 		 */
-		void     sendOverSerialLine(int serIF, const QString &txtToSend) const;
+		void sendOverSerialLine( int serIF, const QString &txtToSend ) const;
 
 		/**
 		 * Set some parameters of the serial device for proper operation with ZORC.
 		 * Returns -1 in case any error occurred.
 		 */
-		int      SetSerial(int fd, long baud, int handshake) const;
+		int SetSerial( int fd, long baud, int handshake ) const;
 
 		/**
 		 * Wait for input on the specified serial device for 'timeOutSecs' number of seconds.
 		 * Returns 'true' when data is pending, 'false' otherwise.
 		 */
-		bool     timedSerialWait(int serIF, int timeOutSecs) const;
+		bool timedSerialWait( int serIF, int timeOutSecs ) const;
 
 		/**
 		 * This method goes one step into the ZORC menu hierarchy.
 		 */
-		void     goZORCMenu(int serIF, char inChoice) const;
+		void goZORCMenu( int serIF, char inChoice ) const;
 	};
 
 }

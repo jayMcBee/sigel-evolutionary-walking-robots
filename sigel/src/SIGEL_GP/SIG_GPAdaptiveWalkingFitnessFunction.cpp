@@ -30,117 +30,123 @@
 namespace SIGEL_GP
 {
 
-  double SIG_GPAdaptiveWalkingFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
-                                                            SIGEL_Robot::SIG_Robot &rob,
-                                                            SIGEL_Environment::SIG_Environment &environment,
-                                                            SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const
-  {
-    double  fitness   = 0,
-            avgHeight = 0,
-            avgHeightPercent = 0;
-    int     steps     = 0,
-            perfSteps = 0;
+double SIG_GPAdaptiveWalkingFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
+                                                          SIGEL_Robot::SIG_Robot &rob,
+                                                          SIGEL_Environment::SIG_Environment &environment,
+                                                          SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const
+{
+	double fitness = 0,
+	       avgHeight = 0,
+	       avgHeightPercent = 0;
+	int steps = 0,
+	    perfSteps = 0;
 
-    // let SIG_EarlyRunTermSimulation record the positions or our robot, each 100. frame
-    SIGEL_GP::SIG_GPFullDataRecorder recorder( 100 );
+	// let SIG_EarlyRunTermSimulation record the positions or our robot, each 100. frame
+	SIGEL_GP::SIG_GPFullDataRecorder recorder( 100 );
 
-    // use class SIG_EarlyRunTermSimulation to terminate the simulation when
-    // robot height drops below 1/2 of start height to speed up evolutionary progress
-    SIGEL_Simulation::SIG_EarlyRunTermSimulation simulation( rob, environment, program, simparameter, recorder );
+	// use class SIG_EarlyRunTermSimulation to terminate the simulation when
+	// robot height drops below 1/2 of start height to speed up evolutionary progress
+	SIGEL_Simulation::SIG_EarlyRunTermSimulation simulation( rob, environment, program, simparameter, recorder );
 
-    // do the simulation
-    try
-    {  simulation.start();
-    }
-    catch (SIGEL_Tools::SIG_Exception &e)
-    {  SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
-    };
+	// do the simulation
+	try
+	{
+		simulation.start();
+	}
+	catch( SIGEL_Tools::SIG_Exception &e )
+	{
+		SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+	}
 
-    // calculate how many steps a complete simulation takes
-    // (usually number of elements in recorder-obj., but we may have terminated earlier)
-    steps = simulation.getMaxRecorderSteps(100);
+	// calculate how many steps a complete simulation takes
+	// (usually number of elements in recorder-obj., but we may have terminated earlier)
+	steps = simulation.getMaxRecorderSteps( 100 );
 
-    SIG_Vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),
-							  *recorder.rotations.value( 0 ), rob );
+	SIG_Vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),
+	                                                       *recorder.rotations.value( 0 ), rob );
 
-    SIG_Vector realEndPosition = normalizeRobotPosition( recorder.endPosition,
-							recorder.endRotation, rob );
+	SIG_Vector realEndPosition = normalizeRobotPosition( recorder.endPosition, recorder.endRotation, rob );
 
-    double const startHeight = realStartPosition.y;
+	double const startHeight = realStartPosition.y;
 
-    SIG_Vector distanceVector = realStartPosition;
-    distanceVector.minusis( &realEndPosition );
+	SIG_Vector distanceVector = realStartPosition;
+	distanceVector.minusis( &realEndPosition );
 
-    double distance = distanceVector.norm();
+	double distance = distanceVector.norm();
 
-    int simulatedSeconds = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
+	int simulatedSeconds = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
 
-    fitness = distance / simulatedSeconds;
+	fitness = distance / simulatedSeconds;
 
-    SIG_Vector *endPosition = new SIG_Vector();
-    *endPosition = recorder.endPosition;
+	SIG_Vector *endPosition = new SIG_Vector();
+	*endPosition = recorder.endPosition;
 
-    SIG_Matrix *endRotation = new SIG_Matrix();
-    *endRotation = recorder.endRotation;
+	SIG_Matrix *endRotation = new SIG_Matrix();
+	*endRotation = recorder.endRotation;
 
-    recorder.positions.append( endPosition );
-    recorder.rotations.append( endRotation );
+	recorder.positions.append( endPosition );
+	recorder.rotations.append( endRotation );
 
-    qsizetype recIdx = 0;
-    SIG_Vector *currentPosition = recorder.positions.value( recIdx );
-    SIG_Matrix *currentRotation = recorder.rotations.value( recIdx );
+	qsizetype recIdx = 0;
+	SIG_Vector *currentPosition = recorder.positions.value( recIdx );
+	SIG_Matrix *currentRotation = recorder.rotations.value( recIdx );
 
-        // iterate through recorded positions and evaluate !
-    while (currentPosition)
+	// iterate through recorded positions and evaluate !
+	while( currentPosition )
+	{
+		SIG_Vector currentRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
+
+		if( !( isValid( currentRealPosition.x ) && isValid( currentRealPosition.y ) && isValid( currentRealPosition.z ) ) )
 		{
-			SIG_Vector currentRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
+			fitness = 0;
+			break;
+		}
 
-			if ( !(isValid( currentRealPosition.x ) && isValid( currentRealPosition.y ) && isValid( currentRealPosition.z )) )
-	  	{
-	    	fitness = 0;
-	    	break;
-	  	}
-
-			// note decrease in height
-			if (currentRealPosition.y <= startHeight)
-			{	//	disallow neg. values
-				if (currentRealPosition.y > 0)
-				{	avgHeight += currentRealPosition.y;
-				}
+		// note decrease in height
+		if( currentRealPosition.y <= startHeight )
+		{
+			// disallow neg. values
+			if( currentRealPosition.y > 0 )
+			{
+				avgHeight += currentRealPosition.y;
 			}
+		}
+		else
+		{
 			// interprete all above startheight as 100% !
-			else
-			{ // really hi ?
-        if (currentRealPosition.y > 1.5*startHeight)
-        {   SIGEL_Tools::SIG_IO::cerr << "\to quite high -- " << currentRealPosition.y << Qt::endl;
-        }
-
-				avgHeight += startHeight;
-
-				// but check for strange effects..
-				if (currentRealPosition.y > 2.0*startHeight)
-				{   SIGEL_Tools::SIG_IO::cerr << "\t## r u ready 2 fly ?  ##  height is > 2*startHeight  (currentRealPosition.y=" << currentRealPosition.y << " ##" << Qt::endl;
-				}
+			// really hi ?
+			if( currentRealPosition.y > 1.5 * startHeight )
+			{
+				SIGEL_Tools::SIG_IO::cerr << "\to quite high -- " << currentRealPosition.y << Qt::endl;
 			}
 
-			perfSteps++;
-			++recIdx;
-			currentPosition = recorder.positions.value( recIdx );
-			currentRotation = recorder.rotations.value( recIdx );
- 		}
+			avgHeight += startHeight;
 
-		// get average height in percent of start height
-		avgHeight = avgHeight / static_cast<double>(steps);
-		avgHeightPercent = avgHeight / startHeight;
+			// but check for strange effects..
+			if( currentRealPosition.y > 2.0 * startHeight )
+			{
+				SIGEL_Tools::SIG_IO::cerr << "\t## r u ready 2 fly ?  ##  height is > 2*startHeight  (currentRealPosition.y=" << currentRealPosition.y << " ##" << Qt::endl;
+			}
+		}
 
-  	// weight fitness using avg. height, height is more important than distance !
-  	fitness = (100*fitness) * avgHeightPercent;
+		perfSteps++;
+		++recIdx;
+		currentPosition = recorder.positions.value( recIdx );
+		currentRotation = recorder.rotations.value( recIdx );
+	}
 
-		// give some information
-		SIGEL_Tools::SIG_IO::cerr << QString::asprintf("fitness: %5.4f  |  avgHeight: %4.1f%%  |  distance: %4.3f  |  steps (calc./total): %d/%d", fitness, avgHeightPercent*100.0, distance, perfSteps, steps) << Qt::endl;
+	// get average height in percent of start height
+	avgHeight = avgHeight / static_cast<double>( steps );
+	avgHeightPercent = avgHeight / startHeight;
 
-  	return fitness;
-  }
+	// weight fitness using avg. height, height is more important than distance !
+	fitness = ( 100 * fitness ) * avgHeightPercent;
+
+	// give some information
+	SIGEL_Tools::SIG_IO::cerr << QString::asprintf( "fitness: %5.4f  |  avgHeight: %4.1f%%  |  distance: %4.3f  |  steps (calc./total): %d/%d", fitness, avgHeightPercent * 100.0, distance, perfSteps, steps ) << Qt::endl;
+
+	return fitness;
+}
 
 }
 #endif // SIG_INCLUDE_ZORC_SUPPORT

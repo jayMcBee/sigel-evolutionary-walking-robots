@@ -33,71 +33,72 @@
 namespace SIGEL_GP
 {
 
-/**
- * This abstract class represents the structure of the different fitnessclasses
- * which computes the fitness of an robot controll program.
- *
- */
-class SIG_GPFitnessFunction{
-/**
- * The destructor of the fitnessfunction.
- * @pre 
- * The computation of the fitnessvalue is done.
- * @post
- * The object of the fitnessfunction is destructed.
- */
- public:
- virtual ~SIG_GPFitnessFunction() = default;
+	/**
+	 * This abstract class represents the structure of the different fitnessclasses
+	 * which computes the fitness of an robot controll program.
+	 *
+	 */
+	class SIG_GPFitnessFunction
+	{
+		/**
+		 * The destructor of the fitnessfunction.
+		 * @pre
+		 * The computation of the fitnessvalue is done.
+		 * @post
+		 * The object of the fitnessfunction is destructed.
+		 */
+	public:
+		virtual ~SIG_GPFitnessFunction() = default;
 
-/**
- * This operation activates the computation of the fitnessvalue. It is virtual, this means 
- * that the implemantation is for every fitnessfunction different. 
- * @pre 
- * Everything is ready to run.
- * @post
- * The fitnessvalue is computed and returned.
- * @param program
- * The individual's robot control program.
- * @param rob
- * The robot architecture on which the robot control program is executed.
- * @param environment
- * The environment of the simulation run.
- * @param simparameter
- * Parameters for the simulation run.
- * @return
- * A double is returned, which represents the fitnessvalue. If an error has occurred, the returnvalue of 
- * the double is -1.
- */
- public:
- virtual double evalFitness( SIGEL_Program::SIG_Program &program,
-                             SIGEL_Robot::SIG_Robot &rob,
-                             SIGEL_Environment::SIG_Environment &environment,
-                             SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const = 0;
+		/**
+		 * This operation activates the computation of the fitnessvalue. It is virtual, this means
+		 * that the implemantation is for every fitnessfunction different.
+		 * @pre
+		 * Everything is ready to run.
+		 * @post
+		 * The fitnessvalue is computed and returned.
+		 * @param program
+		 * The individual's robot control program.
+		 * @param rob
+		 * The robot architecture on which the robot control program is executed.
+		 * @param environment
+		 * The environment of the simulation run.
+		 * @param simparameter
+		 * Parameters for the simulation run.
+		 * @return
+		 * A double is returned, which represents the fitnessvalue. If an error has occurred, the returnvalue of
+		 * the double is -1.
+		 */
+	public:
+		virtual double evalFitness( SIGEL_Program::SIG_Program &program,
+		                            SIGEL_Robot::SIG_Robot &rob,
+		                            SIGEL_Environment::SIG_Environment &environment,
+		                            SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const = 0;
 
-/**
- * The key of this fitness function in experiment files and in the PVM data.
- */
- public:
- virtual QString serializedId() const = 0;
+		/**
+		 * The key of this fitness function in experiment files and in the PVM data.
+		 */
+	public:
+		virtual QString serializedId() const = 0;
 
-/**
- * The name the user sees, e.g. "Force".
- */
- public:
- virtual QString name() const = 0;
+		/**
+		 * The name the user sees, e.g. "Force".
+		 */
+	public:
+		virtual QString name() const = 0;
 
-/**
- * What the function scores, in one sentence for the user.
- */
- public:
- virtual QString description() const = 0;
+		/**
+		 * What the function scores, in one sentence for the user.
+		 */
+	public:
+		virtual QString description() const = 0;
 
- protected:
- bool isValid( double value ) const;
+	protected:
+		bool isValid( double value ) const;
 
- protected:
- SIG_Vector normalizeRobotPosition( SIG_Vector originalPosition,  SIG_Matrix actualRobotRotation, const SIGEL_Robot::SIG_Robot &rob ) const;
-};
+	protected:
+		SIG_Vector normalizeRobotPosition( SIG_Vector originalPosition, SIG_Matrix actualRobotRotation, const SIGEL_Robot::SIG_Robot &rob ) const;
+	};
 
 }
 

@@ -29,88 +29,86 @@
 namespace SIGEL_GP
 {
 
-  double SIG_GPNiceWalkingFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
-                                                        SIGEL_Robot::SIG_Robot &rob,
-                                                        SIGEL_Environment::SIG_Environment &environment,
-                                                        SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const
-  {
-    double const toleranceBandWidth = 0.5;
+double SIG_GPNiceWalkingFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
+                                                      SIGEL_Robot::SIG_Robot &rob,
+                                                      SIGEL_Environment::SIG_Environment &environment,
+                                                      SIGEL_Simulation::SIG_SimulationParameters &simparameter ) const
+{
+	double const toleranceBandWidth = 0.5;
 
-    SIGEL_GP::SIG_GPFullDataRecorder recorder( 1 );
+	SIGEL_GP::SIG_GPFullDataRecorder recorder( 1 );
 
-    SIGEL_Simulation::SIG_Simulation simulation( rob,
-											 environment,
-											 program,
-											 simparameter,
-											 recorder );
+	SIGEL_Simulation::SIG_Simulation simulation( rob,
+	                                             environment,
+	                                             program,
+	                                             simparameter,
+	                                             recorder );
 
-    double fitness = 0;
+	double fitness = 0;
 
-    try
-      {
-	simulation.start();
-      }
-    catch (SIGEL_Tools::SIG_Exception &e)
-      {
-	SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
-      };
+	try
+	{
+		simulation.start();
+	}
+	catch( SIGEL_Tools::SIG_Exception &e )
+	{
+		SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+	}
 
-    SIG_Vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),
-							  *recorder.rotations.value( 0 ), rob );
+	SIG_Vector realStartPosition = normalizeRobotPosition( *recorder.positions.value( 0 ),
+	                                                       *recorder.rotations.value( 0 ), rob );
 
-    SIG_Vector realEndPosition = normalizeRobotPosition( recorder.endPosition,
-							recorder.endRotation, rob );
+	SIG_Vector realEndPosition = normalizeRobotPosition( recorder.endPosition, recorder.endRotation, rob );
 
-    double const optimalHeight = realStartPosition.y;
+	double const optimalHeight = realStartPosition.y;
 
-    double const minimalHeight = optimalHeight - toleranceBandWidth;
-    double const maximalHeight = optimalHeight + toleranceBandWidth;
+	double const minimalHeight = optimalHeight - toleranceBandWidth;
+	double const maximalHeight = optimalHeight + toleranceBandWidth;
 
-    SIG_Vector distanceVector = realStartPosition;
-    distanceVector.minusis( &realEndPosition );
+	SIG_Vector distanceVector = realStartPosition;
+	distanceVector.minusis( &realEndPosition );
 
-    double distance = distanceVector.norm();
+	double distance = distanceVector.norm();
 
-    int simulatedSeconds = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
+	int simulatedSeconds = QTime( 0, 0 ).secsTo( simparameter.getTimeToSimulate() );
 
-    fitness = distance / simulatedSeconds;
+	fitness = distance / simulatedSeconds;
 
-    SIG_Vector *endPosition = new SIG_Vector();
-    *endPosition = recorder.endPosition;
+	SIG_Vector *endPosition = new SIG_Vector();
+	*endPosition = recorder.endPosition;
 
-    SIG_Matrix *endRotation = new SIG_Matrix();
-    *endRotation = recorder.endRotation;
+	SIG_Matrix *endRotation = new SIG_Matrix();
+	*endRotation = recorder.endRotation;
 
-    recorder.positions.append( endPosition );
-    recorder.rotations.append( endRotation );
+	recorder.positions.append( endPosition );
+	recorder.rotations.append( endRotation );
 
-    qsizetype recIdx = 0;
-    SIG_Vector *currentPosition = recorder.positions.value( recIdx );
-    SIG_Matrix *currentRotation = recorder.rotations.value( recIdx );
+	qsizetype recIdx = 0;
+	SIG_Vector *currentPosition = recorder.positions.value( recIdx );
+	SIG_Matrix *currentRotation = recorder.rotations.value( recIdx );
 
-    while (currentPosition)
-      {
-	SIG_Vector currentRealPosition = normalizeRobotPosition( *currentPosition,
-							        *currentRotation, rob );
+	while( currentPosition )
+	{
+		SIG_Vector currentRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
 
-	if ( !(isValid( currentRealPosition.x ) && isValid( currentRealPosition.y ) && isValid( currentRealPosition.z )) )
-	  {
-	    fitness = 0;
-	    break;
-	  };
+		if( !( isValid( currentRealPosition.x ) && isValid( currentRealPosition.y ) && isValid( currentRealPosition.z ) ) )
+		{
+			fitness = 0;
+			break;
+		}
 
-	if ((currentRealPosition.y < minimalHeight) || (currentRealPosition.y > maximalHeight))
-	  {
-	    fitness = 0;
-	    break;
-	  };
+		if( ( currentRealPosition.y < minimalHeight ) || ( currentRealPosition.y > maximalHeight ) )
+		{
+			fitness = 0;
+			break;
+		}
 
-	++recIdx;
-	currentPosition = recorder.positions.value( recIdx );
-	currentRotation = recorder.rotations.value( recIdx );
-      };
+		++recIdx;
+		currentPosition = recorder.positions.value( recIdx );
+		currentRotation = recorder.rotations.value( recIdx );
+	}
 
-    return fitness;
-  }
+	return fitness;
+}
 
 }
