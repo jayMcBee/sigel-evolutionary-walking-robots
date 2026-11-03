@@ -72,11 +72,11 @@ namespace SIGEL_Visualisation
 
 	while (actGeoIter.valid())
 	  {
-	    SIGEL_Robot::SIG_Polygon const &actPolygon = actGeoIter.current();
+	    SIGEL_Robot::SIG_Polygon const &currentPolygon = actGeoIter.current();
 
-	    SIG_Vector vertex0 = actPolygon.getVertex( 0 );
-	    SIG_Vector vertex1 = actPolygon.getVertex( 1 );
-	    SIG_Vector vertex2 = actPolygon.getVertex( 2 );
+	    SIG_Vector vertex0 = currentPolygon.getVertex( 0 );
+	    SIG_Vector vertex1 = currentPolygon.getVertex( 1 );
+	    SIG_Vector vertex2 = currentPolygon.getVertex( 2 );
 
 	    SIG_Vector u = vertex0;
 	    u.minusis( &vertex1 );
@@ -93,9 +93,9 @@ namespace SIGEL_Visualisation
 			static_cast<GLfloat>( polygonNormal.get(2) ) );
 
 	    glBegin(GL_POLYGON);
-	    for (int i=0; i<actPolygon.getNumVertices(); i++)
+	    for (int i=0; i<currentPolygon.getNumVertices(); i++)
 	      {
-		SIG_Vector actVertex = actPolygon.getVertex(i);
+		SIG_Vector actVertex = currentPolygon.getVertex(i);
 		glVertex3d( static_cast<GLdouble>(actVertex.get(0)),
 			    static_cast<GLdouble>(actVertex.get(1)),
 			    static_cast<GLdouble>(actVertex.get(2)) );

@@ -99,7 +99,7 @@ namespace SIGEL_Robot
 							vertices[ i ].set( k, actVertex( k+1 ) );
 					};
 
-					SIG_Polygon *actPolygon = nullptr;
+					SIG_Polygon *currentPolygon = nullptr;
 
 					for (int j=0; j < noOfIndices; j++) {
 						int currentIndex = indexedFaceSetNode->getCoordIndex(j);
@@ -108,11 +108,11 @@ namespace SIGEL_Robot
 						// constructor, so skipping every vertex would leave a 0-vertex face that
 						// SIG_Mirtich::compFaceNormal reads verts[0..2] from.
 						if (currentIndex < 0)
-							actPolygon = nullptr;
+							currentPolygon = nullptr;
 						else if ( currentIndex < vertices.size() ) {
-							if (!actPolygon)
-								actPolygon = new SIG_Polygon( geometry );
-							actPolygon->appendVertex( vertices[ currentIndex ] );
+							if (!currentPolygon)
+								currentPolygon = new SIG_Polygon( geometry );
+							currentPolygon->appendVertex( vertices[ currentIndex ] );
 						};
 					};
 				};

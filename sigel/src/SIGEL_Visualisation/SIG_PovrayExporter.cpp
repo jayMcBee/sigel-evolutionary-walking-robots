@@ -257,15 +257,15 @@ namespace SIGEL_Visualisation
 
 			while (actGeoIter.valid())
 			{
-				SIGEL_Robot::SIG_Polygon const &actPolygon = actGeoIter.current();
+				SIGEL_Robot::SIG_Polygon const &currentPolygon = actGeoIter.current();
 
-				NEWMAT::ColumnVector firstVertex = SIG_TypeConverter::toColumnVector( actPolygon.getVertex( 0 ) );
+				NEWMAT::ColumnVector firstVertex = SIG_TypeConverter::toColumnVector( currentPolygon.getVertex( 0 ) );
 
-				NEWMAT::ColumnVector secondVertex = SIG_TypeConverter::toColumnVector( actPolygon.getVertex( 1 ) );
+				NEWMAT::ColumnVector secondVertex = SIG_TypeConverter::toColumnVector( currentPolygon.getVertex( 1 ) );
 
-				for ( int i=2; i < actPolygon.getNumVertices(); i++ )
+				for ( int i=2; i < currentPolygon.getNumVertices(); i++ )
 				{
-					NEWMAT::ColumnVector thirdVertex = SIG_TypeConverter::toColumnVector( actPolygon.getVertex( i ) );
+					NEWMAT::ColumnVector thirdVertex = SIG_TypeConverter::toColumnVector( currentPolygon.getVertex( i ) );
 
 					polygonDataStream << "  triangle {\n";
 
