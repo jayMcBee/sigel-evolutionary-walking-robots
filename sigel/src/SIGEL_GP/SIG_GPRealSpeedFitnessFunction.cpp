@@ -66,13 +66,13 @@ namespace SIGEL_GP
     double totalDistance = 0;
 
     qsizetype recIdx = 0;
-    SIG_Vector *actPosition = recorder.positions.value( recIdx );
+    SIG_Vector *currentPosition = recorder.positions.value( recIdx );
     SIG_Matrix *actRotation = recorder.rotations.value( recIdx );
 
-    SIG_Vector lastRealPosition = normalizeRobotPosition( *actPosition, *actRotation, rob );
+    SIG_Vector lastRealPosition = normalizeRobotPosition( *currentPosition, *actRotation, rob );
 
-    while (actPosition) {
-      SIG_Vector actRealPosition = normalizeRobotPosition( *actPosition, *actRotation, rob );
+    while (currentPosition) {
+      SIG_Vector actRealPosition = normalizeRobotPosition( *currentPosition, *actRotation, rob );
 
       if (isValid( actRealPosition.x ) && isValid( actRealPosition.y ) && isValid( actRealPosition.z )) {
         SIG_Vector localDistanceVector = actRealPosition;
@@ -96,7 +96,7 @@ namespace SIGEL_GP
       };
 
       ++recIdx;
-      actPosition = recorder.positions.value( recIdx );
+      currentPosition = recorder.positions.value( recIdx );
       actRotation = recorder.rotations.value( recIdx );
     };
 

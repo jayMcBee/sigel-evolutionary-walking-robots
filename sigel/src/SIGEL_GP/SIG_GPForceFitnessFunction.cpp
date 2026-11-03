@@ -131,11 +131,11 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
     recorder.rotations.append( endRotation );
 
     qsizetype recIdx = 0;
-    SIG_Vector *actPosition = recorder.positions.value( recIdx );
+    SIG_Vector *currentPosition = recorder.positions.value( recIdx );
     SIG_Matrix *actRotation = recorder.rotations.value( recIdx );
 
-    while (actPosition) {
-      SIG_Vector actRealPosition = normalizeRobotPosition( *actPosition, *actRotation, rob );
+    while (currentPosition) {
+      SIG_Vector actRealPosition = normalizeRobotPosition( *currentPosition, *actRotation, rob );
 
       if ( !(isValid( actRealPosition.x ) && isValid( actRealPosition.y ) && isValid( actRealPosition.z )) ) {
         fitness = 0;
@@ -148,7 +148,7 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
       };
 
       ++recIdx;
-      actPosition = recorder.positions.value( recIdx );
+      currentPosition = recorder.positions.value( recIdx );
       actRotation = recorder.rotations.value( recIdx );
     };
 
