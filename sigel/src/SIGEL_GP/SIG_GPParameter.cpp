@@ -674,10 +674,10 @@ void SIGEL_GP::SIG_GPParameter::writeToFile(QTextStream & file)
   file << "TERMINATIONDURATIONSECONDS\n";
   file << getTerminationDurationSeconds() << "\n";
 
-  for (SIGEL_GP::SIG_GPPVMHost *actHost : hostList)
+  for (SIGEL_GP::SIG_GPPVMHost *currentHost : hostList)
     {
       file << "PVMHOST\n";
-      file << actHost->print();
+      file << currentHost->print();
     };
 }
 

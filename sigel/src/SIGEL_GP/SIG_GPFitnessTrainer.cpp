@@ -59,20 +59,20 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPMetaGPExper
   pvmTasks.fill( nullptr );
 
   int noOfActiveHosts = 0;
-  for (SIG_GPPVMHost *actHost : exp.gpParameter.getHostList())
-    if (actHost->enabled)
+  for (SIG_GPPVMHost *currentHost : exp.gpParameter.getHostList())
+    if (currentHost->enabled)
       noOfActiveHosts++;
 
   pvmHosts.resize( noOfActiveHosts );
 
   int hostCounter = 0;
 
-  for (SIG_GPPVMHost *actHost : exp.gpParameter.getHostList()) {
-    if (actHost->enabled) {
+  for (SIG_GPPVMHost *currentHost : exp.gpParameter.getHostList()) {
+    if (currentHost->enabled) {
       delete pvmHosts[ hostCounter ];
-      pvmHosts[ hostCounter ] = new SIG_GPActivePVMHost( *actHost );
+      pvmHosts[ hostCounter ] = new SIG_GPActivePVMHost( *currentHost );
 
-      const QByteArray actHostNameByteArray = actHost->name.toUtf8();
+      const QByteArray actHostNameByteArray = currentHost->name.toUtf8();
 
       char const *actHostNameCString = actHostNameByteArray.constData();
 
@@ -95,9 +95,9 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
   pvmTasks.clear();
 
   for (unsigned int i=0; i<pvmHosts.size(); i++) {
-      SIG_GPActivePVMHost *actHost = pvmHosts[i];
+      SIG_GPActivePVMHost *currentHost = pvmHosts[i];
 
-      const QByteArray actHostNameByteArray = actHost->name.toUtf8();
+      const QByteArray actHostNameByteArray = currentHost->name.toUtf8();
 
       char const *actHostNameCString = actHostNameByteArray.constData();
 
