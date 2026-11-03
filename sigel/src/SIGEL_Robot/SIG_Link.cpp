@@ -19,7 +19,7 @@
   You should have received a copy of the GNU General Public License
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ */
 #include "SIGEL_Robot/SIG_Link.h"
 
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
@@ -37,802 +37,909 @@
 
 using namespace SIGEL_Tools;
 
-namespace SIGEL_Robot {
+namespace SIGEL_Robot
+{
 
-        SIG_Link::SIG_Link(SIG_Robot *par, QString n, int nr)
-                : parent (par),
-                  name (n),
-                  number (nr),
-                  body (nullptr),
-                  material (nullptr),
-                  adjacentJoints (),
-                  noCollide (),
-                  initialLocation (0.0, 0.0, 0.0),
-                  initiated (false), mdh_visited (false)
-        {
-                initialOrientation.makeone ();
-        }
+SIG_Link::SIG_Link( SIG_Robot *par, QString n, int nr )
+	: parent( par ),
+	  name( n ),
+	  number( nr ),
+	  body( nullptr ),
+	  material( nullptr ),
+	  adjacentJoints(),
+	  noCollide(),
+	  initialLocation( 0.0, 0.0, 0.0 ),
+	  initiated( false ),
+	  mdh_visited( false )
+{
+	initialOrientation.makeone();
+}
 
-        SIG_Link::SIG_Link (SIG_Robot *par, QTextStream & tx)
-                : parent (par)
-        {
-                QString tmpstr;
-                int anum;
-                
-                // "Link" has already been read by SIG_Robot.
-                tx >> name >> number;
+SIG_Link::SIG_Link( SIG_Robot *par, QTextStream &tx )
+	: parent( par )
+{
+	QString tmpstr;
+	int anum;
 
-                tx >> anum;
-                for (int i = 0; i < anum; i++) {
-                        tx >> tmpstr;
-                        SIG_Vector *dl = new SIG_Vector
-                                (SIG_Robot::streamToVector (tx));
-                        points.append (NamedPoint{ tmpstr, dl });
-                }
+	// "Link" has already been read by SIG_Robot.
+	tx >> name >> number;
 
-                // To understand this, please read my paper. Holger.
-                // addNoCollide also registers this link with the other one,
-                // so it waits until nothing below can throw.
-                QList<SIG_Link *> noCollideRead;
-                tx >> anum;
-                for (int j = 0; j < anum; j++) {
-                        tx >> tmpstr;
-                        SIG_Link *l = parent->lookupLink (tmpstr);
-                        if (l)
-                                noCollideRead.append (l);
-                }
-                
-                initialLocation = SIG_Robot::streamToVector (tx);
-                initialOrientation = SIG_Robot::streamToMatrix (tx);
-                tx >> tmpstr;
-                initiated = (tmpstr == "y");
-                tx >> tmpstr;
-                mdh_visited = (tmpstr == "y");
-
-                tmpstr = SIGEL_Tools::SIG_FileUtils::readWordOrQuoted (tx);
-                body = parent->lookupBody (tmpstr);
-                if (!body)
-                        throw SIG_UnstreamingError (__FILE__, __LINE__, "link '" + name + "' names unknown body '" + tmpstr + "'");
-                tx >> tmpstr;
-                material = parent->lookupMaterial (tmpstr);
-                if (!material)
-                        throw SIG_UnstreamingError (__FILE__, __LINE__, "link '" + name + "' names unknown material '" + tmpstr + "'");
-
-                tx >> tmpstr;
-                if (tmpstr == "y") {
-                        geometry = std::make_unique< SIG_Geometry > (tx);
-                        mirtich = std::make_unique< SIG_Mirtich > (geometry.get (), name + "(" + body->getName () + ")");
-                }
-                for (SIG_Link *l : noCollideRead)
-                        addNoCollide (l);
-        }
-
-        SIG_Link::~SIG_Link()
-        {
-                // Of its lists, SIG_Link owns only points.
-                for (const NamedPoint &p : points) delete p.value;
-                points.clear ();
-        }
-
-        QString SIG_Link::getName () const
-        {
-                return name;
-        }
-        
-        int SIG_Link::getNumber () const
-        {
-                return number;
-        }
-
-        bool SIG_Link::isRootLink () const
-        {
-                return parent->getRootLink () == this;
-        }
-        
-        void SIG_Link::setBody (SIG_Body *b)
-        {
-                body = b;
-        }
-        
-        SIG_Body const *SIG_Link::getBody () const
-        {
-                return body;
-        }
-        
-        void SIG_Link::setMaterial (SIG_Material *mtrl)
-        {
-                material = mtrl;
-        }
-        
-        SIG_Material const *SIG_Link::getMaterial () const
-        {
-                return material;
-        }
-
-        void SIG_Link::addPoint (QString pointname, SIG_Vector point)
-        {
-                points.append (NamedPoint{ pointname, new SIG_Vector (&point) });
-        }
-        
-        SIG_Vector SIG_Link::getPoint (QString id) const
-        {
-                SIG_Vector tmp;
-                SIG_Vector *t;
-                // Backwards, for the newest binding -- see SIG_Robot::lookupLink. A
-                // forward loop with a break would find the oldest.
-                t = nullptr;
-                for (qsizetype i = points.size () - 1; i >= 0; --i)
-                        if (points.at (i).name == id) { t = points.at (i).value; break; }
-                if (t)
-                        tmp = *t;
-                return tmp;
-        }
-
-        bool SIG_Link::hasPoint (QString id) const
-        {
-                for (const NamedPoint &p : points)
-                        if (p.name == id) return true;
-                return false;
-        }
-
-        const QList<SIG_Link::NamedPoint> &SIG_Link::getPoints () const
-        {
-                return points;
-        }
-
-        int SIG_Link::getNrOfPoints () const
-        {
-                return points.count ();
-        }
-
-        void SIG_Link::instantiateGeometry ()
-        {
-                geometry = std::make_unique< SIG_Geometry > (body->getGeometry ());
-                mirtich = std::make_unique< SIG_Mirtich > (geometry.get (), name + "(" + body->getName () + ")");
-        }
-
-        void SIG_Link::transformPoints (SIG_Vector mov, SIG_Matrix rot)
-        {
-                for (const NamedPoint &p : points) {
-                        p.value->plusis (&mov);
-                        SIG_Vector v (p.value);
-                        rot.times (&v, p.value);
-                }
-
-                for (SIG_Joint *j : adjacentJoints)
-                        j->transformPoints (this, mov, rot);
-        }
-        
-        void SIG_Link::addNoCollide (SIG_Link *link, bool negotiate)
-        {
-                if (!noCollide.contains (link)) {
-                        noCollide.append (link);
-                        if (negotiate)
-                                link->addNoCollide (this, false);
-                }
-        }
-        
-        QList<SIG_Link *> SIG_Link::getNoCollides () const
-        {
-                return noCollide;
-        }
-        
-        void SIG_Link::addJoint (SIG_Joint *joint)
-        {
-                adjacentJoints.append (joint);
-        }
-        
-        QList<SIG_Joint *> SIG_Link::getJoints () const
-        {
-                return adjacentJoints;
-        }
-
-        SIG_Geometry const *SIG_Link::getGeometry () const
-        {
-                return geometry.get ();
-        }
-
-        void SIG_Link::getPhysics (double & m,
-                                   SIG_Vector & com,
-                                   SIG_Matrix & it)
-        {
-                mirtich->computePhysics (material->getDensity (), m, com, it);
-        }
-
-        void SIG_Link::propagateInitialLocation (SIG_Link *comingfrom)
-        {
-                // It is very imported, that the following assignment
-                // is done first within this procedure. This is due
-                // to recursion.
-                initiated = true;
-
-                for (SIG_Joint *j : adjacentJoints) {
-                        SIG_Vector transla, fglobtransla;
-                        SIG_Matrix rota, fglobrota;
-
-                        SIG_Link *l = j->otherSide (this);
-                        if (l != comingfrom) {
-                                j->getGeomRelation (transla, rota, this);
-
-                                initialOrientation.times (&rota, &fglobrota);
-                                initialOrientation.times (&transla, &fglobtransla);
-                                fglobtransla.plusis (&initialLocation);
-
-                                l->setInitialLocation (fglobtransla, fglobrota, this);
-                        }
-                }
-        }
-        
-        void SIG_Link::setInitialLocation (SIG_Vector p, SIG_Matrix o, SIG_Link *comingfrom)
-        {
-                if (!initiated) {
-                        initialLocation = p;
-                        initialOrientation = o;
-                        
-                        propagateInitialLocation (comingfrom);
-                } else {
-                        double const ILnull = 0.000001;
-                        for (int i = 0; i < 3; i++) {
-                                if (fabs (p.get (i) - initialLocation.get (i)) > ILnull)
-                                        throw SIG_InitialLocationError
-                                                (__FILE__, __LINE__,
-                                                 "Ambiguous values for position in link \"" +
-                                                 name + "\".");
-                                for (int j = 0; j < 3; j++)
-                                        if (fabs (o.get (i,j) - initialOrientation.get (i,j)) > ILnull)
-                                                throw SIG_InitialLocationError
-                                                        (__FILE__, __LINE__,
-                                                         "Ambiguous values for orientation in link \"" +
-                                                         name + "\".");
-                        }
-                }
-        }
-        
-        void SIG_Link::getInitialLocation (SIG_Vector & p, SIG_Matrix & o) const
-        {
-                p = initialLocation;
-                o = initialOrientation;
-        }
-        
-        bool SIG_Link::isInitiated () const
-        {
-                return initiated;
-        }
-
-        void SIG_Link::writeToFileTransfer (QTextStream & tx) const
-        {
-                tx << "Link "
-                   << getName () << ' '
-                   << getNumber () << ' '
-                   << points.count () << ' ';
-                for (const NamedPoint &p : points) {
-                        tx << p.name << ' ';
-                        SIG_Robot::vectorToStream (tx, *p.value);
-                }
-                tx << noCollide.count () << ' ';
-                for (const SIG_Link *nc : noCollide)
-                        tx << nc->getName () << ' ';
-                SIG_Robot::vectorToStream (tx, initialLocation);
-                SIG_Robot::matrixToStream (tx, initialOrientation);
-                tx << (initiated ? "y " : "n ");
-                tx << (mdh_visited ? "y " : "n ");
-                tx << SIGEL_Tools::SIG_FileUtils::quotedIfContainsWhitespace (body->getName ()) << ' '
-                   << material->getName () << ' ';
-                if (geometry) {
-                        tx << "y\n";
-                        geometry->writeToFileTransfer (tx);
-                } else
-                        tx << "n\n";
-        }
-
-        bool SIG_Link::isMDHVisited () const
+	tx >> anum;
+	for( int i = 0; i < anum; i++ )
 	{
-	  return mdh_visited;
+		tx >> tmpstr;
+		SIG_Vector *dl = new SIG_Vector( SIG_Robot::streamToVector( tx ) );
+		points.append( NamedPoint{ tmpstr, dl } );
 	}
 
-        void SIG_Link::transformToDynaMechs ( SIG_Joint *predecessor,
-					      SIG_Vector predBase,
-					      SIG_Vector predDir,
-					      SIG_Vector predHand )
+	// To understand this, please read my paper. Holger.
+	// addNoCollide also registers this link with the other one,
+	// so it waits until nothing below can throw.
+	QList<SIG_Link *> noCollideRead;
+	tx >> anum;
+	for( int j = 0; j < anum; j++ )
 	{
-#ifdef SIG_DEBUG
-	  SIGEL_Tools::SIG_IO::cerr << "\n\nTransforming link "
-				    << getName()
-				    <<" to DynaMechs!" << Qt::endl;
-#endif
-
-	  mdh_visited = true;
-
-	  QList< SIG_Joint * > successors;
-
-	  for (SIG_Joint *currentAdjacentJoint : adjacentJoints)
-	    if (currentAdjacentJoint->continuable( this ))
-	      successors.append( currentAdjacentJoint );
-
-	  // value() gives null when successors is empty; first() or at() would assert.
-	  // The do-while body must still run once then: currentSuccessor is null, transformX
-	  // is false, and the body takes its "without successor" path.
-	  SIG_Joint *realSuccessor = successors.value( 0 );
-
-	  bool transformZ = predecessor;
-	  bool transformX = realSuccessor;
-
-	  SIG_Vector realNewXAxis;
-	  SIG_Vector realNewYAxis;
-	  SIG_Vector realNewZAxis;
-
-	  SIG_Vector realNewOrigin;
-
-	  qsizetype successorPos = 0;
-	  SIG_Joint *currentSuccessor = successors.value( successorPos );
-
-	  do
-	    {
-#ifdef SIG_DEBUG
-	      if (currentSuccessor)
-		SIGEL_Tools::SIG_IO::cerr << "Transforming link "
-					  << getName()
-					  << " accordingly to successor "
-					  << currentSuccessor->getName()
-					  << "." << Qt::endl;
-	      else
-		SIGEL_Tools::SIG_IO::cerr << "Tansforming link "
-					  << getName()
-					  << " without successor." << Qt::endl;
-#endif
-
-	      bool processingRealSuccessor = (currentSuccessor == realSuccessor);
-
-	      SIG_Vector newXAxis(1, 0, 0);
-	      SIG_Vector newZAxis(0, 0, 1);
-
-	      SIG_Vector newOrigin(0, 0, 0);
-
-	      if (transformZ)
+		tx >> tmpstr;
+		SIG_Link *l = parent->lookupLink( tmpstr );
+		if( l )
 		{
-		  newZAxis = predDir;
-		  newZAxis.minusis( &predBase );
-		  newZAxis.normalize();
-
-#ifdef SIG_DEBUG
-		  SIGEL_Tools::SIG_IO::cerr << "Z-Axis transformed:";
-		  for (int i=0; i<3; i++)
-		    SIGEL_Tools::SIG_IO::cerr << " " << newZAxis.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
-		};
-
-	      if (transformX)
-		{
-		  bool successorsLeftLink = ( this == currentSuccessor->getLeftLink() );
-
-		  SIG_Vector succBase;
-		  SIG_Vector succDir;
-		  SIG_Vector succHand;
-
-		  switch (currentSuccessor->getJointType())
-		    {
-		    case SIG_Joint::tTranslationalJoint:
-		      {
-			SIG_TranslationalJoint *translationalJoint = static_cast< SIG_TranslationalJoint * >(currentSuccessor);
-
-			succBase = ( successorsLeftLink ) ? translationalJoint->getLeftBase() : translationalJoint->getRightBase();
-			succDir = ( successorsLeftLink ) ? translationalJoint->getLeftDir() : translationalJoint->getRightDir();
-			succHand = ( successorsLeftLink ) ? translationalJoint->getLeftFix() : translationalJoint->getRightFix();
-		      };
-		      break;
-		    case SIG_Joint::tRotationalJoint:
-		      {
-			SIG_RotationalJoint *rotationalJoint = static_cast< SIG_RotationalJoint * >(currentSuccessor);
-
-			succBase = ( successorsLeftLink ) ? rotationalJoint->getLeftBase() : rotationalJoint->getRightBase();
-			succDir = ( successorsLeftLink ) ? rotationalJoint->getLeftDir() : rotationalJoint->getRightDir();
-			succHand = ( successorsLeftLink ) ? rotationalJoint->getLeftHand() : rotationalJoint->getRightHand();
-		      };
-		      break;
-		    };
-
-		  SIG_Vector otherAxis = succDir;
-		  otherAxis.minusis( &succBase );
-		  otherAxis.normalize();
-
-		  calculateCommonNormal( predBase,
-					 newZAxis,
-					 succBase,
-					 otherAxis,
-					 newOrigin,
-					 newXAxis );
-
-#ifdef SIG_DEBUG
-		  SIGEL_Tools::SIG_IO::cerr << "X-Axis transformed:";
-		  for (int i=0; i<3; i++)
-		    SIGEL_Tools::SIG_IO::cerr << " " << newXAxis.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		  SIGEL_Tools::SIG_IO::cerr << "Origin transformed:";
-		  for (int i=0; i<3; i++)
-		    SIGEL_Tools::SIG_IO::cerr << " " << newOrigin.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
+			noCollideRead.append( l );
 		}
-	      else if (transformZ)
-		{
-		  int firstIndex;	      
+	}
 
-		  for (int i=0; i<3; i++)
-		    if (newZAxis.get( i )!=0)
-		      {
-			firstIndex = i;
+	initialLocation = SIG_Robot::streamToVector( tx );
+	initialOrientation = SIG_Robot::streamToMatrix( tx );
+	tx >> tmpstr;
+	initiated = ( tmpstr == "y" );
+	tx >> tmpstr;
+	mdh_visited = ( tmpstr == "y" );
+
+	tmpstr = SIGEL_Tools::SIG_FileUtils::readWordOrQuoted( tx );
+	body = parent->lookupBody( tmpstr );
+	if( !body )
+	{
+		throw SIG_UnstreamingError( __FILE__, __LINE__, "link '" + name + "' names unknown body '" + tmpstr + "'" );
+	}
+	tx >> tmpstr;
+	material = parent->lookupMaterial( tmpstr );
+	if( !material )
+	{
+		throw SIG_UnstreamingError( __FILE__, __LINE__, "link '" + name + "' names unknown material '" + tmpstr + "'" );
+	}
+
+	tx >> tmpstr;
+	if( tmpstr == "y" )
+	{
+		geometry = std::make_unique<SIG_Geometry>( tx );
+		mirtich = std::make_unique<SIG_Mirtich>( geometry.get(), name + "(" + body->getName() + ")" );
+	}
+	for( SIG_Link *l : noCollideRead )
+	{
+		addNoCollide( l );
+	}
+}
+
+SIG_Link::~SIG_Link()
+{
+	// Of its lists, SIG_Link owns only points.
+	for( const NamedPoint &p : points )
+	{
+		delete p.value;
+	}
+	points.clear();
+}
+
+QString SIG_Link::getName() const
+{
+	return name;
+}
+
+int SIG_Link::getNumber() const
+{
+	return number;
+}
+
+bool SIG_Link::isRootLink() const
+{
+	return parent->getRootLink() == this;
+}
+
+void SIG_Link::setBody( SIG_Body *b )
+{
+	body = b;
+}
+
+SIG_Body const *SIG_Link::getBody() const
+{
+	return body;
+}
+
+void SIG_Link::setMaterial( SIG_Material *mtrl )
+{
+	material = mtrl;
+}
+
+SIG_Material const *SIG_Link::getMaterial() const
+{
+	return material;
+}
+
+void SIG_Link::addPoint( QString pointname, SIG_Vector point )
+{
+	points.append( NamedPoint{ pointname, new SIG_Vector( &point ) } );
+}
+
+SIG_Vector SIG_Link::getPoint( QString id ) const
+{
+	SIG_Vector tmp;
+	SIG_Vector *t;
+
+	// Backwards, for the newest binding -- see SIG_Robot::lookupLink. A
+	// forward loop with a break would find the oldest.
+	t = nullptr;
+	for( qsizetype i = points.size() - 1; i >= 0; --i )
+	{
+		if( points.at( i ).name == id )
+		{
+			t = points.at( i ).value;
 			break;
-		      };
-
-		  int secondIndex = (firstIndex + 1) % 3;
-
-		  int thirdIndex = (secondIndex + 1) % 3;
-
-		  newXAxis.set( firstIndex, - newZAxis.get( secondIndex ) );
-		  newXAxis.set( secondIndex, newZAxis.get( firstIndex ) );
-		  newXAxis.set( thirdIndex, 0 );
-
-		  newOrigin = predBase;
-
-#ifdef SIG_DEBUG
-		  SIGEL_Tools::SIG_IO::cerr << "X-Axis transformed:";
-		  for (int i=0; i<3; i++)
-		    SIGEL_Tools::SIG_IO::cerr << " " << newXAxis.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		  SIGEL_Tools::SIG_IO::cerr << "Origin transformed:";
-		  for (int i=0; i<3; i++)
-		    SIGEL_Tools::SIG_IO::cerr << " " << newOrigin.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
-		};
-
-	      newXAxis.normalize();
-
-	      double screwD = 0;
-	      double screwTheta = 0;
-
-	      if (processingRealSuccessor)
-		{
-		  realNewXAxis = newXAxis;
-		  realNewZAxis = newZAxis;
-
-		  realNewOrigin = newOrigin;
 		}
-	      else
-		{
-		  SIG_Vector originDistanceVector = newOrigin;
-		  originDistanceVector.minusis( &realNewOrigin );
-
-		  screwD = originDistanceVector.norm();
-
-		  double const minimalDistanceMeasure = 0.00001;
-
-		  if (screwD > minimalDistanceMeasure)
-		    {
-		      SIG_Vector translationDirectionVector = originDistanceVector;
-
-		      translationDirectionVector.normalize();
-
-		      if (translationDirectionVector.inprod( &newZAxis ) < 0)
-			screwD *= -1;
-		    };
-
-		  screwTheta = tolerantACos( realNewXAxis.inprod( &newXAxis ) );
-
-		  double const maximalParallelityMeasure = 0.00001;
-
-		  SIG_Vector xxNormalVector;
-		  realNewXAxis.crossprod( &newXAxis, &xxNormalVector );
-
-		  if (xxNormalVector.norm() > maximalParallelityMeasure)
-		    {
-		      xxNormalVector.normalize();
-
-		      if (newZAxis.inprod( &xxNormalVector ) < 0)
-			screwTheta = 2 * std::numbers::pi - screwTheta;
-		    };
-
-#ifdef SIG_DEBUG
-		  SIGEL_Tools::SIG_IO::cerr << "screwD: " << screwD
-					    << " screwTheta: " << screwTheta
-					    << Qt::endl;
-
-		  SIG_Vector debugScrewTranslationVector = newZAxis;
-		  debugScrewTranslationVector.timesis( screwD );
-
-		  SIG_Vector debugTranslatedOrigin = realNewOrigin;
-		  debugTranslatedOrigin.plusis( &debugScrewTranslationVector );
-
-		  SIG_Matrix debugScrewRotationMatrix = rotationMatrix( newZAxis,
-								       screwTheta );
-
-		  SIG_Vector debugHelpXAxis = realNewXAxis;
-		  SIG_Vector debugRotatedXAxis;
-
-		  debugScrewRotationMatrix.times( &debugHelpXAxis, &debugRotatedXAxis );
-
-		  realNewZAxis.crossprod( &realNewXAxis, &realNewYAxis );
-		  realNewYAxis.normalize();
-
-		  SIG_Vector debugNewYAxis;
-		  newZAxis.crossprod( &newXAxis, &debugNewYAxis );
-		  debugNewYAxis.normalize();
-
-		  SIG_Vector debugHelpYAxis = realNewYAxis;
-		  SIG_Vector debugRotatedYAxis;
-
-		  debugScrewRotationMatrix.times( &debugHelpYAxis, &debugRotatedYAxis );
-
-		  SIGEL_Tools::SIG_IO::cerr << "New origin:";
-		  for (int i=0; i<3; i++)
-		    SIGEL_Tools::SIG_IO::cerr << " " << newOrigin.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		  SIGEL_Tools::SIG_IO::cerr << "Translated real new origin:";
-		  for (int i=0; i<3; i++)
-		    SIGEL_Tools::SIG_IO::cerr << " " << debugTranslatedOrigin.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		  SIGEL_Tools::SIG_IO::cerr << "New X-Axis:";
-		  for (int i=0; i<3; i++)
-		    SIGEL_Tools::SIG_IO::cerr << " " << newXAxis.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		  SIGEL_Tools::SIG_IO::cerr << "Rotated real new X-Axis:";
-		  for (int i=0; i<3; i++)
-		    SIGEL_Tools::SIG_IO::cerr << " " << debugRotatedXAxis.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		  SIGEL_Tools::SIG_IO::cerr << "New Y-Axis:";
-		  for (int i=0; i<3; i++)
-		    SIGEL_Tools::SIG_IO::cerr << " " << debugNewYAxis.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		  SIGEL_Tools::SIG_IO::cerr << "Rotated real new Y-Axis:";
-		  for (int i=0; i<3; i++)
-		    SIGEL_Tools::SIG_IO::cerr << " " << debugRotatedYAxis.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
-		};
-
-	      if (currentSuccessor)
-		{
-		  currentSuccessor->transformToDynaMechs( this,
-						          screwD,
-						          screwTheta );
-
-		  currentSuccessor = successors.value( ++successorPos );
-		};
-	    }
-	  while (currentSuccessor);
-
-	  if (transformX || transformZ)
-	    {
-	      realNewZAxis.crossprod( &realNewXAxis, &realNewYAxis );
-	      realNewYAxis.normalize();
-
-#ifdef SIG_DEBUG
-	      SIGEL_Tools::SIG_IO::cerr << "Y-Axis transformed:";
-	      for (int i=0; i<3; i++)
-		SIGEL_Tools::SIG_IO::cerr << " " << realNewYAxis.get( i );
-	      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
-
-	      NEWMAT::Matrix newCoordinates( 3, 3 );
-	      newCoordinates.Column( 1 ) = SIG_TypeConverter::toColumnVector( realNewXAxis );
-	      newCoordinates.Column( 2 ) = SIG_TypeConverter::toColumnVector( realNewYAxis );
-	      newCoordinates.Column( 3 ) = SIG_TypeConverter::toColumnVector( realNewZAxis );
-
-	      NEWMAT::Matrix rotation = newCoordinates.i();
-
-	      NEWMAT::ColumnVector translation = SIG_TypeConverter::toColumnVector( realNewOrigin ) * -1;
-
-	      if (this->isRootLink())
-		{
-		  parent->initialLocation = SIG_TypeConverter::toSIG_Vector( translation * -1 );
-		  parent->initialOrientation = SIG_TypeConverter::toSIG_Matrix( rotation.i() );
-
-#ifdef SIG_DEBUG
-		  SIGEL_Tools::SIG_IO::cerr << "Initial robot location: ";
-		  for (int i=0; i<3; i++)
-		    SIGEL_Tools::SIG_IO::cerr << " " << parent->initialLocation.get( i );
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		  SIGEL_Tools::SIG_IO::cerr << "Initial robot orientation:" << Qt::endl;
-		  for (int i=0; i<3; i++)
-		    {
-		      for (int j=0; j<3; j++)
-			SIGEL_Tools::SIG_IO::cerr << parent->initialOrientation.get( i, j ) << " ";
-		      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		    };
-#endif
-		};
-
-	      geometry->translate( SIG_TypeConverter::toSIG_Vector( translation ) );
-	      geometry->rotate( SIG_TypeConverter::toSIG_Matrix( rotation ) );
-
-	      transformPoints( SIG_TypeConverter::toSIG_Vector( translation ),
-			       SIG_TypeConverter::toSIG_Matrix( rotation ) );
-
-#ifdef SIG_DEBUG
-	      SIGEL_Tools::SIG_IO::cerr << "Rotation matrix:" << Qt::endl;
-	      for (int i=1; i<=3; i++)
-		{
-		  for (int j=1; j<=3; j++)
-		    SIGEL_Tools::SIG_IO::cerr << rotation( i, j ) << " ";
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		};
-	      SIGEL_Tools::SIG_IO::cerr << "Translation vector:";
-	      for (int i=1; i<=3; i++)
-		SIGEL_Tools::SIG_IO::cerr << " " << translation( i );
-	      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-	      SIGEL_Tools::SIG_IO::cerr << "Transformed points:" << Qt::endl;
-	      for (const NamedPoint &p : points)
-		{
-		  for (int i=0; i<3; i++)
-		    SIGEL_Tools::SIG_IO::cerr << " " << p.value->get( i );
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		};
-#endif	      
-
-	      mirtich->invalidate();
-	    };
-
-#ifdef SIG_DEBUG
-		  SIGEL_Tools::SIG_IO::cerr << "Link "
-					    << getName()
-					    << " transformed." << Qt::endl;
-#endif
 	}
-
-        void SIG_Link::calculateCommonNormal( SIG_Vector a,
-					      SIG_Vector u,
-					      SIG_Vector b,
-					      SIG_Vector v,
-					      SIG_Vector &c,
-					      SIG_Vector &w )
+	if( t )
 	{
-	  u.normalize();
-	  v.normalize();
-
-#ifdef SIG_DEBUG
-	  SIGEL_Tools::SIG_IO::cerr << "Calculating common normal:\n"
-				    << "a:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << a.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-	  SIGEL_Tools::SIG_IO::cerr << "u:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << u.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-	  SIGEL_Tools::SIG_IO::cerr << "b:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << b.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-	  SIGEL_Tools::SIG_IO::cerr << "v:";
-	  for (int i=0; i<3; i++)
-	    SIGEL_Tools::SIG_IO::cerr << " " << v.get( i );
-	  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
-
-	  c.init(0, 0, 0);
-	  w.init(0, 0, 0);
-
-	  double const minimalDistanceMeasure = 0.000001;
-
-	  SIG_Vector uvNormal;
-	  u.crossprod( &v, &uvNormal );
-	  double parallelityMeasure = uvNormal.norm();
-
-	  double const maximalParallelityMeasure = 0.000001; // Let's try other values!
-
-	  bool uvParallel = ( parallelityMeasure <= maximalParallelityMeasure );
-
-	  if (uvParallel)
-	    {
-#ifdef SIG_DEBUG
-	      SIGEL_Tools::SIG_IO::cerr << "u and v are parallel." << Qt::endl;
-#endif
-
-	      c = a;
-
-	      double t0 = ( u.inprod( &c ) - u.inprod( &b ) ) / u.inprod( &v );
-	      SIG_Vector p = b;
-	      SIG_Vector dir = v;
-	      dir.timesis( t0 );
-	      p.plusis( &dir );
-
-	      w = p;
-	      w.minusis( &c );
-
-	      if (w.norm() < minimalDistanceMeasure)
-		{
-		  QString message = "Axes of adjacent joints meeting in link " + getName() + " are overlapping!";
-		  throw SIG_WrongKinematicsException( __FILE__,
-						      __LINE__,
-						      message );
-		};
-
-	      w.normalize();
-	    }
-	  else
-	    {
-#ifdef SIG_DEBUG
-	      SIGEL_Tools::SIG_IO::cerr << "u and v are not parallel." << Qt::endl;
-#endif
-
-	      u.crossprod( &v, &w );
-	      w.normalize();
-
-	      NEWMAT::Matrix linEqSystem( 3, 3 );
-	      linEqSystem.Column( 1 ) = SIG_TypeConverter::toColumnVector( u );
-	      linEqSystem.Column( 2 ) = SIG_TypeConverter::toColumnVector( w );
-	      linEqSystem.Column( 3 ) = SIG_TypeConverter::toColumnVector( v ) * -1;
-
-	      NEWMAT::ColumnVector rightSide = SIG_TypeConverter::toColumnVector( b ) - SIG_TypeConverter::toColumnVector( a );
-
-	      NEWMAT::ColumnVector solutions = linEqSystem.i() * rightSide;
-
-#ifdef SIG_DEBUG
-	      SIGEL_Tools::SIG_IO::cerr << "Linear equation system:" << Qt::endl;
-	      for (int i=1; i<=3; i++)
-		{
-		  for (int j=1; j<=3; j++)
-		    SIGEL_Tools::SIG_IO::cerr << linEqSystem( i, j ) << " ";
-		  SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		};
-
-	      SIGEL_Tools::SIG_IO::cerr << "Right side";
-	      for (int i=1; i<=3; i++)
-		SIGEL_Tools::SIG_IO::cerr << " " << rightSide( i );
-	      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-	      SIGEL_Tools::SIG_IO::cerr << "Solution vector (t0, t1, t2)^T:";
-	      for (int i=1; i<=3; i++)
-		SIGEL_Tools::SIG_IO::cerr << " " << solutions( i );
-	      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
-
-	      c = u;
-	      c.timesis( solutions( 1 ) );
-	      c.plusis( &a );
-
-	      SIG_Vector cut = w;
-	      cut.timesis( solutions( 2 ) );
-	      cut.plusis( &c );
-
-	      SIG_Vector hDir = cut;
-	      hDir.minusis( &c );
-
-	      if (hDir.norm() < minimalDistanceMeasure)
-		{
-		  QString message = "Axes of adjacent joints meeting in link " + getName() + " cut!";
-		  throw SIG_WrongKinematicsException( __FILE__,
-						      __LINE__,
-						      message );
-		};
-
-	      hDir.normalize();
-
-	      if (w.inprod( &hDir ) == -1)
-		w.timesis( -1 );
-
-	      w.normalize();
-	    };
-
-#ifdef SIG_DEBUG
-	      SIGEL_Tools::SIG_IO::cerr << "c:";
-	      for (int i=0; i<3; i++)
-		SIGEL_Tools::SIG_IO::cerr << " " << c.get( i );
-	      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-	      SIGEL_Tools::SIG_IO::cerr << "w:";
-	      for (int i=0; i<3; i++)
-		SIGEL_Tools::SIG_IO::cerr << " " << w.get( i );
-	      SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
+		tmp = *t;
 	}
+	return tmp;
+}
+
+bool SIG_Link::hasPoint( QString id ) const
+{
+	for( const NamedPoint &p : points )
+	{
+		if( p.name == id )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+const QList<SIG_Link::NamedPoint> &SIG_Link::getPoints() const
+{
+	return points;
+}
+
+int SIG_Link::getNrOfPoints() const
+{
+	return points.count();
+}
+
+void SIG_Link::instantiateGeometry()
+{
+	geometry = std::make_unique<SIG_Geometry>( body->getGeometry() );
+	mirtich = std::make_unique<SIG_Mirtich>( geometry.get(), name + "(" + body->getName() + ")" );
+}
+
+void SIG_Link::transformPoints( SIG_Vector mov, SIG_Matrix rot )
+{
+	for( const NamedPoint &p : points )
+	{
+		p.value->plusis( &mov );
+		SIG_Vector v( p.value );
+		rot.times( &v, p.value );
+	}
+
+	for( SIG_Joint *j : adjacentJoints )
+	{
+		j->transformPoints( this, mov, rot );
+	}
+}
+
+void SIG_Link::addNoCollide( SIG_Link *link, bool negotiate )
+{
+	if( !noCollide.contains( link ) )
+	{
+		noCollide.append( link );
+		if( negotiate )
+		{
+			link->addNoCollide( this, false );
+		}
+	}
+}
+
+QList<SIG_Link *> SIG_Link::getNoCollides() const
+{
+	return noCollide;
+}
+
+void SIG_Link::addJoint( SIG_Joint *joint )
+{
+	adjacentJoints.append( joint );
+}
+
+QList<SIG_Joint *> SIG_Link::getJoints() const
+{
+	return adjacentJoints;
+}
+
+SIG_Geometry const *SIG_Link::getGeometry() const
+{
+	return geometry.get();
+}
+
+void SIG_Link::getPhysics( double &m, SIG_Vector &com, SIG_Matrix &it )
+{
+	mirtich->computePhysics( material->getDensity(), m, com, it );
+}
+
+void SIG_Link::propagateInitialLocation( SIG_Link *comingfrom )
+{
+	// It is very imported, that the following assignment
+	// is done first within this procedure. This is due
+	// to recursion.
+	initiated = true;
+
+	for( SIG_Joint *j : adjacentJoints )
+	{
+		SIG_Vector transla, fglobtransla;
+		SIG_Matrix rota, fglobrota;
+
+		SIG_Link *l = j->otherSide( this );
+		if( l != comingfrom )
+		{
+			j->getGeomRelation( transla, rota, this );
+
+			initialOrientation.times( &rota, &fglobrota );
+			initialOrientation.times( &transla, &fglobtransla );
+			fglobtransla.plusis( &initialLocation );
+
+			l->setInitialLocation( fglobtransla, fglobrota, this );
+		}
+	}
+}
+
+void SIG_Link::setInitialLocation( SIG_Vector p, SIG_Matrix o, SIG_Link *comingfrom )
+{
+	if( !initiated )
+	{
+		initialLocation = p;
+		initialOrientation = o;
+
+		propagateInitialLocation( comingfrom );
+	}
+	else
+	{
+		double const ILnull = 0.000001;
+		for( int i = 0; i < 3; i++ )
+		{
+			if( fabs( p.get( i ) - initialLocation.get( i ) ) > ILnull )
+			{
+				throw SIG_InitialLocationError( __FILE__, __LINE__, "Ambiguous values for position in link \"" + name + "\"." );
+			}
+			for( int j = 0; j < 3; j++ )
+			{
+				if( fabs( o.get( i, j ) - initialOrientation.get( i, j ) ) > ILnull )
+				{
+					throw SIG_InitialLocationError( __FILE__, __LINE__, "Ambiguous values for orientation in link \"" + name + "\"." );
+				}
+			}
+		}
+	}
+}
+
+void SIG_Link::getInitialLocation( SIG_Vector &p, SIG_Matrix &o ) const
+{
+	p = initialLocation;
+	o = initialOrientation;
+}
+
+bool SIG_Link::isInitiated() const
+{
+	return initiated;
+}
+
+void SIG_Link::writeToFileTransfer( QTextStream &tx ) const
+{
+	tx << "Link "
+	   << getName() << ' '
+	   << getNumber() << ' '
+	   << points.count() << ' ';
+	for( const NamedPoint &p : points )
+	{
+		tx << p.name << ' ';
+		SIG_Robot::vectorToStream( tx, *p.value );
+	}
+	tx << noCollide.count() << ' ';
+	for( const SIG_Link *nc : noCollide )
+	{
+		tx << nc->getName() << ' ';
+	}
+	SIG_Robot::vectorToStream( tx, initialLocation );
+	SIG_Robot::matrixToStream( tx, initialOrientation );
+	tx << ( initiated ? "y " : "n " );
+	tx << ( mdh_visited ? "y " : "n " );
+	tx << SIGEL_Tools::SIG_FileUtils::quotedIfContainsWhitespace( body->getName() ) << ' '
+	   << material->getName() << ' ';
+	if( geometry )
+	{
+		tx << "y\n";
+		geometry->writeToFileTransfer( tx );
+	}
+	else
+	{
+		tx << "n\n";
+	}
+}
+
+bool SIG_Link::isMDHVisited() const
+{
+	return mdh_visited;
+}
+
+void SIG_Link::transformToDynaMechs( SIG_Joint *predecessor,
+                                     SIG_Vector predBase,
+                                     SIG_Vector predDir,
+                                     SIG_Vector predHand )
+{
+#ifdef SIG_DEBUG
+	SIGEL_Tools::SIG_IO::cerr << "\n\nTransforming link "
+	                          << getName()
+	                          << " to DynaMechs!" << Qt::endl;
+#endif
+
+	mdh_visited = true;
+
+	QList<SIG_Joint *> successors;
+
+	for( SIG_Joint *currentAdjacentJoint : adjacentJoints )
+	{
+		if( currentAdjacentJoint->continuable( this ) )
+		{
+			successors.append( currentAdjacentJoint );
+		}
+	}
+
+	// value() gives null when successors is empty; first() or at() would assert.
+	// The do-while body must still run once then: currentSuccessor is null, transformX
+	// is false, and the body takes its "without successor" path.
+	SIG_Joint *realSuccessor = successors.value( 0 );
+
+	bool transformZ = predecessor;
+	bool transformX = realSuccessor;
+
+	SIG_Vector realNewXAxis;
+	SIG_Vector realNewYAxis;
+	SIG_Vector realNewZAxis;
+
+	SIG_Vector realNewOrigin;
+
+	qsizetype successorPos = 0;
+	SIG_Joint *currentSuccessor = successors.value( successorPos );
+
+	do
+	{
+#ifdef SIG_DEBUG
+		if( currentSuccessor )
+		{
+			SIGEL_Tools::SIG_IO::cerr << "Transforming link "
+			                          << getName()
+			                          << " accordingly to successor "
+			                          << currentSuccessor->getName()
+			                          << "." << Qt::endl;
+		}
+		else
+		{
+			SIGEL_Tools::SIG_IO::cerr << "Tansforming link "
+			                          << getName()
+			                          << " without successor." << Qt::endl;
+		}
+#endif
+
+		bool processingRealSuccessor = ( currentSuccessor == realSuccessor );
+
+		SIG_Vector newXAxis( 1, 0, 0 );
+		SIG_Vector newZAxis( 0, 0, 1 );
+
+		SIG_Vector newOrigin( 0, 0, 0 );
+
+		if( transformZ )
+		{
+			newZAxis = predDir;
+			newZAxis.minusis( &predBase );
+			newZAxis.normalize();
+
+#ifdef SIG_DEBUG
+			SIGEL_Tools::SIG_IO::cerr << "Z-Axis transformed:";
+			for( int i = 0; i < 3; i++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << " " << newZAxis.get( i );
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+#endif
+		}
+
+		if( transformX )
+		{
+			bool successorsLeftLink = ( this == currentSuccessor->getLeftLink() );
+
+			SIG_Vector succBase;
+			SIG_Vector succDir;
+			SIG_Vector succHand;
+
+			switch( currentSuccessor->getJointType() )
+			{
+				case SIG_Joint::tTranslationalJoint:
+				{
+					SIG_TranslationalJoint *translationalJoint = static_cast<SIG_TranslationalJoint *>( currentSuccessor );
+
+					succBase = ( successorsLeftLink ) ? translationalJoint->getLeftBase() : translationalJoint->getRightBase();
+					succDir = ( successorsLeftLink ) ? translationalJoint->getLeftDir() : translationalJoint->getRightDir();
+					succHand = ( successorsLeftLink ) ? translationalJoint->getLeftFix() : translationalJoint->getRightFix();
+				}
+				break;
+				case SIG_Joint::tRotationalJoint:
+				{
+					SIG_RotationalJoint *rotationalJoint = static_cast<SIG_RotationalJoint *>( currentSuccessor );
+
+					succBase = ( successorsLeftLink ) ? rotationalJoint->getLeftBase() : rotationalJoint->getRightBase();
+					succDir = ( successorsLeftLink ) ? rotationalJoint->getLeftDir() : rotationalJoint->getRightDir();
+					succHand = ( successorsLeftLink ) ? rotationalJoint->getLeftHand() : rotationalJoint->getRightHand();
+				}
+				break;
+			}
+
+			SIG_Vector otherAxis = succDir;
+			otherAxis.minusis( &succBase );
+			otherAxis.normalize();
+
+			calculateCommonNormal( predBase,
+			                       newZAxis,
+			                       succBase,
+			                       otherAxis,
+			                       newOrigin,
+			                       newXAxis );
+
+#ifdef SIG_DEBUG
+			SIGEL_Tools::SIG_IO::cerr << "X-Axis transformed:";
+			for( int i = 0; i < 3; i++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << " " << newXAxis.get( i );
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+			SIGEL_Tools::SIG_IO::cerr << "Origin transformed:";
+			for( int i = 0; i < 3; i++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << " " << newOrigin.get( i );
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+#endif
+		}
+		else if( transformZ )
+		{
+			int firstIndex;
+
+			for( int i = 0; i < 3; i++ )
+			{
+				if( newZAxis.get( i ) != 0 )
+				{
+					firstIndex = i;
+					break;
+				}
+			}
+
+			int secondIndex = ( firstIndex + 1 ) % 3;
+
+			int thirdIndex = ( secondIndex + 1 ) % 3;
+
+			newXAxis.set( firstIndex, -newZAxis.get( secondIndex ) );
+			newXAxis.set( secondIndex, newZAxis.get( firstIndex ) );
+			newXAxis.set( thirdIndex, 0 );
+
+			newOrigin = predBase;
+
+#ifdef SIG_DEBUG
+			SIGEL_Tools::SIG_IO::cerr << "X-Axis transformed:";
+			for( int i = 0; i < 3; i++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << " " << newXAxis.get( i );
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+			SIGEL_Tools::SIG_IO::cerr << "Origin transformed:";
+			for( int i = 0; i < 3; i++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << " " << newOrigin.get( i );
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+#endif
+		}
+
+		newXAxis.normalize();
+
+		double screwD = 0;
+		double screwTheta = 0;
+
+		if( processingRealSuccessor )
+		{
+			realNewXAxis = newXAxis;
+			realNewZAxis = newZAxis;
+
+			realNewOrigin = newOrigin;
+		}
+		else
+		{
+			SIG_Vector originDistanceVector = newOrigin;
+			originDistanceVector.minusis( &realNewOrigin );
+
+			screwD = originDistanceVector.norm();
+
+			double const minimalDistanceMeasure = 0.00001;
+
+			if( screwD > minimalDistanceMeasure )
+			{
+				SIG_Vector translationDirectionVector = originDistanceVector;
+
+				translationDirectionVector.normalize();
+
+				if( translationDirectionVector.inprod( &newZAxis ) < 0 )
+				{
+					screwD *= -1;
+				}
+			}
+
+			screwTheta = tolerantACos( realNewXAxis.inprod( &newXAxis ) );
+
+			double const maximalParallelityMeasure = 0.00001;
+
+			SIG_Vector xxNormalVector;
+			realNewXAxis.crossprod( &newXAxis, &xxNormalVector );
+
+			if( xxNormalVector.norm() > maximalParallelityMeasure )
+			{
+				xxNormalVector.normalize();
+
+				if( newZAxis.inprod( &xxNormalVector ) < 0 )
+				{
+					screwTheta = 2 * std::numbers::pi - screwTheta;
+				}
+			}
+
+#ifdef SIG_DEBUG
+			SIGEL_Tools::SIG_IO::cerr << "screwD: " << screwD
+			                          << " screwTheta: " << screwTheta
+			                          << Qt::endl;
+
+			SIG_Vector debugScrewTranslationVector = newZAxis;
+			debugScrewTranslationVector.timesis( screwD );
+
+			SIG_Vector debugTranslatedOrigin = realNewOrigin;
+			debugTranslatedOrigin.plusis( &debugScrewTranslationVector );
+
+			SIG_Matrix debugScrewRotationMatrix = rotationMatrix( newZAxis,
+			                                                      screwTheta );
+
+			SIG_Vector debugHelpXAxis = realNewXAxis;
+			SIG_Vector debugRotatedXAxis;
+
+			debugScrewRotationMatrix.times( &debugHelpXAxis, &debugRotatedXAxis );
+
+			realNewZAxis.crossprod( &realNewXAxis, &realNewYAxis );
+			realNewYAxis.normalize();
+
+			SIG_Vector debugNewYAxis;
+			newZAxis.crossprod( &newXAxis, &debugNewYAxis );
+			debugNewYAxis.normalize();
+
+			SIG_Vector debugHelpYAxis = realNewYAxis;
+			SIG_Vector debugRotatedYAxis;
+
+			debugScrewRotationMatrix.times( &debugHelpYAxis, &debugRotatedYAxis );
+
+			SIGEL_Tools::SIG_IO::cerr << "New origin:";
+			for( int i = 0; i < 3; i++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << " " << newOrigin.get( i );
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+			SIGEL_Tools::SIG_IO::cerr << "Translated real new origin:";
+			for( int i = 0; i < 3; i++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << " " << debugTranslatedOrigin.get( i );
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+			SIGEL_Tools::SIG_IO::cerr << "New X-Axis:";
+			for( int i = 0; i < 3; i++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << " " << newXAxis.get( i );
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+			SIGEL_Tools::SIG_IO::cerr << "Rotated real new X-Axis:";
+			for( int i = 0; i < 3; i++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << " " << debugRotatedXAxis.get( i );
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+			SIGEL_Tools::SIG_IO::cerr << "New Y-Axis:";
+			for( int i = 0; i < 3; i++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << " " << debugNewYAxis.get( i );
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+			SIGEL_Tools::SIG_IO::cerr << "Rotated real new Y-Axis:";
+			for( int i = 0; i < 3; i++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << " " << debugRotatedYAxis.get( i );
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+#endif
+		}
+
+		if( currentSuccessor )
+		{
+			currentSuccessor->transformToDynaMechs( this, screwD, screwTheta );
+
+			currentSuccessor = successors.value( ++successorPos );
+		}
+	} while( currentSuccessor );
+
+	if( transformX || transformZ )
+	{
+		realNewZAxis.crossprod( &realNewXAxis, &realNewYAxis );
+		realNewYAxis.normalize();
+
+#ifdef SIG_DEBUG
+		SIGEL_Tools::SIG_IO::cerr << "Y-Axis transformed:";
+		for( int i = 0; i < 3; i++ )
+		{
+			SIGEL_Tools::SIG_IO::cerr << " " << realNewYAxis.get( i );
+		}
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+#endif
+
+		NEWMAT::Matrix newCoordinates( 3, 3 );
+		newCoordinates.Column( 1 ) = SIG_TypeConverter::toColumnVector( realNewXAxis );
+		newCoordinates.Column( 2 ) = SIG_TypeConverter::toColumnVector( realNewYAxis );
+		newCoordinates.Column( 3 ) = SIG_TypeConverter::toColumnVector( realNewZAxis );
+
+		NEWMAT::Matrix rotation = newCoordinates.i();
+
+		NEWMAT::ColumnVector translation = SIG_TypeConverter::toColumnVector( realNewOrigin ) * -1;
+
+		if( this->isRootLink() )
+		{
+			parent->initialLocation = SIG_TypeConverter::toSIG_Vector( translation * -1 );
+			parent->initialOrientation = SIG_TypeConverter::toSIG_Matrix( rotation.i() );
+
+#ifdef SIG_DEBUG
+			SIGEL_Tools::SIG_IO::cerr << "Initial robot location: ";
+			for( int i = 0; i < 3; i++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << " " << parent->initialLocation.get( i );
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+			SIGEL_Tools::SIG_IO::cerr << "Initial robot orientation:" << Qt::endl;
+			for( int i = 0; i < 3; i++ )
+			{
+				for( int j = 0; j < 3; j++ )
+				{
+					SIGEL_Tools::SIG_IO::cerr << parent->initialOrientation.get( i, j ) << " ";
+				}
+				SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+			}
+#endif
+		}
+
+		geometry->translate( SIG_TypeConverter::toSIG_Vector( translation ) );
+		geometry->rotate( SIG_TypeConverter::toSIG_Matrix( rotation ) );
+
+		transformPoints( SIG_TypeConverter::toSIG_Vector( translation ),
+		                 SIG_TypeConverter::toSIG_Matrix( rotation ) );
+
+#ifdef SIG_DEBUG
+		SIGEL_Tools::SIG_IO::cerr << "Rotation matrix:" << Qt::endl;
+		for( int i = 1; i <= 3; i++ )
+		{
+			for( int j = 1; j <= 3; j++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << rotation( i, j ) << " ";
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		}
+		SIGEL_Tools::SIG_IO::cerr << "Translation vector:";
+		for( int i = 1; i <= 3; i++ )
+		{
+			SIGEL_Tools::SIG_IO::cerr << " " << translation( i );
+		}
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Transformed points:" << Qt::endl;
+		for( const NamedPoint &p : points )
+		{
+			for( int i = 0; i < 3; i++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << " " << p.value->get( i );
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		}
+#endif
+
+		mirtich->invalidate();
+	}
+
+#ifdef SIG_DEBUG
+	SIGEL_Tools::SIG_IO::cerr << "Link "
+	                          << getName()
+	                          << " transformed." << Qt::endl;
+#endif
+}
+
+void SIG_Link::calculateCommonNormal( SIG_Vector a,
+                                      SIG_Vector u,
+                                      SIG_Vector b,
+                                      SIG_Vector v,
+                                      SIG_Vector &c,
+                                      SIG_Vector &w )
+{
+	u.normalize();
+	v.normalize();
+
+#ifdef SIG_DEBUG
+	SIGEL_Tools::SIG_IO::cerr << "Calculating common normal:\n"
+	                          << "a:";
+	for( int i = 0; i < 3; i++ )
+	{
+		SIGEL_Tools::SIG_IO::cerr << " " << a.get( i );
+	}
+	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "u:";
+	for( int i = 0; i < 3; i++ )
+	{
+		SIGEL_Tools::SIG_IO::cerr << " " << u.get( i );
+	}
+	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "b:";
+	for( int i = 0; i < 3; i++ )
+	{
+		SIGEL_Tools::SIG_IO::cerr << " " << b.get( i );
+	}
+	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "v:";
+	for( int i = 0; i < 3; i++ )
+	{
+		SIGEL_Tools::SIG_IO::cerr << " " << v.get( i );
+	}
+	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+#endif
+
+	c.init( 0, 0, 0 );
+	w.init( 0, 0, 0 );
+
+	double const minimalDistanceMeasure = 0.000001;
+
+	SIG_Vector uvNormal;
+	u.crossprod( &v, &uvNormal );
+	double parallelityMeasure = uvNormal.norm();
+
+	double const maximalParallelityMeasure = 0.000001; // Let's try other values!
+
+	bool uvParallel = ( parallelityMeasure <= maximalParallelityMeasure );
+
+	if( uvParallel )
+	{
+#ifdef SIG_DEBUG
+		SIGEL_Tools::SIG_IO::cerr << "u and v are parallel." << Qt::endl;
+#endif
+
+		c = a;
+
+		double t0 = ( u.inprod( &c ) - u.inprod( &b ) ) / u.inprod( &v );
+		SIG_Vector p = b;
+		SIG_Vector dir = v;
+		dir.timesis( t0 );
+		p.plusis( &dir );
+
+		w = p;
+		w.minusis( &c );
+
+		if( w.norm() < minimalDistanceMeasure )
+		{
+			QString message = "Axes of adjacent joints meeting in link " + getName() + " are overlapping!";
+			throw SIG_WrongKinematicsException( __FILE__, __LINE__, message );
+		}
+
+		w.normalize();
+	}
+	else
+	{
+#ifdef SIG_DEBUG
+		SIGEL_Tools::SIG_IO::cerr << "u and v are not parallel." << Qt::endl;
+#endif
+
+		u.crossprod( &v, &w );
+		w.normalize();
+
+		NEWMAT::Matrix linEqSystem( 3, 3 );
+		linEqSystem.Column( 1 ) = SIG_TypeConverter::toColumnVector( u );
+		linEqSystem.Column( 2 ) = SIG_TypeConverter::toColumnVector( w );
+		linEqSystem.Column( 3 ) = SIG_TypeConverter::toColumnVector( v ) * -1;
+
+		NEWMAT::ColumnVector rightSide = SIG_TypeConverter::toColumnVector( b ) - SIG_TypeConverter::toColumnVector( a );
+
+		NEWMAT::ColumnVector solutions = linEqSystem.i() * rightSide;
+
+#ifdef SIG_DEBUG
+		SIGEL_Tools::SIG_IO::cerr << "Linear equation system:" << Qt::endl;
+		for( int i = 1; i <= 3; i++ )
+		{
+			for( int j = 1; j <= 3; j++ )
+			{
+				SIGEL_Tools::SIG_IO::cerr << linEqSystem( i, j ) << " ";
+			}
+			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		}
+
+		SIGEL_Tools::SIG_IO::cerr << "Right side";
+		for( int i = 1; i <= 3; i++ )
+		{
+			SIGEL_Tools::SIG_IO::cerr << " " << rightSide( i );
+		}
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+		SIGEL_Tools::SIG_IO::cerr << "Solution vector (t0, t1, t2)^T:";
+		for( int i = 1; i <= 3; i++ )
+		{
+			SIGEL_Tools::SIG_IO::cerr << " " << solutions( i );
+		}
+		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+#endif
+
+		c = u;
+		c.timesis( solutions( 1 ) );
+		c.plusis( &a );
+
+		SIG_Vector cut = w;
+		cut.timesis( solutions( 2 ) );
+		cut.plusis( &c );
+
+		SIG_Vector hDir = cut;
+		hDir.minusis( &c );
+
+		if( hDir.norm() < minimalDistanceMeasure )
+		{
+			QString message = "Axes of adjacent joints meeting in link " + getName() + " cut!";
+			throw SIG_WrongKinematicsException( __FILE__, __LINE__, message );
+		}
+
+		hDir.normalize();
+
+		if( w.inprod( &hDir ) == -1 )
+		{
+			w.timesis( -1 );
+		}
+
+		w.normalize();
+	}
+
+#ifdef SIG_DEBUG
+	SIGEL_Tools::SIG_IO::cerr << "c:";
+	for( int i = 0; i < 3; i++ )
+	{
+		SIGEL_Tools::SIG_IO::cerr << " " << c.get( i );
+	}
+	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+
+	SIGEL_Tools::SIG_IO::cerr << "w:";
+	for( int i = 0; i < 3; i++ )
+	{
+		SIGEL_Tools::SIG_IO::cerr << " " << w.get( i );
+	}
+	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+#endif
+}
 
 }
