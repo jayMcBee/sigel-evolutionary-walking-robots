@@ -219,9 +219,9 @@ namespace SIGEL_Visualisation
 		// darker than the colour, so that pure colours look like paint and not like plastic.
 		for ( SIGEL_Robot::SIG_Material *materialPtr : robot.getMaterials() )
 		{
-			SIGEL_Robot::SIG_Material &actMaterial = *materialPtr;
+			SIGEL_Robot::SIG_Material &currentMaterial = *materialPtr;
 
-			NEWMAT::ColumnVector paintColor = SIG_TypeConverter::toColumnVector( actMaterial.getColour() );
+			NEWMAT::ColumnVector paintColor = SIG_TypeConverter::toColumnVector( currentMaterial.getColour() );
 
 			double const grey = 0.2126 * paintColor( 1 ) + 0.7152 * paintColor( 2 ) + 0.0722 * paintColor( 3 );
 
@@ -229,7 +229,7 @@ namespace SIGEL_Visualisation
 				paintColor( i ) = (paintColor( i ) + (grey - paintColor( i )) * 0.45) * 0.8;
 
 			stream << "#declare "
-			       << actMaterial.getName()
+			       << currentMaterial.getName()
 			       << " = sigelPaint( "
 			       << vectorToPovray( paintColor )
 			       << " )\n"
