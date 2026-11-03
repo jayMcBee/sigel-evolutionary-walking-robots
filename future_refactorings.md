@@ -23,12 +23,6 @@ Paths are relative to `sigel/`, the source tree.
 
 ## 2 · Renames and translation
 
-- [ ] **15. Rename the `act` prefix to `current`.** German `aktuell`; reads as
-  the verb "act". `actExperiment`, `actExpChanged` and `slotActExpChanged` are
-  done.
-  A signal or slot breaks its string-based connect if only one side moves;
-  `check.sh` catches that. No reference file holds these names.
-
 - [ ] **16. Set the version to 2.0** in `SIGEL_Tools/SIG_Version.h` when it
   is time.
   `pixmaps/altLogo.png`, with a `Sigel v1.0` caption, is kept but unused.
