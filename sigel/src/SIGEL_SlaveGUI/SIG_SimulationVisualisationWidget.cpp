@@ -581,9 +581,9 @@ void SIG_SimulationVisualisationWidget::slotNavigateDown()
 
 	double const distance = 0.1;
 
-	double actHeight = visualisation->viewSettings.lookPoint.get( 1 );
+	double currentHeight = visualisation->viewSettings.lookPoint.get( 1 );
 
-	visualisation->viewSettings.lookPoint.set( 1, actHeight - distance );
+	visualisation->viewSettings.lookPoint.set( 1, currentHeight - distance );
 
 	if (automaticRefresh)
 		update();
@@ -596,9 +596,9 @@ void SIG_SimulationVisualisationWidget::slotNavigateUp()
 
 	double const distance = 0.1;
 
-	double actHeight = visualisation->viewSettings.lookPoint.get( 1 );
+	double currentHeight = visualisation->viewSettings.lookPoint.get( 1 );
 
-	visualisation->viewSettings.lookPoint.set( 1, actHeight + distance );
+	visualisation->viewSettings.lookPoint.set( 1, currentHeight + distance );
 
 	if (automaticRefresh)
 		update();
