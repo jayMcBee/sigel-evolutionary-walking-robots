@@ -201,7 +201,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
         QString senderStr;
         QTextStream qts( &senderStr, QIODeviceBase::ReadWrite );
         SIGEL_Program::SIG_Program const &program = ind.getProgram();
-        PVMData.setActGeneration(exp.population.getPoolGeneration());
+        PVMData.setCurrentGeneration(exp.population.getPoolGeneration());
         PVMData.setFitnessResetInterval(exp.gpParameter.getFitnessResetInterval());
         PVMData.savePVMDataTransfer(qts, program);
         PVMData.sendQStringToPVM(senderStr, taskId, 23);
@@ -456,7 +456,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
 	      QString senderStr;
 	      QTextStream qts( &senderStr, QIODeviceBase::ReadWrite );
 	      SIGEL_Program::SIG_Program const &program = ind.getProgram();
-         PVMData.setActGeneration(exp.population.getPoolGeneration());
+         PVMData.setCurrentGeneration(exp.population.getPoolGeneration());
          PVMData.setFitnessResetInterval(exp.gpParameter.getFitnessResetInterval());
 	      PVMData.savePVMDataTransfer(qts, program);
 	      PVMData.sendQStringToPVM(senderStr, taskId, 23);  

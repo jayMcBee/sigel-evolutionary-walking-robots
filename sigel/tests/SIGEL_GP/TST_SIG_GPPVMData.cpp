@@ -47,7 +47,7 @@ namespace {
 		SIGEL_Environment::SIG_Environment environment;
 		SIGEL_Simulation::SIG_SimulationParameters simulationParameters;
 		SIGEL_GP::SIG_GPPVMData data( robot, environment, simulationParameters, "fitness id", true );
-		data.setActGeneration( 7 );
+		data.setCurrentGeneration( 7 );
 		data.setFitnessResetInterval( 3 );
 		data.setExperimentName( "my experiment" );
 		data.setIndividualName( "individual 42" );
