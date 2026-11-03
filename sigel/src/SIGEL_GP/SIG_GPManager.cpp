@@ -596,9 +596,9 @@ void SIGEL_GP::SIG_GPManager::calcInitTournamentSet()
 
 		SIG_GPTournament &currentTournament=*tournaments[i];
 
-		int actIndisNumber=currentTournament.indis.size();
+		int currentIndividualCount=currentTournament.indis.size();
 
-		for (int j=0; j<actIndisNumber; j++)
+		for (int j=0; j<currentIndividualCount; j++)
 		{
 #ifdef SIG_DEBUG
 			SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager inspecting tournament individual"
