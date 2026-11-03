@@ -117,15 +117,15 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 
 	initializeArticulation();
 
-	for (SIGEL_Robot::SIG_Drive *actDrive : robot.getDrives())
+	for (SIGEL_Robot::SIG_Drive *currentDrive : robot.getDrives())
 	{
-		switch (actDrive->getMode())
+		switch (currentDrive->getMode())
 		{
 			//	should work for both, simple-servo and force drives..
 		case SIGEL_Robot::SIG_Drive::tForceMode:
 		case SIGEL_Robot::SIG_Drive::tServoSimpleMode:
 		{
-			int jointNumber = actDrive->getJoint()->getNumber();
+			int jointNumber = currentDrive->getJoint()->getNumber();
 
 			int linkNumber = jointIndices[ jointNumber ];
 
@@ -133,7 +133,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 			{
 #ifdef SIG_DEBUG
 				SIGEL_Tools::SIG_IO::cerr << "Inserting drive "
-				                          << actDrive->getName()
+				                          << currentDrive->getName()
 				                          << " at joint "
 				                          << jointNumber
 				                          << " corresponding to link "
@@ -143,7 +143,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 				                          << "." << Qt::endl;
 #endif
 
-				drives[ actDrive->getNumber() ] = actDrive;
+				drives[ currentDrive->getNumber() ] = currentDrive;
 			}
 		}
 		break;
@@ -226,9 +226,9 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()
 	dynaMechsIntegrator->simulate( stepSize );
 
 	for (int i = 0; i < drives.size(); i++) {
-		SIGEL_Robot::SIG_Drive *actDrive = drives[ i ];
+		SIGEL_Robot::SIG_Drive *currentDrive = drives[ i ];
 
-		if (actDrive)
+		if (currentDrive)
 		{
 			driveForcesTimeAccounts[ i ] -= simulationParameter.getStepSize();
 
@@ -236,7 +236,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()
 			SIGEL_Tools::SIG_IO::cerr << "driveForcesTimeAccount[ "
 			                          << i
 			                          << " ], drive "
-			                          << actDrive->getName()
+			                          << currentDrive->getName()
 			                          << ": "
 			                          << driveForcesTimeAccounts[ i ]
 			                          << Qt::endl;
@@ -246,12 +246,12 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()
 			{
 #ifdef SIG_DEBUG
 				SIGEL_Tools::SIG_IO::cerr << "Resetting drive "
-				                          << actDrive->getName()
+				                          << currentDrive->getName()
 				                          << "." << Qt::endl;
 #endif
 				driveForcesTimeAccounts[ i ] = 0;
 
-				int jointNumber = actDrive->getJoint()->getNumber();
+				int jointNumber = currentDrive->getJoint()->getNumber();
 
 				int linkNumber = jointIndices[ jointNumber ];
 
