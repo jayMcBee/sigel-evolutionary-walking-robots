@@ -102,17 +102,17 @@ namespace SIGEL_Robot
 					SIG_Polygon *actPolygon = nullptr;
 
 					for (int j=0; j < noOfIndices; j++) {
-						int actIndex = indexedFaceSetNode->getCoordIndex(j);
+						int currentIndex = indexedFaceSetNode->getCoordIndex(j);
 
 						// Before the polygon is created: SIG_Polygon self-registers in its
 						// constructor, so skipping every vertex would leave a 0-vertex face that
 						// SIG_Mirtich::compFaceNormal reads verts[0..2] from.
-						if (actIndex < 0)
+						if (currentIndex < 0)
 							actPolygon = nullptr;
-						else if ( actIndex < vertices.size() ) {
+						else if ( currentIndex < vertices.size() ) {
 							if (!actPolygon)
 								actPolygon = new SIG_Polygon( geometry );
-							actPolygon->appendVertex( vertices[ actIndex ] );
+							actPolygon->appendVertex( vertices[ currentIndex ] );
 						};
 					};
 				};
