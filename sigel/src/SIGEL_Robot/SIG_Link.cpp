@@ -350,7 +350,7 @@ namespace SIGEL_Robot {
 	      successors.append( actAdjacentJoint );
 
 	  // value() gives null when successors is empty; first() or at() would assert.
-	  // The do-while body must still run once then: actSuccessor is null, transformX
+	  // The do-while body must still run once then: currentSuccessor is null, transformX
 	  // is false, and the body takes its "without successor" path.
 	  SIG_Joint *realSuccessor = successors.value( 0 );
 
@@ -364,16 +364,16 @@ namespace SIGEL_Robot {
 	  SIG_Vector realNewOrigin;
 
 	  qsizetype successorPos = 0;
-	  SIG_Joint *actSuccessor = successors.value( successorPos );
+	  SIG_Joint *currentSuccessor = successors.value( successorPos );
 
 	  do
 	    {
 #ifdef SIG_DEBUG
-	      if (actSuccessor)
+	      if (currentSuccessor)
 		SIGEL_Tools::SIG_IO::cerr << "Transforming link "
 					  << getName()
 					  << " accordingly to successor "
-					  << actSuccessor->getName()
+					  << currentSuccessor->getName()
 					  << "." << Qt::endl;
 	      else
 		SIGEL_Tools::SIG_IO::cerr << "Tansforming link "
@@ -381,7 +381,7 @@ namespace SIGEL_Robot {
 					  << " without successor." << Qt::endl;
 #endif
 
-	      bool processingRealSuccessor = (actSuccessor == realSuccessor);
+	      bool processingRealSuccessor = (currentSuccessor == realSuccessor);
 
 	      SIG_Vector newXAxis(1, 0, 0);
 	      SIG_Vector newZAxis(0, 0, 1);
@@ -404,17 +404,17 @@ namespace SIGEL_Robot {
 
 	      if (transformX)
 		{
-		  bool successorsLeftLink = ( this == actSuccessor->getLeftLink() );
+		  bool successorsLeftLink = ( this == currentSuccessor->getLeftLink() );
 
 		  SIG_Vector succBase;
 		  SIG_Vector succDir;
 		  SIG_Vector succHand;
 
-		  switch (actSuccessor->getJointType())
+		  switch (currentSuccessor->getJointType())
 		    {
 		    case SIG_Joint::tTranslationalJoint:
 		      {
-			SIG_TranslationalJoint *translationalJoint = static_cast< SIG_TranslationalJoint * >(actSuccessor);
+			SIG_TranslationalJoint *translationalJoint = static_cast< SIG_TranslationalJoint * >(currentSuccessor);
 
 			succBase = ( successorsLeftLink ) ? translationalJoint->getLeftBase() : translationalJoint->getRightBase();
 			succDir = ( successorsLeftLink ) ? translationalJoint->getLeftDir() : translationalJoint->getRightDir();
@@ -423,7 +423,7 @@ namespace SIGEL_Robot {
 		      break;
 		    case SIG_Joint::tRotationalJoint:
 		      {
-			SIG_RotationalJoint *rotationalJoint = static_cast< SIG_RotationalJoint * >(actSuccessor);
+			SIG_RotationalJoint *rotationalJoint = static_cast< SIG_RotationalJoint * >(currentSuccessor);
 
 			succBase = ( successorsLeftLink ) ? rotationalJoint->getLeftBase() : rotationalJoint->getRightBase();
 			succDir = ( successorsLeftLink ) ? rotationalJoint->getLeftDir() : rotationalJoint->getRightDir();
@@ -598,16 +598,16 @@ namespace SIGEL_Robot {
 #endif
 		};
 
-	      if (actSuccessor)
+	      if (currentSuccessor)
 		{
-		  actSuccessor->transformToDynaMechs( this,
-						      screwD,
-						      screwTheta );
+		  currentSuccessor->transformToDynaMechs( this,
+						          screwD,
+						          screwTheta );
 
-		  actSuccessor = successors.value( ++successorPos );
+		  currentSuccessor = successors.value( ++successorPos );
 		};
 	    }
-	  while (actSuccessor);
+	  while (currentSuccessor);
 
 	  if (transformX || transformZ)
 	    {
