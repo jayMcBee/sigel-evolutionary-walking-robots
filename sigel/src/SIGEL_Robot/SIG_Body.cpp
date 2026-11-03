@@ -88,15 +88,15 @@ namespace SIGEL_Robot
 
 						coordinateNode->getPoint( i, coords.data() );
 
-						NEWMAT::ColumnVector actVertex(4);
+						NEWMAT::ColumnVector currentVertex(4);
 						for (int j=0; j<3; j++)
-							actVertex( j+1 ) = coords[j];
-						actVertex(4) = 1;
+							currentVertex( j+1 ) = coords[j];
+						currentVertex(4) = 1;
 
-						actVertex = transformation * actVertex;
+						currentVertex = transformation * currentVertex;
 
 						for (int k = 0; k<3; k++)
-							vertices[ i ].set( k, actVertex( k+1 ) );
+							vertices[ i ].set( k, currentVertex( k+1 ) );
 					};
 
 					SIG_Polygon *currentPolygon = nullptr;

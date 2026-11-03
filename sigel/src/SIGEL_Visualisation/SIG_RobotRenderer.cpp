@@ -95,10 +95,10 @@ namespace SIGEL_Visualisation
 	    glBegin(GL_POLYGON);
 	    for (int i=0; i<currentPolygon.getNumVertices(); i++)
 	      {
-		SIG_Vector actVertex = currentPolygon.getVertex(i);
-		glVertex3d( static_cast<GLdouble>(actVertex.get(0)),
-			    static_cast<GLdouble>(actVertex.get(1)),
-			    static_cast<GLdouble>(actVertex.get(2)) );
+		SIG_Vector currentVertex = currentPolygon.getVertex(i);
+		glVertex3d( static_cast<GLdouble>(currentVertex.get(0)),
+			    static_cast<GLdouble>(currentVertex.get(1)),
+			    static_cast<GLdouble>(currentVertex.get(2)) );
 	      };
 	    glEnd();
 
