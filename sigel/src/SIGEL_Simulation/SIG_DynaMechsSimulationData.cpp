@@ -150,14 +150,14 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 		}
 	}
 
-	for (SIGEL_Robot::SIG_Sensor *actSensorBase : robot.getSensors())
+	for (SIGEL_Robot::SIG_Sensor *currentSensorBase : robot.getSensors())
 	{
-		switch (actSensorBase->getSensorType())
+		switch (currentSensorBase->getSensorType())
 		{
 			// tJointSensor:
 		case SIGEL_Robot::SIG_Sensor::tJointSensor:
 		{
-			SIGEL_Robot::SIG_JointSensor *currentSensor = static_cast< SIGEL_Robot::SIG_JointSensor* >(actSensorBase);
+			SIGEL_Robot::SIG_JointSensor *currentSensor = static_cast< SIGEL_Robot::SIG_JointSensor* >(currentSensorBase);
 
 			SIGEL_Robot::SIG_Joint const *joint = currentSensor->getJoint();
 
@@ -173,7 +173,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 			// tPitchRollSensor
 		case SIGEL_Robot::SIG_Sensor::tPitchRollSensor:
 		{
-			SIGEL_Robot::SIG_PitchRollSensor *currentSensor = static_cast< SIGEL_Robot::SIG_PitchRollSensor* >(actSensorBase);
+			SIGEL_Robot::SIG_PitchRollSensor *currentSensor = static_cast< SIGEL_Robot::SIG_PitchRollSensor* >(currentSensorBase);
 			SIGEL_Robot::SIG_Link const *link = currentSensor->getLink();
 
 			if (dynaMechsLinks[ link->getNumber() ])
@@ -186,7 +186,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 			// tContactSensor
 		case SIGEL_Robot::SIG_Sensor::tContactSensor:
 		{
-			SIGEL_Robot::SIG_ContactSensor *currentSensor = static_cast< SIGEL_Robot::SIG_ContactSensor* >(actSensorBase);
+			SIGEL_Robot::SIG_ContactSensor *currentSensor = static_cast< SIGEL_Robot::SIG_ContactSensor* >(currentSensorBase);
 			SIGEL_Robot::SIG_Link const *link = currentSensor->getLink();
 
 			if (dynaMechsLinks[ link->getNumber() ])
