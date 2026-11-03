@@ -345,9 +345,9 @@ namespace SIGEL_Robot {
 
 	  QList< SIG_Joint * > successors;
 
-	  for (SIG_Joint *actAdjacentJoint : adjacentJoints)
-	    if (actAdjacentJoint->continuable( this ))
-	      successors.append( actAdjacentJoint );
+	  for (SIG_Joint *currentAdjacentJoint : adjacentJoints)
+	    if (currentAdjacentJoint->continuable( this ))
+	      successors.append( currentAdjacentJoint );
 
 	  // value() gives null when successors is empty; first() or at() would assert.
 	  // The do-while body must still run once then: currentSuccessor is null, transformX
