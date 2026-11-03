@@ -75,7 +75,7 @@ namespace SIGEL_GP
     void setIndividualName( QString name );
     double getIndividualFitness();
     void setIndividualFitness( double fitness );
-    void setCurrentGeneration( int newActGeneration) { currentGeneration = newActGeneration; }
+    void setCurrentGeneration( int newCurrentGeneration) { currentGeneration = newCurrentGeneration; }
     int getCurrentGeneration() { return currentGeneration; }
     void setFitnessResetInterval(int newFitnessResetInterval) { fitnessResetInterval = newFitnessResetInterval; }
     int getFitnessResetInterval() { return fitnessResetInterval; }
