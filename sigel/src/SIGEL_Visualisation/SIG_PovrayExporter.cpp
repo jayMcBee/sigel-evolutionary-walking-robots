@@ -253,11 +253,11 @@ namespace SIGEL_Visualisation
 			       << " = mesh {\n";
 
 			SIGEL_Robot::SIG_Geometry const *actGeometry = actLink.getGeometry();
-			SIGEL_Robot::SIG_GeometryIterator actGeoIter(actGeometry);
+			SIGEL_Robot::SIG_GeometryIterator currentGeometryIterator(actGeometry);
 
-			while (actGeoIter.valid())
+			while (currentGeometryIterator.valid())
 			{
-				SIGEL_Robot::SIG_Polygon const &currentPolygon = actGeoIter.current();
+				SIGEL_Robot::SIG_Polygon const &currentPolygon = currentGeometryIterator.current();
 
 				NEWMAT::ColumnVector firstVertex = SIG_TypeConverter::toColumnVector( currentPolygon.getVertex( 0 ) );
 
@@ -281,7 +281,7 @@ namespace SIGEL_Visualisation
 					secondVertex = thirdVertex;
 				};
 
-				actGeoIter.next();
+				currentGeometryIterator.next();
 			};
 
 			for ( const SIGEL_Robot::SIG_Link::NamedPoint &pointEntry : actLink.getPoints() )

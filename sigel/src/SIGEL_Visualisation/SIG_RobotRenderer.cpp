@@ -66,13 +66,13 @@ namespace SIGEL_Visualisation
 	glNewList(actListIndex, GL_COMPILE);
 
 	SIGEL_Robot::SIG_Geometry const *actGeometry = actLink.getGeometry();
-	SIGEL_Robot::SIG_GeometryIterator actGeoIter(actGeometry);
+	SIGEL_Robot::SIG_GeometryIterator currentGeometryIterator(actGeometry);
 
 	glFrontFace( GL_CCW );
 
-	while (actGeoIter.valid())
+	while (currentGeometryIterator.valid())
 	  {
-	    SIGEL_Robot::SIG_Polygon const &currentPolygon = actGeoIter.current();
+	    SIGEL_Robot::SIG_Polygon const &currentPolygon = currentGeometryIterator.current();
 
 	    SIG_Vector vertex0 = currentPolygon.getVertex( 0 );
 	    SIG_Vector vertex1 = currentPolygon.getVertex( 1 );
@@ -102,7 +102,7 @@ namespace SIGEL_Visualisation
 	      };
 	    glEnd();
 
-	    actGeoIter.next();
+	    currentGeometryIterator.next();
 	  };
 
 	glEndList();
