@@ -87,7 +87,7 @@ void SIGEL_GP::TST_SIG_GPPVMData::loadPVMDataTransferReadsTheSettingsAndTheProgr
 
 	QCOMPARE( thrown, QString() );
 	QCOMPARE( data.getFitnessFunctionName(), QString( "fitness id" ) );
-	QCOMPARE( data.getActGeneration(), 7 );
+	QCOMPARE( data.getCurrentGeneration(), 7 );
 	QCOMPARE( data.getFitnessResetInterval(), 3 );
 	QCOMPARE( data.getVisualize(), true );
 	QCOMPARE( data.getExperimentName(), QString( "my experiment" ) );

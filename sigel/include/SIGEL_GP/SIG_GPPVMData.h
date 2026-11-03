@@ -76,7 +76,7 @@ namespace SIGEL_GP
     double getIndividualFitness();
     void setIndividualFitness( double fitness );
     void setCurrentGeneration( int newActGeneration) { currentGeneration = newActGeneration; }
-    int getActGeneration() { return currentGeneration; }
+    int getCurrentGeneration() { return currentGeneration; }
     void setFitnessResetInterval(int newFitnessResetInterval) { fitnessResetInterval = newFitnessResetInterval; }
     int getFitnessResetInterval() { return fitnessResetInterval; }
 
