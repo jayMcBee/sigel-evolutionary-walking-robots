@@ -264,9 +264,9 @@ namespace SIGEL_CommonGUI
 				SIGEL_CommonGUI::SIG_FloatingTextLabel *floatingTextLabel = floatingTextWidgets[i];
 
 				floatingTextLabel->setText( floatingText->textLabel );
-				QSize actSize = floatingTextLabel->sizeHint();
-				if (actSize.width() > floatingTextsSize.width())
-					floatingTextsSize = actSize;
+				QSize currentSize = floatingTextLabel->sizeHint();
+				if (currentSize.width() > floatingTextsSize.width())
+					floatingTextsSize = currentSize;
 
 				floatingTextLabel->move( floatingText->xPos,
 				                         this->height() - floatingText->yPos );
