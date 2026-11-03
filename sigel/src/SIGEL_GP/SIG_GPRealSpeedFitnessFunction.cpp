@@ -72,10 +72,10 @@ namespace SIGEL_GP
     SIG_Vector lastRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
 
     while (currentPosition) {
-      SIG_Vector actRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
+      SIG_Vector currentRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
 
-      if (isValid( actRealPosition.x ) && isValid( actRealPosition.y ) && isValid( actRealPosition.z )) {
-        SIG_Vector localDistanceVector = actRealPosition;
+      if (isValid( currentRealPosition.x ) && isValid( currentRealPosition.y ) && isValid( currentRealPosition.z )) {
+        SIG_Vector localDistanceVector = currentRealPosition;
         localDistanceVector.minusis( &lastRealPosition );
 
         double localDistance = localDistanceVector.norm();
@@ -88,7 +88,7 @@ namespace SIGEL_GP
 
         totalDistance += localDistance;
 
-        lastRealPosition = actRealPosition;
+        lastRealPosition = currentRealPosition;
       }
       else {
         totalDistance = 0;

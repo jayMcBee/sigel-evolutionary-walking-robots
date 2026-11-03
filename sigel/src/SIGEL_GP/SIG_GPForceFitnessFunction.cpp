@@ -135,14 +135,14 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
     SIG_Matrix *currentRotation = recorder.rotations.value( recIdx );
 
     while (currentPosition) {
-      SIG_Vector actRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
+      SIG_Vector currentRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
 
-      if ( !(isValid( actRealPosition.x ) && isValid( actRealPosition.y ) && isValid( actRealPosition.z )) ) {
+      if ( !(isValid( currentRealPosition.x ) && isValid( currentRealPosition.y ) && isValid( currentRealPosition.z )) ) {
         fitness = 0;
         break;
       };
 
-      if ((actRealPosition.y < minimalHeight) || (actRealPosition.y > maximalHeight)) {
+      if ((currentRealPosition.y < minimalHeight) || (currentRealPosition.y > maximalHeight)) {
         fitness = 0;
         break;
       };

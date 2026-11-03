@@ -93,33 +93,33 @@ namespace SIGEL_GP
         // iterate through recorded positions and evaluate !
     while (currentPosition)
 		{
-			SIG_Vector actRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
+			SIG_Vector currentRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
 
-			if ( !(isValid( actRealPosition.x ) && isValid( actRealPosition.y ) && isValid( actRealPosition.z )) )
+			if ( !(isValid( currentRealPosition.x ) && isValid( currentRealPosition.y ) && isValid( currentRealPosition.z )) )
 	  	{
 	    	fitness = 0;
 	    	break;
 	  	}
 
 			// note decrease in height
-			if (actRealPosition.y <= startHeight)
+			if (currentRealPosition.y <= startHeight)
 			{	//	disallow neg. values
-				if (actRealPosition.y > 0)
-				{	avgHeight += actRealPosition.y;
+				if (currentRealPosition.y > 0)
+				{	avgHeight += currentRealPosition.y;
 				}
 			}
 			// interprete all above startheight as 100% !
 			else
 			{ // really hi ?
-        if (actRealPosition.y > 1.5*startHeight)
-        {   SIGEL_Tools::SIG_IO::cerr << "\to quite high -- " << actRealPosition.y << Qt::endl;
+        if (currentRealPosition.y > 1.5*startHeight)
+        {   SIGEL_Tools::SIG_IO::cerr << "\to quite high -- " << currentRealPosition.y << Qt::endl;
         }
 
 				avgHeight += startHeight;
 
 				// but check for strange effects..
-				if (actRealPosition.y > 2.0*startHeight)
-				{   SIGEL_Tools::SIG_IO::cerr << "\t## r u ready 2 fly ?  ##  height is > 2*startHeight  (actRealPosition.y=" << actRealPosition.y << " ##" << Qt::endl;
+				if (currentRealPosition.y > 2.0*startHeight)
+				{   SIGEL_Tools::SIG_IO::cerr << "\t## r u ready 2 fly ?  ##  height is > 2*startHeight  (currentRealPosition.y=" << currentRealPosition.y << " ##" << Qt::endl;
 				}
 			}
 
