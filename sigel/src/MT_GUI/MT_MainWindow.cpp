@@ -282,7 +282,7 @@ void MT_MainWindow::slotRaiseWidget( QTreeWidgetItem *item )
 
 	int pos = static_cast<MT_ExperimentItem *>( item )->getPos();
 	MT_WidgetBase *nextWidget = widgets[pos];
-	MT_WidgetBase *actWidget = nullptr;
+	MT_WidgetBase *currentWidget = nullptr;
 
 	if( !evolRunning )
 	{
@@ -293,8 +293,8 @@ void MT_MainWindow::slotRaiseWidget( QTreeWidgetItem *item )
 	{
 		if( actWidgetID != -1 )
 		{
-			actWidget = widgets[actWidgetID];
-			if( actWidget->onHide( gpManager, estimationState ) )
+			currentWidget = widgets[actWidgetID];
+			if( currentWidget->onHide( gpManager, estimationState ) )
 			{
 				nextWidget->onShow( gpManager, estimationState );
 				widgetStack->setCurrentIndex( pos );
@@ -318,7 +318,7 @@ void MT_MainWindow::slotRaiseWidget( QTreeWidgetItem *item )
 void MT_MainWindow::raiseWidget( int pos )
 {
 	MT_WidgetBase *nextWidget = widgets[pos];
-	MT_WidgetBase *actWidget = nullptr;
+	MT_WidgetBase *currentWidget = nullptr;
 
 	if( !evolRunning )
 	{
@@ -329,8 +329,8 @@ void MT_MainWindow::raiseWidget( int pos )
 	{
 		if( actWidgetID != -1 )
 		{
-			actWidget = widgets[actWidgetID];
-			if( actWidget->onHide( gpManager, estimationState ) )
+			currentWidget = widgets[actWidgetID];
+			if( currentWidget->onHide( gpManager, estimationState ) )
 			{
 				nextWidget->onShow( gpManager, estimationState );
 				widgetStack->setCurrentIndex( pos );
@@ -357,18 +357,18 @@ MT_GPManager *MT_MainWindow::getManager()
 
 void MT_MainWindow::enforceUpdate( bool GUI )
 {
-	MT_WidgetBase *actWidget = nullptr;
+	MT_WidgetBase *currentWidget = nullptr;
 
 	if( actWidgetID != -1 )
 	{
-		actWidget = widgets[actWidgetID];
+		currentWidget = widgets[actWidgetID];
 		if( GUI )
 		{
-			actWidget->onShow( gpManager, estimationState );
+			currentWidget->onShow( gpManager, estimationState );
 		}
 		else
 		{
-			actWidget->onHide( gpManager, estimationState );
+			currentWidget->onHide( gpManager, estimationState );
 		}
 	}
 }
