@@ -62,8 +62,8 @@ bool SIGEL_Simulation::SIG_EarlyRunTermSimulation::prematureTermination()
   {
       // check current y-position of robot
       SIG_Vector *currentPosition = ertRecorder->positions.value( ertRecorder->positions.size() - 1 );
-      SIG_Matrix *actRotation = ertRecorder->rotations.value( ertRecorder->rotations.size() - 1 );
-      SIG_Vector actRobPos = normalizeRobotPosition( *currentPosition, *actRotation );
+      SIG_Matrix *currentRotation = ertRecorder->rotations.value( ertRecorder->rotations.size() - 1 );
+      SIG_Vector actRobPos = normalizeRobotPosition( *currentPosition, *currentRotation );
 
       // lower than 1/2 of startheight ? Let's stop evaluation here!
       if (actRobPos.y < (ertStartHeight/2.0))

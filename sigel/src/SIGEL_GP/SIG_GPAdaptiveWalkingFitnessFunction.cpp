@@ -88,12 +88,12 @@ namespace SIGEL_GP
 
     qsizetype recIdx = 0;
     SIG_Vector *currentPosition = recorder.positions.value( recIdx );
-    SIG_Matrix *actRotation = recorder.rotations.value( recIdx );
+    SIG_Matrix *currentRotation = recorder.rotations.value( recIdx );
 
         // iterate through recorded positions and evaluate !
     while (currentPosition)
 		{
-			SIG_Vector actRealPosition = normalizeRobotPosition( *currentPosition, *actRotation, rob );
+			SIG_Vector actRealPosition = normalizeRobotPosition( *currentPosition, *currentRotation, rob );
 
 			if ( !(isValid( actRealPosition.x ) && isValid( actRealPosition.y ) && isValid( actRealPosition.z )) )
 	  	{
@@ -126,7 +126,7 @@ namespace SIGEL_GP
 			perfSteps++;
 			++recIdx;
 			currentPosition = recorder.positions.value( recIdx );
-			actRotation = recorder.rotations.value( recIdx );
+			currentRotation = recorder.rotations.value( recIdx );
  		}
 
 		// get average height in percent of start height

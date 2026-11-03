@@ -86,12 +86,12 @@ namespace SIGEL_GP
 
     qsizetype recIdx = 0;
     SIG_Vector *currentPosition = recorder.positions.value( recIdx );
-    SIG_Matrix *actRotation = recorder.rotations.value( recIdx );
+    SIG_Matrix *currentRotation = recorder.rotations.value( recIdx );
 
     while (currentPosition)
       {
 	SIG_Vector actRealPosition = normalizeRobotPosition( *currentPosition,
-							    *actRotation, rob );
+							    *currentRotation, rob );
 
 	if ( !(isValid( actRealPosition.x ) && isValid( actRealPosition.y ) && isValid( actRealPosition.z )) )
 	  {
@@ -107,7 +107,7 @@ namespace SIGEL_GP
 
 	++recIdx;
 	currentPosition = recorder.positions.value( recIdx );
-	actRotation = recorder.rotations.value( recIdx );
+	currentRotation = recorder.rotations.value( recIdx );
       };
 
     return fitness;
