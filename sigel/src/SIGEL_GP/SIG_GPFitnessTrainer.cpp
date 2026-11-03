@@ -142,7 +142,7 @@ void SIGEL_GP::SIG_GPFitnessTrainer::prepareTerrain() {
 int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& ind) {
   int hostNumber = getNextHost();
 
-  int actId = nextFreeNumber;
+  int currentId = nextFreeNumber;
 
   bool success = false;
 
@@ -188,13 +188,13 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
         success = true;
 
         SIG_GPPVMTask *newTask = new SIG_GPPVMTask( *usedHost,
-						      actId,
+						      currentId,
 						      taskId,
 						      ind.getPoolPos(),
 						      QDateTime::currentDateTime() );
 
-        delete pvmTasks[ actId ];
-        pvmTasks[ actId ] = newTask;
+        delete pvmTasks[ currentId ];
+        pvmTasks[ currentId ] = newTask;
 
         usedHost->noOfSlaves++;
 
@@ -245,12 +245,12 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
   };
 
   if (!success) {
-      toSpawnList.append( SIG_GPTaskToSpawn{ actId, ind.getPoolPos() } );
+      toSpawnList.append( SIG_GPTaskToSpawn{ currentId, ind.getPoolPos() } );
     };
 
   nextFreeNumber++;
 
-  return actId;
+  return currentId;
 }
 
 double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
