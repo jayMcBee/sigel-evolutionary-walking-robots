@@ -23,7 +23,7 @@
 #include "SIGEL_GP/SIG_GPTournament.h"
 
 SIGEL_GP::SIG_GPTournament::SIG_GPTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
-					     SIG_GPPopulation& actPool,
+					     SIG_GPPopulation& currentPool,
 					     SIG_GPParameter& gpParameter,
 					     SIGEL_Robot::SIG_LanguageParameters &languageParameters)
 : languageParameters(languageParameters),
@@ -31,7 +31,7 @@ SIGEL_GP::SIG_GPTournament::SIG_GPTournament(SIGEL_Tools::SIG_Randomizer& random
   indis(),
   justWaiting(false),
   waitCounter(0),
-  gpPool(actPool),
+  gpPool(currentPool),
   gpParameter(gpParameter)
 {   
 }

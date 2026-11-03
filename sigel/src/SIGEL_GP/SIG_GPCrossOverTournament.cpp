@@ -27,16 +27,16 @@
 #include "MT_Control/MT_Classifier.h"
 
 SIGEL_GP::SIG_GPCrossOverTournament::SIG_GPCrossOverTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
-							       SIGEL_GP::SIG_GPPopulation& actPool,
+							       SIGEL_GP::SIG_GPPopulation& currentPool,
 							       SIGEL_GP::SIG_GPParameter& gpParameter,
 							       SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 							       int indPos1,
 							       int indPos2,
 							       int indPos3,
 							       int indPos4)
-  : SIG_GPTournament(randomizer,actPool,gpParameter,languageParameters),
-    name1( actPool.getNextIdentifier() ),
-    name2( actPool.getNextIdentifier() )
+  : SIG_GPTournament(randomizer,currentPool,gpParameter,languageParameters),
+    name1( currentPool.getNextIdentifier() ),
+    name2( currentPool.getNextIdentifier() )
 {
   indis.resize( 4 );
   indis[ 0 ] = new SIG_GPTournamentIndividual( indPos1 );

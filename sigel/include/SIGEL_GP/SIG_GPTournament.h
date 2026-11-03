@@ -55,11 +55,11 @@ namespace SIGEL_GP
 		 * All attributes are set to the parameters an a topological sorting is expected.
 		 * @param randomizer
 		 * The reference to the randomizer object of the GPManager.
-		 * @param actPool
+		 * @param currentPool
 		 * The reference to the actual pool object.
 		 */
 		SIG_GPTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
-		                 SIG_GPPopulation& actPool,
+		                 SIG_GPPopulation& currentPool,
 		                 SIG_GPParameter& gpParameter,
 		                 SIGEL_Robot::SIG_LanguageParameters &languageParameters);
 

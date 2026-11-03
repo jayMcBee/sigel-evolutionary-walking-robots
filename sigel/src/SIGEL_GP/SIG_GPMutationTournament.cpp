@@ -26,13 +26,13 @@
 #include "MT_Control/MT_Classifier.h"
 
 SIGEL_GP::SIG_GPMutationTournament::SIG_GPMutationTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
-							     SIG_GPPopulation& actPool,
+							     SIG_GPPopulation& currentPool,
 							     SIG_GPParameter& gpParameter,
 							     SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 							     int ppos1,
 							     int ppos2)
-  :SIG_GPTournament(randomizer,actPool,gpParameter,languageParameters),
-   name(actPool.getNextIdentifier())
+  :SIG_GPTournament(randomizer,currentPool,gpParameter,languageParameters),
+   name(currentPool.getNextIdentifier())
    {
      indis.resize( 2 );
      indis[ 0 ] = new SIG_GPTournamentIndividual( ppos1 );

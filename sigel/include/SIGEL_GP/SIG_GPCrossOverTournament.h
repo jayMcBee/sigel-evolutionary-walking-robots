@@ -62,7 +62,7 @@ class SIG_GPCrossOverTournament : public SIGEL_GP::SIG_GPTournament
 */
  public:
   SIG_GPCrossOverTournament(SIGEL_Tools::SIG_Randomizer& randomizer, 
-			    SIG_GPPopulation& actPool, 
+			    SIG_GPPopulation& currentPool, 
 			    SIG_GPParameter& gpParameter,
 			    SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 			    int indPos1, 

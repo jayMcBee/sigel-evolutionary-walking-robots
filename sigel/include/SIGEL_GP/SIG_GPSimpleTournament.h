@@ -50,7 +50,7 @@ class SIG_GPSimpleTournament : public SIGEL_GP::SIG_GPTournament
 * execution of the tournament
 * @param randomizer
 * The reference to the randomizer object of the GPManager.
-* @param actPool
+* @param currentPool
 * The actual population of the pool.
 * @param ppos1
 * The first tournament member adress in the pool.
@@ -59,7 +59,7 @@ class SIG_GPSimpleTournament : public SIGEL_GP::SIG_GPTournament
 */
  public:
 SIG_GPSimpleTournament( SIGEL_Tools::SIG_Randomizer& randomizer,
-		        SIG_GPPopulation& actPool, 
+		        SIG_GPPopulation& currentPool, 
 			SIG_GPParameter& gpParameter,
 			SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 		        int ppos1, 

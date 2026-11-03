@@ -50,7 +50,7 @@ class SIG_GPMutationTournament : public SIGEL_GP::SIG_GPTournament
 * The mutationtournament object is created.
 * @param randomizer
 * The randomizer which creates the random mutation point.
-* @param actPool
+* @param currentPool
 * The pool, which contains the possible members of the tournament. 
 * @param indPool1
 * The pool position of tournament member number one.
@@ -59,7 +59,7 @@ class SIG_GPMutationTournament : public SIGEL_GP::SIG_GPTournament
 */
  public:
 SIG_GPMutationTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
-			 SIG_GPPopulation& actPool,
+			 SIG_GPPopulation& currentPool,
 			 SIG_GPParameter& gpParameter,
 			 SIGEL_Robot::SIG_LanguageParameters &languageParameters,
 			 int ppos1, 
