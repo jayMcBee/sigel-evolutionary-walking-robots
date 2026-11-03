@@ -513,23 +513,23 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 
 		while (actFitTask)
 		{
-			double actFitness = trainer->checkTask( (*actFitTask)[0] );
+			double currentFitness = trainer->checkTask( (*actFitTask)[0] );
 
 #ifdef SIG_DEBUG
 			SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager checking task "
 			  << (*actFitTask)[0]
 			  << ", has fitness "
-			  << actFitness
+			  << currentFitness
 			  << "." << Qt::endl;
 #endif
 
-			if (actFitness != -1)
+			if (currentFitness != -1)
 			{
 #ifdef SIG_DEBUG
 				SIGEL_Tools::SIG_IO::cerr << "Fitness is ready." << Qt::endl;
 #endif
 
-				pop.getIndividual( (*actFitTask)[1] ).setFitness( actFitness );
+				pop.getIndividual( (*actFitTask)[1] ).setFitness( currentFitness );
 				updateIndividualView( (*actFitTask)[1] );
 
 				delete fitTaskList.takeAt( fitCur );
@@ -1175,11 +1175,11 @@ void SIGEL_GP::SIG_GPManager::evaluateIndividualsForMetaClassifier()
 
 		while (actFitTask)
 		{
-			double actFitness = trainer->checkTask( (*actFitTask)[0] );
+			double currentFitness = trainer->checkTask( (*actFitTask)[0] );
 
-			if (actFitness != -1)
+			if (currentFitness != -1)
 			{
-				pop.getIndividual( (*actFitTask)[1] ).setFitness( actFitness );
+				pop.getIndividual( (*actFitTask)[1] ).setFitness( currentFitness );
 				updateIndividualView( (*actFitTask)[1] );
 
 				delete fitTaskList.takeAt( fitCur );
