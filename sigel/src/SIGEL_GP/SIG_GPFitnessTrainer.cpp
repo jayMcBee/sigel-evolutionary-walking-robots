@@ -74,11 +74,11 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPMetaGPExper
 
       const QByteArray currentHostNameByteArray = currentHost->name.toUtf8();
 
-      char const *actHostNameCString = currentHostNameByteArray.constData();
+      char const *currentHostNameCString = currentHostNameByteArray.constData();
 
       int singleInfo = 0;
 
-	  int info = pvm_addhosts( const_cast< char** >(&actHostNameCString), 1, &singleInfo );
+	  int info = pvm_addhosts( const_cast< char** >(&currentHostNameCString), 1, &singleInfo );
 
       hostCounter++;
     };
@@ -99,11 +99,11 @@ SIGEL_GP::SIG_GPFitnessTrainer::~SIG_GPFitnessTrainer() {
 
       const QByteArray currentHostNameByteArray = currentHost->name.toUtf8();
 
-      char const *actHostNameCString = currentHostNameByteArray.constData();
+      char const *currentHostNameCString = currentHostNameByteArray.constData();
 
       int singleInfo = 0;
 
-      int info = pvm_delhosts( const_cast< char** >(&actHostNameCString), 1, &singleInfo );
+      int info = pvm_delhosts( const_cast< char** >(&currentHostNameCString), 1, &singleInfo );
     };
 
   // The loop above only tells PVM to drop each host. The objects are freed here.
