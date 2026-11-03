@@ -70,12 +70,12 @@ namespace SIGEL_GP
 
   void SIG_GUIGPManager::updateIndividualView( int poolPos )
   {
-    SIG_GPIndividual &actInd = currentExperiment.population.getIndividual( poolPos );
+    SIG_GPIndividual &currentIndividual = currentExperiment.population.getIndividual( poolPos );
 
     // Keep the warning: without it a missing list item fails silently.
     SIGEL_MasterGUI::SIG_IndividualListItem *item = individualItems.value( poolPos );
     if (item)
-      item->setTo( &actInd );
+      item->setTo( &currentIndividual );
     else
       SIGEL_Tools::SIG_IO::cerr << "SIG_GUIGPManager: no list item for pool position "
                                 << poolPos << " (size " << individualItems.size() << ")" << Qt::endl;

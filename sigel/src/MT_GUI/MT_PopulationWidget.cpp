@@ -141,11 +141,11 @@ void MT_PopulationWidget::onShow(MT_GPManager *manager, MT_EstimationState *esti
 	oldPopSize = population->getSize();
 
 	// list all individuals
-	MT_Individual *actInd;
+	MT_Individual *currentIndividual;
 	for(int i=0; i<population->getSize(); i++)
 	{
-		actInd = population->getIndividual(i);
-		new MT_PopListViewItem(individualListView, actInd);
+		currentIndividual = population->getIndividual(i);
+		new MT_PopListViewItem(individualListView, currentIndividual);
 		emit numChanged();
 	}
 
@@ -243,12 +243,12 @@ void MT_PopulationWidget::slotCurrentChanged(QTreeWidgetItem *item)
 
 	// get the currently selected individual
 	int pos = static_cast<MT_PopListViewItem*>(item)->getPos();
-	MT_Individual *actInd = population->getIndividual(pos);
+	MT_Individual *currentIndividual = population->getIndividual(pos);
 
 	// display the program
-	for(int i=0; i<actInd->getProgram()->getLength(); i++)
+	for(int i=0; i<currentIndividual->getProgram()->getLength(); i++)
 	{
-		individualProgramView->append(actInd->printProgramLine(i));
+		individualProgramView->append(currentIndividual->printProgramLine(i));
 	}
 }
 

@@ -457,15 +457,15 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 
 		processInterfaceEvents();
 
-		SIG_GPIndividual &actInd=pop.getIndividual(i);
+		SIG_GPIndividual &currentIndividual=pop.getIndividual(i);
 
-		bool upToDate = actInd.upToDate();
+		bool upToDate = currentIndividual.upToDate();
 
 		// META-System:
 		// individuals with negative fitness haven't been evaluated yet
 		// or have been evaluated by the meta-system
 		// these individuals should be evaluated again
-		if (actInd.getFitness() < 0.0)
+		if (currentIndividual.getFitness() < 0.0)
 		{
 			upToDate = false;
 		}
@@ -480,8 +480,8 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 #endif
 
 			QList<int> *actFitTask = new QList<int>(2);
-			(*actFitTask)[0] = trainer->spawnTask(actInd);
-			(*actFitTask)[1] = actInd.getPoolPos();
+			(*actFitTask)[0] = trainer->spawnTask(currentIndividual);
+			(*actFitTask)[1] = currentIndividual.getPoolPos();
 
 			fitTaskList.append( actFitTask );
 		};
@@ -605,8 +605,8 @@ void SIGEL_GP::SIG_GPManager::calcInitTournamentSet()
 			                          << j << "." << Qt::endl;
 #endif
 
-			SIG_GPTournamentIndividual &actInd = *currentTournament.indis[j];
-			int lastAccess = lastAccesses[ actInd.indNumber ];
+			SIG_GPTournamentIndividual &currentIndividual = *currentTournament.indis[j];
+			int lastAccess = lastAccesses[ currentIndividual.indNumber ];
 
 			if (lastAccess != -1)
 			{
@@ -616,7 +616,7 @@ void SIGEL_GP::SIG_GPManager::calcInitTournamentSet()
 				for (int k=0; k<prevIndisNumber; k++)
 				{
 					SIG_GPTournamentIndividual &prevInd = *previousTournament.indis[k];
-					if ( prevInd.indNumber == actInd.indNumber )
+					if ( prevInd.indNumber == currentIndividual.indNumber )
 					{
 						prevInd.successor = i;
 					};
@@ -624,7 +624,7 @@ void SIGEL_GP::SIG_GPManager::calcInitTournamentSet()
 
 				currentTournament.waitCounter += 1;
 			};
-			lastAccesses[ actInd.indNumber ] = i;
+			lastAccesses[ currentIndividual.indNumber ] = i;
 		};
 
 		if (currentTournament.waitCounter == 0)
@@ -1138,16 +1138,16 @@ void SIGEL_GP::SIG_GPManager::evaluateIndividualsForMetaClassifier()
 
 		processInterfaceEvents();
 
-		SIG_GPIndividual &actInd=pop.getIndividual(i);
+		SIG_GPIndividual &currentIndividual=pop.getIndividual(i);
 
-		bool upToDate = actInd.upToDate();
+		bool upToDate = currentIndividual.upToDate();
 
 		// Only an individual that is not up to date and takes part in a tournament is evaluated.
 		if((!upToDate)&&(TournamentsParticipant[i]!=0))
 		{
 			QList<int> *actFitTask = new QList<int>(2);
-			(*actFitTask)[0] = trainer->spawnTask(actInd);
-			(*actFitTask)[1] = actInd.getPoolPos();
+			(*actFitTask)[0] = trainer->spawnTask(currentIndividual);
+			(*actFitTask)[1] = currentIndividual.getPoolPos();
 
 			fitTaskList.append( actFitTask );
 		};

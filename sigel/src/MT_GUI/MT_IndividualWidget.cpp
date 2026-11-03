@@ -416,12 +416,12 @@ void MT_IndividualsWidget::slotDelConst()
 
 	// iterate over all items, check if they are selected
 	// and delete the selected ones
-	for( uint actInd = 0; actInd < constantsListBox->count(); actInd++ )
+	for( uint currentIndex = 0; currentIndex < constantsListBox->count(); currentIndex++ )
 	{
-		if( constantsListBox->item( actInd )->isSelected() )
+		if( constantsListBox->item( currentIndex )->isSelected() )
 		{
-			delete constantsListBox->takeItem( actInd ); // delete actual constant if selected
-			actInd--; // the indices of the following items were decreased !!
+			delete constantsListBox->takeItem( currentIndex ); // delete actual constant if selected
+			currentIndex--; // the indices of the following items were decreased !!
 			emit numConstChanged();
 		}
 	}
