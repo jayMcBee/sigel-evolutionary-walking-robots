@@ -137,8 +137,8 @@ namespace SIGEL_Robot
 		for (int i=1; i<=4; i++)
 			identity(i,i) = 1;
 
-		for (Node *actNode = bodyScene.getNodes(); actNode; actNode = actNode->next())
-			readVRMLNode( actNode,  identity);
+		for (Node *currentNode = bodyScene.getNodes(); currentNode; currentNode = currentNode->next())
+			readVRMLNode( currentNode,  identity);
 	}
 
 	void SIG_Body::setGeometry (SIG_Geometry *geo)
