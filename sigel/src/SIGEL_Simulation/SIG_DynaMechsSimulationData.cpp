@@ -374,9 +374,9 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 
 	const QList< SIGEL_Robot::SIG_Joint * > rootJoints = rootLink->getJoints();
 
-	for (SIGEL_Robot::SIG_Joint *actJoint : rootJoints)
+	for (SIGEL_Robot::SIG_Joint *currentJoint : rootJoints)
 	{
-		SIG_DynaMechsLink *newDynaMechsLink = initializeJoint( actJoint, rootLink );
+		SIG_DynaMechsLink *newDynaMechsLink = initializeJoint( currentJoint, rootLink );
 
 		if (newDynaMechsLink)
 			dynaMechsRootLink->successors.append( newDynaMechsLink );
@@ -522,9 +522,9 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
 
 	const QList< SIGEL_Robot::SIG_Joint * > joints = link->getJoints();
 
-	for (SIGEL_Robot::SIG_Joint *actJoint : joints)
+	for (SIGEL_Robot::SIG_Joint *currentJoint : joints)
 	{
-		SIG_DynaMechsLink *newSuccessor = initializeJoint( actJoint, link );
+		SIG_DynaMechsLink *newSuccessor = initializeJoint( currentJoint, link );
 
 		if (newSuccessor)
 			dynaMechsLink->successors.append( newSuccessor );

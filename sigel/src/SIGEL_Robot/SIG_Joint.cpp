@@ -742,8 +742,8 @@ namespace SIGEL_Robot {
 
 		const QList< SIG_Joint * > joints = successor->getJoints();
 
-		for (SIG_Joint *actJoint : joints)
-			actJoint->calculateMDH( successor );
+		for (SIG_Joint *currentJoint : joints)
+			currentJoint->calculateMDH( successor );
 	}
 
 	void SIG_Joint::calculateCut( SIG_Vector a,

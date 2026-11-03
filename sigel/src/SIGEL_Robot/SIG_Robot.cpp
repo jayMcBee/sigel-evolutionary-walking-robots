@@ -270,8 +270,8 @@ namespace SIGEL_Robot {
 
 	  const QList< SIG_Joint * > rootJoints = rootlink->getJoints();
 
-	  for (SIG_Joint *actJoint : rootJoints)
-	    actJoint->calculateMDH( rootlink );
+	  for (SIG_Joint *currentJoint : rootJoints)
+	    currentJoint->calculateMDH( rootlink );
         }
 
         void SIG_Robot::writeToFileTransfer (QTextStream & tx) const
