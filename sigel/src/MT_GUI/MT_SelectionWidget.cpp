@@ -52,19 +52,19 @@ int MT_SelectionWidget::calculateTournamentSize(int pSize, int oSize, int oTSize
 		return oTSize;
 
 	intMap::Iterator it = tournamentSizeMap.begin();
-	int lastSize, lastDiff, actDiff;
+	int lastSize, lastDiff, currentDifference;
 
-	actDiff = abs( (it.value()) - oTSize);
+	currentDifference = abs( (it.value()) - oTSize);
 	do
 	{
-		lastDiff = actDiff;
+		lastDiff = currentDifference;
 		lastSize = it.value();
 		it++;
 		if(it == tournamentSizeMap.end())
 			break;
 
-		actDiff = abs( (it.value()) - oTSize);
-	} while( actDiff < lastDiff );
+		currentDifference = abs( (it.value()) - oTSize);
+	} while( currentDifference < lastDiff );
 
 	return lastSize;
 }
