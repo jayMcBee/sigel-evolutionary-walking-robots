@@ -218,8 +218,8 @@ void MT_PopulationWidget::slotRButtonClicked(const QPoint &pos)
  ***/
 void MT_PopulationWidget::slotSelectionChanged()
 {
-	QTreeWidgetItem *actItem = individualListView->currentItem();
-	if(individualListView->topLevelItemCount() != 1 && actItem && actItem->isSelected())
+	QTreeWidgetItem *currentItem = individualListView->currentItem();
+	if(individualListView->topLevelItemCount() != 1 && currentItem && currentItem->isSelected())
 	{
 		delIndAction->setEnabled(true);
 	}
@@ -402,8 +402,8 @@ void MT_PopulationWidget::exportAsPopulation(const QList<MT_PopListViewItem *> &
 	npop.changePopSize(0);
 	for(int i=0; i<selectedItems.count(); i++)
 	{
-		MT_PopListViewItem *actItem = selectedItems.at(i);
-		npop.addIndividual(population->getIndividual(actItem->getPos()));
+		MT_PopListViewItem *currentItem = selectedItems.at(i);
+		npop.addIndividual(population->getIndividual(currentItem->getPos()));
 	}
 
 	QTextStream str(&file);

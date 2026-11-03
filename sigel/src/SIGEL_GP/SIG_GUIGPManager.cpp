@@ -42,12 +42,12 @@ namespace SIGEL_GP
 
     while ( *listIter )
       {
-	SIGEL_MasterGUI::SIG_IndividualListItem *actItem =
+	SIGEL_MasterGUI::SIG_IndividualListItem *currentItem =
 	  static_cast<SIGEL_MasterGUI::SIG_IndividualListItem*>( (*listIter) );
 	// The items belong to the list view; individualItems does not own them.
-	if (actItem->poolPosition >= 0
-	    && actItem->poolPosition < individualItems.size())
-	  individualItems[ actItem->poolPosition ] = actItem;
+	if (currentItem->poolPosition >= 0
+	    && currentItem->poolPosition < individualItems.size())
+	  individualItems[ currentItem->poolPosition ] = currentItem;
 	++listIter;
       };
   }

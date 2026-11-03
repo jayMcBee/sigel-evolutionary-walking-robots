@@ -396,9 +396,9 @@ void MT_IndividualsWidget::slotChangeConstant( const QString &ntext )
 
 void MT_IndividualsWidget::slotSelectionChanged()
 {
-	int actItem = constantsListBox->currentRow();
+	int currentRow = constantsListBox->currentRow();
 
-	if( ( actItem != -1 ) && constantsListBox->item( actItem )->isSelected() )
+	if( ( currentRow != -1 ) && constantsListBox->item( currentRow )->isSelected() )
 	{
 		delConstAction->setEnabled( true );
 		editConstAction->setEnabled( true );
