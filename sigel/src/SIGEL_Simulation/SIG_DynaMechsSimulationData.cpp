@@ -157,14 +157,14 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 			// tJointSensor:
 		case SIGEL_Robot::SIG_Sensor::tJointSensor:
 		{
-			SIGEL_Robot::SIG_JointSensor *actSensor = static_cast< SIGEL_Robot::SIG_JointSensor* >(actSensorBase);
+			SIGEL_Robot::SIG_JointSensor *currentSensor = static_cast< SIGEL_Robot::SIG_JointSensor* >(actSensorBase);
 
-			SIGEL_Robot::SIG_Joint const *joint = actSensor->getJoint();
+			SIGEL_Robot::SIG_Joint const *joint = currentSensor->getJoint();
 
 			int linkNumber = jointIndices[ joint->getNumber() ];
 
 			if (dynaMechsLinks[ linkNumber ])
-			{	sensors[ actSensor->getNumber() ] = actSensor;
+			{	sensors[ currentSensor->getNumber() ] = currentSensor;
 			}
 			else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (1)" << Qt::endl;
 		}
@@ -173,11 +173,11 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 			// tPitchRollSensor
 		case SIGEL_Robot::SIG_Sensor::tPitchRollSensor:
 		{
-			SIGEL_Robot::SIG_PitchRollSensor *actSensor = static_cast< SIGEL_Robot::SIG_PitchRollSensor* >(actSensorBase);
-			SIGEL_Robot::SIG_Link const *link = actSensor->getLink();
+			SIGEL_Robot::SIG_PitchRollSensor *currentSensor = static_cast< SIGEL_Robot::SIG_PitchRollSensor* >(actSensorBase);
+			SIGEL_Robot::SIG_Link const *link = currentSensor->getLink();
 
 			if (dynaMechsLinks[ link->getNumber() ])
-			{	sensors[ actSensor->getNumber() ] = actSensor;
+			{	sensors[ currentSensor->getNumber() ] = currentSensor;
 			}
 			else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (2)" << Qt::endl;
 		}
@@ -186,11 +186,11 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 			// tContactSensor
 		case SIGEL_Robot::SIG_Sensor::tContactSensor:
 		{
-			SIGEL_Robot::SIG_ContactSensor *actSensor = static_cast< SIGEL_Robot::SIG_ContactSensor* >(actSensorBase);
-			SIGEL_Robot::SIG_Link const *link = actSensor->getLink();
+			SIGEL_Robot::SIG_ContactSensor *currentSensor = static_cast< SIGEL_Robot::SIG_ContactSensor* >(actSensorBase);
+			SIGEL_Robot::SIG_Link const *link = currentSensor->getLink();
 
 			if (dynaMechsLinks[ link->getNumber() ])
-			{	sensors[ actSensor->getNumber() ] = actSensor;
+			{	sensors[ currentSensor->getNumber() ] = currentSensor;
 			}
 			else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (3)" << Qt::endl;
 		}
