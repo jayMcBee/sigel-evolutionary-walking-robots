@@ -479,11 +479,11 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 			  << " hasn't an actual fitness value and will be evaluated." << Qt::endl;
 #endif
 
-			QList<int> *actFitTask = new QList<int>(2);
-			(*actFitTask)[0] = trainer->spawnTask(currentIndividual);
-			(*actFitTask)[1] = currentIndividual.getPoolPos();
+			QList<int> *currentFitnessTask = new QList<int>(2);
+			(*currentFitnessTask)[0] = trainer->spawnTask(currentIndividual);
+			(*currentFitnessTask)[1] = currentIndividual.getPoolPos();
 
-			fitTaskList.append( actFitTask );
+			fitTaskList.append( currentFitnessTask );
 		};
 	};
 
@@ -508,16 +508,16 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 		trainer->sweepToSpawn();
 		// One pass over fitTaskList, as in SIG_GPFitnessTrainer::sweepToSpawn.
 		qsizetype fitCur = fitTaskList.isEmpty() ? -1 : 0;
-		QList<int> *actFitTask = (fitCur < 0) ? nullptr : fitTaskList.at( fitCur );
+		QList<int> *currentFitnessTask = (fitCur < 0) ? nullptr : fitTaskList.at( fitCur );
 		QList<int> *prevFitTask = nullptr;
 
-		while (actFitTask)
+		while (currentFitnessTask)
 		{
-			double currentFitness = trainer->checkTask( (*actFitTask)[0] );
+			double currentFitness = trainer->checkTask( (*currentFitnessTask)[0] );
 
 #ifdef SIG_DEBUG
 			SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager checking task "
-			  << (*actFitTask)[0]
+			  << (*currentFitnessTask)[0]
 			  << ", has fitness "
 			  << currentFitness
 			  << "." << Qt::endl;
@@ -529,8 +529,8 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 				SIGEL_Tools::SIG_IO::cerr << "Fitness is ready." << Qt::endl;
 #endif
 
-				pop.getIndividual( (*actFitTask)[1] ).setFitness( currentFitness );
-				updateIndividualView( (*actFitTask)[1] );
+				pop.getIndividual( (*currentFitnessTask)[1] ).setFitness( currentFitness );
+				updateIndividualView( (*currentFitnessTask)[1] );
 
 				delete fitTaskList.takeAt( fitCur );
 				// Past the end: step back to the last task. That is prevFitTask, so the pass ends.
@@ -538,8 +538,8 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 				{
 					fitCur = fitTaskList.isEmpty() ? -1 : fitTaskList.size() - 1;
 				}
-				actFitTask = (fitCur < 0) ? nullptr : fitTaskList.at( fitCur );
-				if (actFitTask == prevFitTask)
+				currentFitnessTask = (fitCur < 0) ? nullptr : fitTaskList.at( fitCur );
+				if (currentFitnessTask == prevFitTask)
 				{
 					break;
 				}
@@ -550,15 +550,15 @@ void SIGEL_GP::SIG_GPManager::evalNewIndis()
 				SIGEL_Tools::SIG_IO::cerr << "Fitness is not yet ready." << Qt::endl;
 #endif
 
-				prevFitTask = actFitTask;
+				prevFitTask = currentFitnessTask;
 				if (fitCur < 0 || ++fitCur >= fitTaskList.size())
 				{
 					fitCur = -1;
-					actFitTask = nullptr;
+					currentFitnessTask = nullptr;
 				}
 				else
 				{
-					actFitTask = fitTaskList.at( fitCur );
+					currentFitnessTask = fitTaskList.at( fitCur );
 				}
 			};
 		};
@@ -1145,11 +1145,11 @@ void SIGEL_GP::SIG_GPManager::evaluateIndividualsForMetaClassifier()
 		// Only an individual that is not up to date and takes part in a tournament is evaluated.
 		if((!upToDate)&&(TournamentsParticipant[i]!=0))
 		{
-			QList<int> *actFitTask = new QList<int>(2);
-			(*actFitTask)[0] = trainer->spawnTask(currentIndividual);
-			(*actFitTask)[1] = currentIndividual.getPoolPos();
+			QList<int> *currentFitnessTask = new QList<int>(2);
+			(*currentFitnessTask)[0] = trainer->spawnTask(currentIndividual);
+			(*currentFitnessTask)[1] = currentIndividual.getPoolPos();
 
-			fitTaskList.append( actFitTask );
+			fitTaskList.append( currentFitnessTask );
 		};
 	};
 
@@ -1170,17 +1170,17 @@ void SIGEL_GP::SIG_GPManager::evaluateIndividualsForMetaClassifier()
 		trainer->sweepToSpawn();
 		// One pass over fitTaskList, as in SIG_GPFitnessTrainer::sweepToSpawn.
 		qsizetype fitCur = fitTaskList.isEmpty() ? -1 : 0;
-		QList<int> *actFitTask = (fitCur < 0) ? nullptr : fitTaskList.at( fitCur );
+		QList<int> *currentFitnessTask = (fitCur < 0) ? nullptr : fitTaskList.at( fitCur );
 		QList<int> *prevFitTask = nullptr;
 
-		while (actFitTask)
+		while (currentFitnessTask)
 		{
-			double currentFitness = trainer->checkTask( (*actFitTask)[0] );
+			double currentFitness = trainer->checkTask( (*currentFitnessTask)[0] );
 
 			if (currentFitness != -1)
 			{
-				pop.getIndividual( (*actFitTask)[1] ).setFitness( currentFitness );
-				updateIndividualView( (*actFitTask)[1] );
+				pop.getIndividual( (*currentFitnessTask)[1] ).setFitness( currentFitness );
+				updateIndividualView( (*currentFitnessTask)[1] );
 
 				delete fitTaskList.takeAt( fitCur );
 				// Past the end: step back to the last task. That is prevFitTask, so the pass ends.
@@ -1188,23 +1188,23 @@ void SIGEL_GP::SIG_GPManager::evaluateIndividualsForMetaClassifier()
 				{
 					fitCur = fitTaskList.isEmpty() ? -1 : fitTaskList.size() - 1;
 				}
-				actFitTask = (fitCur < 0) ? nullptr : fitTaskList.at( fitCur );
-				if (actFitTask == prevFitTask)
+				currentFitnessTask = (fitCur < 0) ? nullptr : fitTaskList.at( fitCur );
+				if (currentFitnessTask == prevFitTask)
 				{
 					break;
 				}
 			}
 			else
 			{
-				prevFitTask = actFitTask;
+				prevFitTask = currentFitnessTask;
 				if (fitCur < 0 || ++fitCur >= fitTaskList.size())
 				{
 					fitCur = -1;
-					actFitTask = nullptr;
+					currentFitnessTask = nullptr;
 				}
 				else
 				{
-					actFitTask = fitTaskList.at( fitCur );
+					currentFitnessTask = fitTaskList.at( fitCur );
 				}
 			};
 		};
