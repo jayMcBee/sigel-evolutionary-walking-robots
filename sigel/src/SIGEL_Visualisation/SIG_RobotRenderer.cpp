@@ -33,13 +33,13 @@ namespace SIGEL_Visualisation
   {
     for ( SIGEL_Robot::SIG_Link *linkPtr : robot.getLinks() )
       {
-	SIGEL_Robot::SIG_Link &actLink = *linkPtr;
+	SIGEL_Robot::SIG_Link &currentLink = *linkPtr;
 
-	int number = actLink.getNumber();
-	QString name = actLink.getName();
+	int number = currentLink.getNumber();
+	QString name = currentLink.getName();
 
 	SIG_VisualSceneObject *newSceneObject = new SIG_VisualSceneObject(number, name);
-	newSceneObject->setColor( actLink.getMaterial()->getColour() );
+	newSceneObject->setColor( currentLink.getMaterial()->getColour() );
 
 	delete sceneObjects[ number ];
 	sceneObjects[ number ] = newSceneObject;
@@ -57,15 +57,15 @@ namespace SIGEL_Visualisation
 
     for ( SIGEL_Robot::SIG_Link *linkPtr : robot.getLinks() )
       {
-	SIGEL_Robot::SIG_Link &actLink = *linkPtr;
+	SIGEL_Robot::SIG_Link &currentLink = *linkPtr;
 
-	int linkNumber = actLink.getNumber();
+	int linkNumber = currentLink.getNumber();
 	GLuint linkIndex = static_cast<GLuint>(linkNumber);
 	GLuint actListIndex = linkIndex + displayListsOffset;
 
 	glNewList(actListIndex, GL_COMPILE);
 
-	SIGEL_Robot::SIG_Geometry const *currentGeometry = actLink.getGeometry();
+	SIGEL_Robot::SIG_Geometry const *currentGeometry = currentLink.getGeometry();
 	SIGEL_Robot::SIG_GeometryIterator currentGeometryIterator(currentGeometry);
 
 	glFrontFace( GL_CCW );
@@ -107,7 +107,7 @@ namespace SIGEL_Visualisation
 
 	glEndList();
 
-	for ( const SIGEL_Robot::SIG_Link::NamedPoint &pointEntry : actLink.getPoints() )
+	for ( const SIGEL_Robot::SIG_Link::NamedPoint &pointEntry : currentLink.getPoints() )
 	  {
 	    GLuint pointIndex = static_cast<GLuint>( nextPointIndex );
 
@@ -131,7 +131,7 @@ namespace SIGEL_Visualisation
 
 	    newPointSceneObject->setFloatingText( newFloatingText );
 
-	    SIG_Vector linkColor = actLink.getMaterial()->getColour();
+	    SIG_Vector linkColor = currentLink.getMaterial()->getColour();
 
 	    for (int i=0; i<3; i++)
 	      {

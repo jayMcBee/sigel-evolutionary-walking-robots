@@ -241,18 +241,18 @@ namespace SIGEL_Visualisation
 
 		for ( SIGEL_Robot::SIG_Link *linkPtr : robot.getLinks() )
 		{
-			SIGEL_Robot::SIG_Link &actLink = *linkPtr;
+			SIGEL_Robot::SIG_Link &currentLink = *linkPtr;
 
-			int linkNumber = actLink.getNumber();
+			int linkNumber = currentLink.getNumber();
 
 			QString polygonDataString;
 			QTextStream polygonDataStream( &polygonDataString, QIODevice::WriteOnly );
 
 			stream << "#declare "
-			       << actLink.getName()
+			       << currentLink.getName()
 			       << " = mesh {\n";
 
-			SIGEL_Robot::SIG_Geometry const *currentGeometry = actLink.getGeometry();
+			SIGEL_Robot::SIG_Geometry const *currentGeometry = currentLink.getGeometry();
 			SIGEL_Robot::SIG_GeometryIterator currentGeometryIterator(currentGeometry);
 
 			while (currentGeometryIterator.valid())
@@ -284,11 +284,11 @@ namespace SIGEL_Visualisation
 				currentGeometryIterator.next();
 			};
 
-			for ( const SIGEL_Robot::SIG_Link::NamedPoint &pointEntry : actLink.getPoints() )
+			for ( const SIGEL_Robot::SIG_Link::NamedPoint &pointEntry : currentLink.getPoints() )
 			{
 				NEWMAT::ColumnVector pointPosition = SIG_TypeConverter::toColumnVector( *pointEntry.value );
 
-				NEWMAT::ColumnVector const linkColor = SIG_TypeConverter::toColumnVector( actLink.getMaterial()->getColour() );
+				NEWMAT::ColumnVector const linkColor = SIG_TypeConverter::toColumnVector( currentLink.getMaterial()->getColour() );
 
 				pointDataStream << "#declare "
 				                << pointEntry.name
@@ -303,7 +303,7 @@ namespace SIGEL_Visualisation
 			stream << polygonDataString
 			       << "\n"
 			       << "  texture { "
-			       << actLink.getMaterial()->getName()
+			       << currentLink.getMaterial()->getName()
 			       << "  }\n"
 			       << "}\n"
 			       << "\n";
