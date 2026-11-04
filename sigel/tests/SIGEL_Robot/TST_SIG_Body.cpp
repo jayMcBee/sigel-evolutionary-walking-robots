@@ -25,7 +25,6 @@
 
 #include "SIGEL_Robot/SIG_Body.h"
 #include "SIGEL_Robot/SIG_Geometry.h"
-#include "SIGEL_Robot/SIG_GeometryIterator.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Robot/SIG_VRMLFileError.h"
@@ -226,12 +225,10 @@ namespace {
   QList< QList< int > > faceIndices( const SIGEL_Robot::SIG_Geometry *geometry )
   {
     QList< QList< int > > faces;
-    SIGEL_Robot::SIG_GeometryIterator it( geometry );
-    while ( it ) {
-      const SIGEL_Robot::SIG_Polygon &polygon = it.iterate();
+    for ( const SIGEL_Robot::SIG_Polygon *polygon : geometry->getPolygons() ) {
       QList< int > face;
-      for ( int i = 0; i < polygon.getNumVertices(); i++ )
-        face.append( polygon.getVertexIndex( i ) );
+      for ( int i = 0; i < polygon->getNumVertices(); i++ )
+        face.append( polygon->getVertexIndex( i ) );
       faces.append( face );
     }
     return faces;
