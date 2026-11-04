@@ -139,6 +139,10 @@ public:
      */
     SIG_Vector getVertex (int i) const;
     /**
+     * Returns the list of polygons.
+     */
+    QList<SIG_Polygon *> const & getPolygons () const;
+    /**
      * getNumPolygons reports the number of polygons in
      * the geometry object.
      */

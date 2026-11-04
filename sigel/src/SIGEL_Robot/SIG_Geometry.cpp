@@ -104,6 +104,11 @@ namespace SIGEL_Robot
 		return *vertices.at (i);
 	}
 
+	QList<SIG_Polygon *> const & SIG_Geometry::getPolygons () const
+	{
+		return polygons;
+	}
+
 	int SIG_Geometry::getNumPolygons () const
 	{
 		return polygons.size ();
