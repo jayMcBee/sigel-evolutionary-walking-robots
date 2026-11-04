@@ -160,9 +160,9 @@ void SIGEL_RobotCheck::SIG_RobotStartPose::getExtent( int axis, double &lowest, 
   lowest = 0;
   highest = 0;
 
-  for ( SIGEL_Robot::SIG_Link *link : startRobot.getLinks() )
+  for ( const auto *link : startRobot.getLinks() )
     {
-      for ( SIG_Vector *vertex : link->getGeometry()->getVertices() )
+      for ( const auto *vertex : link->getGeometry()->getVertices() )
         {
           double coordinate = toWorld( link, *vertex ).get( axis );
           if ( first || coordinate < lowest )
