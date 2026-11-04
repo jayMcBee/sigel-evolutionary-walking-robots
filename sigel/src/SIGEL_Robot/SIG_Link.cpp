@@ -267,7 +267,7 @@ SIG_Geometry const *SIG_Link::getGeometry() const
 	return geometry.get();
 }
 
-void SIG_Link::getPhysics( double &m, SIG_Vector &com, SIG_Matrix &it )
+void SIG_Link::getPhysics( double &m, SIG_Vector &com, SIG_Matrix &it ) const
 {
 	mirtich->computePhysics( material->getDensity(), m, com, it );
 }

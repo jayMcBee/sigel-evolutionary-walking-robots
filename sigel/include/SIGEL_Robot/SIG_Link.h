@@ -100,7 +100,7 @@ namespace SIGEL_Robot
 
 		SIG_Geometry const *getGeometry() const;
 		SIG_Mirtich const *getMirtich() { return mirtich.get(); }
-		void getPhysics( double &m, SIG_Vector &com, SIG_Matrix &it );
+		void getPhysics( double &m, SIG_Vector &com, SIG_Matrix &it ) const;
 		void propagateInitialLocation( SIG_Link *comingfrom );
 		void setInitialLocation( SIG_Vector p, SIG_Matrix o, SIG_Link *comingfrom = nullptr );
 		void getInitialLocation( SIG_Vector &p, SIG_Matrix &o ) const;

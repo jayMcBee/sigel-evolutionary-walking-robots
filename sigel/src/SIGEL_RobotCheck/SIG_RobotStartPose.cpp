@@ -50,7 +50,7 @@ SIGEL_RobotCheck::SIG_RobotStartPose::SIG_RobotStartPose( const SIGEL_Robot::SIG
 
       startRobot.prepareDynaMechs();
 
-      for ( auto *link : startRobot.getLinks() )
+      for ( const auto *link : startRobot.getLinks() )
         {
           double mass;
           SIG_Vector centreOfMass;
