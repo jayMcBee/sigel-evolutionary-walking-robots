@@ -40,6 +40,7 @@
 #include "SIGEL_Program/TST_SIG_ProgramLine.h"
 #include "SIGEL_Robot/TST_SIG_Body.h"
 #include "SIGEL_Robot/TST_SIG_Drive.h"
+#include "SIGEL_Robot/TST_SIG_Geometry.h"
 #include "SIGEL_Robot/TST_SIG_LanguageParameters.h"
 #include "SIGEL_Robot/TST_SIG_Link.h"
 #include "SIGEL_Robot/TST_SIG_Material.h"
@@ -83,6 +84,7 @@ int main( int argc, char *argv[] ) {
   testClasses.push_back( std::make_unique<SIGEL_Program::TST_SIG_ProgramLine>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Body>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Drive>() );
+  testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Geometry>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_LanguageParameters>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Link>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Material>() );
