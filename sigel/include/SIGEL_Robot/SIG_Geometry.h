@@ -110,6 +110,8 @@ public:
      * getOrAddVertex searches for the vertex and hands out
      * its index. If the vertex cannot be found, it will be
      * added and the new index will be returned.
+     * A vertex matches only if all three coordinates are
+     * exactly equal.
      *
      * Since the array of vertices has to be searched,
      * this is a potentially expensive function. But once
@@ -131,11 +133,6 @@ public:
     int getNumVertices () const;
     /**
      * Returns the ith vertex of the geometry.
-     *
-     * Points in space
-     * are considered the same point if the absolute value of
-     * their distance is smaller
-     * than the zero defined in the implementation.
      */
     SIG_Vector getVertex (int i) const;
     /**
