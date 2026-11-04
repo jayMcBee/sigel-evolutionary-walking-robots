@@ -6,6 +6,8 @@
 #include <QLabel>
 #include <QSpinBox>
 
+#include <algorithm>
+
 MT_SelectionWidget::MT_SelectionWidget(QWidget* parent, const char* name, Qt::WindowFlags fl)
 : MT_SelectionWidgetBase(parent, name, fl), MT_WidgetBase(parent)
 {
@@ -44,29 +46,15 @@ void MT_SelectionWidget::updateTSizeList(int pSize, int oSize)
  ***/
 int MT_SelectionWidget::calculateTournamentSize(int pSize, int oSize, int oTSize)
 {
-	typedef QMap<int,int> intMap;
-
 	updateTSizeList(pSize, oSize);
 
-	if(tournamentSizeMap.contains(oTSize))
-		return oTSize;
-
-	intMap::Iterator it = tournamentSizeMap.begin();
-	int lastSize, lastDiff, currentDifference;
-
-	currentDifference = abs( (it.value()) - oTSize);
-	do
-	{
-		lastDiff = currentDifference;
-		lastSize = it.value();
-		it++;
-		if(it == tournamentSizeMap.end())
-			break;
-
-		currentDifference = abs( (it.value()) - oTSize);
-	} while( currentDifference < lastDiff );
-
-	return lastSize;
+	// a still valid old size has distance 0 and wins
+	QList<int> sizes = tournamentSizeMap.keys();
+	return *std::min_element( sizes.begin(), sizes.end(),
+		[oTSize]( int left, int right )
+		{
+			return abs( left - oTSize ) < abs( right - oTSize );
+		} );
 }
 
 void MT_SelectionWidget::onShow(MT_GPManager *manager, MT_EstimationState *estimationState)
@@ -179,22 +167,11 @@ void MT_SelectionWidget::slotOverProdChanged(int nvalue)
 	int poolSize = parentSize * nvalue;
 
 	int oldTournamentSize = tournamentSizeComboBox->currentText().toInt();
-	updateTSizeList(parentSize, poolSize);
 	int tournamentSize = calculateTournamentSize(parentSize, poolSize, oldTournamentSize);
 
 	QObject::disconnect(tournamentSizeComboBox, SIGNAL(textActivated(const QString&)), this, SLOT(slotTournamentSizeChanged(const QString&)));
 
-	if(tournamentSizeMap.contains(tournamentSize))
-	{
-		int index = tournamentSizeMap.find(tournamentSize).value();
-		tournamentSizeComboBox->setCurrentIndex(index);
-	}
-	else
-	{
-		tournamentSizeComboBox->setCurrentIndex(0);
-	}
-
-	tournamentSize = tournamentSizeComboBox->currentText().toInt();
+	tournamentSizeComboBox->setCurrentIndex( tournamentSizeMap.value( tournamentSize ) );
 
 	int tournamentCount = poolSize / tournamentSize;
 	poolSizeLabel->setText(QString::number(poolSize));
