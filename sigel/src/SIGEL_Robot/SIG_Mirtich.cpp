@@ -218,11 +218,11 @@ namespace SIGEL_Robot {
                         p.verts [i][Z] = v.get (Z);
                 }
 
-                SIG_GeometryIterator it (geom);
-                for (int k = 0; (k < p.numFaces) && it; k++) {
+                QList<SIG_Polygon *> const & polygons = geom->getPolygons ();
+                for (int k = 0; k < p.numFaces; k++) {
                         p.faces [k].poly = &p;
                         
-                        SIG_Polygon const & pl = it.iterate ();
+                        SIG_Polygon const & pl = *polygons [k];
                         int numv = pl.getNumVertices ();
                         p.faces [k].numVerts = numv;
                         p.faces [k].verts.resize (numv);

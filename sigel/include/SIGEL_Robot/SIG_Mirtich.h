@@ -28,7 +28,6 @@ namespace SIGEL_Robot { class SIG_Mirtich; }
 #include <math.h>
 #include "SIGEL_Tools/SIG_Vector.h"
 #include "SIGEL_Robot/SIG_Geometry.h"
-#include "SIGEL_Robot/SIG_GeometryIterator.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
 
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
