@@ -41,7 +41,7 @@ SIGEL_RobotCheck::SIG_RobotStartPose::SIG_RobotStartPose( const SIGEL_Robot::SIG
   try
     {
       // The simulation ends the program on any other kind of joint.
-      for ( SIGEL_Robot::SIG_Joint *joint : startRobot.getJoints() )
+      for ( const auto *joint : startRobot.getJoints() )
         {
           if (    joint->getJointType() != SIGEL_Robot::SIG_Joint::tRotationalJoint
                && joint->getJointType() != SIGEL_Robot::SIG_Joint::tTranslationalJoint )
@@ -50,7 +50,7 @@ SIGEL_RobotCheck::SIG_RobotStartPose::SIG_RobotStartPose( const SIGEL_Robot::SIG
 
       startRobot.prepareDynaMechs();
 
-      for ( SIGEL_Robot::SIG_Link *link : startRobot.getLinks() )
+      for ( auto *link : startRobot.getLinks() )
         {
           double mass;
           SIG_Vector centreOfMass;
