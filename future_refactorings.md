@@ -135,6 +135,11 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 4 · The interface
 
+- [ ] **186. Remove the `const char *name` constructor parameter from the GUI
+  classes.** It is a Qt 3 leftover; Qt 6 widgets have no such argument. Each
+  `*Base` class passes it on to `setObjectName`, and the object names are in
+  use, for example in the GUI behaviour baseline.
+
 - [ ] **107. Review `SIG_GPPopulation::readFromFile` with the maintainer,**
   deciding each change before it is made. The method is long and hard to
   read.
