@@ -23,7 +23,6 @@
 */
 #include "SIGEL_RobotCheck/SIG_RobotStartPose.h"
 
-#include "SIGEL_Robot/SIG_GeometryIterator.h"
 #include "SIGEL_Robot/SIG_Joint.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Simulation/SIG_DynaMechsSimulationQueries.h"
@@ -141,17 +140,14 @@ SIGEL_RobotCheck::SIG_LinkVolume SIGEL_RobotCheck::SIG_RobotStartPose::getLinkVo
 {
   SIG_LinkVolume volume;
 
-  SIGEL_Robot::SIG_GeometryIterator polygons( link->getGeometry() );
-  while ( polygons )
+  for ( const auto *polygon : link->getGeometry()->getPolygons() )
     {
-      const SIGEL_Robot::SIG_Polygon &polygon = polygons.iterate();
-
       // A polygon with more than three corners becomes a fan of triangles.
-      for ( int i = 2; i < polygon.getNumVertices(); i++ )
+      for ( int i = 2; i < polygon->getNumVertices(); i++ )
         {
-          volume.addTriangle( toWorld( link, polygon.getVertex( 0 ) ),
-                              toWorld( link, polygon.getVertex( i - 1 ) ),
-                              toWorld( link, polygon.getVertex( i ) ) );
+          volume.addTriangle( toWorld( link, polygon->getVertex( 0 ) ),
+                              toWorld( link, polygon->getVertex( i - 1 ) ),
+                              toWorld( link, polygon->getVertex( i ) ) );
         }
     }
 
