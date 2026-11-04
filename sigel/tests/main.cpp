@@ -47,6 +47,7 @@
 #include "SIGEL_Robot/TST_SIG_Mirtich.h"
 #include "SIGEL_Robot/TST_SIG_Robot.h"
 #include "SIGEL_Robot/TST_SIG_VRMLUtils.h"
+#include "SIGEL_RobotCheck/TST_SIG_RobotStartPose.h"
 #include "SIGEL_Simulation/TST_SIG_DynaMechsSimulationData.h"
 #include "SIGEL_Simulation/TST_SIG_Interpreter.h"
 #include "SIGEL_Simulation/TST_SIG_Register.h"
@@ -92,6 +93,7 @@ int main( int argc, char *argv[] ) {
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Mirtich>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_Robot>() );
   testClasses.push_back( std::make_unique<SIGEL_Robot::TST_SIG_VRMLUtils>() );
+  testClasses.push_back( std::make_unique<SIGEL_RobotCheck::TST_SIG_RobotStartPose>() );
   testClasses.push_back( std::make_unique<SIGEL_Simulation::TST_SIG_DynaMechsSimulationData>() );
   testClasses.push_back( std::make_unique<SIGEL_Simulation::TST_SIG_Interpreter>() );
   testClasses.push_back( std::make_unique<SIGEL_Simulation::TST_SIG_Register>() );
