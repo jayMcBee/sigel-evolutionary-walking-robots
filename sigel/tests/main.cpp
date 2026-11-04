@@ -25,6 +25,7 @@
 #include "MT_GPSystem/TST_MT_Randomizer.h"
 #include "MT_GPSystem/TST_MT_Search.h"
 #include "MT_GUI/TST_MT_EstimationWidget.h"
+#include "MT_GUI/TST_MT_SelectionWidget.h"
 #include "SIGEL_CommonGUI/TST_SIG_WidgetUtils.h"
 #include "SIGEL_Environment/TST_SIG_Terrain.h"
 #include "SIGEL_GP/TST_SIG_GPExperiment.h"
@@ -67,6 +68,7 @@ int main( int argc, char *argv[] ) {
   testClasses.push_back( std::make_unique<TST_MT_Randomizer>() );
   testClasses.push_back( std::make_unique<TST_MT_Search>() );
   testClasses.push_back( std::make_unique<TST_MT_EstimationWidget>() );
+  testClasses.push_back( std::make_unique<TST_MT_SelectionWidget>() );
   testClasses.push_back( std::make_unique<SIGEL_CommonGUI::TST_SIG_WidgetUtils>() );
   testClasses.push_back( std::make_unique<SIGEL_Environment::TST_SIG_Terrain>() );
   testClasses.push_back( std::make_unique<SIGEL_GP::TST_SIG_GPExperiment>() );
