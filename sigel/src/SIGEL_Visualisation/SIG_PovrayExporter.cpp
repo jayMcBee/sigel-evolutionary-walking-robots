@@ -252,20 +252,15 @@ namespace SIGEL_Visualisation
 			       << currentLink.getName()
 			       << " = mesh {\n";
 
-			SIGEL_Robot::SIG_Geometry const *currentGeometry = currentLink.getGeometry();
-			SIGEL_Robot::SIG_GeometryIterator currentGeometryIterator(currentGeometry);
-
-			while (currentGeometryIterator.valid())
+			for ( const auto *currentPolygon : currentLink.getGeometry()->getPolygons() )
 			{
-				SIGEL_Robot::SIG_Polygon const &currentPolygon = currentGeometryIterator.current();
+				NEWMAT::ColumnVector firstVertex = SIG_TypeConverter::toColumnVector( currentPolygon->getVertex( 0 ) );
 
-				NEWMAT::ColumnVector firstVertex = SIG_TypeConverter::toColumnVector( currentPolygon.getVertex( 0 ) );
+				NEWMAT::ColumnVector secondVertex = SIG_TypeConverter::toColumnVector( currentPolygon->getVertex( 1 ) );
 
-				NEWMAT::ColumnVector secondVertex = SIG_TypeConverter::toColumnVector( currentPolygon.getVertex( 1 ) );
-
-				for ( int i=2; i < currentPolygon.getNumVertices(); i++ )
+				for ( int i=2; i < currentPolygon->getNumVertices(); i++ )
 				{
-					NEWMAT::ColumnVector thirdVertex = SIG_TypeConverter::toColumnVector( currentPolygon.getVertex( i ) );
+					NEWMAT::ColumnVector thirdVertex = SIG_TypeConverter::toColumnVector( currentPolygon->getVertex( i ) );
 
 					polygonDataStream << "  triangle {\n";
 
@@ -280,8 +275,6 @@ namespace SIGEL_Visualisation
 
 					secondVertex = thirdVertex;
 				};
-
-				currentGeometryIterator.next();
 			};
 
 			for ( const SIGEL_Robot::SIG_Link::NamedPoint &pointEntry : currentLink.getPoints() )
