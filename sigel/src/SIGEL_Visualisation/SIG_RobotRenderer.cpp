@@ -65,18 +65,13 @@ namespace SIGEL_Visualisation
 
 	glNewList(currentListIndex, GL_COMPILE);
 
-	SIGEL_Robot::SIG_Geometry const *currentGeometry = currentLink.getGeometry();
-	SIGEL_Robot::SIG_GeometryIterator currentGeometryIterator(currentGeometry);
-
 	glFrontFace( GL_CCW );
 
-	while (currentGeometryIterator.valid())
+	for ( const auto *currentPolygon : currentLink.getGeometry()->getPolygons() )
 	  {
-	    SIGEL_Robot::SIG_Polygon const &currentPolygon = currentGeometryIterator.current();
-
-	    SIG_Vector vertex0 = currentPolygon.getVertex( 0 );
-	    SIG_Vector vertex1 = currentPolygon.getVertex( 1 );
-	    SIG_Vector vertex2 = currentPolygon.getVertex( 2 );
+	    SIG_Vector vertex0 = currentPolygon->getVertex( 0 );
+	    SIG_Vector vertex1 = currentPolygon->getVertex( 1 );
+	    SIG_Vector vertex2 = currentPolygon->getVertex( 2 );
 
 	    SIG_Vector u = vertex0;
 	    u.minusis( &vertex1 );
@@ -93,21 +88,19 @@ namespace SIGEL_Visualisation
 			static_cast<GLfloat>( polygonNormal.get(2) ) );
 
 	    glBegin(GL_POLYGON);
-	    for (int i=0; i<currentPolygon.getNumVertices(); i++)
+	    for (int i=0; i<currentPolygon->getNumVertices(); i++)
 	      {
-		SIG_Vector currentVertex = currentPolygon.getVertex(i);
+		SIG_Vector currentVertex = currentPolygon->getVertex(i);
 		glVertex3d( static_cast<GLdouble>(currentVertex.get(0)),
 			    static_cast<GLdouble>(currentVertex.get(1)),
 			    static_cast<GLdouble>(currentVertex.get(2)) );
 	      };
 	    glEnd();
-
-	    currentGeometryIterator.next();
 	  };
 
 	glEndList();
 
-	for ( const SIGEL_Robot::SIG_Link::NamedPoint &pointEntry : currentLink.getPoints() )
+	for ( const auto &pointEntry : currentLink.getPoints() )
 	  {
 	    GLuint pointIndex = static_cast<GLuint>( nextPointIndex );
 
