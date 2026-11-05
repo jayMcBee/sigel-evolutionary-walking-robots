@@ -277,7 +277,7 @@ namespace SIGEL_Visualisation
 				};
 			};
 
-			for ( const SIGEL_Robot::SIG_Link::NamedPoint &pointEntry : currentLink.getPoints() )
+			for ( const auto &pointEntry : currentLink.getPoints() )
 			{
 				NEWMAT::ColumnVector pointPosition = SIG_TypeConverter::toColumnVector( *pointEntry.value );
 
