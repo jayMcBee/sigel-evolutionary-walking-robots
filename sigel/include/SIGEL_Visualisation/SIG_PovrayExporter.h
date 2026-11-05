@@ -72,7 +72,7 @@ namespace SIGEL_Visualisation
 		QStringList vertices;
 
 		/** The index in vertices of each vertex text. */
-		QHash< QString, int > vertexIndices;
+		QHash<QString, int> vertexIndices;
 
 		/** The triangles as vertex indices, each as POV-Ray text. */
 		QStringList faces;
@@ -136,7 +136,7 @@ namespace SIGEL_Visualisation
 		static constexpr float groundReach = 65536;
 
 		/** The distances from an edge at which the ground past it is cut into cells. */
-		static QList< float > outwardSteps();
+		static QList<float> outwardSteps();
 
 		/** Adds the ground past the edge from 'from' to 'to', in the direction 'outward'. */
 		static void edgeStrip( SIG_PovrayMesh &mesh, QVector3D from, QVector3D to, QVector3D outward );
