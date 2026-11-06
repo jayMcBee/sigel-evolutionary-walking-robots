@@ -27,172 +27,176 @@ using namespace SIGEL_Tools;
 namespace SIGEL_Visualisation
 {
 
-  SIG_RobotRenderer::SIG_RobotRenderer(SIGEL_Robot::SIG_Robot const &robot)
-    : SIG_Renderer( robot.getLinks().size() + robot.getNrOfPoints(), robot.getNrOfPoints() ),
-      robot(robot)
-  {
-    for ( SIGEL_Robot::SIG_Link *linkPtr : robot.getLinks() )
-      {
-	SIGEL_Robot::SIG_Link &currentLink = *linkPtr;
+SIG_RobotRenderer::SIG_RobotRenderer( SIGEL_Robot::SIG_Robot const &robot )
+	: SIG_Renderer( robot.getLinks().size() + robot.getNrOfPoints(), robot.getNrOfPoints() ),
+	  robot( robot )
+{
+	for( SIGEL_Robot::SIG_Link *linkPtr : robot.getLinks() )
+	{
+		SIGEL_Robot::SIG_Link &currentLink = *linkPtr;
 
-	int number = currentLink.getNumber();
-	QString name = currentLink.getName();
+		int number = currentLink.getNumber();
+		QString name = currentLink.getName();
 
-	SIG_VisualSceneObject *newSceneObject = new SIG_VisualSceneObject(number, name);
-	newSceneObject->setColor( currentLink.getMaterial()->getColour() );
+		SIG_VisualSceneObject *newSceneObject = new SIG_VisualSceneObject( number, name );
+		newSceneObject->setColor( currentLink.getMaterial()->getColour() );
 
-	delete sceneObjects[ number ];
-	sceneObjects[ number ] = newSceneObject;
-      };
+		delete sceneObjects[number];
+		sceneObjects[number] = newSceneObject;
+	}
 
-    buildDisplayLists();
+	buildDisplayLists();
 
-    setPointsVisible( false );
-  }
+	setPointsVisible( false );
+}
 
-  void SIG_RobotRenderer::buildDisplayLists()
-  {
-    int nextPointIndex = robot.getLinks().size();
-    int nextFloatingIndex = 0;
+void SIG_RobotRenderer::buildDisplayLists()
+{
+	int nextPointIndex = robot.getLinks().size();
+	int nextFloatingIndex = 0;
 
-    for ( SIGEL_Robot::SIG_Link *linkPtr : robot.getLinks() )
-      {
-	SIGEL_Robot::SIG_Link &currentLink = *linkPtr;
+	for( SIGEL_Robot::SIG_Link *linkPtr : robot.getLinks() )
+	{
+		SIGEL_Robot::SIG_Link &currentLink = *linkPtr;
 
-	int linkNumber = currentLink.getNumber();
-	GLuint linkIndex = static_cast<GLuint>(linkNumber);
-	GLuint currentListIndex = linkIndex + displayListsOffset;
+		int linkNumber = currentLink.getNumber();
+		GLuint linkIndex = static_cast<GLuint>( linkNumber );
+		GLuint currentListIndex = linkIndex + displayListsOffset;
 
-	glNewList(currentListIndex, GL_COMPILE);
+		glNewList( currentListIndex, GL_COMPILE );
 
-	glFrontFace( GL_CCW );
+		glFrontFace( GL_CCW );
 
-	for ( const auto *currentPolygon : currentLink.getGeometry()->getPolygons() )
-	  {
-	    SIG_Vector vertex0 = currentPolygon->getVertex( 0 );
-	    SIG_Vector vertex1 = currentPolygon->getVertex( 1 );
-	    SIG_Vector vertex2 = currentPolygon->getVertex( 2 );
+		for( const auto *currentPolygon : currentLink.getGeometry()->getPolygons() )
+		{
+			SIG_Vector vertex0 = currentPolygon->getVertex( 0 );
+			SIG_Vector vertex1 = currentPolygon->getVertex( 1 );
+			SIG_Vector vertex2 = currentPolygon->getVertex( 2 );
 
-	    SIG_Vector u = vertex0;
-	    u.minusis( &vertex1 );
+			SIG_Vector u = vertex0;
+			u.minusis( &vertex1 );
 
-	    SIG_Vector v = vertex2;
-	    v.minusis( &vertex1 );
+			SIG_Vector v = vertex2;
+			v.minusis( &vertex1 );
 
-	    SIG_Vector polygonNormal;
+			SIG_Vector polygonNormal;
 
-	    v.crossprod( &u, &polygonNormal );
+			v.crossprod( &u, &polygonNormal );
 
-	    glNormal3f( static_cast<GLfloat>( polygonNormal.get(0) ),
-			static_cast<GLfloat>( polygonNormal.get(1) ),
-			static_cast<GLfloat>( polygonNormal.get(2) ) );
+			glNormal3f( static_cast<GLfloat>( polygonNormal.get( 0 ) ),
+			            static_cast<GLfloat>( polygonNormal.get( 1 ) ),
+			            static_cast<GLfloat>( polygonNormal.get( 2 ) ) );
 
-	    glBegin(GL_POLYGON);
-	    for (int i=0; i<currentPolygon->getNumVertices(); i++)
-	      {
-		SIG_Vector currentVertex = currentPolygon->getVertex(i);
-		glVertex3d( static_cast<GLdouble>(currentVertex.get(0)),
-			    static_cast<GLdouble>(currentVertex.get(1)),
-			    static_cast<GLdouble>(currentVertex.get(2)) );
-	      };
-	    glEnd();
-	  };
+			glBegin( GL_POLYGON );
+			for( int i = 0; i < currentPolygon->getNumVertices(); i++ )
+			{
+				SIG_Vector currentVertex = currentPolygon->getVertex( i );
+				glVertex3d( static_cast<GLdouble>( currentVertex.get( 0 ) ),
+				            static_cast<GLdouble>( currentVertex.get( 1 ) ),
+				            static_cast<GLdouble>( currentVertex.get( 2 ) ) );
+			}
+			glEnd();
+		}
 
-	glEndList();
+		glEndList();
 
-	for ( const auto &pointEntry : currentLink.getPoints() )
-	  {
-	    GLuint pointIndex = static_cast<GLuint>( nextPointIndex );
+		for( const auto &pointEntry : currentLink.getPoints() )
+		{
+			GLuint pointIndex = static_cast<GLuint>( nextPointIndex );
 
-	    GLuint currentListIndex = pointIndex + displayListsOffset;
+			GLuint currentListIndex = pointIndex + displayListsOffset;
 
-	    SIG_Vector pointPosition = *pointEntry.value;
+			SIG_Vector pointPosition = *pointEntry.value;
 
-	    glNewList( currentListIndex, GL_COMPILE );
-	    glPointSize( 5 );
-	    glBegin( GL_POINTS );
-	    glVertex3d( static_cast<GLdouble>(pointPosition.get(0)),
-			static_cast<GLdouble>(pointPosition.get(1)),
-			static_cast<GLdouble>(pointPosition.get(2)) );
-	    glEnd();
-	    glEndList();
+			glNewList( currentListIndex, GL_COMPILE );
+			glPointSize( 5 );
+			glBegin( GL_POINTS );
+			glVertex3d( static_cast<GLdouble>( pointPosition.get( 0 ) ),
+			            static_cast<GLdouble>( pointPosition.get( 1 ) ),
+			            static_cast<GLdouble>( pointPosition.get( 2 ) ) );
+			glEnd();
+			glEndList();
 
-	    SIG_VisualSceneObject *newPointSceneObject = new SIG_VisualSceneObject( linkNumber,
-										    pointEntry.name );
+			SIG_VisualSceneObject *newPointSceneObject = new SIG_VisualSceneObject( linkNumber,
+			                                                                        pointEntry.name );
 
-	    SIG_FloatingText *newFloatingText = new SIG_FloatingText( 0, 0, pointEntry.name );
+			SIG_FloatingText *newFloatingText = new SIG_FloatingText( 0, 0, pointEntry.name );
 
-	    newPointSceneObject->setFloatingText( newFloatingText );
+			newPointSceneObject->setFloatingText( newFloatingText );
 
-	    SIG_Vector linkColor = currentLink.getMaterial()->getColour();
+			SIG_Vector linkColor = currentLink.getMaterial()->getColour();
 
-	    for (int i=0; i<3; i++)
-	      {
-		double newValue = linkColor.get(i) - 0.3;
-		newValue = ( newValue < 0 ) ? 0 : newValue;
-		linkColor.set( i, newValue );
-	      };
+			for( int i = 0; i < 3; i++ )
+			{
+				double newValue = linkColor.get( i ) - 0.3;
+				newValue = ( newValue < 0 ) ? 0 : newValue;
+				linkColor.set( i, newValue );
+			}
 
-	    newPointSceneObject->setColor( linkColor );
+			newPointSceneObject->setColor( linkColor );
 
-	    delete sceneObjects[ nextPointIndex ];
-	    sceneObjects[ nextPointIndex ] = newPointSceneObject;
+			delete sceneObjects[nextPointIndex];
+			sceneObjects[nextPointIndex] = newPointSceneObject;
 
-	    delete floatingTexts[ nextFloatingIndex ];
-	    floatingTexts[ nextFloatingIndex ] = newFloatingText;
+			delete floatingTexts[nextFloatingIndex];
+			floatingTexts[nextFloatingIndex] = newFloatingText;
 
-	    nextPointIndex++;
-	    nextFloatingIndex++;
-	  };
-      };
-  }
+			nextPointIndex++;
+			nextFloatingIndex++;
+		}
+	}
+}
 
-  void SIG_RobotRenderer::render()
-  {
-    renderLinks();
-    renderPoints();
-  }
+void SIG_RobotRenderer::render()
+{
+	renderLinks();
+	renderPoints();
+}
 
-  void SIG_RobotRenderer::renderLinks()
-  {
-    renderSceneObjects( 0, static_cast<GLuint>(robot.getLinks().size()) );
-  }
+void SIG_RobotRenderer::renderLinks()
+{
+	renderSceneObjects( 0, static_cast<GLuint>( robot.getLinks().size() ) );
+}
 
-  void SIG_RobotRenderer::renderPoints()
-  {
-    renderSceneObjects( static_cast<GLuint>(robot.getLinks().size()), noOfObjects );
+void SIG_RobotRenderer::renderPoints()
+{
+	renderSceneObjects( static_cast<GLuint>( robot.getLinks().size() ), noOfObjects );
 
-    for (GLuint i=static_cast<GLuint>(robot.getLinks().size()); i<noOfObjects; i++)
-      {
-	QList< GLfloat > buffer( 3 );
-	buffer.fill( 0 );
+	for( GLuint i = static_cast<GLuint>( robot.getLinks().size() ); i < noOfObjects; i++ )
+	{
+		QList<GLfloat> buffer( 3 );
+		buffer.fill( 0 );
 
-	glFeedbackBuffer( 3, GL_2D, buffer.data() );
-	glRenderMode(GL_FEEDBACK);
+		glFeedbackBuffer( 3, GL_2D, buffer.data() );
+		glRenderMode( GL_FEEDBACK );
 
-	glPushMatrix();
-	sceneObjects[i]->applyTransformation();
+		glPushMatrix();
+		sceneObjects[i]->applyTransformation();
 
-	glCallList( displayListsOffset + i );
-	glPopMatrix();
+		glCallList( displayListsOffset + i );
+		glPopMatrix();
 
-	glRenderMode(GL_RENDER);
+		glRenderMode( GL_RENDER );
 
-	if ( buffer[0] == GL_POINT_TOKEN )
-	  {
-	    sceneObjects[i]->getFloatingText()->rendered = true;
-	    sceneObjects[i]->getFloatingText()->xPos = static_cast<int>( buffer[1] );
-	    sceneObjects[i]->getFloatingText()->yPos = static_cast<int>( buffer[2] );
-	  }
-	else
-	  sceneObjects[i]->getFloatingText()->rendered = false;
-      };
-  }
+		if( buffer[0] == GL_POINT_TOKEN )
+		{
+			sceneObjects[i]->getFloatingText()->rendered = true;
+			sceneObjects[i]->getFloatingText()->xPos = static_cast<int>( buffer[1] );
+			sceneObjects[i]->getFloatingText()->yPos = static_cast<int>( buffer[2] );
+		}
+		else
+		{
+			sceneObjects[i]->getFloatingText()->rendered = false;
+		}
+	}
+}
 
-  void SIG_RobotRenderer::setPointsVisible( bool visible )
-  {
-    for (int i = robot.getLinks().size(); i < noOfObjects; i++ )
-      sceneObjects[i]->setVisible( visible );
-  }
+void SIG_RobotRenderer::setPointsVisible( bool visible )
+{
+	for( int i = robot.getLinks().size(); i < noOfObjects; i++ )
+	{
+		sceneObjects[i]->setVisible( visible );
+	}
+}
 
 }
