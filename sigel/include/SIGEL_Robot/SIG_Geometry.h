@@ -31,7 +31,6 @@ namespace SIGEL_Robot { class SIG_Geometry; }
 #include "SIGEL_Tools/SIG_Matrix.h"
 #include "SIGEL_Robot/SIG_Robot.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
-#include "SIGEL_Robot/SIG_GeometryIterator.h"
 #include "SIGEL_Robot/SIG_Body.h"
 
 namespace SIGEL_Robot {
@@ -47,7 +46,6 @@ namespace SIGEL_Robot {
    * to the polygon using addVertex.
    */
   class SIG_Geometry {
-    friend class SIG_GeometryIterator;
     friend class SIG_Polygon;
   private:
     // Neither list may hold a null: the SIG_DynaMechsLink constructor
@@ -70,13 +68,6 @@ public:
      * This is used by SIG_Polygon to add itself to the geometry.
      */
     void addPolygon (SIG_Polygon *p);
-    /**
-     * Returns a polygon.
-     *
-     * This is used by the SIG_GeometryIterator class to
-     * get the polygons it iterates over.
-     */
-    SIG_Polygon const *getPolygon (int i) const;
 
   public:
     /**

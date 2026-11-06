@@ -32,11 +32,6 @@ namespace SIGEL_Robot
 		polygons.append (p);
 	}
 
-	SIG_Polygon const *SIG_Geometry::getPolygon (int i) const
-	{
-		return polygons [i];
-	}
-
 	SIG_Geometry::SIG_Geometry ()
 	{
 	}

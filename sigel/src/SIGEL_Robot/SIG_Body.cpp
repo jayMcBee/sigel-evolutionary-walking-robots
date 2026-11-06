@@ -22,7 +22,6 @@
 */
 #include "SIGEL_Robot/SIG_Body.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
-#include "SIGEL_Robot/SIG_GeometryIterator.h"
 #include <QList>
 #include "SIGEL_Tools/SIG_FileUtils.h"
 #include "SIGEL_Robot/SIG_VRMLUtils.h"
