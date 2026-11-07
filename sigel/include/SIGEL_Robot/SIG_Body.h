@@ -65,7 +65,7 @@ namespace SIGEL_Robot
 		/**
 		 * Nonstandard standard constructor.
 		 */
-		SIG_Body( SIG_Robot *par, QString f, QString d );
+		SIG_Body( SIG_Robot *parent, QString geometryFile, QString directory );
 
 		/**
 		 * Unstreaming constructor.

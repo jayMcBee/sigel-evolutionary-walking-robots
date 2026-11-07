@@ -29,10 +29,10 @@
 namespace SIGEL_Robot
 {
 
-	SIG_Body::SIG_Body( SIG_Robot *par, QString f, QString d )
-		: parent( par ),
-		  geometryFile( f ),
-		  directory( d ),
+	SIG_Body::SIG_Body( SIG_Robot *parent, QString geometryFile, QString directory )
+		: parent( parent ),
+		  geometryFile( geometryFile ),
+		  directory( directory ),
 		  geometry( nullptr )
 	{
 	}
