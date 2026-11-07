@@ -220,10 +220,19 @@ found a real defect.** §0 has the rule; it is not optional.
   this document or its siblings, a decision number, a step, a test program or
   script, a review, the oracle, a date, or the deleted shim. This document cites
   SIGEL code by file and function name; SIGEL code never cites this document.
-- When adding a unit test, break the code it covers and confirm that the test
-  fails. Nine assertions have passed on broken code. *This rule was written
-  for the shim self-check, deleted in D27; it applies unchanged to the unit
-  tests in `sigel/tests/`.*
+- **Unit tests in `sigel/tests/` state correct behaviour.**
+  - The expected value comes from what SIGEL is for and from the specs
+    (VRML 97, the file formats), worked out before reading the
+    implementation. Never from what the code does today.
+  - A known fault gets a test that states the correct behaviour and stays
+    red until the code is fixed. A test never records a fault, not even one
+    with a to-do item.
+  - A test counts only once it has been seen to fail: break the code it
+    covers and see the test go red in the raw output.
+  - Test work never runs inside a refactoring. A brief for a test writer or
+    reviewer carries the class, the paths and the project rules only: no
+    purpose, no "behaviour stays the same", no findings to leave alone, no
+    known faults.
 - **This file is the only log of what was done, besides git.** Decided 2026-09-20.
   Anything that records finished work belongs here, not in a new file.
   `future_refactorings.md` holds the to-do list and nothing else.
