@@ -101,7 +101,7 @@ namespace SIGEL_GP
 
     void textWithoutARequiredFieldIsRefused();
 
-    void refusedTextLeavesOnlyCompleteIndividuals();
+    void textRefusedAtAnIndividualLeavesThePopulationAsItWas();
 
     void importNewIndividualAddsTheIndividualOfTheFile();
 

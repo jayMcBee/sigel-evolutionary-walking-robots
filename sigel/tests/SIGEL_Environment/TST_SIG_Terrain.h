@@ -24,7 +24,9 @@
 #ifndef SIGEL_ENVIRONMENT_TST_SIG_TERRAIN_H
 #define SIGEL_ENVIRONMENT_TST_SIG_TERRAIN_H
 
+#include <QByteArray>
 #include <QObject>
+#include <QTemporaryDir>
 
 namespace SIGEL_Environment
 {
@@ -47,6 +49,26 @@ namespace SIGEL_Environment
     void readFromFileThrowsWhenAHeightIsMissing();
 
     void readFromFileThrowsWhenTheTextEndsInsideAHeight();
+
+    void setFromPictureFileGivesTheHeightsOfAP2Picture_data();
+    void setFromPictureFileGivesTheHeightsOfAP2Picture();
+
+    void setFromPictureFileOfAFileThatCannotBeReadChangesNothing_data();
+    void setFromPictureFileOfAFileThatCannotBeReadChangesNothing();
+
+    void setFromFunctionGivesTheHeightsOfTheFunctionAtEachGridPoint();
+
+    void setFromFunctionOfAFunctionThatCannotBeParsedChangesNothing();
+
+    void newTerrainIsAnEmptyGrid();
+
+    void setFlatGivesHeightZeroAtEveryPointOfTheGrid();
+
+    void isFlatIsFalseWhenOnePointIsNotAtHeightZero();
+
+  private:
+
+    QString writePicture( const QTemporaryDir &folder, const QByteArray &picture );
   };
 
 }

@@ -36,7 +36,9 @@ void SIGEL_Simulation::TST_RecordingCommandInterface::moveDrive( int driveNumber
   moveRecord.driveNumber = driveNumber;
 
   for ( const SIG_Register &oneRegister : registers )
+  {
     moveRecord.registerValues.append( oneRegister.getValue() );
+  }
 
   moveRecords.append( moveRecord );
 }
@@ -175,13 +177,13 @@ void SIGEL_Simulation::TST_SIG_Interpreter::invalidProgramLineThrows()
   QString thrown;
 
   try
-    {
-      interpreter.interprete( 1 );
-    }
+  {
+    interpreter.interprete( 1 );
+  }
   catch ( const SIGEL_Tools::SIG_Exception &e )
-    {
-      thrown = e.getMessage();
-    }
+  {
+    thrown = e.getMessage();
+  }
 
   QVERIFY2( thrown.contains( "Program line 0 is invalid." ), qPrintable( thrown ) );
 }
@@ -203,29 +205,29 @@ void SIGEL_Simulation::TST_SIG_Interpreter::invalidProgramLineThrowsOnlyWhenItIs
   QString thrown;
 
   try
-    {
-      // The MOVE exceeds the time account by 1 s.
-      interpreter.interprete( 1 );
+  {
+    // The MOVE exceeds the time account by 1 s.
+    interpreter.interprete( 1 );
 
-      // This call pays the exceeded time exactly, so line 1 is not reached.
-      interpreter.interprete( 1 );
-    }
+    // This call pays the exceeded time exactly, so line 1 is not reached.
+    interpreter.interprete( 1 );
+  }
   catch ( const SIGEL_Tools::SIG_Exception &e )
-    {
-      thrown = e.getMessage();
-    }
+  {
+    thrown = e.getMessage();
+  }
 
   QVERIFY2( thrown.isEmpty(), qPrintable( thrown ) );
   QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
 
   try
-    {
-      interpreter.interprete( 0.25 );
-    }
+  {
+    interpreter.interprete( 0.25 );
+  }
   catch ( const SIGEL_Tools::SIG_Exception &e )
-    {
-      thrown = e.getMessage();
-    }
+  {
+    thrown = e.getMessage();
+  }
 
   QVERIFY2( thrown.contains( "Program line 1 is invalid." ), qPrintable( thrown ) );
   QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
@@ -2293,10 +2295,10 @@ void SIGEL_Simulation::TST_SIG_Interpreter::exceededTimeIsKeptOverSeveralCallsAn
   QList<int> numbersOfMoveRecords;
 
   for ( int call = 1; call <= 10; call++ )
-    {
-      interpreter.interprete( 0.75 );
-      numbersOfMoveRecords.append( commandInterface.getMoveRecords().size() );
-    }
+  {
+    interpreter.interprete( 0.75 );
+    numbersOfMoveRecords.append( commandInterface.getMoveRecords().size() );
+  }
 
   // On a difference, Qt Test gives the index of the first call that differs. Index 0 is call 1.
   QCOMPARE( numbersOfMoveRecords, expectedNumbersOfMoveRecords );
@@ -2450,32 +2452,43 @@ void SIGEL_Simulation::TST_SIG_Interpreter::exceededTimeOfADelayIsSubtractedOver
   QCOMPARE( commandInterface.getMoveRecords().size(), 1 );
 }
 
-void SIGEL_Simulation::TST_SIG_Interpreter::delaySubtractsTheDelayTimeFirstAndItsDurationSecond_data()
+// Ten commands of 0.1 s take 1 s.
+void SIGEL_Simulation::TST_SIG_Interpreter::commandsWhoseDurationsAddUpToTheTimeAccountUseItUpExactly()
+{
+  SIGEL_Robot::SIG_LanguageParameters languageParameters;
+  setAllDurations( languageParameters, 0.1 );
+  SIGEL_Program::SIG_Program program;
+  for ( int line = 0; line < 11; line++ )
+  {
+    appendLine( program, SIGEL_Program::MOVE, 0, 0 );
+  }
+  TST_RecordingCommandInterface commandInterface;
+  TST_FixedSimulationQueries simulationQueries( 55 );
+  SIG_Interpreter interpreter( languageParameters, program, commandInterface, simulationQueries );
+
+  interpreter.interprete( 1.0 );
+
+  QEXPECT_FAIL( "", "SIG_Interpreter::interprete subtracts each duration in turn in double values, and taking 0.1 from 1 ten times one after another leaves 1.4e-16 s, which runs an eleventh command", Abort );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 10 );
+}
+
+void SIGEL_Simulation::TST_SIG_Interpreter::delayThatUsesUpTheTimeAccountExactlyLeavesNoTimeForTheNextCommand_data()
 {
   QTest::addColumn< int >( "registerValue" );
   QTest::addColumn< double >( "durationOfTheDelayCommand" );
   QTest::addColumn< double >( "timeAccount" );
-  QTest::addColumn< int >( "numberOfMoveRecords" );
 
-  // The register value is the delay time in milliseconds: 80 is 0.08 s and 100 is 0.1 s.
-  // 80 * 0.001 and 100 * 0.001 give exactly the double values 0.08 and 0.1.
-  // The DELAY subtracts the delay time from the time account first and its duration second.
-
-  // In double values, 0.1 - 0.08 is 2^-58 more than 0.02, so time is left for the MOVE.
-  // 0.08 + 0.02 is 0.1, and ( 0.1 - 0.02 ) - 0.08 is 0: in another order no time is left.
-  QTest::newRow( "time is left" ) << 80 << 0.02 << 0.1 << 1;
-
-  // In double values, 0.45 - 0.1 is 0.35, so no time is left for the MOVE.
-  // 0.1 + 0.35 is 2^-54 less than 0.45, and 0.45 - 0.35 is 2^-55 more than 0.1: in another order time is left.
-  QTest::newRow( "no time is left" ) << 100 << 0.35 << 0.45 << 0;
+  // The register value is the delay time in milliseconds. The delay time and the
+  // duration of the DELAY add up to the time account.
+  QTest::newRow( "80 ms and 0.02 s in 0.1 s" ) << 80 << 0.02 << 0.1;
+  QTest::newRow( "100 ms and 0.35 s in 0.45 s" ) << 100 << 0.35 << 0.45;
 }
 
-void SIGEL_Simulation::TST_SIG_Interpreter::delaySubtractsTheDelayTimeFirstAndItsDurationSecond()
+void SIGEL_Simulation::TST_SIG_Interpreter::delayThatUsesUpTheTimeAccountExactlyLeavesNoTimeForTheNextCommand()
 {
   QFETCH( int, registerValue );
   QFETCH( double, durationOfTheDelayCommand );
   QFETCH( double, timeAccount );
-  QFETCH( int, numberOfMoveRecords );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   setAllDurations( languageParameters, 1.0 );
   languageParameters.getCommand( "DELAY" )->setDuration( durationOfTheDelayCommand );
@@ -2493,13 +2506,16 @@ void SIGEL_Simulation::TST_SIG_Interpreter::delaySubtractsTheDelayTimeFirstAndIt
 
   interpreter.interprete( timeAccount );
 
-  QCOMPARE( commandInterface.getMoveRecords().size(), numberOfMoveRecords );
+  QEXPECT_FAIL( "80 ms and 0.02 s in 0.1 s", "SIG_Interpreter::interprete subtracts the delay time and the duration of the DELAY one after the other in double values, and 0.1 - 0.08 - 0.02 leaves 2^-58 s, which runs the MOVE", Abort );
+  QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::setAllDurations( SIGEL_Robot::SIG_LanguageParameters &languageParameters, double duration )
 {
   for ( const SIGEL_Robot::SIG_LanguageParameters::NamedCommand &command : languageParameters.getCommands() )
+  {
     command.value->setDuration( duration );
+  }
 }
 
 void SIGEL_Simulation::TST_SIG_Interpreter::setDifferentDurations( SIGEL_Robot::SIG_LanguageParameters &languageParameters )

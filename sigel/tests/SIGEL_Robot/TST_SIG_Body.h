@@ -24,10 +24,23 @@
 #ifndef SIGEL_ROBOT_TST_SIG_BODY_H
 #define SIGEL_ROBOT_TST_SIG_BODY_H
 
+#include "SIGEL_Tools/SIG_Vector.h"
+
+#include <QList>
 #include <QObject>
+#include <QString>
+#include <QStringList>
+#include <QTemporaryDir>
+#include <QTextStream>
+
+#include <memory>
 
 namespace SIGEL_Robot
 {
+
+  class SIG_Body;
+  class SIG_Geometry;
+  class SIG_Robot;
 
   /**
    * The unit tests of SIG_Body.
@@ -41,32 +54,45 @@ namespace SIGEL_Robot
     void constructorStoresTheNameAndLeavesTheBodyWithoutGeometry();
     void bodyCannotBeCopyConstructed();
     void bodyCannotBeCopyAssigned();
-    void getGeometryFilePrependsTheDirectoryVerbatimToARelativeName();
+    void getGeometryFileGivesTheRelativeNameInTheDirectory();
     void getGeometryFileReturnsAnAbsoluteNameWithoutTheDirectory();
-    void getGeometryFileOfAnEmptyNameIsTheDirectory();
     void setGeometryGivesTheBodyThatGeometry();
     void setGeometryFreesTheGeometryItReplaces();
+    void destructorFreesTheGeometry();
     void setGeometryOfTheGeometryItHoldsKeepsIt();
     void writeToFileTransferWritesNForABodyWithoutGeometry();
     void writeToFileTransferWritesYAndThenTheGeometry();
     void unstreamingConstructorReadsWhatWriteToFileTransferWroteAndStopsAfterIt();
     void unstreamingConstructorReadsABodyWithoutGeometryAndStopsAfterIt();
-    void unstreamingConstructorReadsAFlagOtherThanYAsNoGeometry();
+    void unstreamingConstructorThrowsForAFlagOtherThanYOrN();
     void unstreamingConstructorThrowsForAYFollowedByAMalformedGeometry();
-    void unstreamingConstructorReadsAnEndedStreamAsABodyWithoutNameOrGeometry();
+    void unstreamingConstructorThrowsForAnEndedStream();
     void writeToFileTransferQuotesADirectoryWithWhitespace();
     void unstreamingConstructorReadsADirectoryWithWhitespaceAndStopsAfterTheBody();
     void writeToFileTransferQuotesAGeometryFileNameWithWhitespace();
     void unstreamingConstructorReadsAGeometryFileNameWithWhitespaceAndStopsAfterTheBody();
 
     void loadReadsTheVerticesAndFacesOfAnIndexedFaceSet();
-    void loadKeepsOnlyTheUsedCoordinatesInFirstUseOrderAndMergesEqualOnes();
-    void loadEndsAFaceAtANegativeIndexAndAtTheEndOfTheIndices();
-    void loadSkipsIndicesBeyondTheCoordinates();
-    void loadMakesNoFaceOfAnIndexRunWithoutVertices();
-    void loadIgnoresShapesWithoutAnIndexedFaceSetWithCoordinates();
+    void loadReadsFacesOfMoreThanThreeVertices();
+    void loadBuildsTheFacesFromTheCoordIndexOfAShapeWithAppearanceNormalsAndTextureCoordinates();
+    void loadMergesEqualPointsIntoOneVertex();
+    void loadRefusesANegativeIndexOtherThanMinusOne();
+    void loadRefusesAnIndexBeyondTheCoordinates();
+    void loadRefusesAFaceSetWithIndicesButWithoutCoordinates();
+    void loadRefusesAFaceOfFewerThanThreeVertices_data();
+    void loadRefusesAFaceOfFewerThanThreeVertices();
+    void loadEndsAFaceAtTheEndOfItsShape();
+    void loadAddsTheFacesOfTheShapesInFileOrderEachOverItsOwnCoordinates();
+    void loadAddsNoFacesForShapesThatHaveNoFaces();
+    void loadMakesTheFacesOfABox();
+    void loadMakesFacesOnTheSurfaceOfACurvedShape_data();
+    void loadMakesFacesOnTheSurfaceOfACurvedShape();
+    void loadSkipsNodesOtherThanShapesAndGroupsAndReadsTheShapesAfterThem();
+    void loadRefusesAFileWithoutFaces_data();
+    void loadRefusesAFileWithoutFaces();
     void loadWalksIntoNestedGroups();
-    void loadPinsThatItDropsTheFacesInGroupingNodesOtherThanGroupAndTransform();
+    void loadReadsTheFacesInEveryGroupingNode_data();
+    void loadReadsTheFacesInEveryGroupingNode();
     void loadAppliesTheTransformTranslationToEachOfItsChildren();
     void loadAppliesATransformOnlyWithinItsOwnChildren();
     void loadAppliesTheTransformScaleToTheVertices();
@@ -79,6 +105,10 @@ namespace SIGEL_Robot
     void loadScalesAlongTheScaleOrientationAboutTheTransformCenter();
     void loadScalesAlongAnEighthTurnedScaleOrientation();
     void loadAppliesNestedTransformsInnermostFirst();
+    void loadAppliesATransformToTheShapesInGroupsWithinIt();
+    void loadTransformsEveryVertexOfAShape();
+    void loadKeepsTheFacesFacingOutwards_data();
+    void loadKeepsTheFacesFacingOutwards();
     void loadDoesNothingWhenTheBodyHasAGeometry();
     void loadReadsTheFileRelativeToTheDirectory();
     void loadReadsAFileWithANonAsciiName();
@@ -89,8 +119,32 @@ namespace SIGEL_Robot
 
     void loadReadsTheFaceSetsOfAFileWithUse();
     void loadReadsAShapeWhoseGeometryIsAUse();
-    void loadRefusesAUseDirectlyAfterANodeEnd();
-    void loadRefusesAUseDirectlyAfterANodeEndInTheFileRelativeToTheDirectory();
+    void loadReadsAUseDirectlyAfterANodeEndAsACopyBesideThatNode();
+
+  private:
+
+    static QString faceSetShape( const QString &points, const QString &indices );
+    static QString triangleShape();
+    static QString cornerShape( double x, double y, double z );
+    static QString transformed( const QString &fields, const QString &children );
+    static QString writeFile( const QTemporaryDir &folder, const QString &contents, const QString &name = "body.wrl" );
+    static QString writeVRMLFile( const QTemporaryDir &folder, const QString &body, const QString &name = "body.wrl" );
+    static QString thrownByLoad( SIGEL_Robot::SIG_Body &body );
+    static std::unique_ptr< SIGEL_Robot::SIG_Body > unstreamedBody( SIGEL_Robot::SIG_Robot &robot, QTextStream &in, QString &thrown );
+    static QString useDirectlyAfterTransformEnd();
+    static bool isNear( SIG_Vector v, double x, double y, double z );
+    static QString toString( SIG_Vector v );
+    static QString toString( const QList< SIG_Vector > &vertices );
+    static QList< SIG_Vector > verticesOf( const SIGEL_Robot::SIG_Geometry *geometry );
+    static QList< QList< SIG_Vector > > loadedFaces( const QString &body );
+    static QString toString( const QList< QList< SIG_Vector > > &faces );
+    static bool isTheFirstCornerOfTheOnlyFaceNear( const QList< QList< SIG_Vector > > &faces, double x, double y, double z );
+    static bool hasAFaceThatStartsNear( const QList< QList< SIG_Vector > > &faces, double x, double y, double z );
+    static QList< SIG_Vector > withoutTheBesideShape( const QList< SIG_Vector > &vertices );
+    static bool isOnTheSurface( const QString &shape, SIG_Vector v );
+    static double surfaceArea( const SIGEL_Robot::SIG_Geometry *geometry );
+    static QList< QStringList > facePoints( const SIGEL_Robot::SIG_Geometry *geometry );
+    static QList< QList< int > > faceIndices( const SIGEL_Robot::SIG_Geometry *geometry );
   };
 
 }

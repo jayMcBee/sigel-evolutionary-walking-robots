@@ -296,9 +296,11 @@ namespace SIGEL_Simulation
 
     void exceededTimeOfADelayIsSubtractedOverSeveralCalls();
 
-    void delaySubtractsTheDelayTimeFirstAndItsDurationSecond_data();
+    void commandsWhoseDurationsAddUpToTheTimeAccountUseItUpExactly();
 
-    void delaySubtractsTheDelayTimeFirstAndItsDurationSecond();
+    void delayThatUsesUpTheTimeAccountExactlyLeavesNoTimeForTheNextCommand_data();
+
+    void delayThatUsesUpTheTimeAccountExactlyLeavesNoTimeForTheNextCommand();
 
   private:
 

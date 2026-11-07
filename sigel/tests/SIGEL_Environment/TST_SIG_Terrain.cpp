@@ -26,6 +26,8 @@
 #include "SIGEL_Environment/SIG_Terrain.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
+#include <QFile>
+#include <QTemporaryDir>
 #include <QtTest>
 
 void SIGEL_Environment::TST_SIG_Terrain::everyPresetParses()
@@ -62,8 +64,12 @@ void SIGEL_Environment::TST_SIG_Terrain::writeToFileThenReadFromFileGivesTheSame
 
   // Exactly the same doubles, not only close ones.
   for ( int z = 0; z < 3; ++z )
+  {
     for ( int x = 0; x < 5; ++x )
+    {
       QVERIFY( read.getHeight( x, z ) == written.getHeight( x, z ) );
+    }
+  }
 }
 
 void SIGEL_Environment::TST_SIG_Terrain::readFromFileThrowsWhenAHeightIsMissing()
@@ -90,4 +96,141 @@ void SIGEL_Environment::TST_SIG_Terrain::readFromFileThrowsWhenTheTextEndsInside
   SIG_Terrain terrain;
 
   QVERIFY_THROWS_EXCEPTION( SIGEL_Tools::SIG_Exception, terrain.readFromFile( in ) );
+}
+
+void SIGEL_Environment::TST_SIG_Terrain::setFromPictureFileGivesTheHeightsOfAP2Picture_data()
+{
+  QTest::addColumn< QByteArray >( "picture" );
+
+  // Netpbm PGM: a comment runs from # to the end of its line, anywhere in the header.
+  // The picture is 3 wide and 2 high, and no two of its rows or columns are the same.
+  QTest::newRow( "plain" ) << QByteArray( "P2\n3 2\n255\n0 51 255\n255 0 102\n" );
+  QTest::newRow( "comments in the header" ) << QByteArray( "# before the magic key\nP2\n3\n# between the sizes\n2 # after the height\n255\n0 51 255\n255 0 102\n" );
+  QTest::newRow( "no final line break" ) << QByteArray( "P2\n3 2\n255\n0 51 255\n255 0 102" );
+  QTest::newRow( "a maximum grey value other than 255" ) << QByteArray( "P2\n3 2\n50\n0 10 50\n50 0 20\n" );
+}
+
+// A grey value of the maximum is a height of 5. The picture's width is dimension X.
+void SIGEL_Environment::TST_SIG_Terrain::setFromPictureFileGivesTheHeightsOfAP2Picture()
+{
+  QFETCH( QByteArray, picture );
+  QTemporaryDir folder;
+  SIG_Terrain terrain;
+
+  QVERIFY( terrain.setFromPictureFile( writePicture( folder, picture ) ) );
+
+  QCOMPARE( terrain.getDimensionX(), 3 );
+  QCOMPARE( terrain.getDimensionZ(), 2 );
+  QCOMPARE( terrain.getHeight( 0, 0 ), 0.0 );
+  QCOMPARE( terrain.getHeight( 1, 0 ), 1.0 );
+  QCOMPARE( terrain.getHeight( 2, 0 ), 5.0 );
+  QCOMPARE( terrain.getHeight( 0, 1 ), 5.0 );
+  QCOMPARE( terrain.getHeight( 1, 1 ), 0.0 );
+  QCOMPARE( terrain.getHeight( 2, 1 ), 2.0 );
+}
+
+void SIGEL_Environment::TST_SIG_Terrain::setFromPictureFileOfAFileThatCannotBeReadChangesNothing_data()
+{
+  QTest::addColumn< bool >( "fileExists" );
+  QTest::addColumn< QByteArray >( "picture" );
+
+  QTest::newRow( "missing file" ) << false << QByteArray();
+  QTest::newRow( "a picture that is not P2" ) << true << QByteArray( "P5\n2 2\n255\n0000" );
+}
+
+void SIGEL_Environment::TST_SIG_Terrain::setFromPictureFileOfAFileThatCannotBeReadChangesNothing()
+{
+  QFETCH( bool, fileExists );
+  QFETCH( QByteArray, picture );
+  QTemporaryDir folder;
+  const QString fileName = fileExists ? writePicture( folder, picture ) : folder.filePath( "missing.pgm" );
+  SIG_Terrain terrain;
+  QVERIFY( terrain.setFromFunction( "x+2*z", 3, 2 ) );
+
+  QVERIFY( !terrain.setFromPictureFile( fileName ) );
+
+  QCOMPARE( terrain.getDimensionX(), 3 );
+  QCOMPARE( terrain.getDimensionZ(), 2 );
+  QCOMPARE( terrain.getHeight( 2, 1 ), 4.0 );
+}
+
+// The function's x counts along dimension X, its z along dimension Z.
+void SIGEL_Environment::TST_SIG_Terrain::setFromFunctionGivesTheHeightsOfTheFunctionAtEachGridPoint()
+{
+  SIG_Terrain terrain;
+
+  QVERIFY( terrain.setFromFunction( "x+10*z", 3, 2 ) );
+
+  QCOMPARE( terrain.getDimensionX(), 3 );
+  QCOMPARE( terrain.getDimensionZ(), 2 );
+  for ( int z = 0; z < 2; z++ )
+  {
+    for ( int x = 0; x < 3; x++ )
+    {
+      QCOMPARE( terrain.getHeight( x, z ), x + 10.0 * z );
+    }
+  }
+}
+
+void SIGEL_Environment::TST_SIG_Terrain::setFromFunctionOfAFunctionThatCannotBeParsedChangesNothing()
+{
+  SIG_Terrain terrain;
+  QVERIFY( terrain.setFromFunction( "x+2*z", 3, 2 ) );
+
+  QVERIFY( !terrain.setFromFunction( "sin(x", 5, 5 ) );
+
+  QCOMPARE( terrain.getDimensionX(), 3 );
+  QCOMPARE( terrain.getDimensionZ(), 2 );
+  QCOMPARE( terrain.getHeight( 2, 1 ), 4.0 );
+}
+
+void SIGEL_Environment::TST_SIG_Terrain::newTerrainIsAnEmptyGrid()
+{
+  SIG_Terrain terrain;
+
+  QCOMPARE( terrain.getDimensionX(), 0 );
+  QCOMPARE( terrain.getDimensionZ(), 0 );
+}
+
+void SIGEL_Environment::TST_SIG_Terrain::setFlatGivesHeightZeroAtEveryPointOfTheGrid()
+{
+  SIG_Terrain terrain;
+  QVERIFY( terrain.setFromFunction( "1", 2, 2 ) );
+
+  terrain.setFlat( 3, 4 );
+
+  QCOMPARE( terrain.getDimensionX(), 3 );
+  QCOMPARE( terrain.getDimensionZ(), 4 );
+  for ( int z = 0; z < 4; z++ )
+  {
+    for ( int x = 0; x < 3; x++ )
+    {
+      QCOMPARE( terrain.getHeight( x, z ), 0.0 );
+    }
+  }
+  QVERIFY( terrain.isFlat() );
+}
+
+// The one raised point is neither the first nor the last of the grid.
+void SIGEL_Environment::TST_SIG_Terrain::isFlatIsFalseWhenOnePointIsNotAtHeightZero()
+{
+  QTemporaryDir folder;
+  SIG_Terrain terrain;
+  QVERIFY( terrain.setFromPictureFile( writePicture( folder, "P2\n3 3\n255\n0 0 0\n0 51 0\n0 0 0\n" ) ) );
+
+  QVERIFY( !terrain.isFlat() );
+}
+
+// Writes picture to floor.pgm in folder and returns that file's path.
+QString SIGEL_Environment::TST_SIG_Terrain::writePicture( const QTemporaryDir &folder, const QByteArray &picture )
+{
+  const QString fileName = folder.filePath( "floor.pgm" );
+  QFile file( fileName );
+  if ( !folder.isValid() || !file.open( QIODevice::WriteOnly ) )
+  {
+    QTest::qFail( qPrintable( "cannot write " + fileName ), __FILE__, __LINE__ );
+    return fileName;
+  }
+  file.write( picture );
+  return fileName;
 }
