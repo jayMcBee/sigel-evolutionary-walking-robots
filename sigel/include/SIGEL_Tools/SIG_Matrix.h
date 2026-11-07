@@ -40,7 +40,7 @@ public:
   SIG_Vector c1;
   SIG_Vector c2;
 
-  SIG_Matrix() {}
+  SIG_Matrix() = default;
 
   void makeone()
   {

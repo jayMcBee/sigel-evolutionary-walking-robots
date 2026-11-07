@@ -75,7 +75,7 @@ public:
      *
      * This makes the world entirely black.
      */
-    SIG_Geometry ();
+    SIG_Geometry () = default;
     /**
      * Unreal copy constructor.
      *

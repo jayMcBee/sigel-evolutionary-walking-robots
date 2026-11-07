@@ -1,9 +1,5 @@
 #include "MT_GPSystem/MT_Programline.h"
 
-MT_Programline::MT_Programline()
-{
-}
-
 MT_Programline::~MT_Programline()
 {
 	delete OperandA;

@@ -86,7 +86,7 @@ namespace SIGEL_Program
 		 * @post
 		 * An empty line that does not contain any data will be created.
 		 */
-		SIG_ProgramLine();
+		SIG_ProgramLine() = default;
 
 		/**
 		 * This constructor generates a random instruction that is dependend on the language

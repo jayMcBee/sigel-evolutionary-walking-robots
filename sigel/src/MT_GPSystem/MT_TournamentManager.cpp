@@ -2,10 +2,6 @@
 
 // administrative method
 
-MT_TournamentManager::MT_TournamentManager()
-{
-}
-
 MT_TournamentManager::MT_TournamentManager(MT_Population *PPop, MT_Population *OPop, MT_Randomizer * NewRandi, int Method, int TSize)
 {
 	LastError = MT_ErrorCode::None;

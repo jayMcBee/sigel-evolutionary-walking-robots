@@ -56,7 +56,7 @@ class SIG_SimulationQueries {
    * @param theSimulationData
    *  reference to the simulator's simulationData
    */
-  SIG_SimulationQueries();
+  SIG_SimulationQueries() = default;
 
   virtual ~SIG_SimulationQueries() = default;
 

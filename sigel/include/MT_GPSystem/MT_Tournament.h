@@ -29,7 +29,7 @@ public:
 
 	/* create a empty tournament of Size "Size" and a "Winner Array" */
 	MT_Tournament( int Size, int num );
-	MT_Tournament();
+	MT_Tournament() = default;
 
 private:
 	/* the number of winner in this tournament

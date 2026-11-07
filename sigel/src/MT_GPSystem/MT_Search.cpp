@@ -1,10 +1,6 @@
 #include "MT_GPSystem/MT_Search.h"
 #include <qfile.h>
 
-MT_Search::MT_Search()
-{
-}
-
 MT_Search::MT_Search( MT_Population *ParentPop, MT_Population *OffspringPop, MT_Randomizer *NewRandi )
 {
 	LastError = MT_ErrorCode::None;

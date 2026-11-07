@@ -37,7 +37,7 @@ class SIG_Vector
 public:
   double x, y, z;
 
-  SIG_Vector() {}
+  SIG_Vector() = default;
   SIG_Vector( SIG_Vector *v ) { assign( v ); }
   SIG_Vector( double nx, double ny, double nz ) : x( nx ), y( ny ), z( nz ) {}
 

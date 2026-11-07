@@ -44,7 +44,7 @@ public:
 	
 	MT_TournamentManager(MT_Population * PPop, MT_Population * OPop, MT_Randomizer* NewRandi, QTextStream &File);
 	MT_TournamentManager(MT_Population * PPop, MT_Population * OPop, MT_Randomizer* NewRandi, int Method, int TSize);
-	MT_TournamentManager();
+	MT_TournamentManager() = default;
 	virtual ~MT_TournamentManager();
 
 private:

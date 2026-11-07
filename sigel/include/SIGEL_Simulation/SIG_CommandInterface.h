@@ -47,7 +47,7 @@ class SIG_CommandInterface {
    * @param theSimulationData 
    *  A reference to the simulator's simulationData
    */
-  SIG_CommandInterface();
+  SIG_CommandInterface() = default;
 
   virtual ~SIG_CommandInterface() = default;
 

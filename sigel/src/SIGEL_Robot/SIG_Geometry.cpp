@@ -32,10 +32,6 @@ namespace SIGEL_Robot
 		polygons.append (p);
 	}
 
-	SIG_Geometry::SIG_Geometry ()
-	{
-	}
-
 	SIG_Geometry::SIG_Geometry (const SIG_Geometry *geom)
 	{
 		for (SIG_Vector *v : geom->vertices)

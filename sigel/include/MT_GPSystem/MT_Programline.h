@@ -44,7 +44,7 @@ public:
 	MT_Programline(MT_Programline *Line);
 	MT_Programline (const QString &File);
 	MT_Programline (MT_Randomizer *Randi);
-	MT_Programline();
+	MT_Programline() = default;
 
 	virtual ~MT_Programline();
 

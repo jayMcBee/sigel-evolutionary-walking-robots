@@ -31,7 +31,7 @@ public:
 
 	MT_Search( MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * NewRandi, QTextStream & File );
 	MT_Search( MT_Population * ParentPop, MT_Population * OffspringPop, MT_Randomizer * NewRandi );
-	MT_Search();
+	MT_Search() = default;
 	virtual ~MT_Search() = default;
 
 private:
