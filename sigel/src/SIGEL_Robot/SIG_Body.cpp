@@ -56,6 +56,31 @@ namespace SIGEL_Robot
 		delete geometry;
 	}
 
+	QList< SIG_Vector > SIG_Body::transformedVertices( CoordinateNode *coordinateNode, NEWMAT::Matrix const &transformation ) const
+	{
+		int noOfVertices = coordinateNode->getNPoints();
+
+		// Held by value, not as owned SIG_Vector pointers: the NEWMAT multiply can
+		// throw, and values need no free on the unwinding path.
+		QList< SIG_Vector > vertices( noOfVertices );
+		for (int i=0; i < noOfVertices; i++) {
+			QList< float > coords(3);
+
+			coordinateNode->getPoint( i, coords.data() );
+
+			NEWMAT::ColumnVector currentVertex(4);
+			for (int j=0; j<3; j++)
+				currentVertex( j+1 ) = coords[j];
+			currentVertex(4) = 1;
+
+			currentVertex = transformation * currentVertex;
+
+			for (int k = 0; k<3; k++)
+				vertices[ i ].set( k, currentVertex( k+1 ) );
+		}
+		return vertices;
+	}
+
 	void SIG_Body::readVRMLNode(Node *node, NEWMAT::Matrix transformation)
 	{
 		if ( node->isGroupNode() || node->isTransformNode() ) {
@@ -75,28 +100,8 @@ namespace SIGEL_Robot
 
 				CoordinateNode *coordinateNode = indexedFaceSetNode->getCoordinateNodes();
 				if (coordinateNode) {
-					int noOfVertices = coordinateNode->getNPoints();
 					int noOfIndices = indexedFaceSetNode->getNCoordIndexes();
-					// Held by value, not as owned SIG_Vector pointers: the NEWMAT multiply and
-					// the SIG_Polygon allocations below can throw, and values need no free on the
-					// unwinding path.
-					QList< SIG_Vector > vertices( noOfVertices );
-
-					for (int i=0; i < noOfVertices; i++) {
-						QList< float > coords(3);
-
-						coordinateNode->getPoint( i, coords.data() );
-
-						NEWMAT::ColumnVector currentVertex(4);
-						for (int j=0; j<3; j++)
-							currentVertex( j+1 ) = coords[j];
-						currentVertex(4) = 1;
-
-						currentVertex = transformation * currentVertex;
-
-						for (int k = 0; k<3; k++)
-							vertices[ i ].set( k, currentVertex( k+1 ) );
-					};
+					QList< SIG_Vector > vertices = transformedVertices( coordinateNode, transformation );
 
 					SIG_Polygon *currentPolygon = nullptr;
 

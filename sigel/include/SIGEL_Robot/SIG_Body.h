@@ -25,6 +25,7 @@
 
 namespace SIGEL_Robot { class SIG_Body; }
 #include <qstring.h>
+#include <QList>
 #include <CyberVRML97.h>
 #include <newmat.h>
 #include <cstdlib>
@@ -48,7 +49,12 @@ namespace SIGEL_Robot
                 SIG_Robot *parent;
                 QString geometryFile, directory;
                 SIG_Geometry *geometry;
-   
+
+                /**
+                 * Returns the points of the coordinate node, transformed by the transformation matrix.
+                 */
+                QList< SIG_Vector > transformedVertices( CoordinateNode *coordinateNode, NEWMAT::Matrix const &transformation ) const;
+
         public:
                 /**
                  * Nonstandard standard constructor.
