@@ -925,6 +925,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-07 — DONE: ITEM 169, `SIG_Body` READS THE FACES IN EVERY VRML 97 GROUPING NODE.**
+
+- `SIG_Body::readVRMLNode` walks into Anchor, Billboard, Collision, Switch
+  and LOD as well as Group and Transform. It reads every child, so a Switch
+  gives all its choices and a LOD all its levels; no shipped robot uses
+  either. `TST_SIG_Body::loadReadsTheFacesInEveryGroupingNode` passes
+  without its QEXPECT_FAIL mark.
+
 **2026-11-02 — DONE: ITEM 185, THE GP PARAMETERS PAGE KEEPS THE MAXIMUM LENGTH AT OR ABOVE THE MINIMUM.**
 
 - `SIG_GPParameter` makes the minimum length the lowest value of the maximum

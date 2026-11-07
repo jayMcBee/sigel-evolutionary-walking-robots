@@ -124,13 +124,6 @@ touched, because changing one changes behaviour against the reference binary.
   - **Open:** the smallest step and its decimals. The shipped experiments use
     0.01 and 0.002; 0.0001 with 4 decimals would keep both.
 
-- [ ] **169. `SIG_Body::readVRMLNode` drops the faces in Anchor, Billboard,
-  Collision, Switch and LOD.** It descends only into Group and Transform. No
-  shipped robot uses these nodes. Fix it in the most pragmatic, minimal way
-  that covers them. The test `loadReadsTheFacesInEveryGroupingNode` states
-  the correct behaviour and is marked QEXPECT_FAIL; the fix turns it XPASS,
-  and the mark comes out.
-
 ---
 
 ## 4 · The interface

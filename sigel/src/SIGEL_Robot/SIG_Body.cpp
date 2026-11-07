@@ -118,7 +118,7 @@ namespace SIGEL_Robot
 
 	void SIG_Body::readVRMLNode( Node *node, NEWMAT::Matrix transformation )
 	{
-		if( node->isGroupNode() || node->isTransformNode() )
+		if( node->isGroupingNode() || node->isLodNode() || node->isSwitchNode() )
 		{
 			if( node->isTransformNode() )
 			{

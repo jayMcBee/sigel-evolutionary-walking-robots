@@ -1037,7 +1037,6 @@ void SIGEL_Robot::TST_SIG_Body::loadReadsTheFacesInEveryGroupingNode()
   QCOMPARE( thrownByLoad( body ), QString() );
 
   QVERIFY( body.getGeometry() );
-  QEXPECT_FAIL( "", "SIG_Body::readVRMLNode walks only into Group and Transform and drops the faces in the other grouping nodes", Abort );
   QCOMPARE( body.getGeometry()->getNumPolygons(), 2 );
   QCOMPARE( body.getGeometry()->getNumVertices(), 6 );
 }
