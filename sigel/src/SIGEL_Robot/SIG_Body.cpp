@@ -86,17 +86,21 @@ namespace SIGEL_Robot
 		int noOfIndices = indexedFaceSetNode->getNCoordIndexes();
 		SIG_Polygon *currentPolygon = nullptr;
 
-		for (int i=0; i < noOfIndices; i++) {
+		for (int i=0; i < noOfIndices; i++)
+		{
 			int currentIndex = indexedFaceSetNode->getCoordIndex(i);
-
-			// Before the polygon is created: SIG_Polygon self-registers in its
-			// constructor, so skipping every vertex would leave a 0-vertex face that
-			// SIG_Mirtich::compFaceNormal reads verts[0..2] from.
 			if (currentIndex < 0)
+			{
 				currentPolygon = nullptr;
-			else if ( currentIndex < vertices.size() ) {
+			}
+			else if ( currentIndex < vertices.size() )
+			{
+				// Making a SIG_Polygon adds it to the geometry. Wait for the first usable vertex,
+				// so no empty face is added.
 				if (!currentPolygon)
+				{
 					currentPolygon = new SIG_Polygon( geometry );
+				}
 				currentPolygon->appendVertex( vertices[ currentIndex ] );
 			}
 		}
