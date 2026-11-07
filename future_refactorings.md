@@ -127,9 +127,9 @@ touched, because changing one changes behaviour against the reference binary.
 - [ ] **169. `SIG_Body::readVRMLNode` drops the faces in Anchor, Billboard,
   Collision, Switch and LOD.** It descends only into Group and Transform. No
   shipped robot uses these nodes. Fix it in the most pragmatic, minimal way
-  that covers them, and replace the test
-  `loadPinsThatItDropsTheFacesInGroupingNodesOtherThanGroupAndTransform` with
-  one for the fix.
+  that covers them. The test `loadReadsTheFacesInEveryGroupingNode` states
+  the correct behaviour and is marked QEXPECT_FAIL; the fix turns it XPASS,
+  and the mark comes out.
 
 ---
 
