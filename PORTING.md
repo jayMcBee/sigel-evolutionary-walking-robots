@@ -224,9 +224,14 @@ found a real defect.** §0 has the rule; it is not optional.
   - The expected value comes from what SIGEL is for and from the specs
     (VRML 97, the file formats), worked out before reading the
     implementation. Never from what the code does today.
-  - A known fault gets a test that states the correct behaviour and stays
-    red until the code is fixed. A test never records a fault, not even one
-    with a to-do item.
+  - A known fault gets a test that states the correct behaviour, with
+    `QEXPECT_FAIL` and the fault as its reason on the line above the failing
+    check. The run reports XFAIL; once the code is fixed it reports XPASS,
+    which fails the run, and the mark comes out. A test never records a
+    fault as correct, not even one with a to-do item.
+  - The XFAIL list goes to the maintainer as the list of faults. The
+    maintainer decides which fault is fixed and when; test work never fixes
+    the code under test.
   - A test counts only once it has been seen to fail: break the code it
     covers and see the test go red in the raw output.
   - Test work never runs inside a refactoring. A brief for a test writer or
