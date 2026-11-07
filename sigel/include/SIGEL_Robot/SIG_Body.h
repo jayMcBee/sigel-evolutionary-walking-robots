@@ -37,99 +37,103 @@ namespace SIGEL_Robot { class SIG_Body; }
 namespace SIGEL_Robot
 {
 
-        /**
-         * The class SIG_Body represents the geometrical data
-         * of a link.
-         * 
-         * Methods to analize and normalize the geometrical
-         * data, such as calculation of the inertia tensor.
-         */
-        class SIG_Body {
-        private:
-                SIG_Robot *parent;
-                QString geometryFile, directory;
-                SIG_Geometry *geometry;
+	/**
+	 * The class SIG_Body represents the geometrical data
+	 * of a link.
+	 *
+	 * Methods to analize and normalize the geometrical
+	 * data, such as calculation of the inertia tensor.
+	 */
+	class SIG_Body
+	{
+	private:
+		SIG_Robot *parent;
+		QString geometryFile, directory;
+		SIG_Geometry *geometry;
 
-                /**
-                 * Returns the points of the coordinate node, transformed by the transformation matrix.
-                 */
-                QList< SIG_Vector > transformedVertices( CoordinateNode *coordinateNode, NEWMAT::Matrix const &transformation ) const;
+		/**
+		 * Returns the points of the coordinate node, transformed by the transformation matrix.
+		 */
+		QList< SIG_Vector > transformedVertices( CoordinateNode *coordinateNode, NEWMAT::Matrix const &transformation ) const;
 
-                /**
-                 * Adds to the geometry one polygon for each -1-terminated index list in the face set's coordIndex.
-                 */
-                void appendFaces( IndexedFaceSetNode *indexedFaceSetNode, QList< SIG_Vector > const &vertices );
+		/**
+		 * Adds to the geometry one polygon for each -1-terminated index list in the face set's coordIndex.
+		 */
+		void appendFaces( IndexedFaceSetNode *indexedFaceSetNode, QList< SIG_Vector > const &vertices );
 
-        public:
-                /**
-                 * Nonstandard standard constructor.
-                 */
-                SIG_Body (SIG_Robot *par, QString f, QString d);
-                /**
-                 * Unstreaming constructor.
-                 *
-                 * Reads the geometry and its physical attributes from
-                 * a stream.
-                 */
-                SIG_Body (SIG_Robot *par, QTextStream & tx);
-                /**
-                 * Destructor.
-                 */
-                ~SIG_Body ();
-                /**
-                 * Not copyable: the body owns its geometry, and a copy
-                 * would delete it a second time.
-                 */
-                SIG_Body (SIG_Body const &) = delete;
-                SIG_Body & operator= (SIG_Body const &) = delete;
+	public:
+		/**
+		 * Nonstandard standard constructor.
+		 */
+		SIG_Body( SIG_Robot *par, QString f, QString d );
 
-                /**
-                 * Loads the geometry from the VRML file into a new SIG_Geometry.
-                 * Does nothing if the body already has one.
-                 *
-                 * Throws SIG_VRMLFileError if the file cannot be loaded.
-                 */
-                void load ();
-                
-                /**
-                 * Help method to traverse the VRML scene graph.
-                 *
-                 * @param node Pointer to the node where to start the Depth-Search.
-                 * @param transformation The affine transformation matrix which transforms points
-                 *                       described due to the local coordinate system
-                 *                       into the calling node's coordinate system
-                 *                       (if there no such then transformation should be the identity).
-                 */
-                void readVRMLNode(Node *node, NEWMAT::Matrix transformation);
+		/**
+		 * Unstreaming constructor.
+		 *
+		 * Reads the geometry and its physical attributes from
+		 * a stream.
+		 */
+		SIG_Body( SIG_Robot *par, QTextStream &tx );
 
-                /**
-                 * Sets the geometry, which the body then owns; frees the one it
-                 * replaces.
-                 */
-                void setGeometry (SIG_Geometry *geo);
-                
-                /**
-                 * Getting access to the surface of the body.
-                 */
-                SIG_Geometry const *getGeometry () const;
-                
-                /**
-                 * Write the SIG_Body object and the geometry information
-                 * into a stream.
-                 */
-                void writeToFileTransfer (QTextStream & tx);
-                
-                /**
-                 * Get the name of the geometry file.
-                 */
-                QString getGeometryFile () const;
-                
-                /**
-                 * Get the name of the geometry file as specified in the
-                 * robot description.
-                 */
-                QString getName () const;
-        };
+		/**
+		 * Destructor.
+		 */
+		~SIG_Body();
+
+		/**
+		 * Not copyable: the body owns its geometry, and a copy
+		 * would delete it a second time.
+		 */
+		SIG_Body( SIG_Body const & ) = delete;
+		SIG_Body &operator=( SIG_Body const & ) = delete;
+
+		/**
+		 * Loads the geometry from the VRML file into a new SIG_Geometry.
+		 * Does nothing if the body already has one.
+		 *
+		 * Throws SIG_VRMLFileError if the file cannot be loaded.
+		 */
+		void load();
+
+		/**
+		 * Help method to traverse the VRML scene graph.
+		 *
+		 * @param node Pointer to the node where to start the Depth-Search.
+		 * @param transformation The affine transformation matrix which transforms points
+		 *                       described due to the local coordinate system
+		 *                       into the calling node's coordinate system
+		 *                       (if there no such then transformation should be the identity).
+		 */
+		void readVRMLNode( Node *node, NEWMAT::Matrix transformation );
+
+		/**
+		 * Sets the geometry, which the body then owns; frees the one it
+		 * replaces.
+		 */
+		void setGeometry( SIG_Geometry *geo );
+
+		/**
+		 * Getting access to the surface of the body.
+		 */
+		SIG_Geometry const *getGeometry() const;
+
+		/**
+		 * Write the SIG_Body object and the geometry information
+		 * into a stream.
+		 */
+		void writeToFileTransfer( QTextStream &tx );
+
+		/**
+		 * Get the name of the geometry file.
+		 */
+		QString getGeometryFile() const;
+
+		/**
+		 * Get the name of the geometry file as specified in the
+		 * robot description.
+		 */
+		QString getName() const;
+	};
 
 }
 
