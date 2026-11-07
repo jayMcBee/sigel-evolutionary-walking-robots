@@ -81,6 +81,27 @@ namespace SIGEL_Robot
 		return vertices;
 	}
 
+	void SIG_Body::appendFaces( IndexedFaceSetNode *indexedFaceSetNode, QList< SIG_Vector > const &vertices )
+	{
+		int noOfIndices = indexedFaceSetNode->getNCoordIndexes();
+		SIG_Polygon *currentPolygon = nullptr;
+
+		for (int i=0; i < noOfIndices; i++) {
+			int currentIndex = indexedFaceSetNode->getCoordIndex(i);
+
+			// Before the polygon is created: SIG_Polygon self-registers in its
+			// constructor, so skipping every vertex would leave a 0-vertex face that
+			// SIG_Mirtich::compFaceNormal reads verts[0..2] from.
+			if (currentIndex < 0)
+				currentPolygon = nullptr;
+			else if ( currentIndex < vertices.size() ) {
+				if (!currentPolygon)
+					currentPolygon = new SIG_Polygon( geometry );
+				currentPolygon->appendVertex( vertices[ currentIndex ] );
+			}
+		}
+	}
+
 	void SIG_Body::readVRMLNode(Node *node, NEWMAT::Matrix transformation)
 	{
 		if ( node->isGroupNode() || node->isTransformNode() ) {
@@ -100,25 +121,7 @@ namespace SIGEL_Robot
 
 				CoordinateNode *coordinateNode = indexedFaceSetNode->getCoordinateNodes();
 				if (coordinateNode) {
-					int noOfIndices = indexedFaceSetNode->getNCoordIndexes();
-					QList< SIG_Vector > vertices = transformedVertices( coordinateNode, transformation );
-
-					SIG_Polygon *currentPolygon = nullptr;
-
-					for (int j=0; j < noOfIndices; j++) {
-						int currentIndex = indexedFaceSetNode->getCoordIndex(j);
-
-						// Before the polygon is created: SIG_Polygon self-registers in its
-						// constructor, so skipping every vertex would leave a 0-vertex face that
-						// SIG_Mirtich::compFaceNormal reads verts[0..2] from.
-						if (currentIndex < 0)
-							currentPolygon = nullptr;
-						else if ( currentIndex < vertices.size() ) {
-							if (!currentPolygon)
-								currentPolygon = new SIG_Polygon( geometry );
-							currentPolygon->appendVertex( vertices[ currentIndex ] );
-						};
-					};
+					appendFaces( indexedFaceSetNode, transformedVertices( coordinateNode, transformation ) );
 				};
 			};
 		};

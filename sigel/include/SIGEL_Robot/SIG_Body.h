@@ -55,6 +55,11 @@ namespace SIGEL_Robot
                  */
                 QList< SIG_Vector > transformedVertices( CoordinateNode *coordinateNode, NEWMAT::Matrix const &transformation ) const;
 
+                /**
+                 * Adds to the geometry one polygon for each -1-terminated index list in the face set's coordIndex.
+                 */
+                void appendFaces( IndexedFaceSetNode *indexedFaceSetNode, QList< SIG_Vector > const &vertices );
+
         public:
                 /**
                  * Nonstandard standard constructor.
