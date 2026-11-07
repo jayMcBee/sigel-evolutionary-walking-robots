@@ -71,9 +71,7 @@ public:
 
   public:
     /**
-     * Standard constructor.
-     *
-     * This makes the world entirely black.
+     * Standard constructor: a geometry without polygons or vertices.
      */
     SIG_Geometry () = default;
     /**

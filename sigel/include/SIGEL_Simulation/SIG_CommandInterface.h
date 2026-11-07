@@ -38,15 +38,7 @@ namespace SIGEL_Simulation
 class SIG_CommandInterface {
  public:
 
-  /** The constructor
-   * @pre
-   *  theSimulationData has been created
-   * @post
-   *  the SIG_CommandInterface will be created, simulationData will be set
-   *  to theSimulationData.
-   * @param theSimulationData 
-   *  A reference to the simulator's simulationData
-   */
+  /** The constructor */
   SIG_CommandInterface() = default;
 
   virtual ~SIG_CommandInterface() = default;

@@ -31,7 +31,8 @@
  * computed as in the Dynamo library's DL_matrix; only those SIGEL uses are
  * here.
  *
- * The default constructor leaves the elements uninitialised.
+ * A matrix declared without a value (SIG_Matrix m;) leaves the elements
+ * uninitialised; SIG_Matrix() and QList< SIG_Matrix >( n ) give zeros.
  */
 class SIG_Matrix
 {

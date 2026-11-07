@@ -47,15 +47,7 @@ namespace SIGEL_Simulation
 class SIG_SimulationQueries { 
  public:
 
-  /** the constructor
-   * @pre
-   *  the simulator has created theSimulationData
-   * @post
-   *  SIG_SimulationQueries is created. simulationData is set to
-   *  theSimulationData
-   * @param theSimulationData
-   *  reference to the simulator's simulationData
-   */
+  /** the constructor */
   SIG_SimulationQueries() = default;
 
   virtual ~SIG_SimulationQueries() = default;

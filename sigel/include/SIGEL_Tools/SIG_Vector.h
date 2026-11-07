@@ -30,7 +30,8 @@
  * A 3-vector. Its members are named and computed as in the Dynamo
  * library's DL_vector; only those SIGEL uses are here.
  *
- * The default constructor leaves x, y and z uninitialised.
+ * A vector declared without a value (SIG_Vector v;) leaves x, y and z
+ * uninitialised; SIG_Vector() and QList< SIG_Vector >( n ) give zeros.
  */
 class SIG_Vector
 {
