@@ -794,7 +794,7 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsTheJointPos
   QEXPECT_FAIL( "rotational, at its maximum", mirrored, Abort );
   QEXPECT_FAIL( "rotational, range off the middle", mirrored, Abort );
   QEXPECT_FAIL( "rotational, 16-bit register", mirrored, Abort );
-  QEXPECT_FAIL( "rotational, a full turn", "SIG_Joint normalises the limits -180 and 180 to the same angle, so the range in DynaMechs is 0 and SIG_DynaMechsSimulationQueries::sense divides by a range of 0", Abort );
+  QEXPECT_FAIL( "rotational, a full turn", mirrored, Abort );
   QVERIFY2( std::abs( value - expected ) <= 1, qPrintable( QString( "reads %1, expected %2" ).arg( value ).arg( expected ) ) );
 }
 
@@ -1053,7 +1053,6 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsAJointWitho
 
   const QString message = QString( "at 0, 90 and 360 degrees it reads %1, %2 and %3" ).arg( readings[ 0 ] ).arg( readings[ 1 ] ).arg( readings[ 2 ] );
   QVERIFY2( std::abs( readings[ 0 ] - readings[ 2 ] ) <= 1, qPrintable( message ) );
-  QEXPECT_FAIL( "", "SIG_Joint gives a joint without limits the range 0 to 0 in DynaMechs, so SIG_DynaMechsSimulationQueries::sense divides by a range of 0 and every angle reads the same", Abort );
   QVERIFY2( std::abs( readings[ 0 ] - readings[ 1 ] ) > 1, qPrintable( message ) );
 }
 

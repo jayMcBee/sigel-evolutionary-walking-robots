@@ -28,7 +28,6 @@
 #include "SIGEL_Tools/SIG_Vector.h"
 #include <cmath>
 #include <numbers>
-#include <limits>
 
 #include "SIGEL_Robot/SIG_JointSensor.h"
 #include "SIGEL_Robot/SIG_PitchRollSensor.h"
@@ -111,8 +110,17 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense(int sensorNo,
 														minPos = joint->getMechsMinPos();
 														maxPos = joint->getMechsMaxPos();
 
-														if ( (minPos == std::numeric_limits<double>::lowest()) && (maxPos == std::numeric_limits<double>::max()) )
-														posRange = 1;
+														if ( (minPos == maxPos) && (joint->getJointType() == SIGEL_Robot::SIG_Joint::tRotationalJoint) )
+														{
+															// Equal limits are no limits, as in SIG_DynaMechsSimulationData: the angle is read over one turn from minPos.
+															posRange = 2 * std::numbers::pi;
+															q = minPos + std::fmod( q - minPos, posRange );
+
+															if (q < minPos)
+															{
+																q += posRange;
+															}
+														}
 														else
 														{	posRange = maxPos - minPos;
 
