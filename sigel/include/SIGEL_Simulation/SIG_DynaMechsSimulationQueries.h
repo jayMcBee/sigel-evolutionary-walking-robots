@@ -28,7 +28,10 @@
 #include "SIGEL_Simulation/SIG_Register.h"
 #include "SIGEL_Simulation/SIG_SimulationQueries.h"
 #include <qdatetime.h>
+#include <optional>
 #include <vector>
+
+namespace SIGEL_Robot { class SIG_JointSensor; class SIG_PitchRollSensor; class SIG_ContactSensor; }
 
 namespace SIGEL_Simulation
 {
@@ -50,6 +53,15 @@ namespace SIGEL_Simulation
 		/** the reference to the simulator's simulationData
 		 */
 		SIG_DynaMechsSimulationData &simulationData;
+
+		/** The joint's position in its range, 0 at the minimum and 1 at the maximum; a rotational joint without limits over one turn. */
+		double readJointSensor( SIGEL_Robot::SIG_JointSensor const *jointSensor ) const;
+
+		/** The pitch or roll angle from -90 to 90 degrees, as 0 to 1. */
+		double readPitchRollSensor( SIGEL_Robot::SIG_PitchRollSensor *prSensor ) const;
+
+		/** 1 if a contact point of the link touches the ground, else 0; none without a contact model. */
+		std::optional<double> readContactSensor( SIGEL_Robot::SIG_ContactSensor const *ctSensor ) const;
 
 	public:
 		/** the constructor
