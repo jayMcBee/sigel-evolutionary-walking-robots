@@ -94,11 +94,6 @@ touched, because changing one changes behaviour against the reference binary.
   experiments that select `ForceFitnessFunction` are affected; no shipped
   experiment does. No patch to the library touches this method.
 
-- [ ] **73. Fix the latent sensor bugs in
-  `SIG_DynaMechsSimulationQueries::sense`:** pitch at 90° or more reads as 1,
-  and `acos`/`asin` get no clamp. No shipped robot triggers it. The QEXPECT_FAIL rows in
-  `TST_SIG_DynaMechsSimulationQueries` state the correct readings.
-
 - [ ] **76. Warn when a mesh has negative volume.** Inverted face winding
   gives negative mass and inertia in `SIG_Mirtich::computePhysics`; the robot
   loads and the simulation runs into NaN. The robot check reports it as
