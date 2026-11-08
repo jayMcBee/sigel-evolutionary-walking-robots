@@ -45,6 +45,15 @@ Paths are relative to `sigel/`, the source tree.
   general math among them, such as `rotationMatrix` and `tolerantACos`,
   goes into the helper class of item 144.
 
+- [ ] **187. Use `std::clamp`, `std::min` and `std::max` for hand-written
+  limits.** Many places limit a value with `if` chains over several lines,
+  where one standard call says the same thing. Find them with clang-tidy's
+  `readability-use-std-min-max` (single `if`s) and a `clang-query` matcher
+  (the `if … else if` form, which clang-tidy skips). `std::clamp` is
+  undefined when the lower bound is above the upper one, so check at each
+  place that the bounds are in order: the robot compiler, for example,
+  accepts a slider with its minimum above its maximum.
+
 ---
 
 ## 3 · Defects preserved by the port
