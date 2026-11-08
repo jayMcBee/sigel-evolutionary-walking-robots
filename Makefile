@@ -101,6 +101,7 @@ $(PVM_LIB) $(PVM_D) &: $(STAMP)
 	  echo "PVM built nothing in lib/LINUX64 -- this machine's" \
 	       "lib/pvmgetarch says $$($(PVM_DIR)/lib/pvmgetarch)." >&2; \
 	  exit 1; }
+	@touch $(PVM_LIB) $(PVM_D)
 
 # A patch that reverse-applies cleanly is already in the tree; skip it. Anything
 # else that will not apply is a real error and stops the build.

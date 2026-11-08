@@ -18,6 +18,6 @@ our patch stamp survives, and the build keeps objects whose sources are
 gone. Remove the tree first. The `Makefile` header explains
 the traps in full.
 
-`patches/` holds the 12 fixes `make` applies to
+`patches/` holds the 14 fixes `make` applies to
 `downloads/supportingLibs/`, so that it builds and runs with a current
 toolchain.

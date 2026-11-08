@@ -281,7 +281,7 @@ sigel/                                      the repo root
 │   ├── sigelLauncher  sigelDynClient       sigelDynClient: item 47
 │   └── COPYING  README                     upstream, 2003
 ├── vendor/                                 third-party code and our fixes to it
-│   ├── patches/                            13 patches, applied by `make`
+│   ├── patches/                            14 patches, applied by `make`
 │   ├── supportingLibs.tar.gz               tracked, so a clone builds offline
 │   └── pvm3.4.6.tgz                        upstream PVM, tracked -- Phase P
 ├── experiments/                            the 7 kept experiments, tracked
@@ -924,6 +924,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 
 ### Handover — one owner at a time
+
+**2026-11-07 — DONE: NEWMAT SOLVES A SYSTEM WITH A RIGHT SIDE OF ZERO.**
+
+- `NEWMAT::CroutMatrix::lubksb` left `ii` unset when the right side is all
+  zeros and then read memory at a random place. `SIG_Link::calculateCommonNormal`
+  solves such a system when two joint axes cut, and crashed now and then. The
+  patch `newmat09-lubksb-zero-right-side.patch` starts `ii` at `nrows`, as
+  newmat 11 does.
+- The `Makefile` touches `libpvm3.a` and `pvmd3` after PVM's own make. A new
+  vendor patch of any library left them older than the patch stamp, and every
+  program stayed out of date.
 
 **2026-11-07 — DONE: ITEM 169, `SIG_Body` READS THE FACES IN EVERY VRML 97 GROUPING NODE.**
 

@@ -1,0 +1,11 @@
+--- a/newmat09/newmat8.cpp
++++ b/newmat09/newmat8.cpp
+@@ -103,7 +103,7 @@
+ 
+    Tracer trace("Crout(lubksb)");
+    if (sing) Throw(SingularException(*this));
+-   int i, j, ii;
++   int i, j, ii = nrows;           // ii initialised : B might be all zeros
+ 
+ 
+    // scan for first non-zero in B
