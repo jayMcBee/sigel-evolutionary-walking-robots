@@ -54,8 +54,8 @@ namespace SIGEL_Simulation
 		 */
 		SIG_DynaMechsSimulationData &simulationData;
 
-		/** The joint's position in its range, 0 at the minimum and 1 at the maximum; a rotational joint without limits over one turn. */
-		double readJointSensor( SIGEL_Robot::SIG_JointSensor const *jointSensor ) const;
+		/** The joint's position in its range, 0 at the minimum and 1 at the maximum; a rotational joint without limits over one turn; none for a translational joint without limits. */
+		std::optional<double> readJointSensor( SIGEL_Robot::SIG_JointSensor const *jointSensor ) const;
 
 		/** The pitch or roll angle from -90 to 90 degrees, as 0 to 1. */
 		double readPitchRollSensor( SIGEL_Robot::SIG_PitchRollSensor *prSensor ) const;

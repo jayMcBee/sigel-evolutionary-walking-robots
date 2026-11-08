@@ -104,7 +104,7 @@ namespace SIGEL_Simulation
 
     void senseReadsAJointWithoutLimitsByItsAngle();
 
-    void senseReadsASliderWithoutLimitsByItsPosition();
+    void senseLeavesTheRegisterForASliderWithoutLimits();
 
     void senseReadsContactWithTheGroundAsTheTopOfTheRegister_data();
     void senseReadsContactWithTheGroundAsTheTopOfTheRegister();

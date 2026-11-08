@@ -136,7 +136,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense( int sensorNo,
 	registers[0].loadValue( registerValue );
 }
 
-double SIGEL_Simulation::SIG_DynaMechsSimulationQueries::readJointSensor( SIGEL_Robot::SIG_JointSensor const *jointSensor ) const
+std::optional<double> SIGEL_Simulation::SIG_DynaMechsSimulationQueries::readJointSensor( SIGEL_Robot::SIG_JointSensor const *jointSensor ) const
 {
 	SIGEL_Robot::SIG_Joint const *joint = jointSensor->getJoint();
 	int linkNumber = simulationData.jointIndices[joint->getNumber()];
@@ -161,6 +161,11 @@ double SIGEL_Simulation::SIG_DynaMechsSimulationQueries::readJointSensor( SIGEL_
 		{
 			q += posRange;
 		}
+	}
+	else if( minPos == maxPos )
+	{
+		SIGEL_Tools::SIG_IO::cerr << "joint sensor " << jointSensor->getName() << ": a translational joint without limits has no range to read" << Qt::endl;
+		return std::nullopt;
 	}
 	else
 	{

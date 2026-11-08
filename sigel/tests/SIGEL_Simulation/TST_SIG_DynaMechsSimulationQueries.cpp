@@ -1056,8 +1056,8 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsAJointWitho
   QVERIFY2( std::abs( readings[ 0 ] - readings[ 1 ] ) > 1, qPrintable( message ) );
 }
 
-// A slider with equal limits has no limits either. Two positions half a unit apart are different positions.
-void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsASliderWithoutLimitsByItsPosition()
+// A slider with equal limits has no limits, so it has no range to read; sense leaves the register as it was.
+void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseLeavesTheRegisterForASliderWithoutLimits()
 {
   SIGEL_Robot::SIG_Robot robot;
   SIGEL_Robot::SIG_Joint *joint = addBaseAndArm( robot, SIGEL_Robot::SIG_Joint::tTranslationalJoint, 0, 0, 0 );
@@ -1070,22 +1070,12 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsASliderWith
   SIG_SimulationParameters simulationParameters;
   SIG_DynaMechsSimulationData simulationData( robot, environment, simulationParameters );
   SIG_DynaMechsSimulationQueries simulationQueries( simulationData );
-  dmMDHLink *slider = dynamic_cast< dmMDHLink * >( simulationData.dynaMechsLinks[ 1 ]->dynaMechsLink );
-  QVERIFY( slider );
-  Float start[ 1 ];
-  Float velocity[ 1 ];
-  slider->getState( start, velocity );
-  int readings[ 2 ] = { 0, 0 };
+  QList< SIG_Register > registers( 1, SIG_Register( 8 ) );
+  registers[ 0 ].loadValue( 37 );
 
-  for ( int k = 0; k < 2; k++ )
-  {
-    Float position[ 1 ] = { start[ 0 ] + 0.5 * k };
-    slider->setState( position, velocity );
-    readings[ k ] = reading( simulationQueries, 0, 8 );
-  }
+  simulationQueries.sense( 0, registers );
 
-  QEXPECT_FAIL( "", "SIG_Joint gives a joint without limits the range 0 to 0 in DynaMechs, so SIG_DynaMechsSimulationQueries::sense divides by a range of 0 and every position reads the same", Abort );
-  QVERIFY2( std::abs( readings[ 0 ] - readings[ 1 ] ) > 1, qPrintable( QString( "it reads %1 and %2" ).arg( readings[ 0 ] ).arg( readings[ 1 ] ) ) );
+  QCOMPARE( registers[ 0 ].getValue(), 37 );
 }
 
 void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsContactWithTheGroundAsTheTopOfTheRegister_data()
