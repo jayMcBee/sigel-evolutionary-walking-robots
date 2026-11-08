@@ -95,11 +95,10 @@ touched, because changing one changes behaviour against the reference binary.
   experiment does. No patch to the library touches this method.
 
 - [ ] **73. Fix the latent sensor bugs in
-  `SIG_DynaMechsSimulationQueries::sense`:** a joint with equal limits, or
-  limits that normalise to the same angle (0/360, -180/180), reads NaN; pitch
-  at 90° or more reads as 1, and `acos`/`asin` get no clamp; with no contact
-  model, or on the `default:` branch, an uninitialised value is loaded. No shipped robot triggers
-  any of them.
+  `SIG_DynaMechsSimulationQueries::sense`:** a slider with equal limits reads
+  NaN; pitch at 90° or more reads as 1, and `acos`/`asin` get no clamp. No
+  shipped robot triggers them. The QEXPECT_FAIL rows in
+  `TST_SIG_DynaMechsSimulationQueries` state the correct readings.
 
 - [ ] **76. Warn when a mesh has negative volume.** Inverted face winding
   gives negative mass and inertia in `SIG_Mirtich::computePhysics`; the robot
