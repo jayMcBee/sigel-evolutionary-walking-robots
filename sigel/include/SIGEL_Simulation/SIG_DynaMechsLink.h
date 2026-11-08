@@ -46,6 +46,8 @@ class SIG_DynaMechsLink
 		       double screwD,
 		       double screwTheta );
 
+    ~SIG_DynaMechsLink();
+
     int const dynaMechsLinkNumber;
 
     SIGEL_Robot::SIG_Link const * const link;

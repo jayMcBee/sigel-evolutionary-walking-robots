@@ -925,6 +925,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-08 — DONE: `SIG_DynaMechsLink` DELETES ITS DYNAMECHS LINK.**
+
+- `dmArticulation` does not delete the links added to it, so every
+  simulation leaked its DynaMechs links. The `SIG_DynaMechsLink` destructor
+  deletes the link it wraps. The sanitized fitness check runs without leaks.
+
 **2026-11-07 — DONE: NEWMAT SOLVES A SYSTEM WITH A RIGHT SIDE OF ZERO.**
 
 - `NEWMAT::CroutMatrix::lubksb` left `ii` unset when the right side is all

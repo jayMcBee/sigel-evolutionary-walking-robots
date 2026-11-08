@@ -118,6 +118,12 @@ namespace SIGEL_Simulation
 		dynaMechsLink->addForce( &contactModel );
 	}
 
+	SIG_DynaMechsLink::~SIG_DynaMechsLink()
+	{
+		// dmArticulation does not delete the links added to it.
+		delete dynaMechsLink;
+	}
+
 	void SIG_DynaMechsLink::forwardKinematics( SIG_DynaMechsLink *caller )
 	{
 		if (!caller)
