@@ -33,108 +33,106 @@
 namespace SIGEL_Simulation
 {
 
-/**
- * This class is used to query actual data about the simulation.
- *
- * Several entities as for example the recorder or the interpreter
- * need to be able to get actual values from the simulator. For this task the
- * class SIG_SimulationQueries is needed. It gives access to relevant
- * simulation data. Its functionality will be expanded as needed by
- * more sophisticated fitness-functions (respectively their recorders).
- * Especially it can be used to query the actual simulation time and the
- * position of each robot link.
- */
-  class SIG_DynaMechsSimulationQueries : public SIG_SimulationQueries
-  {
- private:
+	/**
+	 * This class is used to query actual data about the simulation.
+	 *
+	 * Several entities as for example the recorder or the interpreter
+	 * need to be able to get actual values from the simulator. For this task the
+	 * class SIG_SimulationQueries is needed. It gives access to relevant
+	 * simulation data. Its functionality will be expanded as needed by
+	 * more sophisticated fitness-functions (respectively their recorders).
+	 * Especially it can be used to query the actual simulation time and the
+	 * position of each robot link.
+	 */
+	class SIG_DynaMechsSimulationQueries : public SIG_SimulationQueries
+	{
+	private:
+		/** the reference to the simulator's simulationData
+		 */
+		SIG_DynaMechsSimulationData &simulationData;
 
-  /** the reference to the simulator's simulationData
-   */
-  SIG_DynaMechsSimulationData& simulationData;
+	public:
+		/** the constructor
+		 * @pre
+		 *  the simulator has created theSimulationData
+		 * @post
+		 *  SIG_SimulationQueries is created. simulationData is set to
+		 *  theSimulationData
+		 * @param theSimulationData
+		 *  reference to the simulator's simulationData
+		 */
+		SIG_DynaMechsSimulationQueries( SIG_DynaMechsSimulationData &theSimulationData );
 
- public:
+		/** Interprets the SENSE command and writes the results into the registers */
+		void sense( int sensorNo, QList<SIG_Register> &registers ) const override;
 
-  /** the constructor
-   * @pre
-   *  the simulator has created theSimulationData
-   * @post
-   *  SIG_SimulationQueries is created. simulationData is set to
-   *  theSimulationData
-   * @param theSimulationData
-   *  reference to the simulator's simulationData
-   */
-  SIG_DynaMechsSimulationQueries(SIG_DynaMechsSimulationData& theSimulationData);
+		/** The current simulated time, frame*stepsize, cut to whole seconds. */
+		QTime getCurrentSimulationWholeSeconds() const override;
 
-  /** Interprets the SENSE command and writes the results into the registers */
-  void sense(int sensorNo,QList<SIG_Register> & registers) const override;
+		double getCurrentSimulationSeconds() const override;
 
-  /** The current simulated time, frame*stepsize, cut to whole seconds. */
-  QTime getCurrentSimulationWholeSeconds() const override;
+		/** gets the position of link linkNo
+		 * @pre
+		 *  none
+		 * @post
+		 *  none
+		 * @param linkNo
+		 *  the number of the link. if the link doesn't exist, it is calculated
+		 *  modulo maxlinks
+		 * @return
+		 *  the position of the center of mass of link linkNo
+		 */
+		SIG_Vector getLinkPosition( int linkNo ) const override;
 
-  double getCurrentSimulationSeconds() const override;
+		/** gets the orientation of link linkNo
+		 * @pre
+		 *  none
+		 * @post
+		 *  none
+		 * @param linkNo
+		 *  the number of the link. if the link doesn't exist, it is calculated
+		 *  modulo maxlinks
+		 * @return
+		 *  the orientation of the link relativ to the original orientation
+		 */
+		SIG_Matrix getLinkOrientation( int linkNo ) const override;
 
-  /** gets the position of link linkNo
-   * @pre
-   *  none
-   * @post
-   *  none
-   * @param linkNo
-   *  the number of the link. if the link doesn't exist, it is calculated
-   *  modulo maxlinks
-   * @return
-   *  the position of the center of mass of link linkNo
-   */
-  SIG_Vector getLinkPosition(int linkNo) const override;
+		/** gets the number of the torso link
+		 * @pre
+		 *  none
+		 * @post
+		 *  none
+		 * @return
+		 *  the number of the torso link
+		 */
+		int getRootNumber() const override;
 
-  /** gets the orientation of link linkNo
-   * @pre
-   *  none
-   * @post
-   *  none
-   * @param linkNo
-   *  the number of the link. if the link doesn't exist, it is calculated
-   *  modulo maxlinks
-   * @return
-   *  the orientation of the link relativ to the original orientation
-   */
-  SIG_Matrix getLinkOrientation(int linkNo) const override;
+		/** gets the forces of each link enacted this timeframe
+		 * @pre
+		 *  none
+		 * @post
+		 *  none
+		 * @return
+		 *  the forces of each link this frame. The forces are stored in a array of size 6. The first three doubles specify the
+		 *  moment and the last three doubles are the 3-d force vector.
+		 *  see also: S. McMillan: Computational Dynamics for Robotic Systems on Land and Under Water, Introduction, page 6.
+		 *  The double* is the pointer to this array.
+		 *  for each link the array is stored in the vector. For example: to query the force for link3, you have to write vector[2].
+		 */
+		std::vector<double *> *getUsedForces() const override;
 
-  /** gets the number of the torso link
-   * @pre
-   *  none
-   * @post
-   *  none
-   * @return
-   *  the number of the torso link
-   */
-  int getRootNumber() const override;
+		/** gets the number of links
+		 * @pre
+		 *  none
+		 * @post
+		 *  none
+		 * @return
+		 *  the number of links
+		 */
+		int getLinkCount() const override;
 
-  /** gets the forces of each link enacted this timeframe
-   * @pre
-   *  none
-   * @post
-   *  none
-   * @return
-   *  the forces of each link this frame. The forces are stored in a array of size 6. The first three doubles specify the
-   *  moment and the last three doubles are the 3-d force vector.
-   *  see also: S. McMillan: Computational Dynamics for Robotic Systems on Land and Under Water, Introduction, page 6.
-   *  The double* is the pointer to this array.
-   *  for each link the array is stored in the vector. For example: to query the force for link3, you have to write vector[2].
-   */
-  std::vector<double*>* getUsedForces() const override;
-
-  /** gets the number of links
-   * @pre
-   *  none
-   * @post
-   *  none
-   * @return
-   *  the number of links
-   */
-  int getLinkCount() const override;
-
-  void checkDynas() const override;
-};
+		void checkDynas() const override;
+	};
 
 }
 
