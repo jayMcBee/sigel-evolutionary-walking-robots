@@ -649,8 +649,6 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::constructorTurnsTheRootL
       }
     }
   }
-  QEXPECT_FAIL( "150 degrees about an axis near y", "SIG_DynaMechsSimulationData::rotationMatrixToQuaternion takes a difference where it needs a sum for x when z is the largest part", Abort );
-  QEXPECT_FAIL( "100 degrees about an axis near x", "SIG_DynaMechsSimulationData::rotationMatrixToQuaternion takes a difference where it needs a sum for z when x is the largest part", Abort );
   QCOMPARE( mismatch, QString() );
 }
 

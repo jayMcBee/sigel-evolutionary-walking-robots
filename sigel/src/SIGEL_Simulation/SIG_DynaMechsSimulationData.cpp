@@ -563,7 +563,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::rotationMatrixToQuaternion( 
 		z = s*0.5;
 		s = 0.5/s;
 
-		x = (rotationMatrix(3,1) - rotationMatrix(1,3))*s;
+		x = (rotationMatrix(3,1) + rotationMatrix(1,3))*s;
 		y = (rotationMatrix(3,2) + rotationMatrix(2,3))*s;
 		w = (rotationMatrix(1,2) - rotationMatrix(2,1))*s;
 		return;
@@ -590,7 +590,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::rotationMatrixToQuaternion( 
 		s = 0.5/s;
 
 		y = (rotationMatrix(2,1) + rotationMatrix(1,2))*s;
-		z = (rotationMatrix(3,1) - rotationMatrix(1,3))*s;
+		z = (rotationMatrix(3,1) + rotationMatrix(1,3))*s;
 		w = (rotationMatrix(2,3) - rotationMatrix(3,2))*s;
 		return;
 	}

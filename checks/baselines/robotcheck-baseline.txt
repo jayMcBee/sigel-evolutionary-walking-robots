@@ -13,7 +13,7 @@ Standing	suggestion	thirdLegJoint3	Robot settles before it rests	With no drive a
 check: errors 0, warnings 2, suggestions 2
 ## runner.exp
 JointStart	warning	secondLegJoint1 (init -45, range -90..-50), firstLegJoint1 (init -45, range -90..-50)	Joint starts outside its range	The start angle of these joints is outside their own range, so the limit spring kicks them at the first step.	Put init between minimal and maximal.
-Standing	suggestion	firstLegJoint3	Robot settles before it rests	With no drive active this joint turns 22 degrees before the robot rests, so every run starts with this motion.	Put the start angles where the robot rests.
+Standing	suggestion	firstLegJoint3	Robot settles before it rests	With no drive active this joint turns 21 degrees before the robot rests, so every run starts with this motion.	Put the start angles where the robot rests.
 check: errors 0, warnings 1, suggestions 1
 ## shortHammer.exp
 LimitHoldsDrive	warning	hinge1Drive, hinge3Drive, hinge2Drive	Joint limit cannot hold its drive	These drives can push their joint up to 1146 degrees past its limit, more than the joint's range of 180 degrees. The joint may fold through or spin freely.	Lower the drive force or raise the joint-limit spring.
