@@ -53,6 +53,7 @@ SIG_Link::SIG_Link( SIG_Robot *par, QString n, int nr )
 	  mdh_visited( false )
 {
 	initialOrientation.makeone();
+	modelToDynaMechsRotation.makeone();
 }
 
 SIG_Link::SIG_Link( SIG_Robot *par, QTextStream &tx )
@@ -93,6 +94,11 @@ SIG_Link::SIG_Link( SIG_Robot *par, QTextStream &tx )
 	initiated = ( tmpstr == "y" );
 	tx >> tmpstr;
 	mdh_visited = ( tmpstr == "y" );
+	modelToDynaMechsRotation.makeone();
+	if( mdh_visited )
+	{
+		modelToDynaMechsRotation = SIG_Robot::streamToMatrix( tx );
+	}
 
 	tmpstr = SIGEL_Tools::SIG_FileUtils::readWordOrQuoted( tx );
 	body = parent->lookupBody( tmpstr );
@@ -358,6 +364,10 @@ void SIG_Link::writeToFileTransfer( QTextStream &tx ) const
 	SIG_Robot::matrixToStream( tx, initialOrientation );
 	tx << ( initiated ? "y " : "n " );
 	tx << ( mdh_visited ? "y " : "n " );
+	if( mdh_visited )
+	{
+		SIG_Robot::matrixToStream( tx, modelToDynaMechsRotation );
+	}
 	tx << SIGEL_Tools::SIG_FileUtils::quotedIfContainsWhitespace( body->getName() ) << ' '
 	   << material->getName() << ' ';
 	if( geometry )
@@ -374,6 +384,11 @@ void SIG_Link::writeToFileTransfer( QTextStream &tx ) const
 bool SIG_Link::isMDHVisited() const
 {
 	return mdh_visited;
+}
+
+SIG_Matrix SIG_Link::getModelToDynaMechsRotation() const
+{
+	return modelToDynaMechsRotation;
 }
 
 void SIG_Link::transformToDynaMechs( SIG_Joint *predecessor,
@@ -708,6 +723,7 @@ void SIG_Link::transformToDynaMechs( SIG_Joint *predecessor,
 		newCoordinates.Column( 3 ) = SIG_TypeConverter::toColumnVector( realNewZAxis );
 
 		NEWMAT::Matrix rotation = newCoordinates.i();
+		modelToDynaMechsRotation = SIG_TypeConverter::toSIG_Matrix( rotation );
 
 		NEWMAT::ColumnVector translation = SIG_TypeConverter::toColumnVector( realNewOrigin ) * -1;
 

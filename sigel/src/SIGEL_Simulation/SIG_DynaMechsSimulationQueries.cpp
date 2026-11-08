@@ -26,6 +26,7 @@
 #include <qdatetime.h>
 #include "SIGEL_Tools/SIG_Matrix.h"
 #include "SIGEL_Tools/SIG_Vector.h"
+#include <algorithm>
 #include <cmath>
 #include <numbers>
 #include <optional>
@@ -212,37 +213,29 @@ std::optional<double> SIGEL_Simulation::SIG_DynaMechsSimulationQueries::readJoin
 
 double SIGEL_Simulation::SIG_DynaMechsSimulationQueries::readPitchRollSensor( SIGEL_Robot::SIG_PitchRollSensor *prSensor ) const
 {
-	SIG_Matrix myMat = getLinkOrientation( prSensor->getLink()->getNumber() );
+	// The orientation of the link's model frame.
+	SIG_Matrix dynaMechsOrientation = getLinkOrientation( prSensor->getLink()->getNumber() );
+	SIG_Matrix modelToDynaMechsRotation = prSensor->getLink()->getModelToDynaMechsRotation();
+	SIG_Matrix orientation;
+	dynaMechsOrientation.times( &modelToDynaMechsRotation, &orientation );
 
-	double pitch = std::acos( myMat.get( 1, 0 ) );
-	double roll = -std::asin( myMat.get( 0, 0 ) );
+	// Row 1 is the vertical in that frame, which a turn about the vertical leaves as it is.
+	// The link's x axis is its front: pitch turns about z, roll about x.
 	double angle;
 
-	// what type (0..360 degrees) ?
 	if( prSensor->IsPitchType() )
 	{
-		angle = pitch * ( 360.0 / ( 2.0 * std::numbers::pi ) );
+		angle = std::atan2( orientation.get( 1, 0 ), orientation.get( 1, 1 ) );
 	}
 	else
 	{
-		angle = roll * ( 360.0 / ( 2.0 * std::numbers::pi ) );
+		angle = std::atan2( -orientation.get( 1, 2 ), orientation.get( 1, 1 ) );
 	}
 
-	// limit to 0..360 degrees
-	angle = fmod( angle, 360.0 );
+	// A link turned past a quarter turn reads as the quarter turn.
+	angle = std::clamp( angle, -std::numbers::pi / 2, std::numbers::pi / 2 );
 
-	// limit to -90/90 degrees -- required for scaling value to some register value
-	if( angle > 90 )
-	{
-		angle = 90;
-	}
-	else if( angle < -90 )
-	{
-		angle = -90;
-	}
-
-	// min. pos is -90, see above..
-	return ( angle + 90 ) / 180;
+	return ( angle + std::numbers::pi / 2 ) / std::numbers::pi;
 }
 
 std::optional<double> SIGEL_Simulation::SIG_DynaMechsSimulationQueries::readContactSensor( SIGEL_Robot::SIG_ContactSensor const *ctSensor ) const

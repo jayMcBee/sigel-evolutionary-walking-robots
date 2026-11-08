@@ -106,6 +106,8 @@ namespace SIGEL_Robot
 		void getInitialLocation( SIG_Vector &p, SIG_Matrix &o ) const;
 		bool isInitiated() const;
 		bool isMDHVisited() const;
+		/** The turn from the link's model frame to its DynaMechs frame, which transformToDynaMechs gives its points. */
+		SIG_Matrix getModelToDynaMechsRotation() const;
 		void calculateCommonNormal( SIG_Vector a,
 		                            SIG_Vector u,
 		                            SIG_Vector b,
@@ -131,6 +133,7 @@ namespace SIGEL_Robot
 		QList<SIG_Link *> noCollide;
 		SIG_Vector initialLocation;
 		SIG_Matrix initialOrientation;
+		SIG_Matrix modelToDynaMechsRotation;
 		bool initiated, mdh_visited;
 	};
 

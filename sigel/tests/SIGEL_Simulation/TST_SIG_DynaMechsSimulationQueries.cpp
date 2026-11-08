@@ -1303,8 +1303,6 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsALevelLinkA
   SIG_DynaMechsSimulationQueries simulationQueries( simulationData );
 
   const int value = reading( simulationQueries, 0, 8 );
-  QEXPECT_FAIL( "pitch", "SIG_DynaMechsSimulationQueries::sense takes the angle between the link's x axis and the vertical as the pitch, so a level link reads 90 degrees", Abort );
-  QEXPECT_FAIL( "roll", "SIG_DynaMechsSimulationQueries::sense takes minus the arc sine of the x part of the link's x axis as the roll, so a level link reads -90 degrees", Abort );
   QVERIFY2( std::abs( value ) <= 1, qPrintable( QString( "reads %1" ).arg( value ) ) );
 }
 
@@ -1337,7 +1335,6 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsATiltAboutO
   }
 
   const bool oneAxisEach = tiltAxis[ 0 ] >= 0 && tiltAxis[ 0 ] < 3 && tiltAxis[ 1 ] >= 0 && tiltAxis[ 1 ] < 3 && tiltAxis[ 0 ] != tiltAxis[ 1 ];
-  QEXPECT_FAIL( "", "SIG_DynaMechsSimulationQueries::sense takes the angle between the link's x axis and the vertical as the pitch and minus the arc sine of the x part of the link's x axis as the roll", Abort );
   QVERIFY2( oneAxisEach, qPrintable( readings ) );
 }
 
@@ -1430,11 +1427,6 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsTheSameTilt
   const int unturned = tiltReading( pitch, tilt );
   const int turned = tiltReading( pitch, product( turnAbout( 1, degrees ), tilt ) );
 
-  const char *roll = "SIG_DynaMechsSimulationQueries::sense takes minus the arc sine of the x part of the link's x axis as the roll, which a turn about the vertical changes";
-  QEXPECT_FAIL( "roll, level, turned 45 degrees", roll, Abort );
-  QEXPECT_FAIL( "roll, level, turned 90 degrees", roll, Abort );
-  QEXPECT_FAIL( "roll, tilted about x, turned 90 degrees", roll, Abort );
-  QEXPECT_FAIL( "roll, tilted about z, turned 90 degrees", roll, Abort );
   QVERIFY2( std::abs( turned - unturned ) <= 1, qPrintable( QString( "reads %1, unturned %2" ).arg( turned ).arg( unturned ) ) );
 }
 
@@ -1479,7 +1471,6 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsATiltPastAQ
     }
   }
 
-  QEXPECT_FAIL( "", "SIG_DynaMechsSimulationQueries::sense takes the angle between the link's x axis and the vertical as the pitch and minus the arc sine of the x part of the link's x axis as the roll", Abort );
   QCOMPARE( mismatch, QString() );
 }
 
@@ -1549,7 +1540,6 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsTheTiltThat
   SIG_Matrix noTurn;
   noTurn.makeone();
   const int level = tiltReading( pitch, noTurn );
-  QEXPECT_FAIL( "pitch, one way", "SIG_DynaMechsSimulationQueries::sense takes the angle between the link's x axis and the vertical as the pitch, so this tilt reads the 90 degrees of a level link", Abort );
   QVERIFY2( std::abs( value - level ) > 1, qPrintable( QString( "reads %1, a level box %2" ).arg( value ).arg( level ) ) );
 }
 
@@ -1590,7 +1580,6 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsTheTiltOfAL
     readings[ linkNumber ] = reading( simulationQueries, 0, 8 );
   }
 
-  QEXPECT_FAIL( "roll", "SIG_DynaMechsSimulationQueries::sense takes the roll from the x part of the x axis of the link's DynaMechs frame, which for a link behind a joint is turned against the model", Abort );
   QVERIFY2( std::abs( readings[ 1 ] - readings[ 0 ] ) <= 1, qPrintable( QString( "the arm reads %1, the base %2" ).arg( readings[ 1 ] ).arg( readings[ 0 ] ) ) );
 }
 
@@ -1605,9 +1594,9 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsTheTiltOfAL
   QTest::newRow( "roll, -30" ) << false << -30.0;
 }
 
-// A hip with a level axis along z tilts the leg behind it. With the start value 30 or -30 the arm is turned
-// from its pose at 0 by some turn; its tilt sensor then reads what one on a box turned that way reads,
-// and not what it reads at 0.
+// A hip with a level axis tilts the leg behind it: along z for the pitch, along x for the roll. With the start
+// value 30 or -30 the arm is turned from its pose at 0 by some turn; its tilt sensor then reads what one on a
+// box turned that way reads, and not what it reads at 0.
 void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsTheTiltOfALinkThatItsJointHasTilted()
 {
   QFETCH( bool, pitch );
@@ -1624,8 +1613,17 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsTheTiltOfAL
     SIGEL_Robot::SIG_RotationalJoint *hip = new SIGEL_Robot::SIG_RotationalJoint( &robot, "hip", 0 );
     hip->setLeftLink( base );
     hip->setRightLink( arm );
-    hip->setLeftPoints( SIG_Vector( 1, 0, 0 ), SIG_Vector( 1, 0, 1 ), SIG_Vector( 2, 0, 0 ) );
-    hip->setRightPoints( SIG_Vector( -1, 0, 0 ), SIG_Vector( -1, 0, 1 ), SIG_Vector( 0, 0, 0 ) );
+    if ( pitch )
+    {
+      hip->setLeftPoints( SIG_Vector( 1, 0, 0 ), SIG_Vector( 1, 0, 1 ), SIG_Vector( 2, 0, 0 ) );
+      hip->setRightPoints( SIG_Vector( -1, 0, 0 ), SIG_Vector( -1, 0, 1 ), SIG_Vector( 0, 0, 0 ) );
+    }
+    else
+    {
+      // Off the base's z axis, which an axis along x through the base's origin would cut.
+      hip->setLeftPoints( SIG_Vector( 1, 0.5, 0 ), SIG_Vector( 2, 0.5, 0 ), SIG_Vector( 1, 0.5, 1 ) );
+      hip->setRightPoints( SIG_Vector( -1, 0.5, 0 ), SIG_Vector( 0, 0.5, 0 ), SIG_Vector( -1, 0.5, 1 ) );
+    }
     hip->setRange( -120, 120, starts[ run ] );
     robot.addJoint( hip );
     SIGEL_Robot::SIG_PitchRollSensor *sensor = new SIGEL_Robot::SIG_PitchRollSensor( &robot, "tilt", 0 );
@@ -1653,7 +1651,6 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsTheTiltOfAL
   QVERIFY2( turn.get( 1, 1 ) < std::cos( 20 * M_PI / 180 ), qPrintable( QString( "the arm is tilted by %1 degrees" ).arg( std::acos( std::min( 1.0, turn.get( 1, 1 ) ) ) * 180 / M_PI ) ) );
   const int expected = tiltReading( pitch, turn );
   QVERIFY2( std::abs( armReadings[ 1 ] - expected ) <= 1, qPrintable( QString( "the arm reads %1, a box turned so %2" ).arg( armReadings[ 1 ] ).arg( expected ) ) );
-  QEXPECT_FAIL( "pitch, 30", "SIG_DynaMechsSimulationQueries::sense takes the angle between the link's x axis and the vertical as the pitch, so this tilt reads the 90 degrees of the untilted arm", Abort );
   QVERIFY2( std::abs( armReadings[ 1 ] - armReadings[ 0 ] ) > 1, qPrintable( QString( "the arm reads %1 tilted and %2 at the start value 0" ).arg( armReadings[ 1 ] ).arg( armReadings[ 0 ] ) ) );
 }
 
