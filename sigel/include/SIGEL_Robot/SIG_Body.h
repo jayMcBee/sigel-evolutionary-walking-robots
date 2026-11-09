@@ -61,6 +61,12 @@ namespace SIGEL_Robot
 		 */
 		void appendFaces( IndexedFaceSetNode *indexedFaceSetNode, QList< SIG_Vector > const &vertices );
 
+		/**
+		 * Adds to the geometry the faces of the shape's IndexedFaceSet or Box, transformed by the transformation matrix.
+		 * Other geometry adds nothing.
+		 */
+		void readVRMLShape( ShapeNode *shapeNode, NEWMAT::Matrix const &transformation );
+
 	public:
 		/**
 		 * Nonstandard standard constructor.
