@@ -116,6 +116,31 @@ namespace SIGEL_Robot
 		}
 	}
 
+	void SIG_Body::appendBoxFaces( BoxNode *boxNode, NEWMAT::Matrix const &transformation )
+	{
+		float const x = boxNode->getX() / 2;
+		float const y = boxNode->getY() / 2;
+		float const z = boxNode->getZ() / 2;
+
+		CoordinateNode corners;
+		for( int i = 0; i < 8; i++ )
+		{
+			corners.addPoint( i & 1 ? x : -x, i & 2 ? y : -y, i & 4 ? z : -z );
+		}
+		QList< SIG_Vector > vertices = transformedVertices( &corners, transformation );
+
+		// Counterclockwise seen from outside, as an IndexedFaceSet with ccw TRUE.
+		int const faces[6][4] = { { 0, 2, 3, 1 }, { 4, 5, 7, 6 }, { 0, 1, 5, 4 }, { 2, 6, 7, 3 }, { 0, 4, 6, 2 }, { 1, 3, 7, 5 } };
+		for( int f = 0; f < 6; f++ )
+		{
+			SIG_Polygon *polygon = new SIG_Polygon( geometry );
+			for( int c = 0; c < 4; c++ )
+			{
+				polygon->appendVertex( vertices[ faces[f][c] ] );
+			}
+		}
+	}
+
 	void SIG_Body::readVRMLShape( ShapeNode *shapeNode, NEWMAT::Matrix const &transformation )
 	{
 		GeometryNode *geometryNode = shapeNode->getGeometry();
@@ -132,28 +157,7 @@ namespace SIGEL_Robot
 		}
 		else if( geometryNode && geometryNode->isBoxNode() )
 		{
-			BoxNode *boxNode = static_cast<BoxNode *>( geometryNode );
-			float const x = boxNode->getX() / 2;
-			float const y = boxNode->getY() / 2;
-			float const z = boxNode->getZ() / 2;
-
-			CoordinateNode corners;
-			for( int i = 0; i < 8; i++ )
-			{
-				corners.addPoint( i & 1 ? x : -x, i & 2 ? y : -y, i & 4 ? z : -z );
-			}
-			QList< SIG_Vector > vertices = transformedVertices( &corners, transformation );
-
-			// Counterclockwise seen from outside, as an IndexedFaceSet with ccw TRUE.
-			int const faces[6][4] = { { 0, 2, 3, 1 }, { 4, 5, 7, 6 }, { 0, 1, 5, 4 }, { 2, 6, 7, 3 }, { 0, 4, 6, 2 }, { 1, 3, 7, 5 } };
-			for( int f = 0; f < 6; f++ )
-			{
-				SIG_Polygon *polygon = new SIG_Polygon( geometry );
-				for( int c = 0; c < 4; c++ )
-				{
-					polygon->appendVertex( vertices[ faces[f][c] ] );
-				}
-			}
+			appendBoxFaces( static_cast<BoxNode *>( geometryNode ), transformation );
 		}
 	}
 

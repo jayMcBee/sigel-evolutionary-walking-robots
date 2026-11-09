@@ -62,6 +62,11 @@ namespace SIGEL_Robot
 		void appendFaces( IndexedFaceSetNode *indexedFaceSetNode, QList< SIG_Vector > const &vertices );
 
 		/**
+		 * Adds to the geometry the 6 faces of the box, transformed by the transformation matrix.
+		 */
+		void appendBoxFaces( BoxNode *boxNode, NEWMAT::Matrix const &transformation );
+
+		/**
 		 * Adds to the geometry the faces of the shape's IndexedFaceSet or Box, transformed by the transformation matrix.
 		 * Other geometry adds nothing.
 		 */
