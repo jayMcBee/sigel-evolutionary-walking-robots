@@ -925,6 +925,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-09 — DONE: `SIG_Body` WARNS THAT IT DOES NOT READ A SPHERE OR CONE.**
+
+- `SIG_Body::readVRMLShape` writes one line to `SIG_IO::cerr` for a Sphere
+  or a Cone and reads the rest of the file. No robot uses either shape.
+  `TST_SIG_Body::loadWarnsThatASphereOrConeIsNotRead` catches the line.
+
 **2026-11-09 — DONE: `SIG_Body` READS A VRML 97 CYLINDER.**
 
 - `SIG_Body::appendCylinderFaces` makes a Cylinder into 16 side faces and

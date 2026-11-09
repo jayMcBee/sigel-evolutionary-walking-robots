@@ -27,6 +27,7 @@
 #include "SIGEL_Robot/SIG_Geometry.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
 #include "SIGEL_Robot/SIG_Robot.h"
+#include "SIGEL_Tools/SIG_IO.h"
 #include "TST_FreeWatch.h"
 
 #include <QFile>
@@ -247,26 +248,13 @@ QList< SIG_Vector > SIGEL_Robot::TST_SIG_Body::withoutTheBesideShape( const QLis
   return kept;
 }
 
-// Whether v lies on the surface of the Cylinder, Sphere or Cone of loadMakesFacesOnTheSurfaceOfACurvedShape.
-bool SIGEL_Robot::TST_SIG_Body::isOnTheSurface( const QString &shape, SIG_Vector v )
+// Whether v lies on the surface of the Cylinder of loadMakesFacesOnTheSurfaceOfACurvedShape.
+bool SIGEL_Robot::TST_SIG_Body::isOnTheSurface( SIG_Vector v )
 {
   const double fromTheAxis = std::sqrt( v.x * v.x + v.z * v.z );
-  const bool withinTheHeight = std::fabs( v.y ) < 1 + epsilon;
-  if ( shape.startsWith( "Sphere" ) )
-  {
-    return std::fabs( std::sqrt( v.x * v.x + v.y * v.y + v.z * v.z ) - 1 ) < epsilon;
-  }
-  if ( shape.startsWith( "Cylinder" ) )
-  {
-    const bool onTheSide = std::fabs( fromTheAxis - 1 ) < epsilon && withinTheHeight;
-    const bool onACap = std::fabs( std::fabs( v.y ) - 1 ) < epsilon && fromTheAxis < 1 + epsilon;
-    return onTheSide || onACap;
-  }
-
-  // The Cone: the apex at y 1, the bottom at y -1 with radius 1.
-  const bool onTheSide = std::fabs( fromTheAxis - ( 1 - v.y ) / 2 ) < epsilon && withinTheHeight;
-  const bool onTheBottom = std::fabs( v.y + 1 ) < epsilon && fromTheAxis < 1 + epsilon;
-  return onTheSide || onTheBottom;
+  const bool onTheSide = std::fabs( fromTheAxis - 1 ) < epsilon && std::fabs( v.y ) < 1 + epsilon;
+  const bool onACap = std::fabs( std::fabs( v.y ) - 1 ) < epsilon && fromTheAxis < 1 + epsilon;
+  return onTheSide || onACap;
 }
 
 // The sum of the areas of the faces, each a flat polygon.
@@ -915,11 +903,8 @@ void SIGEL_Robot::TST_SIG_Body::loadMakesFacesOnTheSurfaceOfACurvedShape_data()
   QTest::addColumn< QString >( "shape" );
   QTest::addColumn< double >( "area" );
 
-  // VRML 97: each shape is centred on the origin, with its axis along y.
-  // The areas: 2 pi r h + 2 pi r^2, 4 pi r^2, and pi r sqrt( r^2 + h^2 ) + pi r^2.
+  // VRML 97: the shape is centred on the origin, with its axis along y. The area: 2 pi r h + 2 pi r^2.
   QTest::newRow( "Cylinder of radius 1 and height 2" ) << "Cylinder { radius 1 height 2 }" << 6 * M_PI;
-  QTest::newRow( "Sphere of radius 1" ) << "Sphere { radius 1 }" << 4 * M_PI;
-  QTest::newRow( "Cone of bottom radius 1 and height 2" ) << "Cone { bottomRadius 1 height 2 }" << M_PI * std::sqrt( 5.0 ) + M_PI;
 }
 
 // How finely a curved surface is divided into faces is not fixed. Faces with their corners on
@@ -938,13 +923,45 @@ void SIGEL_Robot::TST_SIG_Body::loadMakesFacesOnTheSurfaceOfACurvedShape()
 
   QVERIFY( body.getGeometry() );
   const double coveredArea = surfaceArea( body.getGeometry() ) - besideTheShapeArea;
-  QEXPECT_FAIL( "Sphere of radius 1", "SIG_Body::readVRMLShape drops a Sphere without a word", Abort );
-  QEXPECT_FAIL( "Cone of bottom radius 1 and height 2", "SIG_Body::readVRMLShape drops a Cone without a word", Abort );
   QVERIFY2( coveredArea > 0.75 * area && coveredArea < area + epsilon, qPrintable( QString::number( coveredArea ) ) );
   for ( const SIG_Vector &vertex : withoutTheBesideShape( verticesOf( body.getGeometry() ) ) )
   {
-    QVERIFY2( isOnTheSurface( shape, vertex ), qPrintable( toString( vertex ) ) );
+    QVERIFY2( isOnTheSurface( vertex ), qPrintable( toString( vertex ) ) );
   }
+}
+
+void SIGEL_Robot::TST_SIG_Body::loadWarnsThatASphereOrConeIsNotRead_data()
+{
+  QTest::addColumn< QString >( "shape" );
+  QTest::addColumn< QString >( "geometry" );
+
+  QTest::newRow( "Sphere" ) << "Sphere" << "Sphere { radius 1 }";
+  QTest::newRow( "Cone" ) << "Cone" << "Cone { bottomRadius 1 height 2 }";
+}
+
+// SIGEL reads no Sphere or Cone; the load says so on SIG_IO::cerr and reads the rest of the file.
+void SIGEL_Robot::TST_SIG_Body::loadWarnsThatASphereOrConeIsNotRead()
+{
+  QFETCH( QString, shape );
+  QFETCH( QString, geometry );
+  QTemporaryDir folder;
+  QString fileName = writeVRMLFile( folder, cornerShape( 5, 5, 5 ) + "Shape { geometry " + geometry + " }\n" );
+  SIG_Robot robot;
+  SIG_Body body( &robot, fileName, "" );
+
+  // Replacing the device deletes the stream's own one on stderr, so the stream gets a new one afterwards.
+  QString warned;
+  SIGEL_Tools::SIG_IO::cerr.setString( &warned );
+  const QString thrown = thrownByLoad( body );
+  static QFile standardError;
+  const bool opened = standardError.isOpen() || standardError.open( stderr, QIODevice::WriteOnly );
+  SIGEL_Tools::SIG_IO::cerr.setDevice( &standardError );
+
+  QVERIFY( opened );
+  QCOMPARE( thrown, QString() );
+  QCOMPARE( warned, "VRML file \"" + fileName + "\": a " + shape + " is not read, the link gets no faces from it.\n" );
+  QVERIFY( body.getGeometry() );
+  QCOMPARE( surfaceArea( body.getGeometry() ), besideTheShapeArea );
 }
 
 void SIGEL_Robot::TST_SIG_Body::loadSkipsNodesOtherThanShapesAndGroupsAndReadsTheShapesAfterThem()

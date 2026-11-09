@@ -87,6 +87,8 @@ namespace SIGEL_Robot
     void loadMakesTheFacesOfABox();
     void loadMakesFacesOnTheSurfaceOfACurvedShape_data();
     void loadMakesFacesOnTheSurfaceOfACurvedShape();
+    void loadWarnsThatASphereOrConeIsNotRead_data();
+    void loadWarnsThatASphereOrConeIsNotRead();
     void loadSkipsNodesOtherThanShapesAndGroupsAndReadsTheShapesAfterThem();
     void loadRefusesAFileWithoutFaces_data();
     void loadRefusesAFileWithoutFaces();
@@ -141,7 +143,7 @@ namespace SIGEL_Robot
     static bool isTheFirstCornerOfTheOnlyFaceNear( const QList< QList< SIG_Vector > > &faces, double x, double y, double z );
     static bool hasAFaceThatStartsNear( const QList< QList< SIG_Vector > > &faces, double x, double y, double z );
     static QList< SIG_Vector > withoutTheBesideShape( const QList< SIG_Vector > &vertices );
-    static bool isOnTheSurface( const QString &shape, SIG_Vector v );
+    static bool isOnTheSurface( SIG_Vector v );
     static double surfaceArea( const SIGEL_Robot::SIG_Geometry *geometry );
     static QList< QStringList > facePoints( const SIGEL_Robot::SIG_Geometry *geometry );
     static QList< QList< int > > faceIndices( const SIGEL_Robot::SIG_Geometry *geometry );

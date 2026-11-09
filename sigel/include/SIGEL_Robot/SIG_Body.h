@@ -74,7 +74,7 @@ namespace SIGEL_Robot
 
 		/**
 		 * Adds to the geometry the faces of the shape's IndexedFaceSet, Box or Cylinder, transformed by the transformation matrix.
-		 * Other geometry adds nothing.
+		 * A Sphere or Cone adds nothing and gives a warning on SIG_IO::cerr; other geometry adds nothing.
 		 */
 		void readVRMLShape( ShapeNode *shapeNode, NEWMAT::Matrix const &transformation );
 
