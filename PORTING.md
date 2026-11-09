@@ -925,6 +925,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-09 — DONE: A USE DIRECTLY AFTER "}" IS REFUSED BY DECISION.**
+
+- CyberVRML97 would read such a USE into the node that the `}` closes, and
+  `SIG_VRMLUtils::loadScene` refuses the file with its line. That refusal is
+  the defined behaviour; no patch to the CyberVRML97 parser.
+  `TST_SIG_Body::loadRefusesAUseDirectlyAfterANodeEnd` checks it.
+
 **2026-11-09 — DONE: `SIG_Body` REFUSES A MIRRORING TRANSFORM.**
 
 - `SIG_Body::readVRMLNode` refuses a Transform whose scale mirrors the

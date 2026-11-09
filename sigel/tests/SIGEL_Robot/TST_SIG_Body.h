@@ -123,7 +123,7 @@ namespace SIGEL_Robot
 
     void loadReadsTheFaceSetsOfAFileWithUse();
     void loadReadsAShapeWhoseGeometryIsAUse();
-    void loadReadsAUseDirectlyAfterANodeEndAsACopyBesideThatNode();
+    void loadRefusesAUseDirectlyAfterANodeEnd();
 
   private:
 

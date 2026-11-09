@@ -1386,20 +1386,19 @@ void SIGEL_Robot::TST_SIG_Body::loadReadsAShapeWhoseGeometryIsAUse()
   QCOMPARE( body.getGeometry()->getNumVertices(), 3 );
 }
 
-void SIGEL_Robot::TST_SIG_Body::loadReadsAUseDirectlyAfterANodeEndAsACopyBesideThatNode()
+// CyberVRML97 would read a USE directly after a "}" into the node that the "}" closes, so SIGEL refuses it and names its line.
+void SIGEL_Robot::TST_SIG_Body::loadRefusesAUseDirectlyAfterANodeEnd()
 {
   QTemporaryDir folder;
-  QString fileName = writeVRMLFile( folder, useDirectlyAfterTransformEnd() );
+  const QString contents = useDirectlyAfterTransformEnd();
+  QString fileName = writeVRMLFile( folder, contents );
   SIG_Robot robot;
   SIG_Body body( &robot, fileName, "" );
 
   const QString thrown = thrownByLoad( body );
 
-  QEXPECT_FAIL( "", "SIG_Body::load refuses a USE directly after a }, because CyberVRML97 would read it into the node that the } closes", Abort );
-  QCOMPARE( thrown, QString() );
-  QVERIFY( body.getGeometry() );
-  QCOMPARE( body.getGeometry()->getNumPolygons(), 2 );
-
-  // The copy lies where the original does, so they share its vertices: each vertex is one contact point.
-  QCOMPARE( body.getGeometry()->getNumVertices(), 3 );
+  // The USE is on the last line, below the "#VRML V2.0 utf8" line that writeVRMLFile puts first.
+  const QString useLine = QString::number( contents.count( '\n' ) + 1 );
+  QVERIFY2( thrown.startsWith( "VRML file \"" + fileName + "\", line " + useLine + ":" ), qPrintable( thrown ) );
+  QCOMPARE( body.getGeometry(), nullptr );
 }
