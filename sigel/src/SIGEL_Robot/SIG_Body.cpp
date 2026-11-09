@@ -248,9 +248,11 @@ namespace SIGEL_Robot
 				}
 			}
 
-			for( Node *child = node->getChildNodes(); child; child = child->next() )
+			Node *child = node->getChildNodes();
+			while( child )
 			{
 				readVRMLNode( child, transformation );
+				child = child->next();
 			}
 		}
 		else if( node->isShapeNode() )
@@ -282,9 +284,11 @@ namespace SIGEL_Robot
 
 		try
 		{
-			for( Node *currentNode = bodyScene.getNodes(); currentNode; currentNode = currentNode->next() )
+			Node *currentNode = bodyScene.getNodes();
+			while( currentNode )
 			{
 				readVRMLNode( currentNode, identity );
+				currentNode = currentNode->next();
 			}
 
 			// SIG_Mirtich takes the mass of the link from these faces.
