@@ -26,6 +26,9 @@
 #include "SIGEL_Tools/SIG_FileUtils.h"
 #include "SIGEL_Robot/SIG_VRMLUtils.h"
 
+#include <cmath>
+#include <numbers>
+
 namespace SIGEL_Robot
 {
 
@@ -141,6 +144,38 @@ namespace SIGEL_Robot
 		}
 	}
 
+	void SIG_Body::appendCylinderFaces( CylinderNode *cylinderNode, NEWMAT::Matrix const &transformation )
+	{
+		float const radius = cylinderNode->getRadius();
+		float const y = cylinderNode->getHeight() / 2;
+		int const steps = 16;
+
+		// Corner i of the top ring is corner i, the one below it is corner steps + i.
+		CoordinateNode corners;
+		for( int i = 0; i < 2 * steps; i++ )
+		{
+			double const angle = 2 * std::numbers::pi * ( i % steps ) / steps;
+			corners.addPoint( radius * std::cos( angle ), i < steps ? y : -y, radius * std::sin( angle ) );
+		}
+		QList< SIG_Vector > vertices = transformedVertices( &corners, transformation );
+
+		// Counterclockwise seen from outside, as an IndexedFaceSet with ccw TRUE.
+		SIG_Polygon *top = new SIG_Polygon( geometry );
+		SIG_Polygon *bottom = new SIG_Polygon( geometry );
+		for( int i = 0; i < steps; i++ )
+		{
+			top->appendVertex( vertices[ steps - 1 - i ] );
+			bottom->appendVertex( vertices[ steps + i ] );
+
+			int const next = ( i + 1 ) % steps;
+			SIG_Polygon *side = new SIG_Polygon( geometry );
+			side->appendVertex( vertices[ i ] );
+			side->appendVertex( vertices[ next ] );
+			side->appendVertex( vertices[ steps + next ] );
+			side->appendVertex( vertices[ steps + i ] );
+		}
+	}
+
 	void SIG_Body::readVRMLShape( ShapeNode *shapeNode, NEWMAT::Matrix const &transformation )
 	{
 		GeometryNode *geometryNode = shapeNode->getGeometry();
@@ -158,6 +193,10 @@ namespace SIGEL_Robot
 		else if( geometryNode && geometryNode->isBoxNode() )
 		{
 			appendBoxFaces( static_cast<BoxNode *>( geometryNode ), transformation );
+		}
+		else if( geometryNode && geometryNode->isCylinderNode() )
+		{
+			appendCylinderFaces( static_cast<CylinderNode *>( geometryNode ), transformation );
 		}
 	}
 

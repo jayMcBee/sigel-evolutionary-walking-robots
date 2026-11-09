@@ -67,7 +67,13 @@ namespace SIGEL_Robot
 		void appendBoxFaces( BoxNode *boxNode, NEWMAT::Matrix const &transformation );
 
 		/**
-		 * Adds to the geometry the faces of the shape's IndexedFaceSet or Box, transformed by the transformation matrix.
+		 * Adds to the geometry the faces of the cylinder, 16 around its side and one for each cap,
+		 * transformed by the transformation matrix.
+		 */
+		void appendCylinderFaces( CylinderNode *cylinderNode, NEWMAT::Matrix const &transformation );
+
+		/**
+		 * Adds to the geometry the faces of the shape's IndexedFaceSet, Box or Cylinder, transformed by the transformation matrix.
 		 * Other geometry adds nothing.
 		 */
 		void readVRMLShape( ShapeNode *shapeNode, NEWMAT::Matrix const &transformation );

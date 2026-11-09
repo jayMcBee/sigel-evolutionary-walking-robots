@@ -925,6 +925,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-09 — DONE: `SIG_Body` READS A VRML 97 CYLINDER.**
+
+- `SIG_Body::appendCylinderFaces` makes a Cylinder into 16 side faces and
+  one face for each cap. It reads the whole cylinder; the `top`, `side` and
+  `bottom` fields are not read.
+
 **2026-11-08 — DONE: `SIG_Body` READS A VRML 97 BOX.**
 
 - `SIG_Body::readVRMLNode` makes a Box into its 8 corners and 6 faces,

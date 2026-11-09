@@ -938,7 +938,8 @@ void SIGEL_Robot::TST_SIG_Body::loadMakesFacesOnTheSurfaceOfACurvedShape()
 
   QVERIFY( body.getGeometry() );
   const double coveredArea = surfaceArea( body.getGeometry() ) - besideTheShapeArea;
-  QEXPECT_FAIL( "", "SIG_Body::readVRMLNode reads the faces of an IndexedFaceSet only and drops a Cylinder, Sphere or Cone without a word", Abort );
+  QEXPECT_FAIL( "Sphere of radius 1", "SIG_Body::readVRMLShape drops a Sphere without a word", Abort );
+  QEXPECT_FAIL( "Cone of bottom radius 1 and height 2", "SIG_Body::readVRMLShape drops a Cone without a word", Abort );
   QVERIFY2( coveredArea > 0.75 * area && coveredArea < area + epsilon, qPrintable( QString::number( coveredArea ) ) );
   for ( const SIG_Vector &vertex : withoutTheBesideShape( verticesOf( body.getGeometry() ) ) )
   {
