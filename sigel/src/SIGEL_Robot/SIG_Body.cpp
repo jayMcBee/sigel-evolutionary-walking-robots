@@ -275,6 +275,12 @@ namespace SIGEL_Robot
 			{
 				readVRMLNode( currentNode, identity );
 			}
+
+			// SIG_Mirtich takes the mass of the link from these faces.
+			if( geometry->getNumPolygons() == 0 )
+			{
+				throw SIG_VRMLFileError( __FILE__, __LINE__, getGeometryFile(), "the file has no faces." );
+			}
 		}
 		catch( ... )
 		{

@@ -1000,7 +1000,6 @@ void SIGEL_Robot::TST_SIG_Body::loadRefusesAFileWithoutFaces()
 
   QString thrown = thrownByLoad( body );
 
-  QEXPECT_FAIL( "", "SIG_Body::load gives a body an empty geometry when the file has no faces", Abort );
   QVERIFY2( thrown.startsWith( "VRML file \"" + fileName + "\"" ), qPrintable( thrown ) );
   QCOMPARE( body.getGeometry(), nullptr );
 }

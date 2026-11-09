@@ -925,6 +925,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-09 — DONE: `SIG_Body` REFUSES A FILE WITHOUT FACES.**
+
+- `SIG_Body::load` throws `SIG_VRMLFileError` when the file gives no faces,
+  so the body is left without a geometry instead of with an empty one. A
+  file with only a Sphere or Cone is refused this way after its warning.
+
 **2026-11-09 — DONE: `SIG_Body` REFUSES A FACE OF FEWER THAN THREE POINTS.**
 
 - `SIG_Body::appendFaces` counts the points of each face and refuses a face
