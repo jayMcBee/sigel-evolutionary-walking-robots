@@ -904,7 +904,6 @@ void SIGEL_Robot::TST_SIG_Body::loadMakesTheFacesOfABox()
   }
 
   // The geometry merges equal points, so each corner is one vertex.
-  QEXPECT_FAIL( "", "SIG_Body::readVRMLNode reads the faces of an IndexedFaceSet only and drops a Box without a word", Abort );
   QCOMPARE( corners, 8 );
 
   // The faces cover the surface of the box once, 2 * ( 2 * 4 + 4 * 6 + 6 * 2 ), however they divide it.

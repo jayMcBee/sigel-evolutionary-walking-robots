@@ -925,6 +925,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-08 — DONE: `SIG_Body` READS A VRML 97 BOX.**
+
+- `SIG_Body::readVRMLNode` makes a Box into its 8 corners and 6 faces,
+  counterclockwise seen from outside. `TST_SIG_Body::loadMakesTheFacesOfABox`
+  passes without its QEXPECT_FAIL mark.
+
 **2026-11-08 — DONE: `SIG_DynaMechsLink` DELETES ITS DYNAMECHS LINK.**
 
 - `dmArticulation` does not delete the links added to it, so every
