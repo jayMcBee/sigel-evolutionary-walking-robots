@@ -100,17 +100,25 @@ namespace SIGEL_Robot
 	{
 		int noOfIndices = indexedFaceSetNode->getNCoordIndexes();
 		SIG_Polygon *currentPolygon = nullptr;
+		int corners = 0;
+		int faces = 0;
 
-		for( int i = 0; i < noOfIndices; i++ )
+		// The end of the list ends the last face, as -1 does.
+		for( int i = 0; i <= noOfIndices; i++ )
 		{
-			int currentIndex = indexedFaceSetNode->getCoordIndex( i );
+			int currentIndex = i < noOfIndices ? indexedFaceSetNode->getCoordIndex( i ) : -1;
 			if( currentIndex < -1 )
 			{
 				throw SIG_VRMLFileError( __FILE__, __LINE__, getGeometryFile(), "coordIndex " + QString::number( currentIndex ) + " is neither -1 nor the number of a point." );
 			}
 			else if( currentIndex == -1 )
 			{
+				if( currentPolygon && corners < 3 )
+				{
+					throw SIG_VRMLFileError( __FILE__, __LINE__, getGeometryFile(), "face " + QString::number( faces ) + " of an IndexedFaceSet has fewer than 3 points." );
+				}
 				currentPolygon = nullptr;
+				corners = 0;
 			}
 			else if( currentIndex >= vertices.size() )
 			{
@@ -123,8 +131,10 @@ namespace SIGEL_Robot
 				if( !currentPolygon )
 				{
 					currentPolygon = new SIG_Polygon( geometry );
+					faces++;
 				}
 				currentPolygon->appendVertex( vertices[currentIndex] );
+				corners++;
 			}
 		}
 	}

@@ -925,6 +925,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-09 — DONE: `SIG_Body` REFUSES A FACE OF FEWER THAN THREE POINTS.**
+
+- `SIG_Body::appendFaces` counts the points of each face and refuses a face
+  of one or two. The end of the coordIndex list ends the last face, as -1
+  does.
+
 **2026-11-09 — DONE: `SIG_Body` REFUSES AN INDEXEDFACESET WITH INDICES BUT WITHOUT COORD.**
 
 - `SIG_Body::readVRMLShape` gives such a face set an empty point list, so

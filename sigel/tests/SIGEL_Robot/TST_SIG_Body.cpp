@@ -804,7 +804,6 @@ void SIGEL_Robot::TST_SIG_Body::loadRefusesAFaceOfFewerThanThreeVertices()
 
   QString thrown = thrownByLoad( body );
 
-  QEXPECT_FAIL( "", "SIG_Body::readVRMLNode makes a face of every run of indices, also of one or two vertices, and loads the file", Abort );
   QVERIFY2( thrown.startsWith( "VRML file \"" + fileName + "\"" ), qPrintable( thrown ) );
   QCOMPARE( body.getGeometry(), nullptr );
 }
