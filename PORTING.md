@@ -925,6 +925,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-09 — DONE: `SIG_Body` REFUSES AN INDEXEDFACESET WITH INDICES BUT WITHOUT COORD.**
+
+- `SIG_Body::readVRMLShape` gives such a face set an empty point list, so
+  `appendFaces` refuses its first index. A face set without coord and
+  without indices still loads.
+
 **2026-11-09 — DONE: `SIG_Body` REFUSES A COORDINDEX BEYOND THE COORDINATES.**
 
 - `SIG_Body::appendFaces` throws `SIG_VRMLFileError` for an index that names

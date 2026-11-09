@@ -780,7 +780,6 @@ void SIGEL_Robot::TST_SIG_Body::loadRefusesAFaceSetWithIndicesButWithoutCoordina
 
   QString thrown = thrownByLoad( body );
 
-  QEXPECT_FAIL( "", "SIG_Body::readVRMLNode skips an IndexedFaceSet without coord and loads the file", Abort );
   QVERIFY2( thrown.startsWith( "VRML file \"" + fileName + "\"" ), qPrintable( thrown ) );
   QCOMPARE( body.getGeometry(), nullptr );
 }

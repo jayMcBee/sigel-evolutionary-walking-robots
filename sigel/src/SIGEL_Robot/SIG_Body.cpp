@@ -194,11 +194,14 @@ namespace SIGEL_Robot
 		{
 			IndexedFaceSetNode *indexedFaceSetNode = static_cast<IndexedFaceSetNode *>( geometryNode );
 
+			// Without a coord field there are no points, so appendFaces refuses any index.
+			QList< SIG_Vector > vertices;
 			CoordinateNode *coordinateNode = indexedFaceSetNode->getCoordinateNodes();
 			if( coordinateNode )
 			{
-				appendFaces( indexedFaceSetNode, transformedVertices( coordinateNode, transformation ) );
+				vertices = transformedVertices( coordinateNode, transformation );
 			}
+			appendFaces( indexedFaceSetNode, vertices );
 		}
 		else if( geometryNode && geometryNode->isBoxNode() )
 		{
