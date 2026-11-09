@@ -26,6 +26,7 @@
 #include "SIGEL_Tools/SIG_FileUtils.h"
 #include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Robot/SIG_VRMLUtils.h"
+#include "SIGEL_Robot/SIG_VRMLFileError.h"
 
 #include <cmath>
 #include <numbers>
@@ -103,7 +104,11 @@ namespace SIGEL_Robot
 		for( int i = 0; i < noOfIndices; i++ )
 		{
 			int currentIndex = indexedFaceSetNode->getCoordIndex( i );
-			if( currentIndex < 0 )
+			if( currentIndex < -1 )
+			{
+				throw SIG_VRMLFileError( __FILE__, __LINE__, getGeometryFile(), "coordIndex " + QString::number( currentIndex ) + " is neither -1 nor the number of a point." );
+			}
+			else if( currentIndex == -1 )
 			{
 				currentPolygon = nullptr;
 			}
@@ -247,9 +252,19 @@ namespace SIGEL_Robot
 			identity( i, i ) = 1;
 		}
 
-		for( Node *currentNode = bodyScene.getNodes(); currentNode; currentNode = currentNode->next() )
+		try
 		{
-			readVRMLNode( currentNode, identity );
+			for( Node *currentNode = bodyScene.getNodes(); currentNode; currentNode = currentNode->next() )
+			{
+				readVRMLNode( currentNode, identity );
+			}
+		}
+		catch( ... )
+		{
+			// A refused file leaves the body without a geometry, as a file that cannot be parsed does.
+			delete geometry;
+			geometry = nullptr;
+			throw;
 		}
 	}
 

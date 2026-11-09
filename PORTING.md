@@ -925,6 +925,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-09 — DONE: `SIG_Body` REFUSES A NEGATIVE COORDINDEX OTHER THAN -1.**
+
+- `SIG_Body::appendFaces` throws `SIG_VRMLFileError` for such an index.
+  `SIG_Body::load` deletes the half-read geometry when the reading throws,
+  so a refused file leaves the body without a geometry.
+
 **2026-11-09 — DONE: `SIG_Body` WARNS THAT IT DOES NOT READ A SPHERE OR CONE.**
 
 - `SIG_Body::readVRMLShape` writes one line to `SIG_IO::cerr` for a Sphere

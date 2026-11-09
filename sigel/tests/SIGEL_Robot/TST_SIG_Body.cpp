@@ -753,7 +753,6 @@ void SIGEL_Robot::TST_SIG_Body::loadRefusesANegativeIndexOtherThanMinusOne()
 
   QString thrown = thrownByLoad( body );
 
-  QEXPECT_FAIL( "", "SIG_Body::readVRMLNode takes every negative coordIndex as the end of a face and loads the file", Abort );
   QVERIFY2( thrown.startsWith( "VRML file \"" + fileName + "\"" ), qPrintable( thrown ) );
   QCOMPARE( body.getGeometry(), nullptr );
 }
