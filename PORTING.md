@@ -925,6 +925,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-09 — DONE: `SIG_Body` REFUSES CCW FALSE.**
+
+- `SIG_Body::readVRMLShape` refuses an IndexedFaceSet with `ccw FALSE`,
+  whose faces it would read as pointing inwards. No robot uses it.
+
 **2026-11-09 — DONE: `SIG_Body` REFUSES A FILE WITHOUT FACES.**
 
 - `SIG_Body::load` throws `SIG_VRMLFileError` when the file gives no faces,

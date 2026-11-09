@@ -203,6 +203,10 @@ namespace SIGEL_Robot
 		if( geometryNode && geometryNode->isIndexedFaceSetNode() )
 		{
 			IndexedFaceSetNode *indexedFaceSetNode = static_cast<IndexedFaceSetNode *>( geometryNode );
+			if( !indexedFaceSetNode->getCCW() )
+			{
+				throw SIG_VRMLFileError( __FILE__, __LINE__, getGeometryFile(), "ccw FALSE is not supported; write the faces counterclockwise seen from outside." );
+			}
 
 			// Without a coord field there are no points, so appendFaces refuses any index.
 			QList< SIG_Vector > vertices;

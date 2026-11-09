@@ -111,6 +111,7 @@ namespace SIGEL_Robot
     void loadTransformsEveryVertexOfAShape();
     void loadKeepsTheFacesFacingOutwards_data();
     void loadKeepsTheFacesFacingOutwards();
+    void loadRefusesCcwFalse();
     void loadDoesNothingWhenTheBodyHasAGeometry();
     void loadReadsTheFileRelativeToTheDirectory();
     void loadReadsAFileWithANonAsciiName();
