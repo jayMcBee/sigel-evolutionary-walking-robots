@@ -925,6 +925,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-09 — DONE: `SIG_Body` REFUSES A COORDINDEX BEYOND THE COORDINATES.**
+
+- `SIG_Body::appendFaces` throws `SIG_VRMLFileError` for an index that names
+  no point of the coord field, where it skipped the index before.
+
 **2026-11-09 — DONE: `SIG_Body` REFUSES A NEGATIVE COORDINDEX OTHER THAN -1.**
 
 - `SIG_Body::appendFaces` throws `SIG_VRMLFileError` for such an index.

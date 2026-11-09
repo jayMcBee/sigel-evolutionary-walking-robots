@@ -766,7 +766,6 @@ void SIGEL_Robot::TST_SIG_Body::loadRefusesAnIndexBeyondTheCoordinates()
 
   QString thrown = thrownByLoad( body );
 
-  QEXPECT_FAIL( "", "SIG_Body::readVRMLNode skips a coordIndex beyond the coordinates and loads the file", Abort );
   QVERIFY2( thrown.startsWith( "VRML file \"" + fileName + "\"" ), qPrintable( thrown ) );
   QCOMPARE( body.getGeometry(), nullptr );
 }

@@ -112,7 +112,11 @@ namespace SIGEL_Robot
 			{
 				currentPolygon = nullptr;
 			}
-			else if( currentIndex < vertices.size() )
+			else if( currentIndex >= vertices.size() )
+			{
+				throw SIG_VRMLFileError( __FILE__, __LINE__, getGeometryFile(), "coordIndex " + QString::number( currentIndex ) + " is beyond the " + QString::number( vertices.size() ) + " points of the coord field." );
+			}
+			else
 			{
 				// Making a SIG_Polygon adds it to the geometry. Wait for the first usable vertex,
 				// so no empty face is added.
