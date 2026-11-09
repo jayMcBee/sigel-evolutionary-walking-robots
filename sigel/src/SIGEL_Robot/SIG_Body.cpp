@@ -239,6 +239,13 @@ namespace SIGEL_Robot
 			if( node->isTransformNode() )
 			{
 				transformation = transformation * SIG_VRMLUtils::transformNodeMatrix( static_cast<TransformNode *>( node ) );
+
+				// A mirror turns the corner order round, and the faces would point inwards.
+				NEWMAT::Matrix const linearPart = transformation.SubMatrix( 1, 3, 1, 3 );
+				if( linearPart.LogDeterminant().Sign() < 0 )
+				{
+					throw SIG_VRMLFileError( __FILE__, __LINE__, getGeometryFile(), "a Transform with a negative scale mirrors the faces; this is not supported." );
+				}
 			}
 
 			for( Node *child = node->getChildNodes(); child; child = child->next() )

@@ -925,6 +925,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-09 — DONE: `SIG_Body` REFUSES A MIRRORING TRANSFORM.**
+
+- `SIG_Body::readVRMLNode` refuses a Transform whose scale mirrors the
+  faces (a negative determinant of the accumulated transformation), as
+  their faces would point inwards. No robot uses one.
+
 **2026-11-09 — DONE: `SIG_Body` REFUSES CCW FALSE.**
 
 - `SIG_Body::readVRMLShape` refuses an IndexedFaceSet with `ccw FALSE`,

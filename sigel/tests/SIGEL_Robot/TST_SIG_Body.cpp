@@ -1183,10 +1183,8 @@ void SIGEL_Robot::TST_SIG_Body::loadKeepsTheFacesFacingOutwards_data()
   QTest::addColumn< double >( "normalZ" );
 
   // SIG_Mirtich takes a face's outside from the order of its corners: counter-clockwise seen from outside.
-  // A Transform with a negative scale mirrors the face, and a mirror turns the order of its corners round.
   const QString triangle = faceSetShape( "0 0 0, 1 0 0, 0 1 0", "0, 1, 2, -1" );
   QTest::newRow( "ccw TRUE" ) << triangle << 1.0;
-  QTest::newRow( "mirrored along x" ) << transformed( "scale -1 1 1", triangle ) << 1.0;
 }
 
 void SIGEL_Robot::TST_SIG_Body::loadKeepsTheFacesFacingOutwards()
@@ -1201,7 +1199,6 @@ void SIGEL_Robot::TST_SIG_Body::loadKeepsTheFacesFacingOutwards()
   const SIG_Vector b = faces[ 0 ][ 1 ];
   const SIG_Vector c = faces[ 0 ][ 2 ];
   const double crossZ = ( b.x - a.x ) * ( c.y - a.y ) - ( b.y - a.y ) * ( c.x - a.x );
-  QEXPECT_FAIL( "mirrored along x", "SIG_Body::readVRMLNode keeps the order of the corners when a Transform mirrors the face", Abort );
   QCOMPARE( crossZ, normalZ );
 }
 
@@ -1211,6 +1208,21 @@ void SIGEL_Robot::TST_SIG_Body::loadRefusesCcwFalse()
   QTemporaryDir folder;
   QString fileName = writeVRMLFile( folder, "Shape { geometry IndexedFaceSet { ccw FALSE coord Coordinate { point [ 0 0 0, 1 0 0, 0 1 0 ] }\n"
                                             "                                  coordIndex [ 0, 1, 2, -1 ] } }\n" );
+  SIG_Robot robot;
+  SIG_Body body( &robot, fileName, "" );
+
+  QString thrown = thrownByLoad( body );
+
+  QVERIFY2( thrown.startsWith( "VRML file \"" + fileName + "\"" ), qPrintable( thrown ) );
+  QCOMPARE( body.getGeometry(), nullptr );
+}
+
+// A Transform with a negative scale mirrors the faces, and a mirror turns the order of their corners round.
+// SIGEL reads only faces whose corners go counterclockwise seen from outside.
+void SIGEL_Robot::TST_SIG_Body::loadRefusesAMirroringTransform()
+{
+  QTemporaryDir folder;
+  QString fileName = writeVRMLFile( folder, transformed( "scale -1 1 1", faceSetShape( "0 0 0, 1 0 0, 0 1 0", "0, 1, 2, -1" ) ) );
   SIG_Robot robot;
   SIG_Body body( &robot, fileName, "" );
 
