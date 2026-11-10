@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_Environment/SIG_Environment.h"
+#include "SIGEL_Tools/SIG_Exception.h"
 
 namespace SIGEL_Environment {
 
@@ -371,8 +372,10 @@ namespace SIGEL_Environment {
 		if (makeTerrain( terrain ))
 			return terrain;
 
-		terrain.setFlat( floorDimensionX, floorDimensionZ );
-		return terrain;
+		QString const reason = floorFuncSelected
+			? "The floor function " + floorFunction + " cannot be parsed."
+			: "The floor picture " + floorPictureFile + " cannot be read as a P2 PGM file.";
+		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, reason );
 	}
 
 	void SIG_Environment::setTerrain(SIG_Terrain const &newTerrain) {

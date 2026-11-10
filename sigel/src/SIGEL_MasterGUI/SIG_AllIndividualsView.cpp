@@ -319,6 +319,17 @@ namespace SIGEL_MasterGUI
 					return;
 				};
 
+				SIGEL_Environment::SIG_Terrain terrain;
+				try
+				{
+					terrain = theExperiment.environment.getTerrain();
+				}
+				catch (SIGEL_Tools::SIG_Exception &e)
+				{
+					QMessageBox::warning( this, "Can't Start Visualization", e.getMessage() );
+					return;
+				}
+
 				QList< char > hostNameBuffer( 100 );
 
 				gethostname( hostNameBuffer.data(), 100 );
@@ -350,7 +361,7 @@ namespace SIGEL_MasterGUI
 					pvmData.setExperimentName( guiExperiment.getName() );
 					pvmData.setIndividualName( theGPIndividual->getName() );
 					pvmData.setIndividualFitness( theGPIndividual->getFitness() );
-					pvmData.setTerrain( theExperiment.environment.getTerrain() );
+					pvmData.setTerrain( terrain );
 
 					QString pvmDataString;
 					QTextStream pvmDataStream( &pvmDataString, QIODevice::ReadWrite );

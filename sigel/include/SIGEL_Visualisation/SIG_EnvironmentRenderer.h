@@ -166,7 +166,7 @@ namespace SIGEL_Visualisation
 
 		SIGEL_Environment::SIG_Environment const &environment;
 
-		/** Made once: getTerrain prints its warning on each call. */
+		/** Made once: getTerrain returns a new copy on each call. */
 		SIGEL_Environment::SIG_Terrain const terrain;
 
 		GLint const gridSpacing;

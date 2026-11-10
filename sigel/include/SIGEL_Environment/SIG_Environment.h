@@ -338,7 +338,7 @@ class SIG_Environment {
    */
   double getFrictionCoeff_u_k() const;
 
-  /** The terrain given by setTerrain; without one, the terrain of the selected floor function or picture file, or a flat one if that fails. */
+  /** The terrain given by setTerrain; without one, the terrain of the selected floor function or picture file. Throws SIG_Exception if that fails. */
   SIG_Terrain getTerrain() const;
 
   /** Makes getTerrain return newTerrain. A slave gets its floor from the master this way. */

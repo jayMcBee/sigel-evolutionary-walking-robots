@@ -273,7 +273,6 @@ void SIGEL_Environment::TST_SIG_Environment::getTerrainGivesNoQuietFlatFloorForA
   {
   }
 
-  QEXPECT_FAIL( "", "SIG_Environment::getTerrain gives a flat terrain for a picture file that cannot be read", Abort );
   QVERIFY( !flatWithoutAWord );
 }
 
@@ -296,7 +295,6 @@ void SIGEL_Environment::TST_SIG_Environment::getTerrainGivesNoQuietFlatFloorForA
   {
   }
 
-  QEXPECT_FAIL( "", "SIG_Environment::getTerrain gives a flat terrain for a floor function that cannot be parsed", Abort );
   QVERIFY( !flatWithoutAWord );
 }
 

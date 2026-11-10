@@ -925,6 +925,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: `getTerrain` GIVES NO QUIET FLAT FLOOR.**
+
+- `SIG_Environment::getTerrain` throws `SIG_Exception` when `makeTerrain`
+  fails, with the message Start Evolution gives, where it gave a flat floor.
+  `SIG_AllIndividualsView::slotVisualize` shows that message and starts no
+  slave. Slaves get their floor through `setTerrain`, so they never fail here.
+
 **2026-11-09 — DONE: A FLOOR FUNCTION THAT CANNOT BE PARSED STOPS THE START.**
 
 - `SIG_Environment::makeTerrain` returns false for such a function, where it
