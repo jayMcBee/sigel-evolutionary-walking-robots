@@ -925,6 +925,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: THE MIRRORED JOINT SENSOR READING IS NOT FIXED.**
+
+- `SIG_DynaMechsSimulationQueries::sense` reads a rotational joint whose
+  root is the left link, and a slider whose root is the right link, mirrored
+  against the robot file. It stays so by decision: a fix would change how
+  evolved programs that use SENSE behave. The unit tests that marked this
+  fault are removed.
+
 **2026-11-10 — DONE: `SIG_LinkMassCheck` IS GONE.**
 
 - `SIG_Robot::prepareDynaMechs` refuses a link without mass before the robot

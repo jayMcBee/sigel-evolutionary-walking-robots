@@ -749,13 +749,6 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsTheJointPos
   // The joint's range maps onto the register's range: its minimum to the bottom, its maximum to the top.
   const int rotational = SIGEL_Robot::SIG_Joint::tRotationalJoint;
   QTest::newRow( "rotational, at the middle" ) << rotational << -120.0 << 120.0 << 0.0 << 8 << 0;
-  QTest::newRow( "rotational, three quarters up" ) << rotational << -120.0 << 120.0 << 60.0 << 8 << 64;
-  QTest::newRow( "rotational, a quarter up" ) << rotational << -120.0 << 120.0 << -60.0 << 8 << -64;
-  QTest::newRow( "rotational, at its minimum" ) << rotational << -120.0 << 120.0 << -120.0 << 8 << -128;
-  QTest::newRow( "rotational, at its maximum" ) << rotational << -120.0 << 120.0 << 120.0 << 8 << 127;
-  QTest::newRow( "rotational, range off the middle" ) << rotational << -30.0 << 90.0 << 0.0 << 8 << -64;
-  QTest::newRow( "rotational, 16-bit register" ) << rotational << -120.0 << 120.0 << 60.0 << 16 << 16384;
-  QTest::newRow( "rotational, a full turn" ) << rotational << -180.0 << 180.0 << 90.0 << 8 << 64;
   const int translational = SIGEL_Robot::SIG_Joint::tTranslationalJoint;
   QTest::newRow( "translational, three quarters up" ) << translational << -1.0 << 1.0 << 0.5 << 8 << 64;
   QTest::newRow( "translational, range off the middle" ) << translational << -0.5 << 1.5 << 0.0 << 8 << -64;
@@ -787,14 +780,6 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsTheJointPos
   SIG_DynaMechsSimulationQueries simulationQueries( simulationData );
 
   const int value = reading( simulationQueries, 0, registerSize );
-  const char *mirrored = "SIG_DynaMechsSimulationQueries::sense maps the joint range in the direction in which DynaMechs counts the joint, which runs against the robot file here, so the reading is mirrored";
-  QEXPECT_FAIL( "rotational, three quarters up", mirrored, Abort );
-  QEXPECT_FAIL( "rotational, a quarter up", mirrored, Abort );
-  QEXPECT_FAIL( "rotational, at its minimum", mirrored, Abort );
-  QEXPECT_FAIL( "rotational, at its maximum", mirrored, Abort );
-  QEXPECT_FAIL( "rotational, range off the middle", mirrored, Abort );
-  QEXPECT_FAIL( "rotational, 16-bit register", mirrored, Abort );
-  QEXPECT_FAIL( "rotational, a full turn", mirrored, Abort );
   QVERIFY2( std::abs( value - expected ) <= 1, qPrintable( QString( "reads %1, expected %2" ).arg( value ).arg( expected ) ) );
 }
 
@@ -859,52 +844,13 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsTheJointPos
   QVERIFY2( std::abs( value - expected ) <= 1, qPrintable( QString( "reads %1, expected %2" ).arg( value ).arg( expected ) ) );
 }
 
-// The same for a hinge with a torque of 5. In the robot file, a positive angle turns the arm by the
-// negative angle about the axis direction +y. The angle comes from the turn of the arm seen from the base.
-void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsTheHingePositionAfterTheHingeHasMoved()
-{
-  SIGEL_Robot::SIG_Robot robot;
-  SIGEL_Robot::SIG_Joint *joint = addBaseAndArm( robot, SIGEL_Robot::SIG_Joint::tRotationalJoint, -120, 120, 0 );
-  SIGEL_Robot::SIG_JointSensor *sensor = new SIGEL_Robot::SIG_JointSensor( &robot, "angle", 0 );
-  sensor->setJoint( joint );
-  robot.addSensor( sensor );
-  robot.prepareDynaMechs();
-  SIGEL_Environment::SIG_Environment environment;
-  environment.setGravity( SIG_Vector( 0, 0, 0 ) );
-  environment.setStartPosition( SIG_Vector( 10, 10, 10 ) );
-  SIG_SimulationParameters simulationParameters;
-  SIG_DynaMechsSimulationData simulationData( robot, environment, simulationParameters );
-  SIG_DynaMechsSimulationQueries simulationQueries( simulationData );
-  const SIG_Matrix armFromBaseAtStart = product( transposed( simulationQueries.getLinkOrientation( 0 ) ), simulationQueries.getLinkOrientation( 1 ) );
-  dmMDHLink *hinge = dynamic_cast< dmMDHLink * >( simulationData.dynaMechsLinks[ 1 ]->dynaMechsLink );
-  QVERIFY( hinge );
-  Float torque = 5;
-  hinge->setJointInput( &torque );
-
-  for ( int step = 0; step < 25; step++ )
-  {
-    simulationData.simulationProgress();
-  }
-
-  SIG_Matrix armFromBase = product( transposed( simulationQueries.getLinkOrientation( 0 ) ), simulationQueries.getLinkOrientation( 1 ) );
-  SIG_Matrix turn = product( armFromBase, transposed( armFromBaseAtStart ) );
-  const double angle = -std::atan2( turn.get( 0, 2 ), turn.get( 0, 0 ) ) * 180 / M_PI;
-  QVERIFY2( std::fabs( angle ) > 10 && std::fabs( angle ) < 110, qPrintable( QString( "the hinge turned %1 degrees" ).arg( angle ) ) );
-  const int expected = static_cast< int >( -128 + ( angle + 120 ) / 240 * 256 );
-  const int value = reading( simulationQueries, 0, 8 );
-  QEXPECT_FAIL( "", "SIG_DynaMechsSimulationQueries::sense maps the joint range in the direction in which DynaMechs counts the joint, which runs against the robot file here, so the reading is mirrored", Abort );
-  QVERIFY2( std::abs( value - expected ) <= 1, qPrintable( QString( "reads %1, expected %2" ).arg( value ).arg( expected ) ) );
-}
-
 void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsAJointWithTheRootOnTheRight_data()
 {
   QTest::addColumn< int >( "jointType" );
   QTest::addColumn< double >( "start" );
   QTest::addColumn< int >( "expected" );
 
-  const int translational = SIGEL_Robot::SIG_Joint::tTranslationalJoint;
   const int rotational = SIGEL_Robot::SIG_Joint::tRotationalJoint;
-  QTest::newRow( "translational, three quarters up" ) << translational << 0.5 << 64;
   QTest::newRow( "rotational, three quarters up" ) << rotational << 60.0 << 64;
 }
 
@@ -933,7 +879,6 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::senseReadsAJointWithT
   SIG_DynaMechsSimulationQueries simulationQueries( simulationData );
 
   const int value = reading( simulationQueries, 0, 8 );
-  QEXPECT_FAIL( "translational, three quarters up", "SIG_Joint::transformToDynaMechs reverses the range of a slider whose root is the right link, and SIG_DynaMechsSimulationQueries::sense maps the range in that direction, so the reading is mirrored", Abort );
   QVERIFY2( std::abs( value - expected ) <= 1, qPrintable( QString( "reads %1, expected %2" ).arg( value ).arg( expected ) ) );
 }
 

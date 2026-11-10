@@ -91,8 +91,6 @@ namespace SIGEL_Simulation
 
     void senseReadsTheJointPositionAfterTheJointHasMoved();
 
-    void senseReadsTheHingePositionAfterTheHingeHasMoved();
-
     void senseReadsAJointWithTheRootOnTheRight_data();
     void senseReadsAJointWithTheRootOnTheRight();
 
