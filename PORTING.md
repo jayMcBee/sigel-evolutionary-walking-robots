@@ -925,6 +925,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: FORMATTING ROUND ON `SIG_AllIndividualsView`.**
+
+- **Changed:** header and source: Allman braces, braces on every branch and
+  loop, tabs instead of spaces in the header and in wrapped argument lists,
+  `( x )` spacing, `QList< int >`, two stray semicolons after a block gone and
+  the empty-line rules. The object files are byte-identical with `-g0` and
+  `__LINE__` set to 0, with and without `SIG_DEBUG`, and so is the moc output.
+
 **2026-11-10 — DONE: FORMATTING ROUND ON `SIG_Terrain`.**
 
 - **Changed:** header and source: braces on every loop, `( x )` spacing,

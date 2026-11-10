@@ -42,136 +42,134 @@
 namespace SIGEL_MasterGUI
 {
 
-  class SIG_GUIGPExperiment;
+	class SIG_GUIGPExperiment;
 
-  /**
-   * This is the class of the widget in which the pool and single programs
-   * can be viewed.
-   */
-  class SIG_AllIndividualsView : public QSplitter
-    {
-      Q_OBJECT
+	/**
+	 * This is the class of the widget in which the pool and single programs
+	 * can be viewed.
+	 */
+	class SIG_AllIndividualsView : public QSplitter
+	{
+		Q_OBJECT
 
-    public:
-      /**
-       * The constructor of SIG_AllIndividualsView.
-       *
-       * Receives the SIG_GPMetaGPExperiment it belongs to.
-       * @param parent The parent widget of SIG_AllIndividualsView
-       * @param name Internal name for Qt.
-       * @param theExperiment A reference to the experiment this view belongs to.
-       * @param guiExperiment The SIG_GUIGPExperiment this view belongs to.
-       */
-      SIG_AllIndividualsView( QWidget * parent, const char * name, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment );
+	public:
+		/**
+		 * The constructor of SIG_AllIndividualsView.
+		 *
+		 * Receives the SIG_GPMetaGPExperiment it belongs to.
+		 * @param parent The parent widget of SIG_AllIndividualsView
+		 * @param name Internal name for Qt.
+		 * @param theExperiment A reference to the experiment this view belongs to.
+		 * @param guiExperiment The SIG_GUIGPExperiment this view belongs to.
+		 */
+		SIG_AllIndividualsView( QWidget *parent, const char *name, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment );
 
-      /**
-       * This function returns the number of selected items in the listview.
-       */
-      int numberOfSelectedItems();
+		/**
+		 * This function returns the number of selected items in the listview.
+		 */
+		int numberOfSelectedItems();
 
-      /**
-       * The list in the upper part of the SIG_AllIndividualsView.
-       *
-       * This is the widget which contains the list and some buttons.
-       */
-      SIG_IndividualList *individualList;
-      
-      /**
-       * The individual view in the lower part of the view.
-       */
-      SIG_IndividualView *individualView;
+		/**
+		 * The list in the upper part of the SIG_AllIndividualsView.
+		 *
+		 * This is the widget which contains the list and some buttons.
+		 */
+		SIG_IndividualList *individualList;
 
-      /**
-       * The individual menu.
-       *
-       * This menu is shown when a user clicks on an
-       * individual.
-       */
-      QMenu *individualMenu;
+		/**
+		 * The individual view in the lower part of the view.
+		 */
+		SIG_IndividualView *individualView;
 
-      /**
-       * The menu that popups if one clicks in the listview and
-       * not on an item.
-       */
-      QMenu *listviewMenu;
-      
-    signals:
-      void signalDataRefreshNeeded();
+		/**
+		 * The individual menu.
+		 *
+		 * This menu is shown when a user clicks on an
+		 * individual.
+		 */
+		QMenu *individualMenu;
 
-    public slots:
+		/**
+		 * The menu that popups if one clicks in the listview and
+		 * not on an item.
+		 */
+		QMenu *listviewMenu;
 
-    /**
-     * This slot is called for example when an experiment was loaded and
-     * the list needs a complete refresh.
-     */
-      void slotCompleteRefreshList();
+	signals:
+		void signalDataRefreshNeeded();
 
-    /**
-     * This slot is called whenever individuals should be added.
-     */
-      void slotAddIndividuals();
+	public slots:
+		/**
+		 * This slot is called for example when an experiment was loaded and
+		 * the list needs a complete refresh.
+		 */
+		void slotCompleteRefreshList();
 
-      /**
-       * This slot is called whenever individuals should be deleted.
-       */ 
-      void slotDeleteIndividuals();
+		/**
+		 * This slot is called whenever individuals should be added.
+		 */
+		void slotAddIndividuals();
 
-      /**
-       * Sets the fitness of every individual in the pool to -1 and refreshes
-       * the list.
-       */
-      void slotResetAllFitnessValues();
-      
-      /**
-       * This slot is called whenever the pushbutton Stats is clicked.
-       */
-      void slotStatsClicked();
+		/**
+		 * This slot is called whenever individuals should be deleted.
+		 */
+		void slotDeleteIndividuals();
 
-      /**
-       * This slot is called whenever one clicks the right mouse button in
-       * the individual list (the list displaying the pool).
-       */
-      void slotRightButtonClicked( const QPoint &pos );
-      
-      /**
-       * This slot is called whenever one doubleclicks on an item in the
-       * individual list.
-       */
-      void slotDoubleClicked( QTreeWidgetItem * theItem );
+		/**
+		 * Sets the fitness of every individual in the pool to -1 and refreshes
+		 * the list.
+		 */
+		void slotResetAllFitnessValues();
 
-      /**
-       * This slot is called whenever individuals shall
-       * be visualized.
-       */
-      void slotVisualize();
+		/**
+		 * This slot is called whenever the pushbutton Stats is clicked.
+		 */
+		void slotStatsClicked();
 
-      /**
-       * This slot is called when the selection in the individual list changes.
-       */
-      void slotSelectionChanged();
+		/**
+		 * This slot is called whenever one clicks the right mouse button in
+		 * the individual list (the list displaying the pool).
+		 */
+		void slotRightButtonClicked( const QPoint &pos );
 
-      void slotEvolutionNotRunning( bool isNotRunning );
+		/**
+		 * This slot is called whenever one doubleclicks on an item in the
+		 * individual list.
+		 */
+		void slotDoubleClicked( QTreeWidgetItem *theItem );
 
-      void slotImportProgram();
+		/**
+		 * This slot is called whenever individuals shall
+		 * be visualized.
+		 */
+		void slotVisualize();
 
-      void slotExportProgram();
+		/**
+		 * This slot is called when the selection in the individual list changes.
+		 */
+		void slotSelectionChanged();
 
-      void slotImportIndividual();
+		void slotEvolutionNotRunning( bool isNotRunning );
 
-      void slotExportIndividual();
+		void slotImportProgram();
 
-    private:
-      
-      /**
-       * A reference to the experiment object.
-       */
-      SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment;
+		void slotExportProgram();
 
-      /**
-       * The SIG_GUIGPExperiment this view belongs to.
-       */
-      SIG_GUIGPExperiment &guiExperiment;
-    };
+		void slotImportIndividual();
+
+		void slotExportIndividual();
+
+	private:
+		/**
+		 * A reference to the experiment object.
+		 */
+		SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment;
+
+		/**
+		 * The SIG_GUIGPExperiment this view belongs to.
+		 */
+		SIG_GUIGPExperiment &guiExperiment;
+	};
 
 }
 
