@@ -1,0 +1,14 @@
+--- a/dynamechs/dm/dmMDHLink.hpp
++++ b/dynamechs/dm/dmMDHLink.hpp
+@@ -151,6 +151,11 @@
+    {
+       m_joint_input = joint_input[0];
+    }
++   /// The torque or force the joint puts on the link: input plus joint limit, or input minus friction.
++   inline Float getJointTorque() const
++   {
++      return m_joint_input + (m_joint_limit_flag ? m_tau_limit : -m_joint_friction*m_qd);
++   }
+ 
+ // Link-to-Link transformation functions:
+    ///

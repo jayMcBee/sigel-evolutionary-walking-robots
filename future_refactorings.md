@@ -88,12 +88,6 @@ touched, because changing one changes behaviour against the reference binary.
   unlikely edge cases, such as a stored fitness after padding, would not be
   handled.
 
-- [ ] **53. DynaMechs returns uninitialised forces for end links.**
-  `dmArticulation::getForces` returns `f_star`, which is never written for a
-  link without children, and `SIG_GPForceFitnessFunction` uses it. Only
-  experiments that select `ForceFitnessFunction` are affected; no shipped
-  experiment does. No patch to the library touches this method.
-
 - [ ] **89. Refuse bad simulation parameters.** Needs more thought.
   - **Time to simulate under 1 s:** the simulated fitness functions divide by
     the run time in whole seconds, which gives `inf`, or `NaN` for a robot

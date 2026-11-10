@@ -925,6 +925,17 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: `getUsedForces` GIVES THE JOINT FORCES.**
+
+- `SIG_DynaMechsSimulationQueries::getUsedForces` no longer passes on
+  DynaMechs' `f_star`, a solver value that is never written for a link without
+  children. Per link it gives the torque or force of its own joint along the
+  joint axis, and the opposite of that of each successor's joint, in the
+  link's DynaMechs frame. The joint value is input plus joint limit, or input
+  minus friction, from `dmMDHLink::getJointTorque`, which the new patch
+  `vendor/patches/dynamechs-mdhlink-joint-torque.patch` adds. Only
+  `ForceFitnessFunction` reads it; no shipped experiment selects it.
+
 **2026-11-10 — DONE: THE TIME ACCOUNT HAS NO ROUNDING REMAINDER.**
 
 - `SIG_Interpreter::interprete` rounds the time account and the remaining

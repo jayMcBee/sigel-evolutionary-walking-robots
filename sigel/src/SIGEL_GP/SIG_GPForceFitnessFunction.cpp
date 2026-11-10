@@ -166,7 +166,7 @@ double SIGEL_GP::SIG_GPForceFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
 	}
 
 	// now we have to clean up the memory
-	// the forces-Array are created with "new" in dmArticulation::getForces()
+	// the forces-Array are created with "new" in SIG_DynaMechsSimulationQueries::getUsedForces()
 	for( vector<double *> *usedForceLoes : recorder.listForces )
 	{
 		for( unsigned int i = 0; i < usedForceLoes->size(); ++i )

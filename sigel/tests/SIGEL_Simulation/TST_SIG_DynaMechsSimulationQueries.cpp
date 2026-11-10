@@ -683,12 +683,12 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::getUsedForcesGivesThe
     delete[] force;
   }
   delete forces;
-  QEXPECT_FAIL( "", "SIG_DynaMechsSimulationQueries::getUsedForces gives DynaMechs' f_star, which dmArticulation never writes for a link without children", Abort );
   QVERIFY2( std::fabs( moment - 5 ) < 0.05, qPrintable( values ) );
 }
 
 // The same for a slider with a push of 5: the arm takes a force of 5 along the slider axis, the z axis of its
-// link, and the base a force of 5 along its own z axis, the vertical, along which the slider axis runs.
+// link, and the base a force of 5 along its own y axis, the vertical, along which the slider axis runs. The base
+// starts in the robot file's frame, whose y axis points up.
 void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::getUsedForcesGivesTheForceOfASliderOnTheLinkItMoves()
 {
   SIGEL_Robot::SIG_Robot robot;
@@ -723,7 +723,7 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::getUsedForcesGivesThe
   }
   if ( forces->size() == 2 )
   {
-    baseForce = std::fabs( ( *forces )[ 0 ][ 5 ] );
+    baseForce = std::fabs( ( *forces )[ 0 ][ 4 ] );
     force = std::fabs( ( *forces )[ 1 ][ 5 ] );
   }
   for ( double *each : *forces )
@@ -731,9 +731,7 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationQueries::getUsedForcesGivesThe
     delete[] each;
   }
   delete forces;
-  QEXPECT_FAIL( "", "SIG_DynaMechsSimulationQueries::getUsedForces gives DynaMechs' f_star, the bias force of the link's articulated body, and not the force that its joints put on it", Continue );
   QVERIFY2( std::fabs( baseForce - 5 ) < 0.05, qPrintable( values ) );
-  QEXPECT_FAIL( "", "SIG_DynaMechsSimulationQueries::getUsedForces gives DynaMechs' f_star, which dmArticulation never writes for a link without children", Abort );
   QVERIFY2( std::fabs( force - 5 ) < 0.05, qPrintable( values ) );
 }
 

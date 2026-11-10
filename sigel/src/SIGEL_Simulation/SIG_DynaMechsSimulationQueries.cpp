@@ -40,6 +40,7 @@
 #include <dm.h>
 #include "dmContactModel.hpp"
 #include "dmArticulation.hpp"
+#include "dmRevoluteLink.hpp"
 
 using namespace SIGEL_Tools;
 
@@ -381,7 +382,44 @@ int SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getRootNumber() const
 
 std::vector<double *> *SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getUsedForces() const
 {
-	std::vector<double *> *forceList = simulationData.dynaMechsSystem.getForces();
+	// One array per link, [ moment x y z, force x y z ] in the link's DynaMechs frame: the torque or force of its own
+	// joint along its z axis, which is the joint axis, and the opposite of that of each successor's joint.
+	// The reaction is taken at the joint, so the push of a slider gives the parent no moment.
+	std::vector<double *> *forceList = new std::vector<double *>;
+
+	for( SIG_DynaMechsLink const *dynaMechsLink : simulationData.dynaMechsLinks )
+	{
+		double *force = new double[ 6 ]();
+		forceList->push_back( force );
+
+		// A link that is not reached from the root has no DynaMechs link and keeps zeros.
+		if( !dynaMechsLink )
+		{
+			continue;
+		}
+
+		dmMDHLink const *joint = dynamic_cast<dmMDHLink const *>( dynaMechsLink->dynaMechsLink );
+
+		if( joint )
+		{
+			int first = dynamic_cast<dmRevoluteLink const *>( joint ) ? 0 : 3;
+			force[ first + 2 ] += joint->getJointTorque();
+		}
+
+		NEWMAT::Matrix worldToLink = dynaMechsLink->transformation.SubMatrix( 1, 3, 1, 3 ).t();
+
+		for( SIG_DynaMechsLink const *successor : dynaMechsLink->successors )
+		{
+			dmMDHLink const *successorJoint = static_cast<dmMDHLink const *>( successor->dynaMechsLink );
+			int first = dynamic_cast<dmRevoluteLink const *>( successorJoint ) ? 0 : 3;
+			NEWMAT::ColumnVector axis = worldToLink * successor->transformation.SubMatrix( 1, 3, 3, 3 );
+
+			for( int i = 0; i < 3; i++ )
+			{
+				force[ first + i ] -= successorJoint->getJointTorque() * axis( i + 1 );
+			}
+		}
+	}
 
 	return forceList;
 }
