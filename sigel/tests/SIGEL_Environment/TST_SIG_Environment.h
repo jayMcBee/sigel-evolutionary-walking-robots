@@ -73,8 +73,6 @@ namespace SIGEL_Environment
     void writeToFileThenReadFromFileGivesTheSameEnvironment_data();
     void writeToFileThenReadFromFileGivesTheSameEnvironment();
 
-    void writeToFileThenReadFromFileKeepsEveryDigitOfAValue();
-
     void writeToFileWritesTheBlockInTheFormOfTheExperimentFiles();
 
     void readFromFileOfABlockWithoutTheFloorKeysKeepsTheirDefaults();

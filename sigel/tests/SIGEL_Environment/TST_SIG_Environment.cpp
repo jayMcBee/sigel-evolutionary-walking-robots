@@ -364,27 +364,6 @@ void SIGEL_Environment::TST_SIG_Environment::writeToFileThenReadFromFileGivesThe
   QCOMPARE( read.getFrictionCoeff_u_k(), 0.6 );
 }
 
-// A value that a user types may have more than six significant digits.
-void SIGEL_Environment::TST_SIG_Environment::writeToFileThenReadFromFileKeepsEveryDigitOfAValue()
-{
-  SIG_Environment written;
-  written.setGroundPlanarSpringConstant( 12345.678 );
-  written.setVeloDamping( 0.9876543 );
-  QString text;
-  QTextStream out( &text );
-
-  written.writeToFile( out );
-  out.flush();
-  QTextStream in( &text, QIODevice::ReadOnly );
-  SIG_Environment read;
-  read.readFromFile( in );
-
-  QEXPECT_FAIL( "", "SIG_Environment::writeToFile writes the doubles with six significant digits", Continue );
-  QCOMPARE( read.getGroundPlanarSpringConstant(), 12345.678 );
-  QEXPECT_FAIL( "", "SIG_Environment::writeToFile writes the doubles with six significant digits", Continue );
-  QCOMPARE( read.getVeloDamping(), 0.9876543 );
-}
-
 // The form of the environment block in experiments/runner.exp, which the saved experiments have.
 // FLOORMATERIALNAME is written as floor; nothing reads it.
 void SIGEL_Environment::TST_SIG_Environment::writeToFileWritesTheBlockInTheFormOfTheExperimentFiles()

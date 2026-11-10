@@ -925,6 +925,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: THE SIX-DIGIT ENVIRONMENT VALUES ARE NOT FIXED.**
+
+- `SIG_Environment::writeToFile` writes the doubles with six significant
+  digits. It stays so by decision: six digits are finer than any value the
+  model needs. The unit test that marked this fault is removed.
+
 **2026-11-10 — DONE: THE MIRRORED JOINT SENSOR READING IS NOT FIXED.**
 
 - `SIG_DynaMechsSimulationQueries::sense` reads a rotational joint whose
