@@ -538,7 +538,6 @@ void SIGEL_GP::TST_SIG_GPPopulation::textWithoutARequiredFieldIsRefused()
   QVERIFY2( thrown.contains( message ), qPrintable( thrown ) );
   QCOMPARE( copy.getSize(), 2 );
   QCOMPARE( copy.nextIdentifier, QString( "2" ) );
-  QEXPECT_FAIL( "", "SIG_GPPopulation::readFromFile takes the WITHHISTORY setting of the text before it checks the required fields", Abort );
   QCOMPARE( writtenText( copy ), before );
 }
 
@@ -563,7 +562,6 @@ void SIGEL_GP::TST_SIG_GPPopulation::textRefusedAtAnIndividualLeavesThePopulatio
   QTextStream stream( &broken, QIODevice::ReadOnly );
   QVERIFY_THROWS_EXCEPTION( SIGEL_Tools::SIG_Exception, copy.readFromFile( stream ) );
 
-  QEXPECT_FAIL( "", "SIG_GPPopulation::readFromFile deletes the individuals before it reads, so a refused text leaves the individuals read before the fault", Abort );
   QCOMPARE( copy.getSize(), 5 );
   QCOMPARE( writtenText( copy ), before );
 }

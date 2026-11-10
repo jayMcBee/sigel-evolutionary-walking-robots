@@ -925,6 +925,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: A REFUSED POPULATION TEXT LEAVES THE POPULATION AS IT WAS.**
+
+- `SIG_GPPopulation::readFromFile` reads the WITHHISTORY setting, the next
+  identifier, the pool generation and the individuals into locals and puts
+  them into the population only at the end. A text that it refuses, for
+  example at Population > Import, no longer changes the history setting or
+  replaces the pool with the individuals read before the fault.
+
 **2026-11-10 — DONE: THE IMPORT OF AN ENVIRONMENT WITHOUT FLOOR KEYS IS NOT FIXED.**
 
 - `SIG_Environment::readFromFile` sets only the keys the text has, so

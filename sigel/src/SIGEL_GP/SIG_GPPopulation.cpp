@@ -329,6 +329,12 @@ bool SIGEL_GP::SIG_GPPopulation::importNewIndividual( QString& filename )
 
 void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 {
+	// The text is read into these and the population takes them only at the end, so a refused text leaves it as it was.
+	bool readHistory = history;
+	QString readNextIdentifier = nextIdentifier;
+	int readPoolGeneration = poolGeneration;
+	QList<SIGEL_GP::SIG_GPIndividual *> oldPool;
+
 	// first read the global options for the population
 	QString s=file.readLine(); //WITHHISTORY
 	if (s == "WITHHISTORY")
@@ -337,10 +343,10 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 		int tmp = s.toInt();
 		if (tmp == 0)
 		{
-			history = false;
+			readHistory = false;
 		}
 		else
-			history = true;
+			readHistory = true;
 	}
 
 	QString          populationStr=file.readAll();
@@ -365,6 +371,7 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 	if( (pos=populationStr.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive) )!=-1 )
 	{
 		pos2=populationStr.indexOf(";", pos + 16, Qt::CaseInsensitive);
+		oldPool.swap( pool );
 		resizeOwning( pool, (populationStr.mid(pos+15,pos2-pos-15)).toLong() );
 
 #ifdef SIG_DEBUG
@@ -393,7 +400,7 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 			                          << ">" << Qt::endl;
 
 #endif
-			setNextIdentifier(populationStr.mid(pos+15,pos2-pos-15));
+			readNextIdentifier = populationStr.mid(pos+15,pos2-pos-15);
 		}
 
 		pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
@@ -405,7 +412,7 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 			                          << populationStr.mid(pos+15,pos2-pos-15)
 			                          << ">\n" << Qt::endl;
 #endif
-			setPoolGeneration((populationStr.mid(pos+15,pos2-pos-15)).toLong());
+			readPoolGeneration = (populationStr.mid(pos+15,pos2-pos-15)).toLong();
 		}
 
 		for(long x=0;x<getSize();x++)
@@ -415,7 +422,6 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 			pos  = populationStr.indexOf("INDIVIDUAL("+tmpStr1+") BEGIN{", pos2, Qt::CaseInsensitive);
 			pos2 = populationStr.indexOf("}INDIVIDUAL("+tmpStr1+") END", pos2, Qt::CaseInsensitive);
 
-			delete pool[ x ];
 			pool[ x ] = new SIGEL_GP::SIG_GPIndividual();
 
 			indStr = populationStr.mid(pos+19+tmpStr1.length(),pos2-pos-20-tmpStr1.length());
@@ -426,8 +432,8 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 			}
 			catch( ... )
 			{
-				// The pool keeps the individuals that were read completely, as after Cancel.
-				resizeOwning( pool, x );
+				qDeleteAll( pool );
+				pool = oldPool;
 				throw;
 			}
 
@@ -440,16 +446,17 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 				{
 					// The process has been canceled. Because of process preparations the system may crash if
 					// these preparation are not made undone:
-
-					// Slots above x still hold the individuals from before this
-					// load -- the replace loop only reached x -- so this shrink
-					// frees them.
 					resizeOwning( pool, x + 1 );
 
 					break;
 				}
 			}
 		}
+
+		qDeleteAll( oldPool );
+		history = readHistory;
+		nextIdentifier = readNextIdentifier;
+		poolGeneration = readPoolGeneration;
 #ifdef SIG_DEBUG
 
 		SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION FINISHED." << Qt::endl;
