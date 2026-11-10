@@ -925,6 +925,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: A BODY WITH A BROKEN GEOMETRY FLAG IS REFUSED.**
+
+- The `SIG_Body` unstreaming constructor throws `SIG_UnstreamingError` when
+  the flag after the directory is not `y` or `n`, which also covers an ended
+  stream. Before, such a body was read without geometry, and a later error
+  named the wrong cause.
+
 **2026-11-10 — DONE: A REFUSED POPULATION TEXT LEAVES THE POPULATION AS IT WAS.**
 
 - `SIG_GPPopulation::readFromFile` reads the WITHHISTORY setting, the next

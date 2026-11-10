@@ -22,6 +22,7 @@
 */
 #include "SIGEL_Robot/SIG_Body.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
+#include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include <QList>
 #include "SIGEL_Tools/SIG_FileUtils.h"
 #include "SIGEL_Tools/SIG_IO.h"
@@ -51,6 +52,11 @@ namespace SIGEL_Robot
 		geometryFile = SIGEL_Tools::SIG_FileUtils::readWordOrQuoted( tx );
 		directory = SIGEL_Tools::SIG_FileUtils::readWordOrQuoted( tx );
 		tx >> tmpstr;
+
+		// writeToFileTransfer writes y or n.
+		if( tmpstr != "y" && tmpstr != "n" )
+			throw SIG_UnstreamingError( __FILE__, __LINE__, "Body flag y or n expected, found '" + tmpstr + "'" );
+
 		if( tmpstr == "y" )
 		{
 			geometry = new SIG_Geometry( tx );

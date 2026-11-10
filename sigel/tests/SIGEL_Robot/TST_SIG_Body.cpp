@@ -541,7 +541,6 @@ void SIGEL_Robot::TST_SIG_Body::unstreamingConstructorThrowsForAFlagOtherThanYOr
 
   unstreamedBody( robot, in, thrown );
 
-  QEXPECT_FAIL( "", "The SIG_Body unstreaming constructor reads every flag other than y as a body without geometry", Abort );
   QVERIFY2( thrown.contains( "Unstreaming error" ), qPrintable( thrown ) );
 }
 
@@ -568,7 +567,6 @@ void SIGEL_Robot::TST_SIG_Body::unstreamingConstructorThrowsForAnEndedStream()
 
   unstreamedBody( robot, in, thrown );
 
-  QEXPECT_FAIL( "", "The SIG_Body unstreaming constructor reads an ended stream as a body without name, directory and geometry", Abort );
   QVERIFY2( thrown.contains( "Unstreaming error" ), qPrintable( thrown ) );
 }
 
