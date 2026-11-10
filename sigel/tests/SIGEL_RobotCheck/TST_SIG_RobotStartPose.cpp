@@ -225,7 +225,7 @@ void SIGEL_RobotCheck::TST_SIG_RobotStartPose::getMassesGivesEachLinksMassInTheO
   QVERIFY( startPose.everyLinkHasMass() );
 }
 
-void SIGEL_RobotCheck::TST_SIG_RobotStartPose::aLinkWhoseFacesFaceInwardsHasAMassBelowZeroButTheRobotCanBeSimulated()
+void SIGEL_RobotCheck::TST_SIG_RobotStartPose::aLinkWhoseFacesFaceInwardsStopsTheRobotFromBeingSimulated()
 {
   SIGEL_Robot::SIG_Robot robot;
   SIGEL_Robot::SIG_Link *base = addBoxLink( robot, "base", SIG_Vector( -1, -0.5, -0.5 ), SIG_Vector( 1, 3, 0.5 ), 2 );
@@ -241,14 +241,11 @@ void SIGEL_RobotCheck::TST_SIG_RobotStartPose::aLinkWhoseFacesFaceInwardsHasAMas
 
   SIG_RobotStartPose startPose( robot, environment, simulationParameters );
 
-  QVERIFY2( startPose.canBeSimulated(), qPrintable( startPose.getRefusal() ) );
-  QCOMPARE( startPose.getMasses().count(), 2 );
-  QVERIFY2( std::fabs( startPose.getMasses()[ 0 ] - 14 ) < epsilon, qPrintable( QString::number( startPose.getMasses()[ 0 ] ) ) );
-  QVERIFY2( std::fabs( startPose.getMasses()[ 1 ] + 9 ) < epsilon, qPrintable( QString::number( startPose.getMasses()[ 1 ] ) ) );
-  QVERIFY( !startPose.everyLinkHasMass() );
+  QVERIFY( !startPose.canBeSimulated() );
+  QVERIFY2( startPose.getRefusal().contains( "link arm" ), qPrintable( startPose.getRefusal() ) );
 }
 
-void SIGEL_RobotCheck::TST_SIG_RobotStartPose::aLinkOfDensityZeroHasAMassOfZeroButTheRobotCanBeSimulated()
+void SIGEL_RobotCheck::TST_SIG_RobotStartPose::aLinkOfDensityZeroStopsTheRobotFromBeingSimulated()
 {
   SIGEL_Robot::SIG_Robot robot;
   SIGEL_Robot::SIG_Link *base = addBoxLink( robot, "base", SIG_Vector( -1, -0.5, -0.5 ), SIG_Vector( 1, 3, 0.5 ), 2 );
@@ -260,11 +257,8 @@ void SIGEL_RobotCheck::TST_SIG_RobotStartPose::aLinkOfDensityZeroHasAMassOfZeroB
 
   SIG_RobotStartPose startPose( robot, environment, simulationParameters );
 
-  QVERIFY2( startPose.canBeSimulated(), qPrintable( startPose.getRefusal() ) );
-  QCOMPARE( startPose.getMasses().count(), 2 );
-  QVERIFY2( std::fabs( startPose.getMasses()[ 0 ] - 14 ) < epsilon, qPrintable( QString::number( startPose.getMasses()[ 0 ] ) ) );
-  QCOMPARE( startPose.getMasses()[ 1 ], 0.0 );
-  QVERIFY( !startPose.everyLinkHasMass() );
+  QVERIFY( !startPose.canBeSimulated() );
+  QVERIFY2( startPose.getRefusal().contains( "link arm" ), qPrintable( startPose.getRefusal() ) );
 }
 
 void SIGEL_RobotCheck::TST_SIG_RobotStartPose::getRobotGivesAPreparedCopyAndTheGivenRobotStaysAsItIs()

@@ -66,6 +66,9 @@ namespace SIGEL_Robot
     QList<SIG_Drive *> drives;
     QList<SIG_Sensor *> sensors;
 
+    /** Throws a SIG_Exception naming the first link whose mass is 0 or less; the simulation runs into NaN with such a link. */
+    void refuseLinksWithoutMass () const;
+
   public:
     /**
      * Standard constructor.

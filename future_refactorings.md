@@ -94,12 +94,6 @@ touched, because changing one changes behaviour against the reference binary.
   experiments that select `ForceFitnessFunction` are affected; no shipped
   experiment does. No patch to the library touches this method.
 
-- [ ] **76. Warn when a mesh has negative volume.** Inverted face winding
-  gives negative mass and inertia in `SIG_Mirtich::computePhysics`; the robot
-  loads and the simulation runs into NaN. The robot check reports it as
-  "Link without mass" and names the link, but only when Check is pressed. A
-  warning at load, naming the link and the mesh file, is one option.
-
 - [ ] **89. Refuse bad simulation parameters.** Needs more thought.
   - **Time to simulate under 1 s:** the simulated fitness functions divide by
     the run time in whole seconds, which gives `inf`, or `NaN` for a robot

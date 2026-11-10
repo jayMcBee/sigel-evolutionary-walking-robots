@@ -264,6 +264,8 @@ namespace SIGEL_Robot {
         {
 	  instantiateGeometries ();
 
+	  refuseLinksWithoutMass ();
+
 	  rootlink->transformToDynaMechs( nullptr );
 
 	  initiate();
@@ -272,6 +274,20 @@ namespace SIGEL_Robot {
 
 	  for (SIG_Joint *currentJoint : rootJoints)
 	    currentJoint->calculateMDH( rootlink );
+        }
+
+        // Faces that face inwards give a negative mass, a density of 0 a mass of 0.
+        void SIG_Robot::refuseLinksWithoutMass () const
+        {
+	  for (SIG_Link *link : links) {
+	    double mass;
+	    SIG_Vector centreOfMass;
+	    SIG_Matrix inertia;
+	    link->getPhysics (mass, centreOfMass, inertia);
+	    if (!(mass > 0)) {
+	      throw SIG_Exception (__FILE__, __LINE__, "The mass of link " + link->getName() + " is " + QString::number (mass) + ", not above 0. Its material needs a density above 0 and its faces must face outwards.");
+	    }
+	  }
         }
 
         void SIG_Robot::writeToFileTransfer (QTextStream & tx) const

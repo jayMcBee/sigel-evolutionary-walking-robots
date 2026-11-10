@@ -42,9 +42,9 @@ namespace SIGEL_RobotCheck
 
     void getMassesGivesEachLinksMassInTheOrderOfTheRobotsLinks();
 
-    void aLinkWhoseFacesFaceInwardsHasAMassBelowZeroButTheRobotCanBeSimulated();
+    void aLinkWhoseFacesFaceInwardsStopsTheRobotFromBeingSimulated();
 
-    void aLinkOfDensityZeroHasAMassOfZeroButTheRobotCanBeSimulated();
+    void aLinkOfDensityZeroStopsTheRobotFromBeingSimulated();
 
     void getRobotGivesAPreparedCopyAndTheGivenRobotStaysAsItIs();
 

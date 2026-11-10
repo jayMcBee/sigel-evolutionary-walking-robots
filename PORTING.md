@@ -925,6 +925,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: A LINK WITHOUT MASS STOPS EVERY SIMULATION.**
+
+- `SIG_Robot::prepareDynaMechs` calls `refuseLinksWithoutMass`, which throws
+  `SIG_Exception` naming the first link whose mass is not above 0: faces that
+  face inwards or a density of 0 make the simulation run into NaN.
+  `SIG_LinkMassCheck` can therefore no longer report.
+
 **2026-11-10 — DONE: `SIG_AllIndividualsView::slotVisualize` PREPARES ONCE.**
 
 - **Changed:** `prepareRobotAndTerrainForVisualization` puts the GUI into the
