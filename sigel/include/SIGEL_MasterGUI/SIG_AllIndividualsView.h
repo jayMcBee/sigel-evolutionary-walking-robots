@@ -169,6 +169,18 @@ namespace SIGEL_MasterGUI
 		 * The SIG_GUIGPExperiment this view belongs to.
 		 */
 		SIG_GUIGPExperiment &guiExperiment;
+
+		/**
+		 * Puts the GUI into the experiment, then readies robot for DynaMechs and makes terrain from the floor settings.
+		 * Shows a message and returns false if the robot or the floor fails.
+		 */
+		bool prepareRobotAndTerrainForVisualization( SIGEL_Robot::SIG_Robot &robot, SIGEL_Environment::SIG_Terrain &terrain );
+
+		/**
+		 * Starts a sigel_slave on this host and sends it robot, terrain and the individual to show.
+		 * Shows a message if the slave cannot be started.
+		 */
+		void startVisualizationSlave( SIGEL_Robot::SIG_Robot &robot, SIGEL_Environment::SIG_Terrain const &terrain, SIGEL_GP::SIG_GPIndividual &individual );
 	};
 
 }

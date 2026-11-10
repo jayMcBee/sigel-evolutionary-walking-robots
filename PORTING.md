@@ -925,6 +925,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: `SIG_AllIndividualsView::slotVisualize` PREPARES ONCE.**
+
+- **Changed:** `prepareRobotAndTerrainForVisualization` puts the GUI into the
+  experiment, readies the robot and makes the floor once for all selected
+  individuals, where `slotVisualize` did it again for each one;
+  `startVisualizationSlave` starts and feeds one slave. The loop runs over
+  `selectedItems()`, so the windows open in selection order.
+
 **2026-11-10 — DONE: `SIG_AllIndividualsView` USES `QTreeWidget::selectedItems`.**
 
 - **Changed:** `numberOfSelectedItems` returns the size of `selectedItems()`;

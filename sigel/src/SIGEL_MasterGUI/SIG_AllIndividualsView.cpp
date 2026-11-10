@@ -283,87 +283,94 @@ namespace SIGEL_MasterGUI
 		SIGEL_Tools::SIG_IO::cerr << "Starting visualization!" << Qt::endl;
 #endif
 
-		QTreeWidgetItemIterator it( individualList->listviewIndividuals );
-		for( ; *it; ++it )
+		QList< QTreeWidgetItem * > const selectedItems = individualList->listviewIndividuals->selectedItems();
+		if( selectedItems.isEmpty() )
 		{
-			if( !( *it )->isSelected() )
-			{
-				continue;
-			}
-
-			SIG_IndividualListItem *individualListItem = static_cast< SIG_IndividualListItem * >( ( *it ) );
-			SIGEL_GP::SIG_GPIndividual *theGPIndividual = individualListItem->theIndividual;
-
-			emit signalDataRefreshNeeded();
-
-			SIGEL_Program::SIG_Program &theProgram = theGPIndividual->getProgramVar();
-
-			SIGEL_Robot::SIG_Robot modifiedRobot( theExperiment.robot );
-
-			try
-			{
-				modifiedRobot.prepareDynaMechs();
-			}
-			catch( SIGEL_Tools::SIG_Exception &e )
-			{
-				QMessageBox::warning( this, "Robot Exception", e.getMessage() );
-				return;
-			}
-
-			SIGEL_Environment::SIG_Terrain terrain;
-			try
-			{
-				terrain = theExperiment.environment.getTerrain();
-			}
-			catch( SIGEL_Tools::SIG_Exception &e )
-			{
-				QMessageBox::warning( this, "Can't Start Visualization", e.getMessage() );
-				return;
-			}
-
-			QList< char > hostNameBuffer( 100 );
-
-			gethostname( hostNameBuffer.data(), 100 );
-
-			char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
-
-			QString sigelRootString( sigelRootCString );
-
-			QString executableName = sigelRootString + "/sigel_slave";
-			QByteArray executableNameByteArray = executableName.toUtf8();
-			char const *executableNameCString = executableNameByteArray;
-
-			int taskId = 0;
-			int spawnInfo = pvm_spawn( const_cast< char * >( executableNameCString ),
-				nullptr,
-				PvmTaskHost,
-				hostNameBuffer.data(),
-				1,
-				&taskId );
-
-			if( spawnInfo == 1 )
-			{
-				SIGEL_GP::SIG_GPPVMData pvmData( modifiedRobot,
-					theExperiment.environment,
-					theExperiment.simulationParameter,
-					theExperiment.gpParameter.getFitnessName(),
-					true );
-
-				pvmData.setExperimentName( guiExperiment.getName() );
-				pvmData.setIndividualName( theGPIndividual->getName() );
-				pvmData.setIndividualFitness( theGPIndividual->getFitness() );
-				pvmData.setTerrain( terrain );
-
-				QString pvmDataString;
-				QTextStream pvmDataStream( &pvmDataString, QIODevice::ReadWrite );
-				pvmData.savePVMDataTransfer( pvmDataStream, theProgram );
-				pvmData.sendQStringToPVM( pvmDataString, taskId, 23 );
-			}
-			else
-			{
-				QMessageBox::critical( this, "Error While Starting Slave", "The slave could not be started.\nEither there is no executable or a PVM problem occurred." );
-			}
+			return;
 		}
+
+		SIGEL_Robot::SIG_Robot robot( theExperiment.robot );
+		SIGEL_Environment::SIG_Terrain terrain;
+		if( !prepareRobotAndTerrainForVisualization( robot, terrain ) )
+		{
+			return;
+		}
+
+		for( QTreeWidgetItem *item : selectedItems )
+		{
+			startVisualizationSlave( robot, terrain, *static_cast< SIG_IndividualListItem * >( item )->theIndividual );
+		}
+	}
+
+	bool SIG_AllIndividualsView::prepareRobotAndTerrainForVisualization( SIGEL_Robot::SIG_Robot &robot, SIGEL_Environment::SIG_Terrain &terrain )
+	{
+		emit signalDataRefreshNeeded();
+
+		try
+		{
+			robot.prepareDynaMechs();
+		}
+		catch( SIGEL_Tools::SIG_Exception &e )
+		{
+			QMessageBox::warning( this, "Robot Exception", e.getMessage() );
+			return false;
+		}
+
+		try
+		{
+			terrain = theExperiment.environment.getTerrain();
+		}
+		catch( SIGEL_Tools::SIG_Exception &e )
+		{
+			QMessageBox::warning( this, "Can't Start Visualization", e.getMessage() );
+			return false;
+		}
+		return true;
+	}
+
+	void SIG_AllIndividualsView::startVisualizationSlave( SIGEL_Robot::SIG_Robot &robot, SIGEL_Environment::SIG_Terrain const &terrain, SIGEL_GP::SIG_GPIndividual &individual )
+	{
+		QList< char > hostNameBuffer( 100 );
+
+		gethostname( hostNameBuffer.data(), 100 );
+
+		char *sigelRootCString = std::getenv( "SIGEL_ROOT" );
+
+		QString sigelRootString( sigelRootCString );
+
+		QString executableName = sigelRootString + "/sigel_slave";
+		QByteArray executableNameByteArray = executableName.toUtf8();
+		char const *executableNameCString = executableNameByteArray;
+
+		int taskId = 0;
+		int spawnInfo = pvm_spawn( const_cast< char * >( executableNameCString ),
+			nullptr,
+			PvmTaskHost,
+			hostNameBuffer.data(),
+			1,
+			&taskId );
+
+		if( spawnInfo != 1 )
+		{
+			QMessageBox::critical( this, "Error While Starting Slave", "The slave could not be started.\nEither there is no executable or a PVM problem occurred." );
+			return;
+		}
+
+		SIGEL_GP::SIG_GPPVMData pvmData( robot,
+			theExperiment.environment,
+			theExperiment.simulationParameter,
+			theExperiment.gpParameter.getFitnessName(),
+			true );
+
+		pvmData.setExperimentName( guiExperiment.getName() );
+		pvmData.setIndividualName( individual.getName() );
+		pvmData.setIndividualFitness( individual.getFitness() );
+		pvmData.setTerrain( terrain );
+
+		QString pvmDataString;
+		QTextStream pvmDataStream( &pvmDataString, QIODevice::ReadWrite );
+		pvmData.savePVMDataTransfer( pvmDataStream, individual.getProgramVar() );
+		pvmData.sendQStringToPVM( pvmDataString, taskId, 23 );
 	}
 
 	void SIG_AllIndividualsView::slotSelectionChanged()
