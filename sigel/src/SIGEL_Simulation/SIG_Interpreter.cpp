@@ -58,10 +58,11 @@ namespace SIGEL_Simulation
 		long programLength = robotProgram.getProgramLength();
 
 		double maxDelayTime = std::max( static_cast<double>( languageParameters.getMaximalDelayTime() ) * 0.001, 0.0 );
+		const double nanosecondsPerSecond = 1e9;
 
 		if ( timeAccount <= remainingLastCommandTime )
 		{
-			remainingLastCommandTime -= timeAccount;
+			remainingLastCommandTime = std::round( ( remainingLastCommandTime - timeAccount ) * nanosecondsPerSecond ) / nanosecondsPerSecond;
 #ifdef SIG_DEBUG
 			SIGEL_Tools::SIG_IO::cerr << "Remaining Last Command Time: " << remainingLastCommandTime << Qt::endl;
 #endif
@@ -240,6 +241,9 @@ namespace SIGEL_Simulation
 
 			programCounter = nextProgramCounter;
 			timeAccount -= languageParameters.getCommand( commandName )->getDuration();
+
+			// Whole nanoseconds, so that durations that add up to the time account leave exactly 0 and not a rounding remainder.
+			timeAccount = std::round( timeAccount * nanosecondsPerSecond ) / nanosecondsPerSecond;
 		} // close while
 
 		// The last command took more time than was left: the excess is taken off the time of the next call.

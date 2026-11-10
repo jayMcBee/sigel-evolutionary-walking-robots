@@ -925,6 +925,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: THE TIME ACCOUNT HAS NO ROUNDING REMAINDER.**
+
+- `SIG_Interpreter::interprete` rounds the time account and the remaining
+  time of the last command to whole nanoseconds. Durations that add up to the
+  time account now use it up exactly; before, a remainder of about 1e-16 s ran
+  one more command in the same step.
+
 **2026-11-10 — DONE: THE SIX-DIGIT TERRAIN HEIGHTS ARE NOT FIXED.**
 
 - `SIG_DynaMechsSimulationData::loadTerrain` writes the heights with six

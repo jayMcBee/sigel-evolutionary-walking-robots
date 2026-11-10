@@ -2468,7 +2468,6 @@ void SIGEL_Simulation::TST_SIG_Interpreter::commandsWhoseDurationsAddUpToTheTime
 
   interpreter.interprete( 1.0 );
 
-  QEXPECT_FAIL( "", "SIG_Interpreter::interprete subtracts each duration in turn in double values, and taking 0.1 from 1 ten times one after another leaves 1.4e-16 s, which runs an eleventh command", Abort );
   QCOMPARE( commandInterface.getMoveRecords().size(), 10 );
 }
 
@@ -2506,7 +2505,6 @@ void SIGEL_Simulation::TST_SIG_Interpreter::delayThatUsesUpTheTimeAccountExactly
 
   interpreter.interprete( timeAccount );
 
-  QEXPECT_FAIL( "80 ms and 0.02 s in 0.1 s", "SIG_Interpreter::interprete subtracts the delay time and the duration of the DELAY one after the other in double values, and 0.1 - 0.08 - 0.02 leaves 2^-58 s, which runs the MOVE", Abort );
   QCOMPARE( commandInterface.getMoveRecords().size(), 0 );
 }
 
