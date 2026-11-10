@@ -58,11 +58,10 @@ namespace SIGEL_MasterGUI
 		 *
 		 * Receives the SIG_GPMetaGPExperiment it belongs to.
 		 * @param parent The parent widget of SIG_AllIndividualsView
-		 * @param name Internal name for Qt.
 		 * @param theExperiment A reference to the experiment this view belongs to.
 		 * @param guiExperiment The SIG_GUIGPExperiment this view belongs to.
 		 */
-		SIG_AllIndividualsView( QWidget *parent, const char *name, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment );
+		SIG_AllIndividualsView( QWidget *parent, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment );
 
 		/**
 		 * This function returns the number of selected items in the listview.

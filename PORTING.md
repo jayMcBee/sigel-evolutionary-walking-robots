@@ -925,6 +925,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: `SIG_AllIndividualsView` TAKES NO `name`.**
+
+- The constructor's `name` was never used; its one caller,
+  `SIG_GUIGPExperiment`, no longer passes it.
+
 **2026-11-10 — DONE: A LINK WITHOUT MASS STOPS EVERY SIMULATION.**
 
 - `SIG_Robot::prepareDynaMechs` calls `refuseLinksWithoutMass`, which throws
