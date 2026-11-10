@@ -151,7 +151,7 @@ namespace SIGEL_MasterGUI
 				qApp->processEvents();
 			}
 			SIGEL_GP::SIG_GPIndividual *theGPIndividual = &theExperiment.population.getIndividual( counter );
-			SIG_IndividualListItem *theItem = new SIG_IndividualListItem( individualList->listviewIndividuals, counter, theGPIndividual );
+			new SIG_IndividualListItem( individualList->listviewIndividuals, counter, theGPIndividual );
 		}
 		individualList->listviewIndividuals->setSortingEnabled( true );
 		individualList->lcdnumberNumberOfIndividuals->display( theExperiment.population.getSize() );

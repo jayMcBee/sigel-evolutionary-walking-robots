@@ -925,6 +925,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: NO UNUSED `theItem` IN `SIG_AllIndividualsView::slotCompleteRefreshList`.**
+
+- The list item is made with a bare `new`, as in `slotAddIndividuals`; the
+  tree owns it. The object file is byte-identical.
+
 **2026-11-10 — DONE: FORMATTING ROUND ON `SIG_AllIndividualsView`.**
 
 - **Changed:** header and source: Allman braces, braces on every branch and
