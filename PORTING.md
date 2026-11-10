@@ -925,6 +925,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: FORMATTING ROUND ON `SIG_Environment`.**
+
+- **Changed:** header and source: Allman
+  braces instead of K&R, braces on every branch and loop, tabs instead of the
+  mix of spaces and tabs, `( x )` spacing, spaces around operators and the
+  empty-line rules. The object files are byte-identical with `-g0` and
+  `__LINE__` set to 0.
+
 **2026-11-10 — DONE: `getTerrain` GIVES NO QUIET FLAT FLOOR.**
 
 - `SIG_Environment::getTerrain` throws `SIG_Exception` when `makeTerrain`

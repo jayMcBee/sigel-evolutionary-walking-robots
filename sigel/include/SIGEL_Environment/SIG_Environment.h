@@ -33,387 +33,387 @@
 namespace SIGEL_Environment
 {
 
-/**
- * The SIG_Environment contains the Environment Data
- *
- * The class can read from File and write to file.
- */
-class SIG_Environment {
- public:
+	/**
+	 * The SIG_Environment contains the Environment Data
+	 *
+	 * The class can read from File and write to file.
+	 */
+	class SIG_Environment
+	{
+	public:
+		/** Default constructor
+		 *
+		 * @post
+		 *  Sets gravity to 9.81 downwards.
+		 */
+		SIG_Environment();
 
-  /** Default constructor
-   *
-   * @post
-   *  Sets gravity to 9.81 downwards.
-   */  
-  SIG_Environment();
+		/** Value constructor
+		 *
+		 * @param newGravity
+		 *  The vector for the gravity, where the length defines the acceleration.
+		 * @post
+		 *  Sets gravity to newGravity.
+		 */
+		SIG_Environment( SIG_Vector newGravity, double newVeloDamping,
+			SIG_Vector newStartPosition,
+			double newGroundPlanarSpringConstant, double newGroundNormalSpringConstant,
+			double newGroundPlanarDamperConstant, double newGroundNormalDamperConstant,
+			double newFrictionCoeff_u_s, double newFrictionCoeff_u_k );
 
-  /** Value constructor
-   *
-   * @param newGravity
-   *  The vector for the gravity, where the length defines the acceleration.
-   * @post
-   *  Sets gravity to newGravity.
-   */  
-  SIG_Environment(SIG_Vector newGravity, double newVeloDamping, 
-		  SIG_Vector newStartPosition, 
-		  double newGroundPlanarSpringConstant, double newGroundNormalSpringConstant,
-		  double newGroundPlanarDamperConstant, double newGroundNormalDamperConstant, 
-		  double newFrictionCoeff_u_s, double newFrictionCoeff_u_k);
+		/** File constructor
+		 *
+		 * @param file
+		 *  the filestream to be read from.
+		 * @post
+		 *  Reads the environment from file.
+		 */
+		SIG_Environment( QTextStream &file );
 
-  /** File constructor
-   *
-   * @param file
-   *  the filestream to be read from.
-   * @post
-   *  Reads the environment from file.
-   */  
-  SIG_Environment(QTextStream& file);
+		/** Writes the Environment to a File
+		 *
+		 * @param file
+		 *  the filestream to write to.
+		 * @post
+		 *  The environment is written to file.
+		 */
+		void writeToFile( QTextStream &file );
 
-  /** Writes the Environment to a File
-   *
-   * @param file
-   *  the filestream to write to.
-   * @post
-   *  The environment is written to file.
-   */  
-  void writeToFile(QTextStream& file);
+		/** Reads the Environment from a File
+		 *
+		 * @param file
+		 *  the filestream to read from.
+		 * @post
+		 *  The environment is read from file.
+		 */
+		void readFromFile( QTextStream &file );
 
-  /** Reads the Environment from a File
-   *
-   * @param file
-   *  the filestream to read from.
-   * @post
-   *  The environment is read from file.
-   */  
-  void readFromFile(QTextStream& file);
+		/** Sets the gravity
+		 *
+		 * @param newGravity
+		 *  The vector for the gravity, where the length defines the acceleration.
+		 * @post
+		 *  Sets gravity to newGravity.
+		 */
+		void setGravity( SIG_Vector newGravity );
 
-  /** Sets the gravity
-   *
-   * @param newGravity
-   *  The vector for the gravity, where the length defines the acceleration.
-   * @post
-   *  Sets gravity to newGravity.
-   */  
-  void setGravity(SIG_Vector newGravity);
+		/** Reads the gravity
+		 *
+		 * @return
+		 *  The vector for the gravity, where the length defines the acceleration.
+		 */
+		SIG_Vector getGravity() const;
 
-  /** Reads the gravity
-   *
-   * @return
-   *  The vector for the gravity, where the length defines the acceleration.
-   */  
-  SIG_Vector getGravity() const;
+		/** Sets the veloDamping
+		 *
+		 * @param newVeloDamping
+		 *  The amount of velo damping must be between 1 (no damping) and 0 (full damping)
+		 * @post
+		 *  Sets veloDamping to newVeloDamping.
+		 */
+		void setVeloDamping( double newVeloDamping );
 
-  /** Sets the veloDamping
-   *
-   * @param newVeloDamping
-   *  The amount of velo damping must be between 1 (no damping) and 0 (full damping)
-   * @post
-   *  Sets veloDamping to newVeloDamping.
-   */  
-  void setVeloDamping(double newVeloDamping);
+		/** Reads the veloDamping
+		 *
+		 * @return
+		 *  The amount of velo damping must be between 1 (no damping) and 0 (full damping).
+		 */
+		double getVeloDamping() const;
 
-  /** Reads the veloDamping
-   *
-   * @return
-   *  The amount of velo damping must be between 1 (no damping) and 0 (full damping).
-   */  
-  double getVeloDamping() const;
+		/** Sets the startPosition
+		 *
+		 * @param newStartPosition
+		 *  The starting Position of the Robot in the simulation.
+		 * @post
+		 *  Sets startPosition to newStartPosition.
+		 */
+		void setStartPosition( SIG_Vector newStartPosition );
 
-  /** Sets the startPosition
-   *
-   * @param newStartPosition
-   *  The starting Position of the Robot in the simulation.
-   * @post
-   *  Sets startPosition to newStartPosition.
-   */  
-  void setStartPosition(SIG_Vector newStartPosition);
+		/** Reads the startPositon
+		 *
+		 * @return
+		 *  The starting Position of the Robot in the simulation.
+		 */
+		SIG_Vector getStartPosition() const;
 
-  /** Reads the startPositon
-   *
-   * @return
-   *  The starting Position of the Robot in the simulation.
-   */  
-  SIG_Vector getStartPosition() const;
+		/** Sets the floorDimensionX
+		 *
+		 * @param newFloorDimensionX
+		 *  the x-dimension of dynaMechs Environment.
+		 * @post
+		 *  Sets floorDimensionX to newFloorDimensionX
+		 */
+		void setFloorDimensionX( int newFloorDimensionX );
 
-   /** Sets the floorDimensionX
-   *
-   * @param newFloorDimensionX
-   *  the x-dimension of dynaMechs Environment.
-   * @post
-   *  Sets floorDimensionX to newFloorDimensionX
-   */
-  void setFloorDimensionX(int newFloorDimensionX);
+		/** Reads the floorDimensionX
+		 *
+		 * @return
+		 *  The x-dimension of the dynaMech Environment.
+		 */
+		int getFloorDimensionX() const;
 
-  /** Reads the floorDimensionX
-   *
-   * @return
-   *  The x-dimension of the dynaMech Environment.
-   */
-  int getFloorDimensionX() const;
+		/** Sets the floorDimensionZ
+		 *
+		 * @param newFloorDimensionZ
+		 *  the z-dimension of dynaMechs Environment.
+		 * @post
+		 *  Sets floorDimensionZ to newFloorDimensionZ
+		 */
+		void setFloorDimensionZ( int newFloorDimensionZ );
 
-   /** Sets the floorDimensionZ
-   *
-   * @param newFloorDimensionZ
-   *  the z-dimension of dynaMechs Environment.
-   * @post
-   *  Sets floorDimensionZ to newFloorDimensionZ
-   */
-  void setFloorDimensionZ(int newFloorDimensionZ);
+		/** Reads the floorDimensionZ
+		 *
+		 * @return
+		 *  The z-dimension of the dynaMech Environment.
+		 */
+		int getFloorDimensionZ() const;
 
-  /** Reads the floorDimensionZ
-   *
-   * @return
-   *  The z-dimension of the dynaMech Environment.
-   */
-  int getFloorDimensionZ() const;
+		/** Sets the floorFunction
+		 *
+		 * @param newFloorFunction
+		 *  The function of the floor for the dynaMechs Environment.
+		 * @post
+		 *  Sets floorFunction to newFloorFunction.
+		 */
+		void setFloorFunction( QString newFloorFunction );
 
-  /** Sets the floorFunction
-   *
-   * @param newFloorFunction
-   *  The function of the floor for the dynaMechs Environment.
-   * @post
-   *  Sets floorFunction to newFloorFunction.
-   */
-  void setFloorFunction(QString newFloorFunction);
+		/** Reads the floorFunction
+		 *
+		 * @return
+		 *  The function of the floor for the dynaMechs Environment.
+		 */
+		QString getFloorFunction() const;
 
-  /** Reads the floorFunction
-   *
-   * @return
-   *  The function of the floor for the dynaMechs Environment.
-   */
-  QString getFloorFunction() const;
+		/** set the boolean variable floorFuncSelected.
+		 *	it is used to determine how the terrain.ter should be produced
+		 */
+		void setFloorFuncSelected( bool newFloorFuncSelected );
 
-  /** set the boolean variable floorFuncSelected.
-  	*	it is used to determine how the terrain.ter should be produced
-  	*/
-	void setFloorFuncSelected(bool newFloorFuncSelected);
-	
-	/**	reads the floorFuncSelected variable.
-		*
-		*	@return
-		*		the boolean variable floorFuncSelected.
-		*/
-  bool getFloorFuncSelected();
+		/**	reads the floorFuncSelected variable.
+		 *
+		 *	@return
+		 *		the boolean variable floorFuncSelected.
+		 */
+		bool getFloorFuncSelected();
 
-  /**	Sets the FloorPictureFile.
-  	*
-  	*	@param newFloorPictureFile
-  	*		The path of the file.
-  	*/
-  void setFloorPictureFile(QString newFloorPictureFile);
+		/**	Sets the FloorPictureFile.
+		 *
+		 *	@param newFloorPictureFile
+		 *		The path of the file.
+		 */
+		void setFloorPictureFile( QString newFloorPictureFile );
 
-  /**	Reads the TextureFile.
-  	*
-  	*	@return
-  	*		The path of the file.
-  	*/
- 	QString getTextureFile() const;
+		/**	Reads the TextureFile.
+		 *
+		 *	@return
+		 *		The path of the file.
+		 */
+		QString getTextureFile() const;
 
-	/**	Sets the TextureFile.
- 		*
- 		*	@param newTextureFile
- 		*		The path of the file.
- 	*/
-  void setTextureFile(QString newTextureFile);
+		/**	Sets the TextureFile.
+		 *
+		 *	@param newTextureFile
+		 *		The path of the file.
+		 */
+		void setTextureFile( QString newTextureFile );
 
-  /**	Reads the alpha value for the texture.
-  	*
-  	*	@return
-  	*		The alpha value for the texture.
-  	*/
- 	int getTexAlpha() const;
+		/**	Reads the alpha value for the texture.
+		 *
+		 *	@return
+		 *		The alpha value for the texture.
+		 */
+		int getTexAlpha() const;
 
-	/**	Sets the alpha value for the texture.
- 		*
- 		*	@param newTexAlpha
- 		*		The alpha value for the texture.
- 	*/
-  void setTexAlpha(int newTexAlpha);
+		/**	Sets the alpha value for the texture.
+		 *
+		 *	@param newTexAlpha
+		 *		The alpha value for the texture.
+		 */
+		void setTexAlpha( int newTexAlpha );
 
- 	bool getWithTexture() const;
+		bool getWithTexture() const;
 
-  void setWithTexture(bool newWithTexture);
+		void setWithTexture( bool newWithTexture );
 
-  /**	Reads the FloorPictureFile.
-  	*
-  	*	@return
-  	*		The path of the file.
-  	*/
- 	QString getFloorPictureFile() const;
- 	
-  /** Sets the ground planar spring constant
-   *
-   * @param newGroundPlanarSpringConstant
-   *  The ground planar spring constant.
-   * @post
-   *  Sets groundPlanarSpringConstant to newGroundPlanarSpringConstant
-   */
-  void setGroundPlanarSpringConstant(double newGroundPlanarSpringConstant);
+		/**	Reads the FloorPictureFile.
+		 *
+		 *	@return
+		 *		The path of the file.
+		 */
+		QString getFloorPictureFile() const;
 
-  /** Reads the ground planar spring constant
-   *
-   * @return
-   *  The value of the ground planar spring constant
-   */
-  double getGroundPlanarSpringConstant() const;
+		/** Sets the ground planar spring constant
+		 *
+		 * @param newGroundPlanarSpringConstant
+		 *  The ground planar spring constant.
+		 * @post
+		 *  Sets groundPlanarSpringConstant to newGroundPlanarSpringConstant
+		 */
+		void setGroundPlanarSpringConstant( double newGroundPlanarSpringConstant );
 
-  /** Sets the ground normal spring constant
-   *
-   * @param newGroundNormalSpringConstant
-   *  The ground normal spring constant
-   * @post
-   *  Sets groundNormalSpringConstant to newGroundNormalSpringConstant
-   */
-  void setGroundNormalSpringConstant(double newGroundNormalSpringConstant);
+		/** Reads the ground planar spring constant
+		 *
+		 * @return
+		 *  The value of the ground planar spring constant
+		 */
+		double getGroundPlanarSpringConstant() const;
 
-  /** Reads the ground normal spring constant
-   *
-   * @return
-   *  The value of the ground normal spring constant
-   */
-  double getGroundNormalSpringConstant() const;
+		/** Sets the ground normal spring constant
+		 *
+		 * @param newGroundNormalSpringConstant
+		 *  The ground normal spring constant
+		 * @post
+		 *  Sets groundNormalSpringConstant to newGroundNormalSpringConstant
+		 */
+		void setGroundNormalSpringConstant( double newGroundNormalSpringConstant );
 
-  /** Sets the the ground planar damper constant
-   *
-   * @param newGroundPlanarDamperConstant
-   *  The ground planar damper constant
-   * @post
-   *  Sets groundPlanarDamperConstant to newGroundPlanarDamperConstant
-   */
-  void setGroundPlanarDamperConstant(double newGroundPlanarDamperConstant);
+		/** Reads the ground normal spring constant
+		 *
+		 * @return
+		 *  The value of the ground normal spring constant
+		 */
+		double getGroundNormalSpringConstant() const;
 
-  /** Reads the the ground planar damper constant
-   *
-   * @return
-   *  The value of the ground planar damper constant
-   */
-  double getGroundPlanarDamperConstant() const;
+		/** Sets the the ground planar damper constant
+		 *
+		 * @param newGroundPlanarDamperConstant
+		 *  The ground planar damper constant
+		 * @post
+		 *  Sets groundPlanarDamperConstant to newGroundPlanarDamperConstant
+		 */
+		void setGroundPlanarDamperConstant( double newGroundPlanarDamperConstant );
 
-  /** Sets the ground normal damper constant
-   *
-   * @param newGroundNormalDamperConstant
-   *  The ground normal damper constant
-   * @post
-   *  Sets groundNormalDamperConstant to newGroundNormalDamperConstant
-   */
-  void setGroundNormalDamperConstant(double newGroundNormalDamperConstant);
+		/** Reads the the ground planar damper constant
+		 *
+		 * @return
+		 *  The value of the ground planar damper constant
+		 */
+		double getGroundPlanarDamperConstant() const;
 
-  /** Reads the ground normal damper constant
-   *
-   * @return
-   *  The value of the ground normal damper constant
-   */
-  double getGroundNormalDamperConstant() const;
+		/** Sets the ground normal damper constant
+		 *
+		 * @param newGroundNormalDamperConstant
+		 *  The ground normal damper constant
+		 * @post
+		 *  Sets groundNormalDamperConstant to newGroundNormalDamperConstant
+		 */
+		void setGroundNormalDamperConstant( double newGroundNormalDamperConstant );
 
-  /** Sets the static friction coefficient
-   *
-   * @param newFrictionCoeff_u_s
-   *  The static friction coefficient
-   * @post
-   *  Sets frictionCoeff_u_s to newFrictionCoeff_u_s
-   */
-  void setFrictionCoeff_u_s(double newFrictionCoeff_u_s);
+		/** Reads the ground normal damper constant
+		 *
+		 * @return
+		 *  The value of the ground normal damper constant
+		 */
+		double getGroundNormalDamperConstant() const;
 
-  /** Reads the static friction coefficient
-   *
-   * @return
-   *  The value of the static friction coefficient
-   */
-  double getFrictionCoeff_u_s() const;
+		/** Sets the static friction coefficient
+		 *
+		 * @param newFrictionCoeff_u_s
+		 *  The static friction coefficient
+		 * @post
+		 *  Sets frictionCoeff_u_s to newFrictionCoeff_u_s
+		 */
+		void setFrictionCoeff_u_s( double newFrictionCoeff_u_s );
 
-  /** Sets the kinetic friction coefficient
-   *
-   * @param newFrictionCoeff_u_k
-   *  The kinetic friction coefficient
-   * @post
-   *  Sets frictionCoeff_u_k to newFrictionCoeff_u_k
-   */
-  void setFrictionCoeff_u_k(double newFrictionCoeff_u_k);
+		/** Reads the static friction coefficient
+		 *
+		 * @return
+		 *  The value of the static friction coefficient
+		 */
+		double getFrictionCoeff_u_s() const;
 
-  /** Reads the kinetic friction coefficient
-   *
-   * @return
-   *  The value of the kinetic friction coefficient
-   */
-  double getFrictionCoeff_u_k() const;
+		/** Sets the kinetic friction coefficient
+		 *
+		 * @param newFrictionCoeff_u_k
+		 *  The kinetic friction coefficient
+		 * @post
+		 *  Sets frictionCoeff_u_k to newFrictionCoeff_u_k
+		 */
+		void setFrictionCoeff_u_k( double newFrictionCoeff_u_k );
 
-  /** The terrain given by setTerrain; without one, the terrain of the selected floor function or picture file. Throws SIG_Exception if that fails. */
-  SIG_Terrain getTerrain() const;
+		/** Reads the kinetic friction coefficient
+		 *
+		 * @return
+		 *  The value of the kinetic friction coefficient
+		 */
+		double getFrictionCoeff_u_k() const;
 
-  /** Makes getTerrain return newTerrain. A slave gets its floor from the master this way. */
-  void setTerrain(SIG_Terrain const &newTerrain);
+		/** The terrain given by setTerrain; without one, the terrain of the selected floor function or picture file. Throws SIG_Exception if that fails. */
+		SIG_Terrain getTerrain() const;
 
-  /**
-   * Makes the terrain of the selected floor function or picture file into terrain.
-   * Returns false if the picture file is missing or not a P2 PGM file, or if the function cannot be parsed.
-   */
-  bool makeTerrain(SIG_Terrain &terrain) const;
+		/** Makes getTerrain return newTerrain. A slave gets its floor from the master this way. */
+		void setTerrain( SIG_Terrain const &newTerrain );
 
-  /** This is the set method for the variable autosaveIntervalGenerations. */
-  void setAutosaveIntervalGenerations(int newAutosaveIntervalGenerations);
-	
-	/** This is the get method for the variable autosaveIntervalGenerations. */
-	int getAutosaveIntervalGenerations();
+		/**
+		 * Makes the terrain of the selected floor function or picture file into terrain.
+		 * Returns false if the picture file is missing or not a P2 PGM file, or if the function cannot be parsed.
+		 */
+		bool makeTerrain( SIG_Terrain &terrain ) const;
 
- private:
-  /** the storage for the gravity vector */
-  SIG_Vector gravity;
+		/** This is the set method for the variable autosaveIntervalGenerations. */
+		void setAutosaveIntervalGenerations( int newAutosaveIntervalGenerations );
 
-  /** the storage for the velo-damping */
-  double veloDamping;
+		/** This is the get method for the variable autosaveIntervalGenerations. */
+		int getAutosaveIntervalGenerations();
 
-  /** the storage for the start position */
-  SIG_Vector startPosition;
+	private:
+		/** the storage for the gravity vector */
+		SIG_Vector gravity;
 
-  /** the storage of the x-dimension of the floor */
-  int floorDimensionX;
+		/** the storage for the velo-damping */
+		double veloDamping;
 
-  /** the storage of the z-dimension of the floor */
-  int floorDimensionZ;
+		/** the storage for the start position */
+		SIG_Vector startPosition;
 
-  /** the storage of the floor function */
-  QString floorFunction;
+		/** the storage of the x-dimension of the floor */
+		int floorDimensionX;
 
-  /** the storage of filename for a floor picture */
-  QString floorPictureFile;
+		/** the storage of the z-dimension of the floor */
+		int floorDimensionZ;
 
-  /** determines whether a floorFunction or a floorPictureFile is specified */
-  bool floorFuncSelected;
+		/** the storage of the floor function */
+		QString floorFunction;
 
-  /** the storage for the texture pixmap */
-  QString textureFile;
+		/** the storage of filename for a floor picture */
+		QString floorPictureFile;
 
-  /** holds true if the user wants to see the texture else the variable holds false */
-  bool withTexture;
+		/** determines whether a floorFunction or a floorPictureFile is specified */
+		bool floorFuncSelected;
 
-  /** the storage of the alpha value for the texture */
-  int texAlpha;
+		/** the storage for the texture pixmap */
+		QString textureFile;
 
-  /** the ground planar spring constant */
-  double groundPlanarSpringConstant;
+		/** holds true if the user wants to see the texture else the variable holds false */
+		bool withTexture;
 
-  /** the ground normal spring constant */
-  double groundNormalSpringConstant;
+		/** the storage of the alpha value for the texture */
+		int texAlpha;
 
-  /** the ground planar damper constant */
-  double groundPlanarDamperConstant;
+		/** the ground planar spring constant */
+		double groundPlanarSpringConstant;
 
-  /** the ground normal damper constant */
-  double groundNormalDamperConstant;
+		/** the ground normal spring constant */
+		double groundNormalSpringConstant;
 
-  /** the static friction coefficient */
-  double frictionCoeff_u_s;
+		/** the ground planar damper constant */
+		double groundPlanarDamperConstant;
 
-  /** the kinetic friction coefficient */
-  double frictionCoeff_u_k;
+		/** the ground normal damper constant */
+		double groundNormalDamperConstant;
 
-  /** 0 disables autosave. */
-  int autosaveIntervalGenerations;
+		/** the static friction coefficient */
+		double frictionCoeff_u_s;
 
-  /** The terrain of setTerrain, which getTerrain returns instead of making one. */
-  std::optional<SIG_Terrain> givenTerrain;
-};
+		/** the kinetic friction coefficient */
+		double frictionCoeff_u_k;
+
+		/** 0 disables autosave. */
+		int autosaveIntervalGenerations;
+
+		/** The terrain of setTerrain, which getTerrain returns instead of making one. */
+		std::optional< SIG_Terrain > givenTerrain;
+	};
 
 }
 
