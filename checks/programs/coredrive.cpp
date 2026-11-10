@@ -184,7 +184,6 @@ int main(int argc, char *argv[])
         case SIGEL_RobotCheck::SIG_RobotIssue::tGroundStepSize:    check = "GroundStepSize"; break;
         case SIGEL_RobotCheck::SIG_RobotIssue::tJointStepSize:     check = "JointStepSize"; break;
         case SIGEL_RobotCheck::SIG_RobotIssue::tIntegrator:        check = "Integrator"; break;
-        case SIGEL_RobotCheck::SIG_RobotIssue::tLinkMass:          check = "LinkMass"; break;
         case SIGEL_RobotCheck::SIG_RobotIssue::tStanding:          check = "Standing"; break;
       }
       printf("%s\t%s\t%s\t%s\t%s\t%s\n", check,

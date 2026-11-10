@@ -925,6 +925,11 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: `SIG_LinkMassCheck` IS GONE.**
+
+- `SIG_Robot::prepareDynaMechs` refuses a link without mass before the robot
+  check runs, so the check could not report; `tLinkMass` goes with it.
+
 **2026-11-10 — DONE: `SIG_AllIndividualsView` TAKES NO `name`.**
 
 - The constructor's `name` was never used; its one caller,

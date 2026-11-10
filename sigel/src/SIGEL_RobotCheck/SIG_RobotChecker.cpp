@@ -30,7 +30,6 @@
 #include "SIGEL_RobotCheck/SIG_JointStartCheck.h"
 #include "SIGEL_RobotCheck/SIG_JointStepSizeCheck.h"
 #include "SIGEL_RobotCheck/SIG_LimitHoldsDriveCheck.h"
-#include "SIGEL_RobotCheck/SIG_LinkMassCheck.h"
 #include "SIGEL_RobotCheck/SIG_LinkOverlapCheck.h"
 #include "SIGEL_RobotCheck/SIG_RobotStartPose.h"
 #include "SIGEL_RobotCheck/SIG_SimulationCheck.h"
@@ -63,7 +62,6 @@ QList<SIGEL_RobotCheck::SIG_RobotIssue> SIGEL_RobotCheck::SIG_RobotChecker::chec
   issues += SIG_GroundStepSizeCheck( startPose, environment, simulationParameter ).issues();
   issues += SIG_JointStepSizeCheck( startPose, environment, simulationParameter ).issues();
   issues += SIG_IntegratorCheck( simulationParameter ).issues();
-  issues += SIG_LinkMassCheck( startPose ).issues();
   issues += SIG_StandingCheck( robot, startPose, environment, simulationParameter ).issues();
 
   std::stable_sort( issues.begin(), issues.end() );

@@ -37,7 +37,7 @@ namespace SIGEL_RobotCheck
   {
     // The check that raised the issue, in the order in which issues are listed.
     enum Check { tCannotBeSimulated, tLimitHoldsDrive, tDriveStrength, tJointAxis, tLinkOverlap, tJointStart,
-                 tStartHeight, tGroundStepSize, tJointStepSize, tIntegrator, tLinkMass, tStanding };
+                 tStartHeight, tGroundStepSize, tJointStepSize, tIntegrator, tStanding };
 
     // An error is a robot that cannot run at all.
     enum Kind { tError, tWarning, tSuggestion };
