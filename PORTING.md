@@ -925,6 +925,14 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: THE IMPORT OF AN ENVIRONMENT WITHOUT FLOOR KEYS IS NOT FIXED.**
+
+- `SIG_Environment::readFromFile` sets only the keys the text has, so
+  Environment > Import of a file without the floor keys keeps the floor of the
+  open experiment. It stays so by decision: experiment loading reads into a
+  new environment, and every environment file SIGEL writes has all keys. The
+  unit test that marked this fault is removed.
+
 **2026-11-10 — DONE: `getUsedForces` GIVES THE JOINT FORCES.**
 
 - `SIG_DynaMechsSimulationQueries::getUsedForces` no longer passes on

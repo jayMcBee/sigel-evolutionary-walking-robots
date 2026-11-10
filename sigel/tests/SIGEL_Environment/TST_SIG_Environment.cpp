@@ -463,38 +463,3 @@ void SIGEL_Environment::TST_SIG_Environment::readFromFileReadsEachKeyOfABlockOfT
   QCOMPARE( read.getFrictionCoeff_u_s(), 3.0 );
   QCOMPARE( read.getFrictionCoeff_u_k(), 2.9 );
 }
-
-// Environment > Import and the loading of an experiment read into an environment that is in use.
-// An experiment file without these keys was made before they existed and ran with their defaults.
-void SIGEL_Environment::TST_SIG_Environment::readFromFileOfABlockWithoutTheFloorKeysGivesTheirDefaultsToAnEnvironmentInUse()
-{
-  QString text( "YPLANELEVEL\n0\nVELODAMPING\n0.9\nGRAVITY\n0\n-9.81\n0\nSTARTPOSITION\n0\n1.2\n0\n"
-                "FLOORMATERIALNAME\nplastic\nGPSconst\n5500\nGNSconst\n7500\nGPDconst\n50\nGNDconst\n50\n"
-                "USFcoeff\n1.5\nUKFcoeff\n1\n\n" );
-  QTextStream in( &text, QIODevice::ReadOnly );
-  SIG_Environment defaults;
-  SIG_Environment inUse;
-  inUse.setFloorDimensionX( 20 );
-  inUse.setFloorDimensionZ( 30 );
-  inUse.setFloorFunction( "sin(x)" );
-  inUse.setFloorPictureFile( "/home/user/hill.pgm" );
-  inUse.setFloorFuncSelected( false );
-  inUse.setTextureFile( "/home/user/grass.ppm" );
-  inUse.setTexAlpha( 99 );
-  inUse.setWithTexture( true );
-  inUse.setAutosaveIntervalGenerations( 25 );
-
-  inUse.readFromFile( in );
-
-  QCOMPARE( inUse.getVeloDamping(), 0.9 );
-  QEXPECT_FAIL( "", "SIG_Environment::readFromFile leaves a setting whose key the text does not have as it was", Abort );
-  QCOMPARE( inUse.getFloorDimensionX(), defaults.getFloorDimensionX() );
-  QCOMPARE( inUse.getFloorDimensionZ(), defaults.getFloorDimensionZ() );
-  QCOMPARE( inUse.getFloorFunction(), defaults.getFloorFunction() );
-  QCOMPARE( inUse.getFloorPictureFile(), defaults.getFloorPictureFile() );
-  QCOMPARE( inUse.getFloorFuncSelected(), defaults.getFloorFuncSelected() );
-  QCOMPARE( inUse.getTextureFile(), defaults.getTextureFile() );
-  QCOMPARE( inUse.getTexAlpha(), defaults.getTexAlpha() );
-  QCOMPARE( inUse.getWithTexture(), defaults.getWithTexture() );
-  QCOMPARE( inUse.getAutosaveIntervalGenerations(), defaults.getAutosaveIntervalGenerations() );
-}

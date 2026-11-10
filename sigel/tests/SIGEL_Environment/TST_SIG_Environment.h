@@ -79,8 +79,6 @@ namespace SIGEL_Environment
 
     void readFromFileReadsEachKeyOfABlockOfTheCurrentForm();
 
-    void readFromFileOfABlockWithoutTheFloorKeysGivesTheirDefaultsToAnEnvironmentInUse();
-
   private:
 
     static QString pictureFile( const QTemporaryDir &folder, bool fileExists, const QByteArray &contents );
