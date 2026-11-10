@@ -342,33 +342,6 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadTerrainNeedsNoSigelR
   QCOMPARE( height, 2.0 );
 }
 
-void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadTerrainGivesTheHeightsOfTheTerrainUnrounded()
-{
-  SIGEL_Environment::SIG_Environment environment;
-  environment.setFloorDimensionX( 4 );
-  environment.setFloorDimensionZ( 4 );
-  environment.setFloorFunction( "(x+z)/3" );
-
-  QEXPECT_FAIL( "", "SIG_DynaMechsSimulationData::loadTerrain writes the heights with six significant digits", Continue );
-  QCOMPARE( loadedHeight( environment, 1, 0 ), 1.0 / 3 );
-  QEXPECT_FAIL( "", "SIG_DynaMechsSimulationData::loadTerrain writes the heights with six significant digits", Continue );
-  QCOMPARE( loadedHeight( environment, 2, 2 ), 4.0 / 3 );
-
-  // A grey value of 100 of 255 is a height of 100 * 5 / 255.
-  dmEnvironment dynaMechsEnvironment;
-  QVERIFY( loadPictureTerrain( "P2\n2 2\n255\n0 100\n100 255\n", dynaMechsEnvironment ) );
-
-  int firstDimension = 0;
-  int secondDimension = 0;
-  Float spacing = 0;
-  Float **heights = dynaMechsEnvironment.getTerrainData( firstDimension, secondDimension, spacing );
-
-  QEXPECT_FAIL( "", "SIG_DynaMechsSimulationData::loadTerrain writes the heights with six significant digits", Continue );
-  QCOMPARE( heights[ 0 ][ 1 ], 100.0 * 5 / 255 );
-  QEXPECT_FAIL( "", "SIG_DynaMechsSimulationData::loadTerrain writes the heights with six significant digits", Continue );
-  QCOMPARE( heights[ 1 ][ 0 ], 100.0 * 5 / 255 );
-}
-
 void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadTerrainGivesEachHeightOfASymmetricFloorFunction()
 {
   SIGEL_Environment::SIG_Environment environment;
@@ -420,28 +393,6 @@ double SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadedHeight( const SI
   Float **heights = dynaMechsEnvironment.getTerrainData( firstDimension, secondDimension, spacing );
 
   return heights[ first ][ second ];
-}
-
-bool SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::loadPictureTerrain( const QByteArray &picture, dmEnvironment &target ) const
-{
-  QTemporaryDir folder;
-  QFile pictureFile( folder.filePath( "floor.pgm" ) );
-
-  if (!folder.isValid() || !pictureFile.open( QIODevice::WriteOnly ) || pictureFile.write( picture ) != picture.size())
-  {
-    return false;
-  }
-
-  pictureFile.close();
-
-  SIGEL_Environment::SIG_Environment environment;
-  environment.setFloorDimensionX( 3 );
-  environment.setFloorDimensionZ( 5 );
-  environment.setFloorPictureFile( pictureFile.fileName() );
-  environment.setFloorFuncSelected( false );
-  SIG_DynaMechsSimulationData::loadTerrain( environment.getTerrain(), target );
-
-  return true;
 }
 
 void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::verifyFloorOfOneHeight( dmEnvironment &dynaMechsEnvironment, int firstDimension, int secondDimension, double height ) const

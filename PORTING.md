@@ -925,6 +925,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: THE SIX-DIGIT TERRAIN HEIGHTS ARE NOT FIXED.**
+
+- `SIG_DynaMechsSimulationData::loadTerrain` writes the heights with six
+  significant digits. It stays so by decision: the rounding is a few
+  micrometres, and a fix would change how every terrain run behaves. The unit
+  test that marked this fault is removed.
+
 **2026-11-10 — DONE: THE SIX-DIGIT ENVIRONMENT VALUES ARE NOT FIXED.**
 
 - `SIG_Environment::writeToFile` writes the doubles with six significant

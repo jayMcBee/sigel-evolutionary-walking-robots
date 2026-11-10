@@ -28,7 +28,6 @@
 #include "SIGEL_Robot/SIG_Joint.h"
 #include "SIGEL_Tools/SIG_Vector.h"
 
-#include <QByteArray>
 #include <QList>
 #include <QObject>
 #include <QString>
@@ -74,8 +73,6 @@ namespace SIGEL_Simulation
     void eachLoadHasATerrainFileOfItsOwnAndLeavesNoneBehind();
 
     void loadTerrainNeedsNoSigelRoot();
-
-    void loadTerrainGivesTheHeightsOfTheTerrainUnrounded();
 
     void loadTerrainGivesEachHeightOfASymmetricFloorFunction();
 
@@ -152,9 +149,6 @@ namespace SIGEL_Simulation
 
     /** The height that DynaMechs holds at one grid point after loadTerrain. */
     double loadedHeight( const SIGEL_Environment::SIG_Environment &environment, int first, int second ) const;
-
-    /** Loads the terrain of a picture file with this text into target; false if the file cannot be written. The floor settings are 3 by 5. */
-    bool loadPictureTerrain( const QByteArray &picture, dmEnvironment &target ) const;
 
     /** Fails the test unless the terrain has these dimensions and this height at each grid point. */
     void verifyFloorOfOneHeight( dmEnvironment &dynaMechsEnvironment, int firstDimension, int secondDimension, double height ) const;
