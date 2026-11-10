@@ -925,6 +925,12 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: FORMATTING ROUND ON `SIG_Terrain`.**
+
+- **Changed:** header and source: braces on every loop, `( x )` spacing,
+  `QList< double >`, tabs in the header and the empty-line rules. The object
+  files are byte-identical with `-g0` and `__LINE__` set to 0.
+
 **2026-11-10 — DONE: FORMATTING ROUND ON `SIG_Environment`.**
 
 - **Changed:** header and source: Allman

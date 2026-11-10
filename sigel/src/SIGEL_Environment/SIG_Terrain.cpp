@@ -38,9 +38,9 @@ SIGEL_Environment::SIG_Terrain::SIG_Terrain()
 {
 }
 
-QList<SIGEL_Environment::SIG_TerrainPreset> const &SIGEL_Environment::SIG_Terrain::presets()
+QList< SIGEL_Environment::SIG_TerrainPreset > const &SIGEL_Environment::SIG_Terrain::presets()
 {
-	static QList<SIG_TerrainPreset> const list =
+	static QList< SIG_TerrainPreset > const list =
 	{
 		{ "Valley", "0.15*abs(x-cx)" },
 		{ "Hill", "4*exp(-((x-cx)^2+(z-cz)^2)/100)" },
@@ -68,22 +68,24 @@ QString SIGEL_Environment::SIG_Terrain::presetFunction( SIG_TerrainPreset const 
 bool SIGEL_Environment::SIG_Terrain::setFromFunction( const QString &function, int newDimensionX, int newDimensionZ )
 {
 	FunctionParser fp;
-	if ( fp.Parse( function.toUtf8().constData(), "xz" ) != -1 )
+	if( fp.Parse( function.toUtf8().constData(), "xz" ) != -1 )
 	{
 		SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain function could not be parsed. It must depend on x and z, and contain only valid expressions." << Qt::endl;
 		return false;
 	}
 
-	QList<double> newHeights;
+	QList< double > newHeights;
 	double vals[2];
 
-	for ( int z = 0; z < newDimensionZ; ++z )
-		for ( int x = 0; x < newDimensionX; ++x )
+	for( int z = 0; z < newDimensionZ; ++z )
+	{
+		for( int x = 0; x < newDimensionX; ++x )
 		{
 			vals[0] = x;
 			vals[1] = z;
 			newHeights.append( fp.Eval( vals ) );
 		}
+	}
 
 	dimensionX = newDimensionX;
 	dimensionZ = newDimensionZ;
@@ -94,7 +96,7 @@ bool SIGEL_Environment::SIG_Terrain::setFromFunction( const QString &function, i
 bool SIGEL_Environment::SIG_Terrain::setFromPictureFile( const QString &pictureFile )
 {
 	std::ifstream pgm( pictureFile.toUtf8().constData() );
-	if ( !pgm )
+	if( !pgm )
 	{
 		SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain file does not exist." << Qt::endl;
 		return false;
@@ -102,25 +104,25 @@ bool SIGEL_Environment::SIG_Terrain::setFromPictureFile( const QString &pictureF
 
 	int newDimensionX = 0;
 	int newDimensionZ = 0;
-	QList<double> newHeights;
+	QList< double > newHeights;
 	std::string s;
 	double max = 0;
 	int counter = 0;
 
-	while ( !pgm.eof() )
+	while( !pgm.eof() )
 	{
 		pgm >> s; // read file content till white space
 
-		if ( s.find( "#", 0 ) != std::string::npos )
+		if( s.find( "#", 0 ) != std::string::npos )
 		{
 			pgm.ignore( 255, '\n' );
 			continue;
 		}
 
-		switch ( counter )
+		switch( counter )
 		{
 		case 0: // Magic Key
-			if ( s.compare( "P2" ) != 0 )
+			if( s.compare( "P2" ) != 0 )
 			{
 				SIGEL_Tools::SIG_IO::cerr << "Warning: the specified picture file is not in PGM format." << Qt::endl;
 				return false;
@@ -154,7 +156,7 @@ void SIGEL_Environment::SIG_Terrain::setFlat( int newDimensionX, int newDimensio
 {
 	dimensionX = newDimensionX;
 	dimensionZ = newDimensionZ;
-	heights = QList<double>( newDimensionX * newDimensionZ, 0.0 );
+	heights = QList< double >( newDimensionX * newDimensionZ, 0.0 );
 }
 
 int SIGEL_Environment::SIG_Terrain::getDimensionX() const
@@ -169,7 +171,7 @@ int SIGEL_Environment::SIG_Terrain::getDimensionZ() const
 
 double SIGEL_Environment::SIG_Terrain::getHeight( int x, int z ) const
 {
-	return heights[ z * dimensionX + x ];
+	return heights[z * dimensionX + x];
 }
 
 bool SIGEL_Environment::SIG_Terrain::isFlat() const
@@ -182,10 +184,12 @@ void SIGEL_Environment::SIG_Terrain::writeToFile( QTextStream &file ) const
 	file << dimensionX << " " << dimensionZ << "\n";
 
 	// 17 significant digits are enough to read back exactly the same double.
-	for ( int z = 0; z < dimensionZ; ++z )
+	for( int z = 0; z < dimensionZ; ++z )
 	{
-		for ( int x = 0; x < dimensionX; ++x )
+		for( int x = 0; x < dimensionX; ++x )
+		{
 			file << QString::number( getHeight( x, z ), 'g', 17 ) << " ";
+		}
 
 		file << "\n";
 	}
@@ -200,19 +204,19 @@ void SIGEL_Environment::SIG_Terrain::readFromFile( QTextStream &file )
 	int newDimensionZ = 0;
 	file >> newDimensionX >> newDimensionZ;
 
-	if ( file.status() != QTextStream::Ok || newDimensionX < 0 || newDimensionZ < 0 )
+	if( file.status() != QTextStream::Ok || newDimensionX < 0 || newDimensionZ < 0 )
 	{
 		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The terrain has no valid dimensions." );
 	}
 
-	QList<double> newHeights;
+	QList< double > newHeights;
 
-	for ( qsizetype i = 0; i < qsizetype( newDimensionX ) * newDimensionZ; ++i )
+	for( qsizetype i = 0; i < qsizetype( newDimensionX ) * newDimensionZ; ++i )
 	{
 		double height = 0;
 		file >> height;
 
-		if ( file.status() != QTextStream::Ok )
+		if( file.status() != QTextStream::Ok )
 		{
 			throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The terrain ends before its last height." );
 		}
@@ -223,7 +227,7 @@ void SIGEL_Environment::SIG_Terrain::readFromFile( QTextStream &file )
 	QString marker;
 	file >> marker;
 
-	if ( marker != "TerrainComplete" )
+	if( marker != "TerrainComplete" )
 	{
 		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The terrain ends before its last height." );
 	}

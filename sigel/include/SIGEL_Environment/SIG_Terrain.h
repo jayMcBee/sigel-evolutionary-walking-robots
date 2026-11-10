@@ -31,70 +31,68 @@
 namespace SIGEL_Environment
 {
 
-  /**
-   * A floor function with a name. cx and cz in the function stand for the centre of the grid.
-   */
-  struct SIG_TerrainPreset
-  {
-    QString name;
-    QString function;
-  };
+	/**
+	 * A floor function with a name. cx and cz in the function stand for the centre of the grid.
+	 */
+	struct SIG_TerrainPreset
+	{
+		QString name;
+		QString function;
+	};
 
-  /**
-   * The heights of a floor on a grid with a spacing of 1.
-   */
-  class SIG_Terrain
-  {
-  public:
+	/**
+	 * The heights of a floor on a grid with a spacing of 1.
+	 */
+	class SIG_Terrain
+	{
+	public:
+		/** An empty grid of 0 by 0. */
+		SIG_Terrain();
 
-    /** An empty grid of 0 by 0. */
-    SIG_Terrain();
+		/** The preset floor functions. */
+		static QList< SIG_TerrainPreset > const &presets();
 
-    /** The preset floor functions. */
-    static QList<SIG_TerrainPreset> const &presets();
+		/** The preset's function, with cx and cz replaced by the centre of a grid of dimensionX by dimensionZ. */
+		static QString presetFunction( SIG_TerrainPreset const &preset, int dimensionX, int dimensionZ );
 
-    /** The preset's function, with cx and cz replaced by the centre of a grid of dimensionX by dimensionZ. */
-    static QString presetFunction( SIG_TerrainPreset const &preset, int dimensionX, int dimensionZ );
+		/**
+		 * Makes the heights of function, which depends on x and z, on a grid of newDimensionX by newDimensionZ.
+		 * If the function cannot be parsed, a warning is printed, the terrain does not change and false is returned.
+		 */
+		bool setFromFunction( const QString &function, int newDimensionX, int newDimensionZ );
 
-    /**
-     * Makes the heights of function, which depends on x and z, on a grid of newDimensionX by newDimensionZ.
-     * If the function cannot be parsed, a warning is printed, the terrain does not change and false is returned.
-     */
-    bool setFromFunction( const QString &function, int newDimensionX, int newDimensionZ );
+		/**
+		 * Makes the heights of a PGM picture file in P2 format: a grey value of the maximum is a height of 5.
+		 * The picture's width is dimension X, its height is dimension Z.
+		 * If the file does not exist or is not in P2 format, a warning is printed, the terrain does not change and false is returned.
+		 */
+		bool setFromPictureFile( const QString &pictureFile );
 
-    /**
-     * Makes the heights of a PGM picture file in P2 format: a grey value of the maximum is a height of 5.
-     * The picture's width is dimension X, its height is dimension Z.
-     * If the file does not exist or is not in P2 format, a warning is printed, the terrain does not change and false is returned.
-     */
-    bool setFromPictureFile( const QString &pictureFile );
+		/** Makes a grid of newDimensionX by newDimensionZ with height 0 at every point. */
+		void setFlat( int newDimensionX, int newDimensionZ );
 
-    /** Makes a grid of newDimensionX by newDimensionZ with height 0 at every point. */
-    void setFlat( int newDimensionX, int newDimensionZ );
+		int getDimensionX() const;
 
-    int getDimensionX() const;
+		int getDimensionZ() const;
 
-    int getDimensionZ() const;
+		double getHeight( int x, int z ) const;
 
-    double getHeight( int x, int z ) const;
+		/** True if every height is 0. */
+		bool isFlat() const;
 
-    /** True if every height is 0. */
-    bool isFlat() const;
+		/** Writes the dimensions, then the heights, one line for each z, then the line TerrainComplete. */
+		void writeToFile( QTextStream &file ) const;
 
-    /** Writes the dimensions, then the heights, one line for each z, then the line TerrainComplete. */
-    void writeToFile( QTextStream &file ) const;
+		/** Reads what writeToFile wrote. Throws a SIG_Exception if the text is not a whole terrain. */
+		void readFromFile( QTextStream &file );
 
-    /** Reads what writeToFile wrote. Throws a SIG_Exception if the text is not a whole terrain. */
-    void readFromFile( QTextStream &file );
+	private:
+		int dimensionX;
+		int dimensionZ;
 
-  private:
-
-    int dimensionX;
-    int dimensionZ;
-
-    /** In the order they are made: z is the outer loop, x the inner one. */
-    QList<double> heights;
-  };
+		/** In the order they are made: z is the outer loop, x the inner one. */
+		QList< double > heights;
+	};
 
 }
 
