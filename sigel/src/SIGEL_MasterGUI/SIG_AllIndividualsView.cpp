@@ -111,18 +111,7 @@ namespace SIGEL_MasterGUI
 
 	int SIG_AllIndividualsView::numberOfSelectedItems()
 	{
-		int numberOfSelectedItems = 0;
-
-		// count the number of selected items
-		QTreeWidgetItemIterator it( individualList->listviewIndividuals );
-		for( ; *it; ++it )
-		{
-			if( ( *it )->isSelected() )
-			{
-				numberOfSelectedItems++;
-			}
-		}
-		return numberOfSelectedItems;
+		return individualList->listviewIndividuals->selectedItems().size();
 	}
 
 	void SIG_AllIndividualsView::slotCompleteRefreshList()
@@ -200,37 +189,24 @@ namespace SIGEL_MasterGUI
 	{
 		/*
 		 * Delete works as follows. First we iterate over the list and save the position of each individual
-		 * that shall be deleted into an array. While iterating over the list each QTreeWidgetItem is deleted.
-		 * The the list gets sorted and every individual deleted. As the pool is rearranged each time an individual
+		 * that shall be deleted into an array.
+		 * Then the list gets sorted and every individual deleted. As the pool is rearranged each time an individual
 		 * gets deleted, we have to be careful that the right individual is deleted.
 		 */
-		QList< int > positions;
-
-		int numberOfSelectedItems = 0;
-
-		// first count the number of selected items
-		QTreeWidgetItemIterator it( individualList->listviewIndividuals );
-		for( ; *it; ++it )
-		{
-			if( ( *it )->isSelected() )
-			{
-				numberOfSelectedItems++;
-			}
-		}
-
-		if( numberOfSelectedItems == 0 )
+		int const selectedCount = numberOfSelectedItems();
+		if( selectedCount == 0 )
 		{
 			return;
 		}
 
 		QString question;
-		if( numberOfSelectedItems == 1 )
+		if( selectedCount == 1 )
 		{
 			question = "selected individual?";
 		}
 		else
 		{
-			question = QString::number( numberOfSelectedItems ) + " selected individuals?";
+			question = QString::number( selectedCount ) + " selected individuals?";
 		}
 
 		if( QMessageBox::warning( this, "Continue Deletion?", "Do you really want to delete the " + question, QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes ) != QMessageBox::Yes )
@@ -238,19 +214,10 @@ namespace SIGEL_MasterGUI
 			return;
 		}
 
-		// resize the array, so we can save all positions
-		positions.resize( numberOfSelectedItems );
-
-		int counter = 0;
-
-		QTreeWidgetItemIterator it2( individualList->listviewIndividuals );
-		for( ; *it2; ++it2 )
+		QList< int > positions;
+		for( QTreeWidgetItem *item : individualList->listviewIndividuals->selectedItems() )
 		{
-			if( ( *it2 )->isSelected() )
-			{
-				SIG_IndividualListItem *individualListItem = static_cast< SIG_IndividualListItem * >( ( *it2 ) );
-				positions[counter++] = individualListItem->poolPosition;
-			}
+			positions.append( static_cast< SIG_IndividualListItem * >( item )->poolPosition );
 		}
 
 		std::sort( positions.begin(), positions.end() );

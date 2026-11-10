@@ -925,6 +925,13 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: `SIG_AllIndividualsView` USES `QTreeWidget::selectedItems`.**
+
+- **Changed:** `numberOfSelectedItems` returns the size of `selectedItems()`;
+  `slotDeleteIndividuals` calls it instead of its own counting loop and
+  collects the pool positions from `selectedItems()`. The positions are sorted
+  right after, so the order of `selectedItems()` does not matter.
+
 **2026-11-10 — DONE: `SIG_AllIndividualsView` LEAVES EARLY INSTEAD OF WRAPPING.**
 
 - **Changed:** `slotDoubleClicked`, `slotSelectionChanged`,
