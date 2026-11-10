@@ -355,7 +355,11 @@ void SIG_GUIGPExperiment::slotStartEvolution()
   SIGEL_Environment::SIG_Terrain terrain;
   if( !gpExperiment.environment.makeTerrain( terrain ) )
     {
-      QMessageBox::warning( experimentListView, "Can't Start Evolution", "The floor picture " + gpExperiment.environment.getFloorPictureFile() + " cannot be read as a P2 PGM file." );
+      SIGEL_Environment::SIG_Environment &environment = gpExperiment.environment;
+      QString const reason = environment.getFloorFuncSelected()
+        ? "The floor function " + environment.getFloorFunction() + " cannot be parsed."
+        : "The floor picture " + environment.getFloorPictureFile() + " cannot be read as a P2 PGM file.";
+      QMessageBox::warning( experimentListView, "Can't Start Evolution", reason );
       return;
     }
 

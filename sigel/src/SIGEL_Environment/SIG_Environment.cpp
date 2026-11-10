@@ -383,10 +383,7 @@ namespace SIGEL_Environment {
 		if (!floorFuncSelected)
 			return terrain.setFromPictureFile( floorPictureFile );
 
-		if (!terrain.setFromFunction( floorFunction, floorDimensionX, floorDimensionZ ))
-			terrain.setFlat( floorDimensionX, floorDimensionZ );
-
-		return true;
+		return terrain.setFromFunction( floorFunction, floorDimensionX, floorDimensionZ );
 	}
 
 	int SIG_Environment::getTexAlpha() const {

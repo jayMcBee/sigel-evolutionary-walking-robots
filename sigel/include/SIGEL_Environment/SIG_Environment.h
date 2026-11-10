@@ -346,7 +346,7 @@ class SIG_Environment {
 
   /**
    * Makes the terrain of the selected floor function or picture file into terrain.
-   * Returns false if the picture file is missing or not a P2 PGM file; a function that cannot be parsed gives a flat terrain.
+   * Returns false if the picture file is missing or not a P2 PGM file, or if the function cannot be parsed.
    */
   bool makeTerrain(SIG_Terrain &terrain) const;
 

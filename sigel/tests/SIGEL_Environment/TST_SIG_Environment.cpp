@@ -166,7 +166,6 @@ void SIGEL_Environment::TST_SIG_Environment::makeTerrainRefusesAFloorFunctionTha
 
   const bool made = environment.makeTerrain( terrain );
 
-  QEXPECT_FAIL( "", "SIG_Environment::makeTerrain gives a flat terrain for a floor function that cannot be parsed", Abort );
   QVERIFY( !made );
 }
 

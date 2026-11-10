@@ -133,7 +133,10 @@ void SIGEL_GP::SIG_GPFitnessTrainer::addDynHost(QString newHost, int maxSlaves) 
 void SIGEL_GP::SIG_GPFitnessTrainer::prepareTerrain() {
   SIGEL_Environment::SIG_Terrain terrain;
   if (!exp.environment.makeTerrain( terrain )) {
-    throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The floor picture " + exp.environment.getFloorPictureFile() + " cannot be read as a P2 PGM file." );
+    QString const reason = exp.environment.getFloorFuncSelected()
+      ? "The floor function " + exp.environment.getFloorFunction() + " cannot be parsed."
+      : "The floor picture " + exp.environment.getFloorPictureFile() + " cannot be read as a P2 PGM file.";
+    throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, reason );
   }
 
   PVMData.setTerrain( terrain );
