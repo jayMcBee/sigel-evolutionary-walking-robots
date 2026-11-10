@@ -925,6 +925,15 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: `SIG_AllIndividualsView` LEAVES EARLY INSTEAD OF WRAPPING.**
+
+- **Changed:** `slotDoubleClicked`, `slotSelectionChanged`,
+  `slotDeleteIndividuals`, `slotImportProgram`, `slotExportProgram` and
+  `slotExportIndividual` return early on a missing item, a wrong selection
+  count, a No answer or an empty file name; `slotVisualize` skips an
+  unselected row with `continue`. Messages and the order of the checks stay
+  the same.
+
 **2026-11-10 — DONE: NO UNUSED `theItem` IN `SIG_AllIndividualsView::slotCompleteRefreshList`.**
 
 - The list item is made with a bare `new`, as in `slotAddIndividuals`; the
