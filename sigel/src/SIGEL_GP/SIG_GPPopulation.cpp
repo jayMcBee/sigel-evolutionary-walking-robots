@@ -402,18 +402,9 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
 	for(long index=0;index<getSize();index++)
 	{
-		QString indexText = QString::number( index );
-
-		long beginPosition = populationStr.indexOf("INDIVIDUAL("+indexText+") BEGIN{", endPosition, Qt::CaseInsensitive);
-		endPosition = populationStr.indexOf("}INDIVIDUAL("+indexText+") END", endPosition, Qt::CaseInsensitive);
-
-		pool[ index ] = new SIGEL_GP::SIG_GPIndividual();
-
-		QString individualText = populationStr.mid(beginPosition+19+indexText.length(),endPosition-beginPosition-20-indexText.length());
-
 		try
 		{
-			getIndividualPointer(index)->readFromFile(individualText);
+			pool[ index ] = readIndividual( populationStr, index, endPosition );
 		}
 		catch( ... )
 		{
@@ -452,6 +443,17 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 		QString message = QString( "Warning: the pool has %1 individuals; only the first %2 take part in tournaments reliably." ).arg( getSize() ).arg( maximumSize );
 		SIGEL_Tools::SIG_IO::cerr << message << Qt::endl;
 	}
+}
+
+SIGEL_GP::SIG_GPIndividual *SIGEL_GP::SIG_GPPopulation::readIndividual( const QString &populationText, long index, long &endPosition )
+{
+	QString indexText = QString::number( index );
+	QString beginMarker = "INDIVIDUAL(" + indexText + ") BEGIN{";
+
+	long beginPosition = populationText.indexOf( beginMarker, endPosition, Qt::CaseInsensitive ) + beginMarker.length();
+	endPosition = populationText.indexOf( "}INDIVIDUAL(" + indexText + ") END", endPosition, Qt::CaseInsensitive );
+
+	return new SIGEL_GP::SIG_GPIndividual( populationText.mid( beginPosition, endPosition - beginPosition ) );
 }
 
 void SIGEL_GP::SIG_GPPopulation::writeToFile(QTextStream &file)

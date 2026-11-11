@@ -337,6 +337,13 @@ class SIG_GPPopulation
     void readFromFile(QTextStream &file);
 
     /**
+     * Returns a new individual read from block index of the population text. The search starts at endPosition, which is left on that block's END marker.
+     */
+
+  private:
+    SIG_GPIndividual *readIndividual( const QString &populationText, long index, long &endPosition );
+
+    /**
      * This function reads a complete population out of a given text stream.
      * @pre
      * The QTextStream file must exist, and it has to contain a complete population.
