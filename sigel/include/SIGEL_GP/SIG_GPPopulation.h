@@ -79,14 +79,6 @@ namespace SIGEL_GP
 		SIG_GPPopulation &operator=( SIG_GPPopulation const & ) = delete;
 
 		/**
-		 * This attribute contains the next free name for a new individual.
-		 * It is assembled from the experiment name, an continuos number at
-		 * the end and other characters, which are needed to build funny
-		 * individual names.
-		 */
-		QString nextIdentifier;
-
-		/**
 		 * The value, which indicates how old a population is. A generation
 		 * change occurs after a special number of played tournaments, default
 		 * is the half of the individuals. Is the number of tournaments reached,
@@ -301,6 +293,14 @@ namespace SIGEL_GP
 		 * be saved whithin the experiment. True enables the history, false disables the history.
 		 */
 		bool history;
+
+		/**
+		 * This attribute contains the next free name for a new individual.
+		 * It is assembled from the experiment name, an continuos number at
+		 * the end and other characters, which are needed to build funny
+		 * individual names.
+		 */
+		QString nextIdentifier;
 
 		/**
 		 * Returns a new individual read from block index of the population text. The search starts at endPosition, which is left on that block's END marker.

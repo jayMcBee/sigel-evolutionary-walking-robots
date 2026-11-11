@@ -38,7 +38,7 @@ void SIGEL_GP::TST_SIG_GPPopulation::defaultConstructorGivesAnEmptyPopulation()
   SIG_GPPopulation population;
 
   QCOMPARE( population.getSize(), 0 );
-  QCOMPARE( population.nextIdentifier, QString( "0" ) );
+  QCOMPARE( population.getNextIdentifier(), QString( "0" ) );
   QCOMPARE( population.getPoolGeneration(), 0 );
   QVERIFY( population.getHistory() );
 }
@@ -49,12 +49,12 @@ void SIGEL_GP::TST_SIG_GPPopulation::getNextIdentifierCountsUp()
 
   QCOMPARE( population.getNextIdentifier(), QString( "0" ) );
   QCOMPARE( population.getNextIdentifier(), QString( "1" ) );
-  QCOMPARE( population.nextIdentifier, QString( "2" ) );
+  QCOMPARE( population.getNextIdentifier(), QString( "2" ) );
 
   population.setNextIdentifier( "7" );
 
   QCOMPARE( population.getNextIdentifier(), QString( "7" ) );
-  QCOMPARE( population.nextIdentifier, QString( "8" ) );
+  QCOMPARE( population.getNextIdentifier(), QString( "8" ) );
 }
 
 void SIGEL_GP::TST_SIG_GPPopulation::addRandomIndividualsGivesNamesAndPoolPositions()
@@ -69,7 +69,7 @@ void SIGEL_GP::TST_SIG_GPPopulation::addRandomIndividualsGivesNamesAndPoolPositi
     QCOMPARE( population.getIndividualPointer( i )->getName(), QString::number( i ) );
     QCOMPARE( population.getIndividualPointer( i )->getPoolPos(), i );
   }
-  QCOMPARE( population.nextIdentifier, QString( "4" ) );
+  QCOMPARE( population.getNextIdentifier(), QString( "4" ) );
 }
 
 void SIGEL_GP::TST_SIG_GPPopulation::addRandomIndividualsKeepsTheIndividualsThatAreThere()
@@ -102,7 +102,7 @@ void SIGEL_GP::TST_SIG_GPPopulation::addRandomIndividualsTakesTheNamesFromTheIde
   QCOMPARE( population.getIndividualPointer( 1 )->getName(), QString( "41" ) );
   QCOMPARE( population.getIndividualPointer( 0 )->getPoolPos(), 0 );
   QCOMPARE( population.getIndividualPointer( 1 )->getPoolPos(), 1 );
-  QCOMPARE( population.nextIdentifier, QString( "42" ) );
+  QCOMPARE( population.getNextIdentifier(), QString( "42" ) );
 }
 
 void SIGEL_GP::TST_SIG_GPPopulation::addRandomIndividualsUsesTheLengthLimits()
@@ -372,12 +372,12 @@ void SIGEL_GP::TST_SIG_GPPopulation::writtenTextIsReadBack()
   copy.readFromFile( stream );
 
   QCOMPARE( copy.getSize(), 11 );
-  QCOMPARE( copy.nextIdentifier, QString( "11" ) );
   QCOMPARE( copy.getPoolGeneration(), 6 );
   QCOMPARE( copy.getIndividualPointer( 4 )->getFitness(), 3.5 );
   QCOMPARE( copy.getIndividualPointer( 10 )->getName(), QString( "10" ) );
   QCOMPARE( copy.getIndividualPointer( 10 )->getPoolPos(), 10 );
   QCOMPARE( writtenText( copy ), written );
+  QCOMPARE( copy.getNextIdentifier(), QString( "11" ) );
 }
 
 void SIGEL_GP::TST_SIG_GPPopulation::writtenTextWithoutHistoryHasNoHistoryBlock()
@@ -459,7 +459,7 @@ void SIGEL_GP::TST_SIG_GPPopulation::emptyPopulationIsReadBack()
   copy.readFromFile( stream );
 
   QCOMPARE( copy.getSize(), 0 );
-  QCOMPARE( copy.nextIdentifier, QString( "0" ) );
+  QCOMPARE( copy.getNextIdentifier(), QString( "0" ) );
 }
 
 void SIGEL_GP::TST_SIG_GPPopulation::savePoolWritesTheTextOfWriteToFile()
@@ -537,8 +537,8 @@ void SIGEL_GP::TST_SIG_GPPopulation::textWithoutARequiredFieldIsRefused()
 
   QVERIFY2( thrown.contains( message ), qPrintable( thrown ) );
   QCOMPARE( copy.getSize(), 2 );
-  QCOMPARE( copy.nextIdentifier, QString( "2" ) );
   QCOMPARE( writtenText( copy ), before );
+  QCOMPARE( copy.getNextIdentifier(), QString( "2" ) );
 }
 
 // Population > Import shows the refusal; the pool the user had must still be there.
@@ -586,7 +586,7 @@ void SIGEL_GP::TST_SIG_GPPopulation::importNewIndividualAddsTheIndividualOfTheFi
   QCOMPARE( imported->getPoolPos(), 2 );
   QCOMPARE( imported->getFitness(), -1.0 );
   QCOMPARE( imported->getProgram().getProgramLength(), source.getIndividualPointer( 0 )->getProgram().getProgramLength() );
-  QCOMPARE( population.nextIdentifier, QString( "3" ) );
+  QCOMPARE( population.getNextIdentifier(), QString( "3" ) );
 }
 
 void SIGEL_GP::TST_SIG_GPPopulation::importNewIndividualOfABrokenFileLeavesThePopulation()

@@ -33,9 +33,9 @@
 #include "SIGEL_Tools/SIG_Exception.h"
 
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation()
-	: nextIdentifier( QString::number( 0 ) ),
-	  poolGeneration(0),
-	  history( true )
+	: poolGeneration(0),
+	  history( true ),
+	  nextIdentifier( QString::number( 0 ) )
 {
 }
 
