@@ -169,18 +169,12 @@ SIGEL_GP::SIG_GPIndividual *SIGEL_GP::SIG_GPPopulation::getIndividualPointer(int
 
 void SIGEL_GP::SIG_GPPopulation::deleteIndividual(int poolpos)
 {
-	SIGEL_GP::SIG_GPIndividual *tmpInd;
-
 	delete pool[ poolpos ];
+	pool.removeAt( poolpos );
 
-	for( int x=poolpos; x<getSize()-1; x++ )
-	{
-		tmpInd = getIndividualPointer( x + 1 );
-		tmpInd->setPoolPos( x );
-		pool[ x ] = pool[ x+1 ];
-	}
-
-	pool.removeLast();
+	// Each individual keeps its own pool position; the ones that moved up need their new index.
+	for( int x=poolpos; x<getSize(); x++ )
+		pool[ x ]->setPoolPos( x );
 }
 
 SIGEL_Tools::SIG_Randomizer &SIGEL_GP::SIG_GPPopulation::getRandomizer()
