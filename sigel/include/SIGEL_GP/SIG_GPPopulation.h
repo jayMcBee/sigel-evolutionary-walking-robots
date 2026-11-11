@@ -264,13 +264,6 @@ namespace SIGEL_GP
 		void setRandomizer(SIGEL_Tools::SIG_Randomizer *newRandomizer);
 
 		/**
-		 * This function returns the pointer of the randomizer all random operations are connected with.
-		 * @return
-		 * The pointer of the randomizer will be returned.
-		 */
-		SIGEL_Tools::SIG_Randomizer getRandomizer();
-
-		/**
 		 * This function is obsolete (and will be deleted later)
 		 */
 		SIGEL_Tools::SIG_Randomizer *getRandomizerPointer();

@@ -272,11 +272,6 @@ void SIGEL_GP::SIG_GPPopulation::setRandomizer(SIGEL_Tools::SIG_Randomizer *newR
 	randomizer=newRandomizer;
 }
 
-SIGEL_Tools::SIG_Randomizer SIGEL_GP::SIG_GPPopulation::getRandomizer()
-{
-	return *randomizer;
-}
-
 SIGEL_Tools::SIG_Randomizer *SIGEL_GP::SIG_GPPopulation::getRandomizerPointer()
 {
 	return randomizer;
