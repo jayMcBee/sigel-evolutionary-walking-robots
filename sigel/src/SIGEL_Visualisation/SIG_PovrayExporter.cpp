@@ -163,6 +163,10 @@ bool SIG_PovrayExporter::writeFrame( QString includeFileName, QString fileName )
 	       << "\n"
 	       << environmentObjects()
 	       << sceneObjects( visualisation.getRobotRenderer(), 0, visualisation.getRobotRenderer().getNoOfObjects() )
+	       // Not used by the scene; for tools that place the camera relative to the robot.
+	       << "#declare sigelRobotCentre = "
+	       << vectorToPovray( SIG_TypeConverter::sigelToPovray() * SIG_TypeConverter::toColumnVector( visualisation.getRobotCentre() ) )
+	       << ";\n"
 	       << "sigelCamera( "
 	       << vectorToPovray( SIG_TypeConverter::sigelToPovray() * finalEyePointColumnVector )
 	       << ", "
