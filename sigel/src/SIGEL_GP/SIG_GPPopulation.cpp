@@ -401,20 +401,20 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
 	readPoolGeneration = (populationStr.mid(pos+15,pos2-pos-15)).toLong();
 
-	for(long x=0;x<getSize();x++)
+	for(long index=0;index<getSize();index++)
 	{
-		tmpStr1.setNum(x);
+		tmpStr1.setNum(index);
 
 		pos  = populationStr.indexOf("INDIVIDUAL("+tmpStr1+") BEGIN{", pos2, Qt::CaseInsensitive);
 		pos2 = populationStr.indexOf("}INDIVIDUAL("+tmpStr1+") END", pos2, Qt::CaseInsensitive);
 
-		pool[ x ] = new SIGEL_GP::SIG_GPIndividual();
+		pool[ index ] = new SIGEL_GP::SIG_GPIndividual();
 
 		indStr = populationStr.mid(pos+19+tmpStr1.length(),pos2-pos-20-tmpStr1.length());
 
 		try
 		{
-			getIndividualPointer(x)->readFromFile(indStr);
+			getIndividualPointer(index)->readFromFile(indStr);
 		}
 		catch( ... )
 		{
@@ -425,14 +425,14 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
 		if( qApp )
 		{
-			progress->setValue( x );
+			progress->setValue( index );
 			qApp->processEvents();
 
 			if ( progress->wasCanceled() )
 			{
 				// The process has been canceled. Because of process preparations the system may crash if
 				// these preparation are not made undone:
-				resizeOwning( pool, x + 1 );
+				resizeOwning( pool, index + 1 );
 
 				break;
 			}
