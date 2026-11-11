@@ -320,18 +320,9 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 	QList<SIGEL_GP::SIG_GPIndividual *> oldPool;
 
 	// first read the global options for the population
-	QString s=file.readLine(); //WITHHISTORY
-	if (s == "WITHHISTORY")
-	{
-		s=file.readLine();
-		int tmp = s.toInt();
-		if (tmp == 0)
-		{
-			readHistory = false;
-		}
-		else
-			readHistory = true;
-	}
+	QString s=file.readLine();
+	if( s == "WITHHISTORY" )
+		readHistory = file.readLine().toInt() != 0;
 
 	QString          populationStr=file.readAll();
 	long             pos, endPosition;
