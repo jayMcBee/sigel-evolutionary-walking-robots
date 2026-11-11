@@ -33,10 +33,10 @@
 #include "SIGEL_Tools/SIG_Exception.h"
 
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation()
-	: pool(),
-	  randomizer( new SIGEL_Tools::SIG_Randomizer() ),
-	  nextIdentifier( QString::number( 0 ) ),
-	  poolGeneration(0)
+	: nextIdentifier( QString::number( 0 ) ),
+	  poolGeneration(0),
+	  pool(),
+	  randomizer( new SIGEL_Tools::SIG_Randomizer() )
 {
 	history = true;
 }
