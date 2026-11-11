@@ -329,11 +329,17 @@ class SIG_GPPopulation
     SIGEL_Tools::SIG_Randomizer *getRandomizerPointer();
 
     /**
-     * This function writes a complete population (including all individuals and their programs) to a text stream.
+     * This function reads a complete population out of a given text stream.
      * @pre
-     * The QTextStream file must exist.
+     * The QTextStream file must exist, and it has to contain a complete population.
+     * Either this text stream has been created by writeToFile, or the stream has
+     * been edited by the user. The stream has to have a defined format, which is
+     * described more in detail in the corresponding specification.
      * @post
-     * The current population will be written to the given text stream.
+     * The population, which is described in the text stream, has been transfered
+     * (and translated) into (new created) individuals. All neccessary data is
+     * prepared. WARNING: An existing population will be deleted by calling this
+     * function.
      */
 
   public:
@@ -347,17 +353,11 @@ class SIG_GPPopulation
     SIG_GPIndividual *readIndividual( const QString &populationText, long index, long &endPosition );
 
     /**
-     * This function reads a complete population out of a given text stream.
+     * This function writes a complete population (including all individuals and their programs) to a text stream.
      * @pre
-     * The QTextStream file must exist, and it has to contain a complete population.
-     * Either this text stream has been created by writeToFile, or the stream has
-     * been edited by the user. The stream has to have a defined format, which is
-     * described more in detail in the corresponding specification.
+     * The QTextStream file must exist.
      * @post
-     * The population, which is described in the text stream, has been transfered
-     * (and translated) into (new created) individuals. All neccessary data is
-     * prepared. WARNING: An existing population will be deleted by calling this
-     * function.
+     * The current population will be written to the given text stream.
      */
 
   public:
