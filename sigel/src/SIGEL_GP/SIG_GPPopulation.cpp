@@ -404,12 +404,12 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 	{
 		QString indexText = QString::number( index );
 
-		pos  = populationStr.indexOf("INDIVIDUAL("+indexText+") BEGIN{", pos2, Qt::CaseInsensitive);
+		long beginPosition = populationStr.indexOf("INDIVIDUAL("+indexText+") BEGIN{", pos2, Qt::CaseInsensitive);
 		pos2 = populationStr.indexOf("}INDIVIDUAL("+indexText+") END", pos2, Qt::CaseInsensitive);
 
 		pool[ index ] = new SIGEL_GP::SIG_GPIndividual();
 
-		QString individualText = populationStr.mid(pos+19+indexText.length(),pos2-pos-20-indexText.length());
+		QString individualText = populationStr.mid(beginPosition+19+indexText.length(),pos2-beginPosition-20-indexText.length());
 
 		try
 		{
