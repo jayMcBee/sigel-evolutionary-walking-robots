@@ -195,9 +195,6 @@ int SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
 
 		if( progressCanceled( progress.get(), x - maxPos ) )
 		{
-			// The process has been canceled. Because of process preparations the system may crash if
-			// these preparation are not made undone:
-
 			// The slots above x were never filled.
 			resizeOwning( pool, x + 1 );
 
@@ -396,8 +393,7 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
 		if( progressCanceled( progress.get(), index ) )
 		{
-			// The process has been canceled. Because of process preparations the system may crash if
-			// these preparation are not made undone:
+			// Cancel keeps the individuals read so far; the slots above index were never filled.
 			resizeOwning( pool, index + 1 );
 
 			break;
