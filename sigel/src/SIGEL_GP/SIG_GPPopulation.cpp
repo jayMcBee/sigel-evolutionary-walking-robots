@@ -350,7 +350,7 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 	}
 
 	QString          populationStr=file.readAll();
-	QString          tmpStr1, indStr;
+	QString          indStr;
 	long             pos, pos2;
 
 #ifdef SIG_DEBUG
@@ -403,14 +403,14 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
 	for(long index=0;index<getSize();index++)
 	{
-		tmpStr1.setNum(index);
+		QString indexText = QString::number( index );
 
-		pos  = populationStr.indexOf("INDIVIDUAL("+tmpStr1+") BEGIN{", pos2, Qt::CaseInsensitive);
-		pos2 = populationStr.indexOf("}INDIVIDUAL("+tmpStr1+") END", pos2, Qt::CaseInsensitive);
+		pos  = populationStr.indexOf("INDIVIDUAL("+indexText+") BEGIN{", pos2, Qt::CaseInsensitive);
+		pos2 = populationStr.indexOf("}INDIVIDUAL("+indexText+") END", pos2, Qt::CaseInsensitive);
 
 		pool[ index ] = new SIGEL_GP::SIG_GPIndividual();
 
-		indStr = populationStr.mid(pos+19+tmpStr1.length(),pos2-pos-20-tmpStr1.length());
+		indStr = populationStr.mid(pos+19+indexText.length(),pos2-pos-20-indexText.length());
 
 		try
 		{
