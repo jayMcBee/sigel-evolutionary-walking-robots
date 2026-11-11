@@ -31,6 +31,9 @@
 
 #include <qstring.h>
 #include <qtextstream.h>
+#include <memory>
+
+class QProgressDialog;
 
 namespace SIGEL_GP
 {
@@ -426,6 +429,20 @@ class SIG_GPPopulation
       */
     void setHistory(bool newHistory);
     bool getHistory();
+
+    /**
+     * Returns a modal progress dialog with a Cancel button, or nullptr when there is no QApplication.
+     */
+
+  private:
+    static std::unique_ptr< QProgressDialog > createProgressDialog( const QString &title, long maximum );
+
+    /**
+     * Shows value in the progress dialog and handles pending events. Returns true if Cancel was pressed; false without a dialog.
+     */
+
+  private:
+    static bool progressCanceled( QProgressDialog *progress, long value );
 };
 
 }

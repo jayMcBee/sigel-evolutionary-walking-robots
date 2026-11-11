@@ -183,14 +183,7 @@ int SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
 
 	pool.resize( maxPos + quantity );
 
-	std::unique_ptr< QProgressDialog > progress;
-
-	if( qApp )
-	{
-		progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, quantity, SIGEL_CommonGUI::dialogParent() );
-		progress->setWindowModality( Qt::ApplicationModal );
-		progress->setWindowTitle( "Generating" );
-	}
+	std::unique_ptr< QProgressDialog > progress = createProgressDialog( "Generating", quantity );
 
 	for( int x = maxPos; x<maxPos + quantity; x++ )
 	{
@@ -200,21 +193,15 @@ int SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
 		pool[ x ] = newInd;
 		getIndividualPointer( x )->setPoolPos( x );
 
-		if( qApp )
+		if( progressCanceled( progress.get(), x - maxPos ) )
 		{
-			progress->setValue( x - maxPos );
-			qApp->processEvents();
+			// The process has been canceled. Because of process preparations the system may crash if
+			// these preparation are not made undone:
 
-			if( progress->wasCanceled() )
-			{
-				// The process has been canceled. Because of process preparations the system may crash if
-				// these preparation are not made undone:
+			// The slots above x were never filled.
+			resizeOwning( pool, x + 1 );
 
-				// The slots above x were never filled.
-				resizeOwning( pool, x + 1 );
-
-				break;
-			}
+			break;
 		}
 	}
 
@@ -374,13 +361,7 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 	SIGEL_Tools::SIG_IO::cerr << "<Poolsize loaded:" << populationStr.mid(pos+15,endPosition-pos-15).toLong() << ">" << Qt::endl;
 #endif
 
-	std::unique_ptr< QProgressDialog > progress;
-	if( qApp )
-	{
-		progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, getSize(), SIGEL_CommonGUI::dialogParent() );
-		progress->setWindowModality( Qt::ApplicationModal );
-		progress->setWindowTitle( "Loading" );
-	}
+	std::unique_ptr< QProgressDialog > progress = createProgressDialog( "Loading", getSize() );
 
 	endPosition=populationStr.indexOf(";", endPosition+1, Qt::CaseInsensitive);
 	pos=populationStr.indexOf("NEXTIDENTIFIER=", 0, Qt::CaseInsensitive);
@@ -413,19 +394,13 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 			throw;
 		}
 
-		if( qApp )
+		if( progressCanceled( progress.get(), index ) )
 		{
-			progress->setValue( index );
-			qApp->processEvents();
+			// The process has been canceled. Because of process preparations the system may crash if
+			// these preparation are not made undone:
+			resizeOwning( pool, index + 1 );
 
-			if ( progress->wasCanceled() )
-			{
-				// The process has been canceled. Because of process preparations the system may crash if
-				// these preparation are not made undone:
-				resizeOwning( pool, index + 1 );
-
-				break;
-			}
+			break;
 		}
 	}
 
@@ -543,4 +518,25 @@ void SIGEL_GP::SIG_GPPopulation::setHistory(bool newHistory)
 bool SIGEL_GP::SIG_GPPopulation::getHistory()
 {
 	return history;
+}
+
+std::unique_ptr< QProgressDialog > SIGEL_GP::SIG_GPPopulation::createProgressDialog( const QString &title, long maximum )
+{
+	if( !qApp )
+		return nullptr;
+
+	std::unique_ptr< QProgressDialog > progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, maximum, SIGEL_CommonGUI::dialogParent() );
+	progress->setWindowModality( Qt::ApplicationModal );
+	progress->setWindowTitle( title );
+	return progress;
+}
+
+bool SIGEL_GP::SIG_GPPopulation::progressCanceled( QProgressDialog *progress, long value )
+{
+	if( !progress )
+		return false;
+
+	progress->setValue( value );
+	qApp->processEvents();
+	return progress->wasCanceled();
 }
