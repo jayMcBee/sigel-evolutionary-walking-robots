@@ -610,6 +610,17 @@ bool SIG_SimulationVisualisationWidget::canShowShadows() const
 		&& static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation const* >( visualisation )->canShowShadows();
 }
 
+QString SIG_SimulationVisualisationWidget::cameraLine() const
+{
+	if (!visualisation)
+		return QString();
+
+	auto const text = []( SIG_Vector const &v ) { return QString::asprintf( "%.3f %.3f %.3f", v.x, v.y, v.z ); };
+	return "eye " + text( visualisation->viewSettings.getAbsoluteEyePoint() )
+		+ "  look " + text( visualisation->viewSettings.lookPoint )
+		+ "  robot " + text( static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation const* >( visualisation )->getRobotCentre() );
+}
+
 double SIG_SimulationVisualisationWidget::getFittingDistance() const
 {
 	if (!visualisation)

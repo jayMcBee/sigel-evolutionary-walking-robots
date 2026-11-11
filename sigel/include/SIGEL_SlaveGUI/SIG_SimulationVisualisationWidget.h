@@ -98,6 +98,12 @@ namespace SIGEL_SlaveGUI
 		double getFittingDistance() const;
 
 		/**
+		 * Returns the absolute eye and look points and the robot centre as
+		 * one line of text; empty without a visualisation.
+		 */
+		QString cameraLine() const;
+
+		/**
 		 * Returns false when there is no visualisation or it could not
 		 * set up shadow mapping.
 		 */

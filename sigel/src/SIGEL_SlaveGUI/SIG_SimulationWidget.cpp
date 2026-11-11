@@ -30,6 +30,10 @@
 #include <QPixmap>
 #include <QPainter>
 #include <QTextEdit>
+#include <QAction>
+#include <QApplication>
+#include <QClipboard>
+#include <QLabel>
 
 #include <cmath>
 
@@ -43,6 +47,20 @@ namespace SIGEL_SlaveGUI
 					      Qt::WindowFlags f )
     : SIG_SimulationWidgetBase( parent, name, f )
   {
+    // A right-click on the X, Y or Z value copies the camera and the robot centre to the clipboard.
+    QAction *copyCameraAction = new QAction( "Copy camera", this );
+    connect( copyCameraAction, &QAction::triggered, this, [this]()
+	     {
+	       QString const line = visualisationWidget->cameraLine();
+	       QApplication::clipboard()->setText( line );
+	       qInfo( "%s", qPrintable( line ) );
+	     } );
+    for (QLabel *label : { xPosTextLabel, yPosTextLabel, zPosTextLabel })
+      {
+	label->setContextMenuPolicy( Qt::ActionsContextMenu );
+	label->addAction( copyCameraAction );
+      }
+
     connect( yawSlider,
 	     SIGNAL(valueChanged(int)),
 	     SLOT(slotSetYaw(int)) );
