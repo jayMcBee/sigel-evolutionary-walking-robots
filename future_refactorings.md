@@ -123,10 +123,6 @@ touched, because changing one changes behaviour against the reference binary.
   `*Base` class passes it on to `setObjectName`, and the object names are in
   use, for example in the GUI behaviour baseline.
 
-- [ ] **107. Review `SIG_GPPopulation::readFromFile` with the maintainer,**
-  deciding each change before it is made. The method is long and hard to
-  read.
-
 - [ ] **106. Review `SIGEL_MasterGUI::SIG_GPParameter` with the maintainer,**
   the GP Parameters page, method by method, deciding each change before it is
   made. Its long methods, `slotItemDoubleClicked` and `slotDeleteHost` above
