@@ -34,10 +34,12 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QLabel>
+#include <QColorDialog>
 
 #include <cmath>
 
 #include "SIGEL_SlaveGUI/SIG_SimulationVisualisationWidget.h"
+#include "SIGEL_Visualisation/SIG_Visualisation.h"
 
 namespace SIGEL_SlaveGUI
 {
@@ -191,6 +193,24 @@ namespace SIGEL_SlaveGUI
 		      [this, showColor]( QColor const &color ) { showColor( planecolorPushButton, color ); } );
     QObject::connect( visualisationWidget, &SIG_SimulationVisualisationWidget::signalGridColorChanged, this,
 		      [this, showColor]( QColor const &color ) { showColor( gridcolorPushButton, color ); } );
+
+    // The sky goes from the horizon colour at the bottom of the view to the sky colour at the top.
+    auto const chooseSkyColor = [this, showColor]( QPushButton *button, QVector3D &sky )
+      {
+	QColor const color = QColorDialog::getColor( QColor::fromRgbF( sky.x(), sky.y(), sky.z() ), this );
+	if (!color.isValid())
+	  return;
+	sky = QVector3D( color.redF(), color.greenF(), color.blueF() );
+	showColor( button, color );
+	visualisationWidget->update();
+      };
+    auto const toColor = []( QVector3D const &sky ) { return QColor::fromRgbF( sky.x(), sky.y(), sky.z() ); };
+    showColor( skycolorPushButton, toColor( SIGEL_Visualisation::SIG_Visualisation::skyTopColor ) );
+    showColor( horizoncolorPushButton, toColor( SIGEL_Visualisation::SIG_Visualisation::skyBottomColor ) );
+    QObject::connect( skycolorPushButton, &QPushButton::clicked, this, [this, chooseSkyColor]()
+		      { chooseSkyColor( skycolorPushButton, SIGEL_Visualisation::SIG_Visualisation::skyTopColor ); } );
+    QObject::connect( horizoncolorPushButton, &QPushButton::clicked, this, [this, chooseSkyColor]()
+		      { chooseSkyColor( horizoncolorPushButton, SIGEL_Visualisation::SIG_Visualisation::skyBottomColor ); } );
 
     QObject::connect( gridcolorPushButton,
 		      SIGNAL(clicked()),

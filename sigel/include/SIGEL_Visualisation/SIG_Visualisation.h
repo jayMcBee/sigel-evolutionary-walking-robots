@@ -89,9 +89,10 @@ namespace SIGEL_Visualisation
 
       QList< SIG_FloatingText * > floatingTexts;
 
-      static constexpr QVector3D skyTopColor = QVector3D( 0.70f, 0.80f, 0.95f );
+      // One sky for all views; the viewer's sky and horizon colour buttons change it.
+      static inline QVector3D skyTopColor = QVector3D( 0.70f, 0.80f, 0.95f );
 
-      static constexpr QVector3D skyBottomColor = QVector3D( 1.0f, 1.0f, 1.0f );
+      static inline QVector3D skyBottomColor = QVector3D( 1.0f, 1.0f, 1.0f );
 
     private:
 

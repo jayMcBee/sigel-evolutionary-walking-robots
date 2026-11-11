@@ -624,7 +624,7 @@
                   </widget>
                 </widget>
               </item>
-              <item row="8" column="0">
+              <item row="9" column="0">
                 <widget class="QCheckBox" name="showAncorPointsCheckBox">
                   <property name="text">
                     <string>Show anchor points</string>
@@ -634,14 +634,14 @@
                   </property>
                 </widget>
               </item>
-              <item row="7" column="0">
+              <item row="8" column="0">
                 <widget class="QCheckBox" name="showRobotPathCheckBox">
                   <property name="text">
                     <string>Show robot path</string>
                   </property>
                 </widget>
               </item>
-              <item row="9" column="0">
+              <item row="10" column="0">
                 <widget class="QCheckBox" name="showShadowsCheckBox">
                   <property name="text">
                     <string>Show shadows</string>
@@ -651,7 +651,7 @@
                   </property>
                 </widget>
               </item>
-              <item row="10" column="0">
+              <item row="11" column="0">
                 <spacer name="Spacer3">
                   <property name="sizeHint">
                     <size>
@@ -680,6 +680,24 @@
                     <widget class="QPushButton" name="gridcolorPushButton">
                       <property name="text">
                         <string>Grid color...</string>
+                      </property>
+                    </widget>
+                  </item>
+                </layout>
+              </item>
+              <item row="7" column="0">
+                <layout class="QHBoxLayout">
+                  <item>
+                    <widget class="QPushButton" name="skycolorPushButton">
+                      <property name="text">
+                        <string>Sky color...</string>
+                      </property>
+                    </widget>
+                  </item>
+                  <item>
+                    <widget class="QPushButton" name="horizoncolorPushButton">
+                      <property name="text">
+                        <string>Horizon color...</string>
                       </property>
                     </widget>
                   </item>
