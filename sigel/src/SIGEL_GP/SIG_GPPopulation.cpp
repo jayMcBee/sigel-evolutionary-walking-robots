@@ -368,101 +368,95 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 	if( populationStr.indexOf("POOLGENERATION=", 0, Qt::CaseInsensitive)==-1 )
 		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The population has no POOLGENERATION field." );
 
-	if( (pos=populationStr.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive) )!=-1 )
-	{
-		pos2=populationStr.indexOf(";", pos + 16, Qt::CaseInsensitive);
-		oldPool.swap( pool );
-		resizeOwning( pool, (populationStr.mid(pos+15,pos2-pos-15)).toLong() );
+	pos=populationStr.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive);
+	pos2=populationStr.indexOf(";", pos + 16, Qt::CaseInsensitive);
+	oldPool.swap( pool );
+	resizeOwning( pool, (populationStr.mid(pos+15,pos2-pos-15)).toLong() );
 
 #ifdef SIG_DEBUG
 
-		SIGEL_Tools::SIG_IO::cerr << "<Poolsize loaded:"
-		                          << populationStr.mid(pos+15,pos2-pos-15).toLong()
-		                          << ">" << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "<Poolsize loaded:"
+	                          << populationStr.mid(pos+15,pos2-pos-15).toLong()
+	                          << ">" << Qt::endl;
 
 #endif
 
-		std::unique_ptr< QProgressDialog > progress;
+	std::unique_ptr< QProgressDialog > progress;
+	if( qApp )
+	{
+		progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, getSize(), SIGEL_CommonGUI::dialogParent() );
+		progress->setWindowModality( Qt::ApplicationModal );
+		progress->setWindowTitle( "Loading" );
+	}
+
+	pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
+	pos=populationStr.indexOf("NEXTIDENTIFIER=", 0, Qt::CaseInsensitive);
+#ifdef SIG_DEBUG
+
+	SIGEL_Tools::SIG_IO::cerr << "<Identifier loaded:"
+	                          << populationStr.mid(pos+15,pos2-pos-15).toLong()
+	                          << ">" << Qt::endl;
+
+#endif
+	readNextIdentifier = populationStr.mid(pos+15,pos2-pos-15);
+
+	pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
+	pos=populationStr.indexOf("POOLGENERATION=", 0, Qt::CaseInsensitive);
+#ifdef SIG_DEBUG
+
+	SIGEL_Tools::SIG_IO::cerr << "<Poolgeneration loaded:"
+	                          << populationStr.mid(pos+15,pos2-pos-15)
+	                          << ">\n" << Qt::endl;
+#endif
+	readPoolGeneration = (populationStr.mid(pos+15,pos2-pos-15)).toLong();
+
+	for(long x=0;x<getSize();x++)
+	{
+		tmpStr1.setNum(x);
+
+		pos  = populationStr.indexOf("INDIVIDUAL("+tmpStr1+") BEGIN{", pos2, Qt::CaseInsensitive);
+		pos2 = populationStr.indexOf("}INDIVIDUAL("+tmpStr1+") END", pos2, Qt::CaseInsensitive);
+
+		pool[ x ] = new SIGEL_GP::SIG_GPIndividual();
+
+		indStr = populationStr.mid(pos+19+tmpStr1.length(),pos2-pos-20-tmpStr1.length());
+
+		try
+		{
+			getIndividualPointer(x)->readFromFile(indStr);
+		}
+		catch( ... )
+		{
+			qDeleteAll( pool );
+			pool = oldPool;
+			throw;
+		}
+
 		if( qApp )
 		{
-			progress = std::make_unique< QProgressDialog >( "Progress:", "Cancel", 0, getSize(), SIGEL_CommonGUI::dialogParent() );
-			progress->setWindowModality( Qt::ApplicationModal );
-			progress->setWindowTitle( "Loading" );
-		}
+			progress->setValue( x );
+			qApp->processEvents();
 
-		pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
-		if( (pos=populationStr.indexOf("NEXTIDENTIFIER=", 0, Qt::CaseInsensitive))!=-1 )
-		{
-#ifdef SIG_DEBUG
-
-			SIGEL_Tools::SIG_IO::cerr << "<Identifier loaded:"
-			                          << populationStr.mid(pos+15,pos2-pos-15).toLong()
-			                          << ">" << Qt::endl;
-
-#endif
-			readNextIdentifier = populationStr.mid(pos+15,pos2-pos-15);
-		}
-
-		pos2=populationStr.indexOf(";", pos2+1, Qt::CaseInsensitive);
-		if( (pos=populationStr.indexOf("POOLGENERATION=", 0, Qt::CaseInsensitive))!=-1 )
-		{
-#ifdef SIG_DEBUG
-
-			SIGEL_Tools::SIG_IO::cerr << "<Poolgeneration loaded:"
-			                          << populationStr.mid(pos+15,pos2-pos-15)
-			                          << ">\n" << Qt::endl;
-#endif
-			readPoolGeneration = (populationStr.mid(pos+15,pos2-pos-15)).toLong();
-		}
-
-		for(long x=0;x<getSize();x++)
-		{
-			tmpStr1.setNum(x);
-
-			pos  = populationStr.indexOf("INDIVIDUAL("+tmpStr1+") BEGIN{", pos2, Qt::CaseInsensitive);
-			pos2 = populationStr.indexOf("}INDIVIDUAL("+tmpStr1+") END", pos2, Qt::CaseInsensitive);
-
-			pool[ x ] = new SIGEL_GP::SIG_GPIndividual();
-
-			indStr = populationStr.mid(pos+19+tmpStr1.length(),pos2-pos-20-tmpStr1.length());
-
-			try
+			if ( progress->wasCanceled() )
 			{
-				getIndividualPointer(x)->readFromFile(indStr);
-			}
-			catch( ... )
-			{
-				qDeleteAll( pool );
-				pool = oldPool;
-				throw;
-			}
+				// The process has been canceled. Because of process preparations the system may crash if
+				// these preparation are not made undone:
+				resizeOwning( pool, x + 1 );
 
-			if( qApp )
-			{
-				progress->setValue( x );
-				qApp->processEvents();
-
-				if ( progress->wasCanceled() )
-				{
-					// The process has been canceled. Because of process preparations the system may crash if
-					// these preparation are not made undone:
-					resizeOwning( pool, x + 1 );
-
-					break;
-				}
+				break;
 			}
 		}
-
-		qDeleteAll( oldPool );
-		history = readHistory;
-		nextIdentifier = readNextIdentifier;
-		poolGeneration = readPoolGeneration;
-#ifdef SIG_DEBUG
-
-		SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION FINISHED." << Qt::endl;
-
-#endif
 	}
+
+	qDeleteAll( oldPool );
+	history = readHistory;
+	nextIdentifier = readNextIdentifier;
+	poolGeneration = readPoolGeneration;
+#ifdef SIG_DEBUG
+
+	SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION FINISHED." << Qt::endl;
+
+#endif
 
 	if( getSize() > maximumSize )
 	{
