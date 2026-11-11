@@ -33,9 +33,9 @@
 #include "SIGEL_Tools/SIG_Exception.h"
 
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation()
-	: poolGeneration(0),
-	  history( true ),
-	  nextIdentifier( QString::number( 0 ) )
+	: history( true ),
+	  nextIdentifier( QString::number( 0 ) ),
+	  poolGeneration(0)
 {
 }
 
@@ -145,6 +145,11 @@ int SIGEL_GP::SIG_GPPopulation::getPoolGeneration()
 void SIGEL_GP::SIG_GPPopulation::setPoolGeneration(int pGen)
 {
 	poolGeneration = pGen;
+}
+
+void SIGEL_GP::SIG_GPPopulation::incrementPoolGeneration()
+{
+	poolGeneration++;
 }
 
 void SIGEL_GP::SIG_GPPopulation::loadPool(QTextStream & pool)

@@ -79,15 +79,6 @@ namespace SIGEL_GP
 		SIG_GPPopulation &operator=( SIG_GPPopulation const & ) = delete;
 
 		/**
-		 * The value, which indicates how old a population is. A generation
-		 * change occurs after a special number of played tournaments, default
-		 * is the half of the individuals. Is the number of tournaments reached,
-		 * the generation value of the population is increased by one and all
-		 * ages of the individuals are increased by one too.
-		 */
-		int poolGeneration;
-
-		/**
 		 * This operation returns an individual, which is placed in the population
 		 * on position poolpos.
 		 * @pre
@@ -199,6 +190,11 @@ namespace SIGEL_GP
 		void setPoolGeneration(int pGen);
 
 		/**
+		 * Raises the generation number of the pool by one.
+		 */
+		void incrementPoolGeneration();
+
+		/**
 		 * Returns the randomizer that creates the population's random individuals.
 		 */
 		SIGEL_Tools::SIG_Randomizer &getRandomizer();
@@ -301,6 +297,15 @@ namespace SIGEL_GP
 		 * individual names.
 		 */
 		QString nextIdentifier;
+
+		/**
+		 * The value, which indicates how old a population is. A generation
+		 * change occurs after a special number of played tournaments, default
+		 * is the half of the individuals. Is the number of tournaments reached,
+		 * the generation value of the population is increased by one and all
+		 * ages of the individuals are increased by one too.
+		 */
+		int poolGeneration;
 
 		/**
 		 * Returns a new individual read from block index of the population text. The search starts at endPosition, which is left on that block's END marker.

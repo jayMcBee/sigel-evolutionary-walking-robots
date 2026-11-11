@@ -823,9 +823,9 @@ void SIGEL_GP::SIG_GPManager::run()
 		// this gives us the current generation and it starts with 0 every time we start the evolution
 		runGenerationCounter++;
 		// this is the total amount of generations evolved, since the project is created
-		currentExperiment.population.poolGeneration++;
+		currentExperiment.population.incrementPoolGeneration();
 
-		SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentExperiment.population.poolGeneration << " (" << runGenerationCounter << " in this run)\t(" << (QDateTime::currentDateTime()).toString() << ")" << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentExperiment.population.getPoolGeneration() << " (" << runGenerationCounter << " in this run)\t(" << (QDateTime::currentDateTime()).toString() << ")" << Qt::endl;
 
 		// increment the age of the individuals
 		for (int i=0; i < currentExperiment.population.getSize(); i++)
@@ -836,7 +836,7 @@ void SIGEL_GP::SIG_GPManager::run()
 
 		int poolImageGeneration = currentExperiment.getGPParameter().getPoolImageGeneration();
 
-		int poolGenerationNo = currentExperiment.population.poolGeneration;
+		int poolGenerationNo = currentExperiment.population.getPoolGeneration();
 		QDateTime generationBreak = QDateTime::currentDateTime();
 		double bestFitness = currentExperiment.population.getBestFitness();
 		double minFitness = currentExperiment.population.getWorstFitness();
@@ -859,7 +859,7 @@ void SIGEL_GP::SIG_GPManager::run()
 		}
 
 		// if the user wants a poolImage and it the generation where it should generate, then he gets it
-		if ( poolImageGeneration && ((currentExperiment.population.poolGeneration % poolImageGeneration) == 0) )
+		if ( poolImageGeneration && ((currentExperiment.population.getPoolGeneration() % poolImageGeneration) == 0) )
 		{
 			QString poolImageName = currentExperiment.getGPParameter().getPoolImageFileName( currentExperiment.experimentName, QDateTime::currentDateTime() );
 
@@ -892,7 +892,7 @@ void SIGEL_GP::SIG_GPManager::run()
 		// checks whether to save the population or not
 		// only save if getAutosaveIntervalGenerations() not zero and the modulo rest is zero
 		if (currentExperiment.environment.getAutosaveIntervalGenerations()!=0
-		    && (currentExperiment.population.poolGeneration%currentExperiment.environment.getAutosaveIntervalGenerations())==0)
+		    && (currentExperiment.population.getPoolGeneration()%currentExperiment.environment.getAutosaveIntervalGenerations())==0)
 		{
 			if (!currentExperiment.saveToFile(currentExperiment.getPath()))
 			{
@@ -998,9 +998,9 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 		}
 
 		runGenerationCounter++;
-		currentExperiment.population.poolGeneration++;
+		currentExperiment.population.incrementPoolGeneration();
 
-		SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentExperiment.population.poolGeneration << " (" << runGenerationCounter << " in this run)\t(" << (QDateTime::currentDateTime()).toString() << ")" << Qt::endl;
+		SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentExperiment.population.getPoolGeneration() << " (" << runGenerationCounter << " in this run)\t(" << (QDateTime::currentDateTime()).toString() << ")" << Qt::endl;
 
 		for (int i=0; i < currentExperiment.population.getSize(); i++)
 		{
@@ -1010,7 +1010,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 		int poolImageGeneration = currentExperiment.getGPParameter().getPoolImageGeneration();
 
-		int poolGenerationNo = currentExperiment.population.poolGeneration;
+		int poolGenerationNo = currentExperiment.population.getPoolGeneration();
 		QDateTime generationBreak = QDateTime::currentDateTime();
 		double bestFitness = currentExperiment.population.getBestFitness();
 		double minFitness = currentExperiment.population.getWorstFitness();
@@ -1049,7 +1049,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 		currentExperiment.experimentHistory.append( newExpHistEntry );
 
-		if ( poolImageGeneration && ((currentExperiment.population.poolGeneration % poolImageGeneration) == 0) )
+		if ( poolImageGeneration && ((currentExperiment.population.getPoolGeneration() % poolImageGeneration) == 0) )
 		{
 			QString poolImageName = currentExperiment.getGPParameter().getPoolImageFileName( currentExperiment.experimentName, QDateTime::currentDateTime() );
 
@@ -1082,7 +1082,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 		// checks whether to save the population or not
 		// only save if getAutosaveIntervalGenerations() not zero and the modulo rest is zero
 		if (currentExperiment.environment.getAutosaveIntervalGenerations()!=0
-		    && (currentExperiment.population.poolGeneration%currentExperiment.environment.getAutosaveIntervalGenerations())==0)
+		    && (currentExperiment.population.getPoolGeneration()%currentExperiment.environment.getAutosaveIntervalGenerations())==0)
 		{
 			if (!currentExperiment.saveToFile(currentExperiment.getPath()))
 			{

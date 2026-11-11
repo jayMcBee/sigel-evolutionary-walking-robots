@@ -3874,7 +3874,7 @@ static int guidriveMain(int argc, char **argv)
         // `after' value.
         QLCDNumber *gens = theExp->experimentView->lcdnumberGenerations;
         const int genAtRest = theExp->gpExperiment.population.getPoolGeneration();
-        theExp->gpExperiment.population.poolGeneration = genAtRest + 3;
+        theExp->gpExperiment.population.setPoolGeneration( genAtRest + 3 );
         printf("  [counter] model=%d display before slotEvolutionStopped=%d\n",
                theExp->gpExperiment.population.getPoolGeneration(), gens->intValue());
         if (gens->intValue() == theExp->gpExperiment.population.getPoolGeneration()) {
@@ -3889,7 +3889,7 @@ static int guidriveMain(int argc, char **argv)
             gens->intValue() == theExp->gpExperiment.population.getPoolGeneration() ? 1 : 0;
         printf("  [counter] display after slotEvolutionStopped=%d refreshed=%d\n",
                gens->intValue(), refreshed);
-        theExp->gpExperiment.population.poolGeneration = genAtRest;
+        theExp->gpExperiment.population.setPoolGeneration( genAtRest );
         if (!refreshed) {
             printf("!! slotEvolutionStopped left the generation counter stale\n");
             fflush(stdout); return 1;
