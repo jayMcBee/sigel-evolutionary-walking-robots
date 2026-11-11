@@ -132,7 +132,7 @@ void SIG_GPParameter::slotChangePoolImageDir()
 void SIG_GPParameter::putIntoExperiment()
 {
 	theExperiment.gpParameter.setRandomSeed( spinboxRandomSeed->value() );
-	theExperiment.population.getRandomizerPointer()->setNewSeed( spinboxRandomSeed->value() );
+	theExperiment.population.getRandomizer().setNewSeed( spinboxRandomSeed->value() );
 	theExperiment.gpParameter.setMinIndLength( spinboxMinIndLength->value() );
 	if( checkboxIgnoreMaxIndLength->isChecked() )
 		theExperiment.gpParameter.setMaxIndLength( SIGEL_GP::SIG_GPParameter::unlimitedMaxIndLength );

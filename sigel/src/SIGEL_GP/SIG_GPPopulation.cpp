@@ -35,10 +35,8 @@
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation()
 	: nextIdentifier( QString::number( 0 ) ),
 	  poolGeneration(0),
-	  pool(),
-	  randomizer( new SIGEL_Tools::SIG_Randomizer() )
+	  history( true )
 {
-	history = true;
 }
 
 namespace
@@ -59,7 +57,6 @@ SIGEL_GP::SIG_GPPopulation::~SIG_GPPopulation()
 {
 	qDeleteAll( pool );
 	pool.clear();
-	delete randomizer;
 }
 
 SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPPopulation::getIndividual(int poolpos)
@@ -101,7 +98,7 @@ int SIGEL_GP::SIG_GPPopulation::addRandomIndividuals(int quantity,
 
 	for( int x = maxPos; x<maxPos + quantity; x++ )
 	{
-		SIG_GPIndividual *newInd = new SIG_GPIndividual( *getRandomizerPointer(), gpParameter, languageParameters );
+		SIG_GPIndividual *newInd = new SIG_GPIndividual( randomizer, gpParameter, languageParameters );
 		newInd->setName( getNextIdentifier() );
 		delete pool[ x ];
 		pool[ x ] = newInd;
@@ -181,7 +178,7 @@ void SIGEL_GP::SIG_GPPopulation::deleteIndividual(int poolpos)
 	pool.removeLast();
 }
 
-SIGEL_Tools::SIG_Randomizer *SIGEL_GP::SIG_GPPopulation::getRandomizerPointer()
+SIGEL_Tools::SIG_Randomizer &SIGEL_GP::SIG_GPPopulation::getRandomizer()
 {
 	return randomizer;
 }

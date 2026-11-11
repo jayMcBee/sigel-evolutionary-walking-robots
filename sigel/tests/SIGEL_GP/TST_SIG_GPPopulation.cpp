@@ -112,7 +112,7 @@ void SIGEL_GP::TST_SIG_GPPopulation::addRandomIndividualsUsesTheLengthLimits()
   gpParameter.setMaxIndLength( 7 );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   SIG_GPPopulation population;
-  population.getRandomizerPointer()->setNewSeed( 1 );
+  population.getRandomizer().setNewSeed( 1 );
 
   population.addRandomIndividuals( 3, gpParameter, languageParameters );
 
@@ -129,7 +129,7 @@ void SIGEL_GP::TST_SIG_GPPopulation::programLengthsAreInsideTheLimits()
   gpParameter.setMaxIndLength( 8 );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   SIG_GPPopulation population;
-  population.getRandomizerPointer()->setNewSeed( 1 );
+  population.getRandomizer().setNewSeed( 1 );
 
   population.addRandomIndividuals( 20, gpParameter, languageParameters );
 
@@ -148,7 +148,7 @@ void SIGEL_GP::TST_SIG_GPPopulation::programLengthsReachBothLimits()
   gpParameter.setMaxIndLength( 8 );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   SIG_GPPopulation population;
-  population.getRandomizerPointer()->setNewSeed( 1 );
+  population.getRandomizer().setNewSeed( 1 );
 
   population.addRandomIndividuals( 100, gpParameter, languageParameters );
 
@@ -179,7 +179,7 @@ void SIGEL_GP::TST_SIG_GPPopulation::randomProgramsHaveTheMinimumLengthWithoutAM
   gpParameter.setMaxIndLength( 0 );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
   SIG_GPPopulation population;
-  population.getRandomizerPointer()->setNewSeed( 1 );
+  population.getRandomizer().setNewSeed( 1 );
 
   population.addRandomIndividuals( 20, gpParameter, languageParameters );
 
@@ -614,7 +614,7 @@ int SIGEL_GP::TST_SIG_GPPopulation::addIndividuals( SIG_GPPopulation &population
   gpParameter.setMinIndLength( 5 );
   gpParameter.setMaxIndLength( 8 );
   SIGEL_Robot::SIG_LanguageParameters languageParameters;
-  population.getRandomizerPointer()->setNewSeed( seed );
+  population.getRandomizer().setNewSeed( seed );
 
   return population.addRandomIndividuals( quantity, gpParameter, languageParameters );
 }

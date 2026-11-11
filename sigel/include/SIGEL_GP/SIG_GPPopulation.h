@@ -207,9 +207,9 @@ namespace SIGEL_GP
 		void setPoolGeneration(int pGen);
 
 		/**
-		 * This function is obsolete (and will be deleted later)
+		 * Returns the randomizer that creates the population's random individuals.
 		 */
-		SIGEL_Tools::SIG_Randomizer *getRandomizerPointer();
+		SIGEL_Tools::SIG_Randomizer &getRandomizer();
 
 		/**
 		 * This function reads a complete population out of a given text stream.
@@ -292,11 +292,9 @@ namespace SIGEL_GP
 		QList<SIG_GPIndividual *> pool;
 
 		/**
-		 * The is a refernce of the SIG_Randomizer object of the GPManager. It is
-		 * used for the randomly individual creation and the use of the
-		 * genetic generation.
+		 * The population's own randomizer, used to create random individuals.
 		 */
-		SIGEL_Tools::SIG_Randomizer *randomizer;
+		SIGEL_Tools::SIG_Randomizer randomizer;
 
 		/**
 		 * This attribute holds the information whether the history for each individual should
