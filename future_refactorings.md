@@ -1,13 +1,5 @@
 # To do — SIGEL 2.0
 
-Independent of the port, which is done. Do not combine commits across the two.
-
-**Protocol:** one commit per item, each reviewed and approved.
-
-**Status:** `[ ]` open · `[~]` in review. **Finished items are
-not kept here.** They move to `PORTING.md`, which is the only log of what was
-done; their numbers stay with them, because other items cite them.
-
 Paths are relative to `sigel/`, the source tree.
 
 ---

@@ -244,6 +244,10 @@ found a real defect.** §0 has the rule; it is not optional.
   `LIBRARIES.md` lists the third-party libraries, by decision
   2026-09-23; `README.md` links to it. `physics_backends.md` was folded into
   this file on 2026-09-20.
+- **The to-do list holds open items only.** A finished item is deleted from
+  `future_refactorings.md`; git is its log. Item numbers never change,
+  because items cite each other. Each change to an item gets its own commit,
+  reviewed and approved by the maintainer.
 
 ---
 
