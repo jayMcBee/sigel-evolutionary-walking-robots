@@ -925,6 +925,16 @@ classes and leave truncation a hard error. **They are not interchangeable.**
 
 ### Handover — one owner at a time
 
+**2026-11-10 — DONE: A RELATIVE OR ABSOLUTE DRIVE STOPS THE SIMULATION.**
+
+- `SIG_RobotCompilerObjects::driveMode` refuses the drive modes `relative`
+  and `absolute` with a semantic error, so the user sees it when the robot
+  file is read. The simulation runs only force and simple servo drives;
+  before, it left such a drive out and every MOVE to it did nothing, without
+  a message.
+- The `SIG_DynaMechsSimulationData` constructor throws `SIG_Exception`
+  naming the drive for a robot that reaches it with such a drive anyway.
+
 **2026-11-10 — DONE: A BODY WITH A BROKEN GEOMETRY FLAG IS REFUSED.**
 
 - The `SIG_Body` unstreaming constructor throws `SIG_UnstreamingError` when

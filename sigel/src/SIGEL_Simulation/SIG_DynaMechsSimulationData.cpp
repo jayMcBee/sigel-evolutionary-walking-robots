@@ -147,6 +147,9 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 			}
 		}
 		break;
+
+		default:
+			throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, QString( "Drive '%1' is relative or absolute; the simulation runs only force and simple servo drives." ).arg( currentDrive->getName() ) );
 		}
 	}
 

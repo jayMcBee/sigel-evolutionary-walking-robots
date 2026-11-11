@@ -814,7 +814,6 @@ void SIGEL_Simulation::TST_SIG_DynaMechsSimulationData::constructorListsOrRefuse
     refused = true;
   }
 
-  QEXPECT_FAIL( "", "SIG_DynaMechsSimulationData leaves a relative or absolute drive out of its drives and simulates the robot", Abort );
   QVERIFY( listed || refused );
 }
 

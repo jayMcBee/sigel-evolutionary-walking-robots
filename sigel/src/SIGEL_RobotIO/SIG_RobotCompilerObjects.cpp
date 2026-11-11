@@ -264,10 +264,8 @@ namespace SIGEL_RobotIO {
         {
                 if (mode == "force")
                         d->setMode (SIG_Drive::tForceMode);
-                else if (mode == "relative")
-                        d->setMode (SIG_Drive::tRelativeMode);
-                else if (mode == "absolute")
-                        d->setMode (SIG_Drive::tAbsoluteMode);
+                else if (mode == "relative" || mode == "absolute")
+                        throw SIG_SemanticError (__FILE__, __LINE__, "Drive mode '"+mode+"' is not supported by the simulation");
                 else if (mode == "simpleservo")
                         d->setMode (SIG_Drive::tServoSimpleMode);
                 else
