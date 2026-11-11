@@ -1,6 +1,6 @@
 # To do — SIGEL 2.0
 
-Paths are relative to `sigel/`, the source tree.
+Open work on SIGEL 2.0, by area. Paths are relative to `sigel/`.
 
 ---
 
