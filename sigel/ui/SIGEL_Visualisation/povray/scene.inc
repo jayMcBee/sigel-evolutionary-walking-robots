@@ -19,11 +19,16 @@ light_source {
   orient
 }
 
+// The sky is the horizon colour at the horizon and reaches the sky colour
+// sigelSkyGlowElevation degrees above it, a glow band low over the ground. After scale
+// and translate, 0.5 is the horizon and 0.5 + sin(elevation) / 2 an elevation above it.
+#declare sigelSkyGlowElevation = 12;
 sky_sphere {
   pigment {
     gradient y
     color_map {
       [0.5 srgb sigelHorizonColor]
+      [0.5 + sin( radians( sigelSkyGlowElevation ) ) / 2 srgb sigelSkyTopColor]
       [1.0 srgb sigelSkyTopColor]
     }
     scale 2
