@@ -41,92 +41,6 @@ SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation()
 	history = true;
 }
 
-SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size)
-	: randomizer( nullptr )   // the guard below reads it
-{
-	if( getRandomizerPointer()==nullptr )
-	{
-		SIGEL_Tools::SIG_IO::cerr << "\n\nA randomizer is needed to initialize a population ! Program terminated." << Qt::endl;
-		exit(1);
-		// ToDo: Exception
-	}
-
-	pool.resize( size );
-
-	history = true;
-
-	setNextIdentifier( QString::number(0) );
-	setPoolGeneration( 0 );
-
-	for( int x=0; x<getSize(); x++ )
-	{
-		delete pool[ x ];
-		pool[ x ] = new SIGEL_GP::SIG_GPIndividual( *getRandomizerPointer() );
-		getIndividualPointer( x )->setPoolPos( x );
-	}
-}
-
-SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(QString data)
-	: randomizer( nullptr )   // the guard below reads it
-{
-	QTextStream                 inputFile(&data, QIODeviceBase::ReadOnly);
-
-	history = true;
-
-#ifdef SIG_DEBUG
-
-	SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION DATA FROM FILE:" << Qt::endl;
-
-#endif
-
-	readFromFile(inputFile);
-
-#ifdef SIG_DEBUG
-
-	SIGEL_Tools::SIG_IO::cerr << "\n\nREADING FINISHED.\n" << Qt::endl;
-
-#endif
-}
-
-SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
-                                             SIGEL_Tools::SIG_Randomizer &newRandomizer,
-                                             SIGEL_GP::SIG_GPParameter& gpParameter,
-                                             SIGEL_Robot::SIG_LanguageParameters& languageParameters)
-{
-	setRandomizer( &newRandomizer );
-
-	pool.resize( size );
-
-	history = true;
-
-	setNextIdentifier( QString::number(0) );
-	setPoolGeneration( 0 );
-
-	for( int x=0; x<getSize(); x++ )
-	{
-		delete pool[ x ];
-		pool[ x ] = new SIGEL_GP::SIG_GPIndividual( newRandomizer, gpParameter, languageParameters );
-		getIndividualPointer( x )->setPoolPos( x );
-	}
-}
-
-SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation(int size,
-                                             SIGEL_Tools::SIG_Randomizer &newRandomizer)
-{
-	setRandomizer( &newRandomizer );
-
-	pool.resize( size );
-
-	history = true;
-
-	for( int x=0; x<getSize(); x++ )
-	{
-		delete pool[ x ];
-		pool[ x ] = new SIGEL_GP::SIG_GPIndividual( newRandomizer );
-		getIndividualPointer( x )->setPoolPos( x );
-	}
-}
-
 namespace
 {
 
@@ -265,11 +179,6 @@ void SIGEL_GP::SIG_GPPopulation::deleteIndividual(int poolpos)
 	}
 
 	pool.removeLast();
-}
-
-void SIGEL_GP::SIG_GPPopulation::setRandomizer(SIGEL_Tools::SIG_Randomizer *newRandomizer)
-{
-	randomizer=newRandomizer;
 }
 
 SIGEL_Tools::SIG_Randomizer *SIGEL_GP::SIG_GPPopulation::getRandomizerPointer()

@@ -64,56 +64,6 @@ namespace SIGEL_GP
 		SIG_GPPopulation();
 
 		/**
-		 * The constructor of a population, which builds a pool with a number
-		 * of randomly created individuals.
-		 * @pre
-		 * A new population is demanded by the user and he knows how many
-		 * individuals he wants the population to contain in front.
-		 * @post
-		 * The population object is created and contains the demanded number of
-		 * randomly created individuals.
-		 * @param size
-		 * The number of individuals, which have to be constructed by the
-		 * construction of the pool.
-		 */
-		SIG_GPPopulation(int size);
-
-		/**
-		 * This constructor should be the STANDARD constructor to create a pupoluation consisting of
-		 * a number of SIZE individuals. All individuals are created as defined in the language and
-		 * GP parameters.
-		 * @pre
-		 * A randomizer, the language and GP parameters must exist.
-		 * @post
-		 * A population consisting of SIZE individuals is created. Each individual contains a randomly
-		 * created program.
-		 */
-		SIG_GPPopulation(int size,
-		                 SIGEL_Tools::SIG_Randomizer &newRandomizer,
-		                 SIGEL_GP::SIG_GPParameter& gpParameter,
-		                 SIGEL_Robot::SIG_LanguageParameters& languageParameters);
-
-		/**
-		 * The constructor of an population, which is constructed from a QString.
-		 * @pre
-		 * The user want to construct a population from a QString.
-		 * @post
-		 * The population object is constructed correctly, due to the data from
-		 * the QString.
-		 * @param data
-		 * The data represent a population encoded in a QString.
-		 */
-		SIG_GPPopulation(QString data);
-
-		/**
-		 * This constructor creates a population that contains a number of randomly created individuals.
-		 * @post
-		 * A population with the given number of individuals is created. All individuals will also contain
-		 * complete programs.
-		 */
-		SIG_GPPopulation(int size, SIGEL_Tools::SIG_Randomizer &newRandomizer);
-
-		/**
 		 * The destructor of a population object.
 		 * @pre
 		 * A termination condition is fulfilled and the genetic programming
@@ -255,13 +205,6 @@ namespace SIGEL_GP
 		 * The generation number will be set to the given value.
 		 */
 		void setPoolGeneration(int pGen);
-
-		/**
-		 * This function sets a randomizer for all random operations.
-		 * @post
-		 * The randomizer will be set to the given randomizer
-		 */
-		void setRandomizer(SIGEL_Tools::SIG_Randomizer *newRandomizer);
 
 		/**
 		 * This function is obsolete (and will be deleted later)
