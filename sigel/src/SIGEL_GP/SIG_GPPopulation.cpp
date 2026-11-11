@@ -224,56 +224,56 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 	if( s == "WITHHISTORY" )
 		readHistory = file.readLine().toInt() != 0;
 
-	QString          populationStr=file.readAll();
+	QString populationText=file.readAll();
 	long             pos, endPosition;
 
 #ifdef SIG_DEBUG
 	SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION DATA FROM FILE:" << Qt::endl;
 #endif
 
-	if( populationStr.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive)==-1 )
+	if( populationText.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive)==-1 )
 		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The population has no POPULATIONSIZE field." );
 
-	if( populationStr.indexOf("NEXTIDENTIFIER=", 0, Qt::CaseInsensitive)==-1 )
+	if( populationText.indexOf("NEXTIDENTIFIER=", 0, Qt::CaseInsensitive)==-1 )
 		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The population has no NEXTIDENTIFIER field." );
 
-	if( populationStr.indexOf("POOLGENERATION=", 0, Qt::CaseInsensitive)==-1 )
+	if( populationText.indexOf("POOLGENERATION=", 0, Qt::CaseInsensitive)==-1 )
 		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The population has no POOLGENERATION field." );
 
-	pos=populationStr.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive);
-	endPosition=populationStr.indexOf(";", pos + 16, Qt::CaseInsensitive);
+	pos=populationText.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive);
+	endPosition=populationText.indexOf(";", pos + 16, Qt::CaseInsensitive);
 	oldPool.swap( pool );
-	resizeOwning( pool, (populationStr.mid(pos+15,endPosition-pos-15)).toLong() );
+	resizeOwning( pool, (populationText.mid(pos+15,endPosition-pos-15)).toLong() );
 
 #ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "<Poolsize loaded:" << populationStr.mid(pos+15,endPosition-pos-15).toLong() << ">" << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "<Poolsize loaded:" << populationText.mid(pos+15,endPosition-pos-15).toLong() << ">" << Qt::endl;
 #endif
 
 	std::unique_ptr< QProgressDialog > progress = createProgressDialog( "Loading", getSize() );
 
-	endPosition=populationStr.indexOf(";", endPosition+1, Qt::CaseInsensitive);
-	pos=populationStr.indexOf("NEXTIDENTIFIER=", 0, Qt::CaseInsensitive);
+	endPosition=populationText.indexOf(";", endPosition+1, Qt::CaseInsensitive);
+	pos=populationText.indexOf("NEXTIDENTIFIER=", 0, Qt::CaseInsensitive);
 
 #ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "<Identifier loaded:" << populationStr.mid(pos+15,endPosition-pos-15).toLong() << ">" << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "<Identifier loaded:" << populationText.mid(pos+15,endPosition-pos-15).toLong() << ">" << Qt::endl;
 #endif
 
-	readNextIdentifier = populationStr.mid(pos+15,endPosition-pos-15);
+	readNextIdentifier = populationText.mid(pos+15,endPosition-pos-15);
 
-	endPosition=populationStr.indexOf(";", endPosition+1, Qt::CaseInsensitive);
-	pos=populationStr.indexOf("POOLGENERATION=", 0, Qt::CaseInsensitive);
+	endPosition=populationText.indexOf(";", endPosition+1, Qt::CaseInsensitive);
+	pos=populationText.indexOf("POOLGENERATION=", 0, Qt::CaseInsensitive);
 
 #ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "<Poolgeneration loaded:" << populationStr.mid(pos+15,endPosition-pos-15) << ">\n" << Qt::endl;
+	SIGEL_Tools::SIG_IO::cerr << "<Poolgeneration loaded:" << populationText.mid(pos+15,endPosition-pos-15) << ">\n" << Qt::endl;
 #endif
 
-	readPoolGeneration = (populationStr.mid(pos+15,endPosition-pos-15)).toLong();
+	readPoolGeneration = (populationText.mid(pos+15,endPosition-pos-15)).toLong();
 
 	for(long index=0;index<getSize();index++)
 	{
 		try
 		{
-			pool[ index ] = readIndividual( populationStr, index, endPosition );
+			pool[ index ] = readIndividual( populationText, index, endPosition );
 		}
 		catch( ... )
 		{
