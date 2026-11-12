@@ -45,9 +45,8 @@ namespace SIGEL_SlaveGUI
 {
 
   SIG_SimulationWidget::SIG_SimulationWidget( QWidget *parent,
-					      char const *name,
 					      Qt::WindowFlags f )
-    : SIG_SimulationWidgetBase( parent, name, f )
+    : SIG_SimulationWidgetBase( parent, f )
   {
     // A right-click on the X, Y or Z value copies the camera and the robot centre to the clipboard.
     QAction *copyCameraAction = new QAction( "Copy camera", this );

@@ -15,7 +15,7 @@ class SIG_SimulationWidgetBase : public QWidget, public Ui::SIG_SimulationWidget
     Q_OBJECT
 
 public:
-    SIG_SimulationWidgetBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
+    SIG_SimulationWidgetBase(QWidget* parent = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 
 protected:
     // Qt does not call languageChange() itself.

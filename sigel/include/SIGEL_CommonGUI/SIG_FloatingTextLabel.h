@@ -31,8 +31,7 @@ namespace SIGEL_CommonGUI
   class SIG_FloatingTextLabel : public QLabel
     {
     public:
-      SIG_FloatingTextLabel( QWidget * parent,
-			     const char * name=nullptr );
+      SIG_FloatingTextLabel( QWidget * parent );
 
     private:
       void mousePressEvent( QMouseEvent *e ) override;

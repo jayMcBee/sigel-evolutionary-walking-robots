@@ -41,9 +41,8 @@ namespace SIGEL_SlaveGUI
 {
 
 SIG_SimulationVisualisationWidget::SIG_SimulationVisualisationWidget( QWidget *parent,
-                                                                      char const *name,
                                                                       Qt::WindowFlags f )
-	: SIG_VisualisationWidget( parent, name, f ),
+	: SIG_VisualisationWidget( parent, f ),
 	  frameDelay(0),
 	  pausedForDialog(false),
 	  frameShown(true),
@@ -665,7 +664,7 @@ void SIG_SimulationVisualisationWidget::slotAlterMovieSettingsClicked()
 	SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
 		static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
 
-	SIGEL_SlaveGUI::SIG_MovieSettingsDialog movieSettingsDialog( this, simulationParameters->getStepSize(), this, "movieSettingsDialog", true );
+	SIGEL_SlaveGUI::SIG_MovieSettingsDialog movieSettingsDialog( this, simulationParameters->getStepSize(), this, true );
 	movieSettingsDialog.setSettings( movieRecorder.getSettings() );
 	movieSettingsDialog.checkboxEnableMovie->setChecked( movieRecorder.isRecording() );
 

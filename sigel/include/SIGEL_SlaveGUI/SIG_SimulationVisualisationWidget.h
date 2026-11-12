@@ -57,11 +57,9 @@ namespace SIGEL_SlaveGUI
 		 * The constructor of the SIG_SimulationVisualisationWidget.
 		 *
 		 * @param parent Pointer to this widget's parent.
-		 * @param name This widget's name.
 		 * @param f The widget flag of this widget.
 		 */
 		SIG_SimulationVisualisationWidget( QWidget *parent=nullptr,
-		                                   char const *name=nullptr,
 		                                   Qt::WindowFlags f = Qt::WindowFlags() );
 
 		/**

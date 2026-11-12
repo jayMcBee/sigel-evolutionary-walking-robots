@@ -15,7 +15,7 @@ class SIG_MovieSettingsDialogBase : public QDialog, public Ui::SIG_MovieSettings
     Q_OBJECT
 
 public:
-    SIG_MovieSettingsDialogBase(QWidget* parent = nullptr, const char* name = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
+    SIG_MovieSettingsDialogBase(QWidget* parent = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
 
 public slots:
     virtual void slotToolButtonClicked() = 0;

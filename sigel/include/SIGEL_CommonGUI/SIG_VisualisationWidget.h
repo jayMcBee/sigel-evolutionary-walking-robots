@@ -61,11 +61,9 @@ namespace SIGEL_CommonGUI
 		 * setDistance apply them once there is a visualisation.
 		 *
 		 * @param parent Pointer to this widget's parent.
-		 * @param name This widget's name.
 		 * @param f The widget flag of this widget.
 		 */
 		SIG_VisualisationWidget( QWidget *parent=nullptr,
-		                         char const *name=nullptr,
 		                         Qt::WindowFlags f = Qt::WindowFlags() );
 
 		/**

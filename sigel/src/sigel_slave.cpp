@@ -131,7 +131,7 @@ int showSimulation( SIGEL_Robot::SIG_Robot const &robot,
                     SIGEL_Program::SIG_Program const &program,
                     SIG_MovieStaticRunInfo const &staticRunInfo )
 {
-	SIG_SimulationWindow simWindow(nullptr, "simWindow");
+	SIG_SimulationWindow simWindow(nullptr);
 
 	simWindow.setWindowTitle("Simulation Visualisation");
 	simWindow.setStaticRunInfo( staticRunInfo );

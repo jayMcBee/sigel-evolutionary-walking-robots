@@ -1583,7 +1583,7 @@ static int guidriveMain(int argc, char **argv)
         SIGEL_Robot::SIG_Robot robot(experiment.robot);
         robot.prepareDynaMechs();
 
-        SIGEL_SlaveGUI::SIG_SimulationWindow sim(nullptr, "simWindow");
+        SIGEL_SlaveGUI::SIG_SimulationWindow sim(nullptr);
         sim.resize(900, 750);
         sim.show();
         (void)QTest::qWaitForWindowExposed(&sim);

@@ -35,8 +35,8 @@ namespace SIGEL_SlaveGUI
 {
 
 // The movie settings for the view 'view', whose simulation advances by 'stepSize' seconds per step.
-SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize, QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
-    : SIG_MovieSettingsDialogBase( parent, name, modal, fl ),
+SIG_MovieSettingsDialog::SIG_MovieSettingsDialog( QWidget *view, double stepSize, QWidget* parent, bool modal, Qt::WindowFlags fl )
+    : SIG_MovieSettingsDialogBase( parent, modal, fl ),
       view( view ),
       stepSize( stepSize )
 {

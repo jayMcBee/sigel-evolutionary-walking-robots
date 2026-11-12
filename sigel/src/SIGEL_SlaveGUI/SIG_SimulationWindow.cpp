@@ -31,13 +31,9 @@ namespace SIGEL_SlaveGUI
 {
 
   SIG_SimulationWindow::SIG_SimulationWindow( QWidget *parent,
-					      char const *name,
 					      Qt::WindowFlags f )
     : QMainWindow( parent, f )
   {
-    if ( name )
-      setObjectName( QString::fromUtf8( name ) );
-
     this->setToolButtonStyle( Qt::ToolButtonIconOnly );
 
     // 25x25 is what these XPMs are, measured from the files.
@@ -47,7 +43,7 @@ namespace SIGEL_SlaveGUI
     // central widget, and the setStatusTip strings below never show.
     setStatusBar( new QStatusBar( this ) );
 
-    simulationWidget = new SIG_SimulationWidget(this, "simulationWidget");
+    simulationWidget = new SIG_SimulationWidget(this);
     setCentralWidget( simulationWidget );
 
     simulationControlBar = new QToolBar( this );

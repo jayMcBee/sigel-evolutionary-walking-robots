@@ -32,7 +32,6 @@ namespace SIGEL_CommonGUI
 {
 
 	SIG_VisualisationWidget::SIG_VisualisationWidget( QWidget *parent,
-	                                                  char const *name,
 	                                                  Qt::WindowFlags f )
 		: QOpenGLWidget(parent, f),
 		  visualisation(nullptr),
@@ -47,9 +46,6 @@ namespace SIGEL_CommonGUI
 		  floatingTextsSize(),
 		  showAncorPointsState(0)
 	{
-		if ( name )
-			setObjectName( QString::fromUtf8( name ) );
-
 		QSurfaceFormat surfaceFormat = format();
 		surfaceFormat.setSamples( multisamplingSamples );
 		setFormat( surfaceFormat );

@@ -65,11 +65,9 @@ namespace SIGEL_SlaveGUI
      * Creates this classes components (for exmaple SIG_SimulationWidget and toolbar).
      *
      * @param parent Pointer to this widget's parent.
-     * @param name This widget's name.
      * @param f The widget flag of this widget.
      */
     SIG_SimulationWindow( QWidget *parent,
-			  char const *name = nullptr,
 			  Qt::WindowFlags f = Qt::Window );
 
     /**
