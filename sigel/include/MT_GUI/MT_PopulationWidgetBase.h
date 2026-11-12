@@ -15,7 +15,7 @@ class MT_PopulationWidgetBase : public QWidget, public Ui::MT_PopulationWidgetBa
     Q_OBJECT
 
 public:
-    MT_PopulationWidgetBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
+    MT_PopulationWidgetBase(QWidget* parent = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 
 protected:
     // Qt does not call languageChange() itself.

@@ -1602,7 +1602,7 @@ Do you want to replace it?]
     row5  [Statistics]
 
 == METAGP PAGE 0: clicked [Strategy] ==
-  [page] index=0 class=MT_EstimationWidget objectName=[MTEstimationWidget]
+  [page] index=0 class=MT_EstimationWidget objectName=[MT_EstimationWidgetBase]
   [survey]
     group  [Comment] enabled=1 checkable=0
     group  [Evaluation] enabled=1 checkable=0
@@ -1619,7 +1619,7 @@ Do you want to replace it?]
       5 Up   clamps at current=0 [Mean error]
 
 == METAGP PAGE 1: clicked [Individual] ==
-  [page] index=1 class=MT_IndividualsWidget objectName=[MTIndividualsWidget]
+  [page] index=1 class=MT_IndividualsWidget objectName=[MT_IndividualsWidgetBase]
   [survey]
     group  [Terminal set:] enabled=1 checkable=0
     group  [Function set:] enabled=1 checkable=0
@@ -1705,7 +1705,7 @@ Do you want to replace it?]
     group  editSWT                        type[1,000] -> [1000] acceptable=1 toInt=1000(ok=1)
 
 == METAGP PAGE 2: clicked [Population] ==
-  [page] index=2 class=MT_PopulationWidget objectName=[MTPopulationWidget]
+  [page] index=2 class=MT_PopulationWidget objectName=[MT_PopulationWidgetBase]
   [survey]
     tree   individualListView                   cols=4 rows=10
       row0  | 0                     | -1                    | 0                     | 33                    | col0icon=0 col0check=0
@@ -1722,7 +1722,7 @@ Do you want to replace it?]
     (nothing on this container is in C11's scope: no spin box, slider, combo, checkbox, radio or validated field)
 
 == METAGP PAGE 3: clicked [GP Parameters] ==
-  [page] index=3 class=MT_SearchWidget objectName=[MTSearchWidget]
+  [page] index=3 class=MT_SearchWidget objectName=[MT_SearchWidgetBase]
   [survey]
     group  [Operator probability] enabled=1 checkable=0
     group  [Mutation] enabled=1 checkable=0
@@ -1755,7 +1755,7 @@ Do you want to replace it?]
     group  xOverProbEdit                  type[1,000] -> [1000] acceptable=0 toInt=1000(ok=1)
 
 == METAGP PAGE 4: clicked [Selection] ==
-  [page] index=4 class=MT_SelectionWidget objectName=[MTSelectionWidget]
+  [page] index=4 class=MT_SelectionWidget objectName=[MT_SelectionWidgetBase]
   [survey]
     group  [Pressure] enabled=1 checkable=0
     group  [Training] enabled=1 checkable=0
@@ -1782,7 +1782,7 @@ Do you want to replace it?]
       2 Up   clamps at current=0 [Simple error]
 
 == METAGP PAGE 5: clicked [Statistics] ==
-  [page] index=5 class=MT_StatisticsWidget objectName=[MTStatisticsWidget]
+  [page] index=5 class=MT_StatisticsWidget objectName=[MT_StatisticsWidgetBase]
   [survey]
     group  [Fitness] enabled=1 checkable=0
     group  [Parent pool] enabled=1 checkable=0

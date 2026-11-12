@@ -9,8 +9,8 @@
 #include <QLCDNumber>
 #include <QLayout>
 
-MT_SearchWidget::MT_SearchWidget(QWidget* parent, const char* name, Qt::WindowFlags fl)
-: MT_SearchWidgetBase(parent, name, fl), MT_WidgetBase(parent)
+MT_SearchWidget::MT_SearchWidget(QWidget* parent, Qt::WindowFlags fl)
+: MT_SearchWidgetBase(parent, fl), MT_WidgetBase(parent)
 {
     powerSpinBox = new DISpinBox( 1, GroupBox12 );
     lineProbSpinBox = new DISpinBox( 1, GroupBox12 );

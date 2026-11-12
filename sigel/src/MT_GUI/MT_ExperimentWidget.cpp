@@ -5,12 +5,9 @@
 #include <QPixmap>
 #include <stdlib.h>
 
-MT_ExperimentWidget::MT_ExperimentWidget(QWidget* parent, const char* name)
+MT_ExperimentWidget::MT_ExperimentWidget(QWidget* parent)
 	: QTreeWidget( parent )
 {
-	if ( name )
-		setObjectName( QString::fromUtf8( name ) );
-
 	// Sorting stays off. Each item goes on top of the list, so the pages show
 	// in reverse order: Strategy first, Statistics last.
 	setSortingEnabled(false);

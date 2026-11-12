@@ -1,11 +1,8 @@
 #include "MT_GUI/MT_StatisticsWidgetBase.h"
 
-MT_StatisticsWidgetBase::MT_StatisticsWidgetBase(QWidget* parent, const char* name, Qt::WindowFlags fl)
+MT_StatisticsWidgetBase::MT_StatisticsWidgetBase(QWidget* parent, Qt::WindowFlags fl)
   : QWidget( parent, fl )
 {
-  if ( name )
-    setObjectName( QString::fromUtf8( name ) );
-
   setupUi( this );
 }
 

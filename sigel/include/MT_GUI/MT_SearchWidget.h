@@ -12,7 +12,7 @@ class MT_SearchWidget : public MT_SearchWidgetBase, public MT_WidgetBase
 	Q_OBJECT
 
 public:
-	MT_SearchWidget(QWidget* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
+	MT_SearchWidget(QWidget* parent=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 
 	void onShow(MT_GPManager *manager, MT_EstimationState *estimationState) override;
 	bool onHide(MT_GPManager *manager, MT_EstimationState *estimationState) override;

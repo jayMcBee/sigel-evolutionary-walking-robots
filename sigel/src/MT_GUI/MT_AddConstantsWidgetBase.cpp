@@ -1,10 +1,8 @@
 #include "MT_GUI/MT_AddConstantsWidgetBase.h"
 
-MT_AddConstantsWidgetBase::MT_AddConstantsWidgetBase(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
+MT_AddConstantsWidgetBase::MT_AddConstantsWidgetBase(QWidget* parent, bool modal, Qt::WindowFlags fl)
   : QDialog( parent, fl )
 {
-  if ( name )
-    setObjectName( QString::fromUtf8( name ) );
   setModal( modal );
 
   setupUi( this );

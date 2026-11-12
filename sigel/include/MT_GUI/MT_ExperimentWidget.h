@@ -10,7 +10,7 @@ class MT_ExperimentWidget : public QTreeWidget
 	Q_OBJECT
 
 public:
-	MT_ExperimentWidget(QWidget* parent=nullptr, const char* name=nullptr);
+	MT_ExperimentWidget(QWidget* parent=nullptr);
 
 public slots:
 	void lastSelected();

@@ -15,7 +15,7 @@ class MT_AddConstantsWidgetBase : public QDialog, public Ui::MT_AddConstantsWidg
     Q_OBJECT
 
 public:
-    MT_AddConstantsWidgetBase(QWidget* parent = nullptr, const char* name = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
+    MT_AddConstantsWidgetBase(QWidget* parent = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
 
 protected:
     // Qt does not call languageChange() itself.

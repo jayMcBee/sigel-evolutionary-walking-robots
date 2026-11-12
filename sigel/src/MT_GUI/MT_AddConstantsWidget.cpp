@@ -103,8 +103,8 @@ namespace
 
 }
 
-MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, const char *name, bool modal, Qt::WindowFlags fl)
-	: MT_AddConstantsWidgetBase(parent, name, true, fl)
+MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, bool modal, Qt::WindowFlags fl)
+	: MT_AddConstantsWidgetBase(parent, true, fl)
 {
 	individualsWidget = parent;
 	if(individualsWidget->integer){

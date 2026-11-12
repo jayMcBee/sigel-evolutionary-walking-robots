@@ -1,11 +1,8 @@
 #include "MT_GUI/MT_IndividualWidgetBase.h"
 
-MT_IndividualsWidgetBase::MT_IndividualsWidgetBase(QWidget* parent, const char* name, Qt::WindowFlags fl)
+MT_IndividualsWidgetBase::MT_IndividualsWidgetBase(QWidget* parent, Qt::WindowFlags fl)
   : QWidget( parent, fl )
 {
-  if ( name )
-    setObjectName( QString::fromUtf8( name ) );
-
   setupUi( this );
 }
 

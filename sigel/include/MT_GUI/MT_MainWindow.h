@@ -33,7 +33,7 @@ class MT_MainWindow : public QMainWindow
 	friend class MT_Controller;
 
 public:
-	MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, MT_EstimationState *estimationState, QWidget *parent = nullptr, const char *name = nullptr );
+	MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, MT_EstimationState *estimationState, QWidget *parent = nullptr );
 	~MT_MainWindow() override;
 
 	MT_GPManager *getManager();

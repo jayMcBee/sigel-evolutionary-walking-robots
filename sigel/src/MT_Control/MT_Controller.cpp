@@ -402,7 +402,7 @@ void MT_Controller::configureSystem( QWidget *owner )
 	}
 	if( !mainWindow )
 	{
-		if( !( mainWindow = new MT_MainWindow( this, gpManager, &estimationState, owner, "MTMainWindow" ) ) )
+		if( !( mainWindow = new MT_MainWindow( this, gpManager, &estimationState, owner ) ) )
 		{
 			SIGEL_Tools::SIG_IO::cerr << "Configure meta system: couldn't open the configuration window." << Qt::endl;
 			return;

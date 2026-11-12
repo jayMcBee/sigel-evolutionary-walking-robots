@@ -8,8 +8,8 @@
 
 #include <algorithm>
 
-MT_SelectionWidget::MT_SelectionWidget(QWidget* parent, const char* name, Qt::WindowFlags fl)
-: MT_SelectionWidgetBase(parent, name, fl), MT_WidgetBase(parent)
+MT_SelectionWidget::MT_SelectionWidget(QWidget* parent, Qt::WindowFlags fl)
+: MT_SelectionWidgetBase(parent, fl), MT_WidgetBase(parent)
 {
 	lastParentSize = -1;
 

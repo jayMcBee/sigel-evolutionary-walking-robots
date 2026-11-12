@@ -7,8 +7,8 @@
 #include <QLayout>
 #include <QGroupBox>
 
-MT_EstimationWidget::MT_EstimationWidget( QWidget *parent, const char *name, Qt::WindowFlags fl )
-	: MT_EstimationWidgetBase( parent, name, fl ), MT_WidgetBase( parent )
+MT_EstimationWidget::MT_EstimationWidget( QWidget *parent, Qt::WindowFlags fl )
+	: MT_EstimationWidgetBase( parent, fl ), MT_WidgetBase( parent )
 {
 	lastIndex = 0;
 	tol0 = tol1 = 0.0;

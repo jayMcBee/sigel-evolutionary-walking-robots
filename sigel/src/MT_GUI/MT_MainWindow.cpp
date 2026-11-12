@@ -4,14 +4,9 @@
 #include "MT_GUI/MT_MainWindow.h"
 #include "MT_Control/MT_Controller.h"
 
-MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, MT_EstimationState *estimationState, QWidget *parent, const char *name )
+MT_MainWindow::MT_MainWindow( MT_Controller *controller, MT_GPManager *manager, MT_EstimationState *estimationState, QWidget *parent )
 	: QMainWindow( parent, Qt::Dialog ), gpManager( manager ), estimationState( estimationState )
 {
-	if( name )
-	{
-		setObjectName( QString::fromUtf8( name ) );
-	}
-
 	setWindowModality( Qt::ApplicationModal );
 	evolRunning = false;
 	this->controller = controller;
@@ -187,22 +182,22 @@ void MT_MainWindow::createWidgets()
 	widgetStack->setContentsMargins( 6, 6, 6, 6 );
 	widgetStack->setFrameStyle( QFrame::Box | QFrame::Sunken );
 
-	widgets[0] = estimationWidget = new MT_EstimationWidget( this, "MTEstimationWidget", Qt::WindowFlags() );
+	widgets[0] = estimationWidget = new MT_EstimationWidget( this, Qt::WindowFlags() );
 	widgetStack->insertWidget( 0, estimationWidget );
 
-	widgets[1] = individualsWidget = new MT_IndividualsWidget( this, "MTIndividualsWidget", Qt::WindowFlags() );
+	widgets[1] = individualsWidget = new MT_IndividualsWidget( this, Qt::WindowFlags() );
 	widgetStack->insertWidget( 1, individualsWidget );
 
-	widgets[2] = populationWidget = new MT_PopulationWidget( this, "MTPopulationWidget", Qt::WindowFlags() );
+	widgets[2] = populationWidget = new MT_PopulationWidget( this, Qt::WindowFlags() );
 	widgetStack->insertWidget( 2, populationWidget );
 
-	widgets[3] = searchWidget = new MT_SearchWidget( this, "MTSearchWidget", Qt::WindowFlags() );
+	widgets[3] = searchWidget = new MT_SearchWidget( this, Qt::WindowFlags() );
 	widgetStack->insertWidget( 3, searchWidget );
 
-	widgets[4] = selectionWidget = new MT_SelectionWidget( this, "MTSelectionWidget", Qt::WindowFlags() );
+	widgets[4] = selectionWidget = new MT_SelectionWidget( this, Qt::WindowFlags() );
 	widgetStack->insertWidget( 4, selectionWidget );
 
-	widgets[5] = statisticsWidget = new MT_StatisticsWidget( this, "MTStatisticsWidget", Qt::WindowFlags() );
+	widgets[5] = statisticsWidget = new MT_StatisticsWidget( this, Qt::WindowFlags() );
 	widgetStack->insertWidget( 5, statisticsWidget );
 }
 

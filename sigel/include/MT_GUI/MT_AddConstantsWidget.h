@@ -11,7 +11,7 @@ class MT_AddConstantsWidget : public MT_AddConstantsWidgetBase
 	Q_OBJECT
 
 public:
-	MT_AddConstantsWidget(MT_IndividualsWidget *parent=nullptr, const char *name=nullptr, bool modal=true, Qt::WindowFlags fl = Qt::WindowFlags() );
+	MT_AddConstantsWidget(MT_IndividualsWidget *parent=nullptr, bool modal=true, Qt::WindowFlags fl = Qt::WindowFlags() );
 
 private:
 	// uic emits only the QGroupBox, so the button group is built here; without

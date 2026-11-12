@@ -6,8 +6,8 @@
 #include <QMessageBox>
 #include <QFileDialog>
 
-MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, const char* name, Qt::WindowFlags fl)
-: MT_StatisticsWidgetBase(parent, name, fl), MT_WidgetBase(parent)
+MT_StatisticsWidget::MT_StatisticsWidget(QMainWindow* parent, Qt::WindowFlags fl)
+: MT_StatisticsWidgetBase(parent, fl), MT_WidgetBase(parent)
 {
 	soFarSigIdx = totalSim = totalEst = 0;
 	soFarMetIdx = totalMaxFit = totalAvgFit = totalVarFit = 0;

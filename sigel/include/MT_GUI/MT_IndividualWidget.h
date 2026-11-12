@@ -23,7 +23,7 @@ public:
 	bool onHide( MT_GPManager *manager, MT_EstimationState *estimationState ) override;
 	void onShow( MT_GPManager *manager, MT_EstimationState *estimationState ) override;
 
-	MT_IndividualsWidget( QWidget *parent = nullptr, const char *name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags() );
+	MT_IndividualsWidget( QWidget *parent = nullptr, Qt::WindowFlags fl = Qt::WindowFlags() );
 
 private slots:
 	void slotCreateConstants();

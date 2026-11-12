@@ -1,11 +1,8 @@
 #include "MT_GUI/MT_SearchWidgetBase.h"
 
-MT_SearchWidgetBase::MT_SearchWidgetBase(QWidget* parent, const char* name, Qt::WindowFlags fl)
+MT_SearchWidgetBase::MT_SearchWidgetBase(QWidget* parent, Qt::WindowFlags fl)
   : QWidget( parent, fl )
 {
-  if ( name )
-    setObjectName( QString::fromUtf8( name ) );
-
   setupUi( this );
 }
 

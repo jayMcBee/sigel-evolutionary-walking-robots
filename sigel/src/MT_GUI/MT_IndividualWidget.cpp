@@ -19,8 +19,8 @@
  *       general methods
  ********************************/
 
-MT_IndividualsWidget::MT_IndividualsWidget( QWidget *parent, const char *name, Qt::WindowFlags fl )
-	: MT_IndividualsWidgetBase( parent, name, fl ), MT_WidgetBase( parent )
+MT_IndividualsWidget::MT_IndividualsWidget( QWidget *parent, Qt::WindowFlags fl )
+	: MT_IndividualsWidgetBase( parent, fl ), MT_WidgetBase( parent )
 {
 	minValue = -10000.0;
 	maxValue =  10000.0;
@@ -440,7 +440,7 @@ void MT_IndividualsWidget::slotRButtonClicked( const QPoint &pos )
 
 void MT_IndividualsWidget::slotCreateConstants()
 {
-	MT_AddConstantsWidget constDialog( this, nullptr, true );
+	MT_AddConstantsWidget constDialog( this, true );
 
 	if( QDialog::Accepted == constDialog.exec() && numToCreate > 0 )
 	{

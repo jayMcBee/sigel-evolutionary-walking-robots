@@ -20,8 +20,8 @@
 #include <QAbstractButton>
 
 
-MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, const char* name, Qt::WindowFlags fl)
-	: MT_PopulationWidgetBase(parent, name, fl), MT_WidgetBase(parent)
+MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, Qt::WindowFlags fl)
+	: MT_PopulationWidgetBase(parent, fl), MT_WidgetBase(parent)
 {
 	oldPopSize = -1;
 	mainWindow = static_cast<MT_MainWindow*>(parent);
@@ -260,7 +260,7 @@ void MT_PopulationWidget::slotAddInd()
 	// opens a window in which the user can enter
 	// the number of individuals to create
 	// shows a progressbar
-	MT_AddIndividualsWidgetBase numDialog(this, nullptr, true);
+	MT_AddIndividualsWidgetBase numDialog(this, true);
 	if(QDialog::Accepted != numDialog.exec())
 		return;
 

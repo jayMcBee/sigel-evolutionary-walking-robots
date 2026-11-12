@@ -1,11 +1,8 @@
 #include "MT_GUI/MT_PopulationWidgetBase.h"
 
-MT_PopulationWidgetBase::MT_PopulationWidgetBase(QWidget* parent, const char* name, Qt::WindowFlags fl)
+MT_PopulationWidgetBase::MT_PopulationWidgetBase(QWidget* parent, Qt::WindowFlags fl)
   : QWidget( parent, fl )
 {
-  if ( name )
-    setObjectName( QString::fromUtf8( name ) );
-
   setupUi( this );
 
   // setSortingEnabled leaves the indicator descending, so the order is set here.

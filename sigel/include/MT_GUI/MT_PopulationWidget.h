@@ -21,7 +21,7 @@ class MT_PopulationWidget : public MT_PopulationWidgetBase, public MT_WidgetBase
 public:
 	bool onHide(MT_GPManager *manager, MT_EstimationState *estimationState) override;
 	void onShow(MT_GPManager *manager, MT_EstimationState *estimationState) override;
-	MT_PopulationWidget(QMainWindow* parent=nullptr, const char* name=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
+	MT_PopulationWidget(QMainWindow* parent=nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 
 private:
 	int oldPopSize;

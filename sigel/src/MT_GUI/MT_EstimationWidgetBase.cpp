@@ -1,11 +1,8 @@
 #include "MT_GUI/MT_EstimationWidgetBase.h"
 
-MT_EstimationWidgetBase::MT_EstimationWidgetBase(QWidget* parent, const char* name, Qt::WindowFlags fl)
+MT_EstimationWidgetBase::MT_EstimationWidgetBase(QWidget* parent, Qt::WindowFlags fl)
   : QWidget( parent, fl )
 {
-  if ( name )
-    setObjectName( QString::fromUtf8( name ) );
-
   setupUi( this );
 }
 

@@ -15,7 +15,7 @@ class MT_SelectionWidgetBase : public QWidget, public Ui::MT_SelectionWidgetBase
     Q_OBJECT
 
 public:
-    MT_SelectionWidgetBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
+    MT_SelectionWidgetBase(QWidget* parent = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 
 protected:
     // Qt does not call languageChange() itself.
