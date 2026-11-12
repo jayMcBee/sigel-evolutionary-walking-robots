@@ -34,8 +34,8 @@
 namespace SIGEL_MasterGUI
 {
 
-SIG_SimulationParameter::SIG_SimulationParameter( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment )
-  : SIG_SimulationParameterBase( parent, name, fl ), theExperiment( theExperiment )
+SIG_SimulationParameter::SIG_SimulationParameter( QWidget* parent, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment )
+  : SIG_SimulationParameterBase( parent, fl ), theExperiment( theExperiment )
 {
   lineeditStepSize->setValidator( new QDoubleValidator( lineeditStepSize ) );
   lineeditJointlimitsSpringConstant->setValidator( new QDoubleValidator( lineeditJointlimitsSpringConstant ) );

@@ -40,11 +40,11 @@ namespace SIGEL_MasterGUI
 {
 
 /*
- *  Constructs a SIG_Environment which is a child of 'parent', with the
- *  name 'name' and widget flags set to 'f'
+ *  Constructs a SIG_Environment which is a child of 'parent', with
+ *  widget flags set to 'f'
  */
-SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment )
-	: SIG_EnvironmentBase( parent, name, fl ), theExperiment( theExperiment )
+SIG_EnvironmentView::SIG_EnvironmentView( QWidget* parent, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment )
+	: SIG_EnvironmentBase( parent, fl ), theExperiment( theExperiment )
 {
 	// gravity validators
 	lineeditGravityX->setValidator( new QDoubleValidator( lineeditGravityX ) );

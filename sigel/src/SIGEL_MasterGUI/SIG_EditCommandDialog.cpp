@@ -47,20 +47,18 @@ namespace SIGEL_MasterGUI
 {
 
 /* 
- *  Constructs a SIG_EditCommandDialog which is a child of 'parent', with the 
- *  name 'name' and widget flags set to 'f' 
+ *  Constructs a SIG_EditCommandDialog which is a child of 'parent', with
+ *  widget flags set to 'f'
  *
  *  The dialog will by default be modeless, unless you set 'modal' to
  *  true to construct a modal dialog.
  */
-SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
+SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent, bool modal, Qt::WindowFlags fl )
     : QDialog( parent, fl )
 {
-    setObjectName( QString::fromUtf8( name ) );
     setModal( modal );
 
-    if ( !name )
-	setObjectName( "SIG_EditCommandDialog" );
+    setObjectName( "SIG_EditCommandDialog" );
     setMinimumWidth( 400 );
     setWindowTitle( tr( "Edit Command" ) );
     SIG_EditCommandDialogLayout = new QVBoxLayout( this ); 

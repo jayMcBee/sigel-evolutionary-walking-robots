@@ -42,20 +42,18 @@ namespace SIGEL_MasterGUI
 {
 
 /* 
- *  Constructs a SIG_RenameDialog which is a child of 'parent', with the 
- *  name 'name' and widget flags set to 'f' 
+ *  Constructs a SIG_RenameDialog which is a child of 'parent', with
+ *  widget flags set to 'f'
  *
  *  The dialog will by default be modeless, unless you set 'modal' to
  *  true to construct a modal dialog.
  */
-SIG_RenameDialog::SIG_RenameDialog( QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
+SIG_RenameDialog::SIG_RenameDialog( QWidget* parent, bool modal, Qt::WindowFlags fl )
     : QDialog( parent, fl )
 {
-    setObjectName( QString::fromUtf8( name ) );
     setModal( modal );
 
-    if ( !name )
-	setObjectName( "SIG_RenameDialog" );
+    setObjectName( "SIG_RenameDialog" );
     resize( 400, 95 ); 
     setWindowTitle( tr( "Rename" ) );
     SIG_RenameDialogLayout = new QVBoxLayout( this ); 

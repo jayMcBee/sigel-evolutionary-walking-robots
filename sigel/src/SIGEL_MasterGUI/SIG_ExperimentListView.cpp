@@ -37,7 +37,7 @@
 namespace SIGEL_MasterGUI
 {
 
-  SIG_ExperimentListView::SIG_ExperimentListView( QWidget * parent, const char * name, QStackedWidget *theWidgetStack ) : QTreeWidget( parent ), widgetStack( theWidgetStack ), numberOfExperiments(1)
+  SIG_ExperimentListView::SIG_ExperimentListView( QWidget * parent, QStackedWidget *theWidgetStack ) : QTreeWidget( parent ), widgetStack( theWidgetStack ), numberOfExperiments(1)
 {
   setHeaderLabels( QStringList( "Experiments" ) );
   setContextMenuPolicy( Qt::CustomContextMenu );
@@ -85,7 +85,7 @@ void SIG_ExperimentListView::slotRenameExperiment()
   SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
   if( theExperiment )
     {
-      SIG_RenameDialog renameDialog( this, nullptr, true );
+      SIG_RenameDialog renameDialog( this, true );
       QString oldName = currentlySelectedExperimentName();
       renameDialog.setWindowTitle( "Rename " + oldName );
       renameDialog.lineeditNewName->setText( oldName );

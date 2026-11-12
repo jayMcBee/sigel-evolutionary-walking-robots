@@ -4,16 +4,13 @@
 #include <QTreeWidget>
 
 /*
- *  Constructs a SIG_GPParameterBase which is a child of 'parent', with the
- *  name 'name' and widget flags set to 'f'
+ *  Constructs a SIG_GPParameterBase which is a child of 'parent', with
+ *  widget flags set to 'f'
  */
-SIG_GPParameterBase::SIG_GPParameterBase( QWidget *parent, const char *name,
+SIG_GPParameterBase::SIG_GPParameterBase( QWidget *parent,
                                           Qt::WindowFlags fl )
   : QWidget( parent, fl )
 {
-  if ( name )
-    setObjectName( QString::fromUtf8( name ) );
-
   setupUi( this );
 
   // setSortingEnabled leaves the indicator descending, so the order is set here.

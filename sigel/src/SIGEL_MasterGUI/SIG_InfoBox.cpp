@@ -33,10 +33,9 @@
 namespace SIGEL_MasterGUI
 {
 
-SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::WindowFlags f )
+SIG_InfoBox::SIG_InfoBox( QWidget *parent, bool modal, Qt::WindowFlags f )
   : QDialog( parent, f )
 {
-    setObjectName( QString::fromUtf8( name ) );
     setModal( modal );
 
   QString sigelRoot( std::getenv( "SIGEL_ROOT" ) );
@@ -53,7 +52,7 @@ SIG_InfoBox::SIG_InfoBox( QWidget *parent, const char *name, bool modal, Qt::Win
 
   QVBoxLayout *vL = new QVBoxLayout();
   hL->addLayout( vL );
-  SIG_TextView *theView = new SIG_TextView( this, nullptr );
+  SIG_TextView *theView = new SIG_TextView( this );
   theView->setVerticalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
   theView->setText(QString("<h3>SIGEL v%1</h3>").arg( SIGEL_Tools::SIG_Version::number ) +
 		   "<h3>SIGEL 1.0 (2001) by PG 368:</h3>"

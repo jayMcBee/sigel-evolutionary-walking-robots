@@ -45,7 +45,7 @@ public:
     /**
      * The constructor.
      */
-    SIG_RobotView( QWidget* paren, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment );
+    SIG_RobotView( QWidget* paren, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment );
 
     void putIntoExperiment();
     

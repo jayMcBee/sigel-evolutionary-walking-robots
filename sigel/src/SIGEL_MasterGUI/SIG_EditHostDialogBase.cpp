@@ -1,10 +1,8 @@
 #include "SIGEL_MasterGUI/SIG_EditHostDialogBase.h"
 
-SIG_EditHostDialogBase::SIG_EditHostDialogBase(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
+SIG_EditHostDialogBase::SIG_EditHostDialogBase(QWidget* parent, bool modal, Qt::WindowFlags fl)
   : QDialog( parent, fl )
 {
-  if ( name )
-    setObjectName( QString::fromUtf8( name ) );
   setModal( modal );
 
   setupUi( this );

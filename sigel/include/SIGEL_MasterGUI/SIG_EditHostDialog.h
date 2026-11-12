@@ -39,7 +39,7 @@ public:
     /**
      * Constructor.
      */
-    SIG_EditHostDialog( QWidget* parent = nullptr, const char* name = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
+    SIG_EditHostDialog( QWidget* parent = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
 
     /**
      * This slot is used to popup a file dialog whenever a user clicks

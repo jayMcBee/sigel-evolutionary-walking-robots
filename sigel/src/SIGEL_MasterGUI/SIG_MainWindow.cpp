@@ -38,10 +38,8 @@
 namespace SIGEL_MasterGUI
 {
 
-SIG_MainWindow::SIG_MainWindow( QWidget *parent, const char *name, Qt::WindowFlags f ) : QMainWindow( parent, f )
+SIG_MainWindow::SIG_MainWindow( QWidget *parent, Qt::WindowFlags f ) : QMainWindow( parent, f )
 {
-	setObjectName( QString::fromUtf8( name ) );
-
 	// A toolbar has one icon size. 25 is the largest of the small pixmaps,
 	// so no pixmap is drawn larger than its own size.
 	setIconSize( QSize( 25, 25 ) );
@@ -738,7 +736,7 @@ void SIG_MainWindow::createWidgets( const QString &sigelRoot )
 	widgetStack->setContentsMargins( 6, 6, 6, 6 );
 	widgetStack->setFrameStyle( QFrame::Box | QFrame::Sunken );
 
-	experimentListView = new SIGEL_MasterGUI::SIG_ExperimentListView( splitter, "ExperimentListView", widgetStack );
+	experimentListView = new SIGEL_MasterGUI::SIG_ExperimentListView( splitter, widgetStack );
 
 	splitter->insertWidget( 0, experimentListView );
 	splitter->setOpaqueResize();
@@ -766,7 +764,7 @@ void SIG_MainWindow::createWidgets( const QString &sigelRoot )
 
 void SIG_MainWindow::slotAbout()
 {
-	SIG_InfoBox theInfoBox( this, "InfoBox", true );
+	SIG_InfoBox theInfoBox( this, true );
 	theInfoBox.resize( 600, -1 );
 	theInfoBox.exec();
 }

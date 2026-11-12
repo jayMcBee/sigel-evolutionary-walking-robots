@@ -49,11 +49,11 @@ namespace SIGEL_MasterGUI
 {
 
 /*
- *  Constructs a SIG_GPParameter which is a child of 'parent', with the
- *  name 'name' and widget flags set to 'f'
+ *  Constructs a SIG_GPParameter which is a child of 'parent', with
+ *  widget flags set to 'f'
  */
-SIG_GPParameter::SIG_GPParameter( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment )
-	: SIG_GPParameterBase( parent, name, fl ), theExperiment( theExperiment ), sigelRoot( std::getenv( "SIGEL_ROOT" ) )
+SIG_GPParameter::SIG_GPParameter( QWidget* parent, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment )
+	: SIG_GPParameterBase( parent, fl ), theExperiment( theExperiment ), sigelRoot( std::getenv( "SIGEL_ROOT" ) )
 {
 	for ( const SIGEL_GP::SIG_GPFitnessFunction *fitnessFunction : SIGEL_GP::SIG_GPFitnessFunctionRegistry::fitnessFunctions() )
 		fitnessFunctionList->addItem( fitnessFunction->name() );
@@ -407,7 +407,7 @@ void SIG_GPParameter::getOutOfExperiment()
 void SIG_GPParameter::slotAddHost()
 {
 	// create an show the dialog
-	SIG_EditHostDialog editDialog( this, "editDialogAddHosts", true, Qt::WindowFlags() );
+	SIG_EditHostDialog editDialog( this, true, Qt::WindowFlags() );
 	editDialog.checkboxEnableHost->setChecked( true );
 	editDialog.lineeditHostName->setFocus();
 	editDialog.lineeditSlaveDirectory->setText( QDir::currentPath() );
@@ -579,7 +579,7 @@ void SIG_GPParameter::slotItemDoubleClicked( QTreeWidgetItem * theItem )
 		}
 	}
 
-	SIG_EditHostDialog editDialog( this, "editDialogEditHosts", true, Qt::WindowFlags() );
+	SIG_EditHostDialog editDialog( this, true, Qt::WindowFlags() );
 	if( numberOfSelectedHosts == 1 )
 	{
 		editDialog.lineeditHostName->setText( theHost->name );

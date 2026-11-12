@@ -1,11 +1,8 @@
 #include "SIGEL_MasterGUI/SIG_IndividualViewBase.h"
 
-SIG_IndividualViewBase::SIG_IndividualViewBase(QWidget* parent, const char* name, Qt::WindowFlags fl)
+SIG_IndividualViewBase::SIG_IndividualViewBase(QWidget* parent, Qt::WindowFlags fl)
   : QWidget( parent, fl )
 {
-  if ( name )
-    setObjectName( QString::fromUtf8( name ) );
-
   setupUi( this );
 }
 

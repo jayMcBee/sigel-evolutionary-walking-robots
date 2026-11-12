@@ -47,10 +47,9 @@ public:
      *
      * Receives the SIG_GPMetaGPExperiment it belongs to.
      * @param parent The parent widget of SIG_AllIndividualsView
-     * @param name Internal name for Qt.
      * @param theExperiment A reference to the experiment this view belongs to.
      */
-    SIG_SimulationParameter( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment );
+    SIG_SimulationParameter( QWidget* parent, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment );
 
  public slots:
       /**

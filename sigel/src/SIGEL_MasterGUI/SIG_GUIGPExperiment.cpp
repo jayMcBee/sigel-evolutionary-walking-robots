@@ -45,13 +45,13 @@ namespace SIGEL_MasterGUI
 {
   createMenus();
 
-  gpParameter = new SIG_GPParameter( this , "GPParameter", Qt::WindowFlags(), gpExperiment );
-  simulationParameter = new SIG_SimulationParameter( this, "SimulationParameter", Qt::WindowFlags(), gpExperiment);
-  environmentView = new SIG_EnvironmentView( this, "EnvironmentView", Qt::WindowFlags(), gpExperiment );
-  robotView = new SIG_RobotView( this, "RobotView", Qt::WindowFlags(), gpExperiment );
-  experimentView = new SIG_ExperimentView( this, "ExperimentView", Qt::WindowFlags(), gpExperiment, *this );
+  gpParameter = new SIG_GPParameter( this , Qt::WindowFlags(), gpExperiment );
+  simulationParameter = new SIG_SimulationParameter( this, Qt::WindowFlags(), gpExperiment);
+  environmentView = new SIG_EnvironmentView( this, Qt::WindowFlags(), gpExperiment );
+  robotView = new SIG_RobotView( this, Qt::WindowFlags(), gpExperiment );
+  experimentView = new SIG_ExperimentView( this, Qt::WindowFlags(), gpExperiment, *this );
   allIndividualsView = new SIG_AllIndividualsView( this, gpExperiment, *this );
-  languageParameters = new SIG_LanguageParameters( this, "LanguageParametersView", Qt::WindowFlags(), gpExperiment );
+  languageParameters = new SIG_LanguageParameters( this, Qt::WindowFlags(), gpExperiment );
   
   // put all the widgets on the stack
   widgetStack->addWidget( gpParameter );

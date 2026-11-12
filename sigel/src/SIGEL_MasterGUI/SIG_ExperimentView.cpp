@@ -39,11 +39,11 @@ namespace SIGEL_MasterGUI
 {
 
 /* 
- *  Constructs a SIG_ExperimentView which is a child of 'parent', with the 
- *  name 'name' and widget flags set to 'f' 
+ *  Constructs a SIG_ExperimentView which is a child of 'parent', with
+ *  widget flags set to 'f'
  */
-SIG_ExperimentView::SIG_ExperimentView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment )
-  : SIG_ExperimentViewBase( parent, name, fl ), theExperiment( theExperiment ), guiExperiment( guiExperiment )
+SIG_ExperimentView::SIG_ExperimentView( QWidget* parent, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment, SIG_GUIGPExperiment &guiExperiment )
+  : SIG_ExperimentViewBase( parent, fl ), theExperiment( theExperiment ), guiExperiment( guiExperiment )
 {
 }
 

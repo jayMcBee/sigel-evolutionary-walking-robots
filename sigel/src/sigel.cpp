@@ -148,7 +148,7 @@ int main( int argc, char *argv[] ) {
     QApplication app( argc, argv );
     app.setStyle( QStyleFactory::create( "Fusion" ) );
 
-    SIGEL_MasterGUI::SIG_MainWindow *mainWindow = new SIGEL_MasterGUI::SIG_MainWindow( nullptr , "MainWindow" );
+    SIGEL_MasterGUI::SIG_MainWindow *mainWindow = new SIGEL_MasterGUI::SIG_MainWindow( nullptr );
     mainWindow->show();
 
     int result = app.exec();

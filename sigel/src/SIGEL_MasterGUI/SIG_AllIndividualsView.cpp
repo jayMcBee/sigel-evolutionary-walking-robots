@@ -59,10 +59,10 @@ namespace SIGEL_MasterGUI
 		setOpaqueResize( true );
 
 		// create the upper part of the splitter (the individual list)
-		individualList = new SIG_IndividualList( this, "IndividualListAndButtons" );
+		individualList = new SIG_IndividualList( this );
 
 		// create the lower part of the splitter (the individual view)
-		individualView = new SIG_IndividualView( this, "IndividualView" );
+		individualView = new SIG_IndividualView( this );
 
 		// create the menu which pops up if one clicks on an individual
 		individualMenu = new QMenu( this );
@@ -148,7 +148,7 @@ namespace SIGEL_MasterGUI
 
 	void SIG_AllIndividualsView::slotAddIndividuals()
 	{
-		SIG_AddIndividualsDialog addDialog( this, "Add Individual Dialog", true );
+		SIG_AddIndividualsDialog addDialog( this, true );
 		addDialog.spinboxNumber->setFocus();
 
 		// The value must stay unselected, or a typed 2 replaces the 1.
@@ -270,7 +270,7 @@ namespace SIGEL_MasterGUI
 
 		SIG_IndividualListItem *individualListItem = static_cast< SIG_IndividualListItem * >( theItem );
 		SIGEL_GP::SIG_GPIndividual *theGPIndividual = &theExperiment.population.getIndividual( individualListItem->poolPosition );
-		SIG_IndividualView *theView = new SIG_IndividualView( nullptr, "IndividualViewDoubleClicked", Qt::WindowFlags(), theGPIndividual );
+		SIG_IndividualView *theView = new SIG_IndividualView( nullptr, Qt::WindowFlags(), theGPIndividual );
 
 		// No parent owns this window, so it deletes itself when closed.
 		theView->setAttribute( Qt::WA_DeleteOnClose );

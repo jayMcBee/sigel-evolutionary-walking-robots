@@ -50,7 +50,7 @@ class SIG_RenameDialog : public QDialog
     Q_OBJECT
 
 public:
-    SIG_RenameDialog( QWidget* parent = nullptr, const char* name = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
+    SIG_RenameDialog( QWidget* parent = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
 
     QLabel* textlabelNewName;
     QLineEdit* lineeditNewName;

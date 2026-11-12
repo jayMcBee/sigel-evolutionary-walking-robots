@@ -31,7 +31,7 @@ namespace SIGEL_MasterGUI
 class SIG_InfoBox : public QDialog
 {
  public:
-  SIG_InfoBox( QWidget *parent = nullptr, const char *name = nullptr, bool modal = false, Qt::WindowFlags f = Qt::WindowFlags() );
+  SIG_InfoBox( QWidget *parent = nullptr, bool modal = false, Qt::WindowFlags f = Qt::WindowFlags() );
 };
 
 }

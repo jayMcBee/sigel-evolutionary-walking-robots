@@ -1,11 +1,8 @@
 #include "SIGEL_MasterGUI/SIG_EnvironmentBase.h"
 
-SIG_EnvironmentBase::SIG_EnvironmentBase(QWidget* parent, const char* name, Qt::WindowFlags fl)
+SIG_EnvironmentBase::SIG_EnvironmentBase(QWidget* parent, Qt::WindowFlags fl)
   : QWidget( parent, fl )
 {
-  if ( name )
-    setObjectName( QString::fromUtf8( name ) );
-
   setupUi( this );
 }
 

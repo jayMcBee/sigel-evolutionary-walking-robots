@@ -15,7 +15,7 @@ class SIG_RobotBase : public QWidget, public Ui::SIG_RobotBase
     Q_OBJECT
 
 public:
-    SIG_RobotBase(QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
+    SIG_RobotBase(QWidget* parent = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
 
 protected:
     // Qt does not call languageChange() itself.

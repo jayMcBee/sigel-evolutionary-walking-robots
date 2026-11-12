@@ -27,10 +27,9 @@
 namespace SIGEL_MasterGUI
 {
 
-SIG_TextView::SIG_TextView( QWidget *parent, const char *name )
+SIG_TextView::SIG_TextView( QWidget *parent )
   : QTextBrowser( parent ), oldY(0), scrollDown( true ), scroll( true )
 {
-  setObjectName( QString::fromUtf8( name ) );
   QTimer *scrollTimer = new QTimer( this );
   connect( scrollTimer,
 	   SIGNAL( timeout() ),

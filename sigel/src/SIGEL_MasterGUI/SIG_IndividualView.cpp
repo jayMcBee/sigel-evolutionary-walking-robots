@@ -30,16 +30,16 @@ namespace SIGEL_MasterGUI
 {
 
 /* 
- *  Constructs a SIG_IndividualView which is a child of 'parent', with the 
- *  name 'name' and widget flags set to 'f' 
+ *  Constructs a SIG_IndividualView which is a child of 'parent', with
+ *  widget flags set to 'f'
  */
-SIG_IndividualView::SIG_IndividualView( QWidget* parent,  const char* name, Qt::WindowFlags fl )
-    : SIG_IndividualViewBase( parent, name, fl )
+SIG_IndividualView::SIG_IndividualView( QWidget* parent, Qt::WindowFlags fl )
+    : SIG_IndividualViewBase( parent, fl )
 {
 }
 
-SIG_IndividualView::SIG_IndividualView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPIndividual *theGPIndividual )
-    : SIG_IndividualViewBase( parent, name, fl )
+SIG_IndividualView::SIG_IndividualView( QWidget* parent, Qt::WindowFlags fl, SIGEL_GP::SIG_GPIndividual *theGPIndividual )
+    : SIG_IndividualViewBase( parent, fl )
 {
   textlabelShowName->setText( theGPIndividual->getName() );
   QString age = QString::number( theGPIndividual->getAge() );

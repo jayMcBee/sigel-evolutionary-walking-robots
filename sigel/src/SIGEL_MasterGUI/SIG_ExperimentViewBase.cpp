@@ -1,11 +1,8 @@
 #include "SIGEL_MasterGUI/SIG_ExperimentViewBase.h"
 
-SIG_ExperimentViewBase::SIG_ExperimentViewBase(QWidget* parent, const char* name, Qt::WindowFlags fl)
+SIG_ExperimentViewBase::SIG_ExperimentViewBase(QWidget* parent, Qt::WindowFlags fl)
   : QWidget( parent, fl )
 {
-  if ( name )
-    setObjectName( QString::fromUtf8( name ) );
-
   setupUi( this );
 }
 

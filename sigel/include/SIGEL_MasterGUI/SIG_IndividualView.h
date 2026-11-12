@@ -49,9 +49,8 @@ public:
      *
      * @param parent The parent widget of this individual view. If 0 the individual
      * view will get its own window.
-     * @param name The internal name used by Qt.
      */
-    SIG_IndividualView( QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags() );
+    SIG_IndividualView( QWidget* parent = nullptr, Qt::WindowFlags fl = Qt::WindowFlags() );
 
     /**
      * The constructor with a supplied individual.
@@ -61,10 +60,9 @@ public:
      * individual list).
      * @param parent The parent widget of this individual view. If 0 the individual
      * view will get its own window.
-     * @param name The internal name used by Qt.
      * @param theGPIndividual The individual that shall be displayed.
      */
-    SIG_IndividualView( QWidget* parent, const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPIndividual *theGPIndividual );
+    SIG_IndividualView( QWidget* parent, Qt::WindowFlags fl, SIGEL_GP::SIG_GPIndividual *theGPIndividual );
 
     /**
      * This method clear the individual view.

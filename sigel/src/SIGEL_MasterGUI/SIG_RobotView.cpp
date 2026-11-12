@@ -37,11 +37,11 @@ namespace SIGEL_MasterGUI
 {
 
 /* 
- *  Constructs a SIG_Robot which is a child of 'parent', with the
- *  name 'name' and widget flags set to 'f' 
+ *  Constructs a SIG_Robot which is a child of 'parent', with
+ *  widget flags set to 'f'
  */
-SIG_RobotView::SIG_RobotView( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment )
-  : SIG_RobotBase( parent, name, fl ), theExperiment( theExperiment )
+SIG_RobotView::SIG_RobotView( QWidget* parent, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment )
+  : SIG_RobotBase( parent, fl ), theExperiment( theExperiment )
 {
   // The names take the room that the three number columns leave.
   listviewLinks->header()->setStretchLastSection( false );

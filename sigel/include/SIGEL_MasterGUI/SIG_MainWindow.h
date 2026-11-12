@@ -55,9 +55,8 @@ public:
 	 * the SIG_ExperimentListView on one side and the QStackedWidget on the other side.
 	 * @param parent The parent widget of SIG_MainWindow. If 0 (the normal case) the widget will
 	 * get its own window.
-	 * @param name Internal widget name for Qt.
 	 */
-	SIG_MainWindow( QWidget *parent = nullptr, const char *name = nullptr, Qt::WindowFlags f = Qt::Window );
+	SIG_MainWindow( QWidget *parent = nullptr, Qt::WindowFlags f = Qt::Window );
 
 public slots:
 	/** Enables or disables every action that requires an experiment. */

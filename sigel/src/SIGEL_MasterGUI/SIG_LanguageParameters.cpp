@@ -42,11 +42,11 @@ namespace SIGEL_MasterGUI
 {
 
 /* 
- *  Constructs a SIG_LanguageParameters which is a child of 'parent', with the 
- *  name 'name' and widget flags set to 'f' 
+ *  Constructs a SIG_LanguageParameters which is a child of 'parent', with
+ *  widget flags set to 'f'
  */
-SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent,  const char* name, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment )
-  : SIG_LanguageParametersBase( parent, name, fl ), theExperiment( theExperiment ), sigelRoot( std::getenv( "SIGEL_ROOT" ) )
+SIG_LanguageParameters::SIG_LanguageParameters( QWidget* parent, Qt::WindowFlags fl, SIGEL_GP::SIG_GPMetaGPExperiment &theExperiment )
+  : SIG_LanguageParametersBase( parent, fl ), theExperiment( theExperiment ), sigelRoot( std::getenv( "SIGEL_ROOT" ) )
 {
   createWidgets();
 
@@ -164,7 +164,7 @@ void SIG_LanguageParameters::slotCommandDoubleClicked( QTreeWidgetItem *theItem 
 	}
       
       QString command = theItem->text( 1 ); // HAS TO BE IN THE true-BRANCH OF IF!!!
-      SIG_EditCommandDialog editCommandDialog( this, "EditCommandDialog", true );
+      SIG_EditCommandDialog editCommandDialog( this, true );
       if( numberOfSelectedCommands == 1 )
 	{
 	  editCommandDialog.textlabelCommand->setText( "Command: <b>" + command + "</b>" );

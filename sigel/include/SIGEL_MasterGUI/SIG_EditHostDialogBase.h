@@ -15,7 +15,7 @@ class SIG_EditHostDialogBase : public QDialog, public Ui::SIG_EditHostDialogBase
     Q_OBJECT
 
 public:
-    SIG_EditHostDialogBase(QWidget* parent = nullptr, const char* name = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
+    SIG_EditHostDialogBase(QWidget* parent = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
 
 public slots:
     virtual void slotToolbuttonSlaveDirectoryClicked() = 0;

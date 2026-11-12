@@ -17,7 +17,7 @@ class SIG_GPParameterBase : public QWidget, public Ui::SIG_GPParameterBase
     Q_OBJECT
 
 public:
-    SIG_GPParameterBase( QWidget *parent = nullptr, const char *name = nullptr,
+    SIG_GPParameterBase( QWidget *parent = nullptr,
                          Qt::WindowFlags fl = Qt::WindowFlags() );
 
 public slots:

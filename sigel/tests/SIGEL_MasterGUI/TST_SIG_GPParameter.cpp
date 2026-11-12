@@ -50,7 +50,7 @@ void SIGEL_MasterGUI::TST_SIG_GPParameter::cleanupTestCase()
 void SIGEL_MasterGUI::TST_SIG_GPParameter::maximumLengthCannotBeSetBelowTheMinimumLength()
 {
 	SIGEL_GP::SIG_GPMetaGPExperiment experiment;
-	SIG_GPParameter page( nullptr, "gpParameter", Qt::WindowFlags(), experiment );
+	SIG_GPParameter page( nullptr, Qt::WindowFlags(), experiment );
 	page.spinboxMinIndLength->setValue( 50 );
 
 	page.spinboxMaxIndLength->setValue( 20 );
@@ -61,7 +61,7 @@ void SIGEL_MasterGUI::TST_SIG_GPParameter::maximumLengthCannotBeSetBelowTheMinim
 void SIGEL_MasterGUI::TST_SIG_GPParameter::minimumLengthAboveTheMaximumLengthRaisesTheMaximumLength()
 {
 	SIGEL_GP::SIG_GPMetaGPExperiment experiment;
-	SIG_GPParameter page( nullptr, "gpParameter", Qt::WindowFlags(), experiment );
+	SIG_GPParameter page( nullptr, Qt::WindowFlags(), experiment );
 	page.spinboxMinIndLength->setValue( 10 );
 	page.spinboxMaxIndLength->setValue( 30 );
 

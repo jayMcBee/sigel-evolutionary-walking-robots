@@ -1,11 +1,8 @@
 #include "SIGEL_MasterGUI/SIG_LanguageParametersBase.h"
 
-SIG_LanguageParametersBase::SIG_LanguageParametersBase(QWidget* parent, const char* name, Qt::WindowFlags fl)
+SIG_LanguageParametersBase::SIG_LanguageParametersBase(QWidget* parent, Qt::WindowFlags fl)
   : QWidget( parent, fl )
 {
-  if ( name )
-    setObjectName( QString::fromUtf8( name ) );
-
   setupUi( this );
 
   // setSortingEnabled leaves the indicator descending, so the order is set here.

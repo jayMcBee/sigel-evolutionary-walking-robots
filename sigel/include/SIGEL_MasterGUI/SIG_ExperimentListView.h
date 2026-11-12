@@ -49,10 +49,9 @@ class SIG_ExperimentListView : public QTreeWidget
    *
    * @param parent The parent widget. If 0 the widget gets
    * its own window.
-   * @param name The internal name of the widget.
    * @param theWidgetStack The widget stack in the main window.
    */
-  SIG_ExperimentListView( QWidget * parent, const char * name, QStackedWidget *theWidgetStack );
+  SIG_ExperimentListView( QWidget * parent, QStackedWidget *theWidgetStack );
 
   /**
    * The destructor of the SIG_ExperimentListView.

@@ -50,7 +50,7 @@ class SIG_AddIndividualsDialog : public QDialog
     Q_OBJECT
 
 public:
-    SIG_AddIndividualsDialog( QWidget* parent = nullptr, const char* name = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
+    SIG_AddIndividualsDialog( QWidget* parent = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
 
     QLabel* textlabelNumber;
     QSpinBox* spinboxNumber;

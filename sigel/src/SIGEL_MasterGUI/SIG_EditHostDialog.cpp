@@ -28,14 +28,14 @@ namespace SIGEL_MasterGUI
 {
 
 /* 
- *  Constructs a SIG_EditHostDialog which is a child of 'parent', with the 
- *  name 'name' and widget flags set to 'f' 
+ *  Constructs a SIG_EditHostDialog which is a child of 'parent', with
+ *  widget flags set to 'f'
  *
  *  The dialog will by default be modeless, unless you set 'modal' to
  *  true to construct a modal dialog.
  */
-SIG_EditHostDialog::SIG_EditHostDialog( QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
-    : SIG_EditHostDialogBase( parent, name, modal, fl )
+SIG_EditHostDialog::SIG_EditHostDialog( QWidget* parent, bool modal, Qt::WindowFlags fl )
+    : SIG_EditHostDialogBase( parent, modal, fl )
 {
   // A note, not a field label: drawn in the theme's secondary text colour.
   textlabelProcessesHint->setForegroundRole( QPalette::PlaceholderText );

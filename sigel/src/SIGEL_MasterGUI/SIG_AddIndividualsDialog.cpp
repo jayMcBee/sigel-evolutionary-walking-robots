@@ -42,20 +42,18 @@ namespace SIGEL_MasterGUI
 {
 
 /* 
- *  Constructs a SIG_AddIndividualsDialogBase which is a child of 'parent', with the 
- *  name 'name' and widget flags set to 'f' 
+ *  Constructs a SIG_AddIndividualsDialogBase which is a child of 'parent', with
+ *  widget flags set to 'f'
  *
  *  The dialog will by default be modeless, unless you set 'modal' to
  *  true to construct a modal dialog.
  */
-SIG_AddIndividualsDialog::SIG_AddIndividualsDialog( QWidget* parent,  const char* name, bool modal, Qt::WindowFlags fl )
+SIG_AddIndividualsDialog::SIG_AddIndividualsDialog( QWidget* parent, bool modal, Qt::WindowFlags fl )
     : QDialog( parent, fl )
 {
-    setObjectName( QString::fromUtf8( name ) );
     setModal( modal );
 
-    if ( !name )
-	setObjectName( "SIG_AddIndividualsDialogBase" );
+    setObjectName( "SIG_AddIndividualsDialogBase" );
     resize( 300, 95 ); 
     setSizePolicy( QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum ) );
     setWindowTitle( tr( "Add Individuals" ) );

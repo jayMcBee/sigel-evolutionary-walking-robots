@@ -1,11 +1,8 @@
 #include "SIGEL_MasterGUI/SIG_RobotBase.h"
 
-SIG_RobotBase::SIG_RobotBase(QWidget* parent, const char* name, Qt::WindowFlags fl)
+SIG_RobotBase::SIG_RobotBase(QWidget* parent, Qt::WindowFlags fl)
   : QWidget( parent, fl )
 {
-  if ( name )
-    setObjectName( QString::fromUtf8( name ) );
-
   setupUi( this );
 }
 

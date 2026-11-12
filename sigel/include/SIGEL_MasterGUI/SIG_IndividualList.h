@@ -47,9 +47,8 @@ class SIG_IndividualList : public SIG_IndividualListBase
    *
    * @param parent The parent widget og SIG_IndividualList. If 0 the
    * widget will get its own window.
-   * @param name Internal name for Qt.
    */
-  SIG_IndividualList( QWidget* parent = nullptr, const char* name = nullptr, Qt::WindowFlags fl = Qt::WindowFlags() );
+  SIG_IndividualList( QWidget* parent = nullptr, Qt::WindowFlags fl = Qt::WindowFlags() );
 };
 
 }

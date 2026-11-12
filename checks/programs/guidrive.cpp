@@ -1520,7 +1520,7 @@ static int guidriveMain(int argc, char **argv)
         fflush(stdout);
     }
 
-    SIG_MainWindow w(nullptr, "MainWindow");
+    SIG_MainWindow w(nullptr);
     W = &w;
     w.resize(900, 750);
     w.show();
