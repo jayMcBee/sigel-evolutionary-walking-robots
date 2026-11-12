@@ -292,12 +292,12 @@ pass=$((pass+pp)); fail=$((fail+pf))
 # It needs an experiment to open, so a missing experiment file SKIPS it,
 # loudly, and the skip fails the exit status.
 bp=0; bf=0
-BEXP=$ROOT/experiments/twoBases.exp
+BEXP=$ROOT/experiments/sigel-1.3/twoBases.exp
 if [ ! -f "$BEXP" ]; then
-    # experiments/ is tracked, so only a damaged checkout lands here. The skip
+    # experiments/sigel-1.3/ is tracked, so only a damaged checkout lands here. The skip
     # is counted: `0 pass 0 fail' would drop the section from the total and
     # leave the exit status clean.
-    echo "  SKIPPED: no $BEXP -- restore experiments/ from git, then re-run."
+    echo "  SKIPPED: no $BEXP -- restore experiments/sigel-1.3/ from git, then re-run."
     echo "  THIS SECTION TESTED NOTHING."
     skipped=$((skipped+1))
 elif make -s -C "$ROOT" guidrive sigelApp >/tmp/bdb.$$ 2>&1; then
@@ -572,7 +572,7 @@ elif [ ! -f "$BEXP" ]; then
     # Same data dependency and the same policy as `gui behaviour'. Without
     # this the two runs HANG in the modal Load dialog until the 300 s timeout,
     # and the message would blame the driver for a missing file.
-    echo "  SKIPPED: no $BEXP -- restore experiments/ from git. THIS SECTION"
+    echo "  SKIPPED: no $BEXP -- restore experiments/sigel-1.3/ from git. THIS SECTION"
     echo "  TESTED NOTHING."
     skipped=$((skipped+1))
 elif guidrive_current; then
@@ -740,7 +740,7 @@ pass=$((pass+pp)); fail=$((fail+pf))
 #
 #   NOT 1.3's: `markers', `pvmhost' and the hammer robot-block hash. The
 #   experiment's host block and Body directories are not the shipped ones, so
-#   these pin this build against the file in experiments/. The file has one
+#   these pin this build against the file in experiments/sigel-1.3/. The file has one
 #   host, so host order is not tested; v8-1.3-gp-blocks.txt keeps the order of
 #   1.3's 20 hosts for the file as shipped.
 #
@@ -765,13 +765,13 @@ pass=$((pass+pp)); fail=$((fail+pf))
 # the extractor dies. So every "identical in all three" line also prints
 # content: a size, a hash, or a first and last entry.
 v2p=0; v2f=0
-V2HAM=$ROOT/experiments/hammer.exp
-V2OCT=$ROOT/experiments/octopus.exp
+V2HAM=$ROOT/experiments/sigel-1.3/hammer.exp
+V2OCT=$ROOT/experiments/sigel-1.3/octopus.exp
 V2D=${TMPDIR:-/tmp}/v2.$$
 if [ ! -f "$V2HAM" ] || [ ! -f "$V2OCT" ]; then
     # Same data dependency and the same policy as the sections above: say
     # SKIPPED loudly and count it, never report 0 pass 0 fail.
-    echo "  SKIPPED: no $V2HAM or $V2OCT -- restore experiments/ from git,"
+    echo "  SKIPPED: no $V2HAM or $V2OCT -- restore experiments/sigel-1.3/ from git,"
     echo "  then re-run. THIS SECTION TESTED NOTHING."
     skipped=$((skipped+1))
 elif [ ! -x "$ROOT/build/guidrive" ]; then
@@ -1068,7 +1068,7 @@ pass=$((pass+fp)); fail=$((fail+ff))
 # because the order of a glob changes with the locale.
 rp=0; rf=0
 if make -s -C "$ROOT" coredrive sigelApp >/tmp/rcb.$$ 2>&1; then
-    for e in $(ls "$ROOT"/experiments/*.exp | LC_ALL=C sort); do
+    for e in $(ls "$ROOT"/experiments/sigel-1.3/*.exp | LC_ALL=C sort); do
         echo "## $(basename "$e")"
         SIGEL_ROOT="$APP" "$ROOT/build/coredrive" -check "$e" 2>/dev/null || echo "!! coredrive failed on $(basename "$e")"
     done > /tmp/rc.$$

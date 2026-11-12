@@ -364,7 +364,7 @@ void SIGEL_Environment::TST_SIG_Environment::writeToFileThenReadFromFileGivesThe
   QCOMPARE( read.getFrictionCoeff_u_k(), 0.6 );
 }
 
-// The form of the environment block in experiments/runner.exp, which the saved experiments have.
+// The form of the environment block in experiments/sigel-1.3/runner.exp, which the saved experiments have.
 // FLOORMATERIALNAME is written as floor; nothing reads it.
 void SIGEL_Environment::TST_SIG_Environment::writeToFileWritesTheBlockInTheFormOfTheExperimentFiles()
 {
@@ -399,7 +399,7 @@ void SIGEL_Environment::TST_SIG_Environment::writeToFileWritesTheBlockInTheFormO
                            "GPSconst\n550\nGNSconst\n750\nGPDconst\n5\nGNDconst\n5\nUSFcoeff\n3\nUKFcoeff\n2.9\n" ) );
 }
 
-// Six of the seven experiments in experiments/ have an environment block of this form, without
+// Six of the seven experiments in experiments/sigel-1.3/ have an environment block of this form, without
 // the floor, texture and autosave keys. Those settings keep the values of a new environment.
 void SIGEL_Environment::TST_SIG_Environment::readFromFileOfABlockWithoutTheFloorKeysKeepsTheirDefaults()
 {
@@ -427,7 +427,7 @@ void SIGEL_Environment::TST_SIG_Environment::readFromFileOfABlockWithoutTheFloor
   QVERIFY( read.makeTerrain( terrain ) );
 }
 
-// The form of experiments/runner.exp, with a value other than the default for each key.
+// The form of experiments/sigel-1.3/runner.exp, with a value other than the default for each key.
 void SIGEL_Environment::TST_SIG_Environment::readFromFileReadsEachKeyOfABlockOfTheCurrentForm()
 {
   QString text( "YPLANELEVEL\n0\nVELODAMPING\n0.75\nGRAVITY\n0.5\n-3.5\n1.25\nSTARTPOSITION\n2\n3.5\n-4\n"

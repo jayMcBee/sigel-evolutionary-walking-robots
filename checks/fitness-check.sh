@@ -21,7 +21,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 # Run from the repository root, whatever the caller's folder is.
 cd "$ROOT" || exit 1
 B=${1:-build}
-[ $# -le 1 ] || { echo "usage: $0 [build-dir] -- it reads experiments/ and robots/" >&2; exit 1; }
+[ $# -le 1 ] || { echo "usage: $0 [build-dir] -- it reads experiments/sigel-1.3/ and robots/" >&2; exit 1; }
 [ -x "$ROOT/$B/coredrive" ] || { echo "no $ROOT/$B/coredrive" >&2; exit 1; }
 
 # A failed build leaves the previous coredrive in place. Without this test
@@ -71,13 +71,13 @@ fi
 
 # Tracked files only: an untracked file there must not change what this reads.
 tracked() { git -C "$ROOT" ls-files -- "$1" | sed "s|^|$ROOT/|" | sort; }
-n=$(tracked 'experiments/*.exp' | wc -l)
-[ "$n" -eq 7 ] || { echo "expected 7 .exp under experiments/, found $n" >&2; exit 1; }
+n=$(tracked 'experiments/sigel-1.3/*.exp' | wc -l)
+[ "$n" -eq 7 ] || { echo "expected 7 .exp under experiments/sigel-1.3/, found $n" >&2; exit 1; }
 # Capture the output, test the exit status, then filter. A pipe into tail
 # would report tail's status and hide a crash of coredrive. stderr is kept
 # and searched, because a sanitizer reports there.
 out=$(mktemp); err=$(mktemp)
-for f in $(tracked 'experiments/*.exp'); do
+for f in $(tracked 'experiments/sigel-1.3/*.exp'); do
 	for i in 0 1 2; do
 		rc=0; "$ROOT/$B/coredrive" "$f" "$i" >"$out" 2>"$err" || rc=$?
 		if [ "$rc" -ne 0 ]; then

@@ -61,7 +61,7 @@
                     after 5 minutes.
                     With neither lever, both scenarios refuse to Start an
                     experiment that ends on a date still to come; the seven in
-                    experiments/ end in 2030.
+                    experiments/sigel-1.3/ end in 2030.
 
   Build: see check.sh, or the guidrive target in the Makefile.
 */
@@ -1493,7 +1493,7 @@ static int guidriveMain(int argc, char **argv)
     QString scenario = argc > 1 ? argv[1] : "open";
     QString expFile  = argc > 2 ? argv[2]
         : qEnvironmentVariable("SIGEL_EXP",
-              "experiments/twoBases.exp");
+              "experiments/sigel-1.3/twoBases.exp");
 
     // sigel.cpp, main brings PVM up before the window exists. Only the visualize
     // scenario needs it, and starting a daemon for the others would be noise.
@@ -4601,7 +4601,7 @@ static int guidriveMain(int argc, char **argv)
             return 1;
         }
         // With neither lever the run lasts until the experiment's own end
-        // date. The seven in experiments/ end in 2030, so refuse; a 1.3
+        // date. The seven in experiments/sigel-1.3/ end in 2030, so refuse; a 1.3
         // original ends in 2001 and still starts and ends at once.
         if (wantGens <= 0 && qgetenv("SIGEL_RUN_LONGER") != "1") {
             SIG_GUIGPExperiment *ex = lv->currentlySelectedExperiment();

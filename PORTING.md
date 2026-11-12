@@ -288,7 +288,7 @@ sigel/                                      the repo root
 │   ├── patches/                            14 patches, applied by `make`
 │   ├── supportingLibs.tar.gz               tracked, so a clone builds offline
 │   └── pvm3.4.6.tgz                        upstream PVM, tracked -- Phase P
-├── experiments/                            the 7 kept experiments, tracked
+├── experiments/sigel-1.3/                  the 7 kept 1.3 experiments, tracked
 ├── robots/                                 the 7 robots, tracked
 ├── shim/                                   4 pre-standard C++ headers
 ├── verification-against-sigel-1.3/         the 1.3 captures, Phase V
@@ -5434,7 +5434,7 @@ time**, for
   to its robot's
   name — `hammer`, `insect`, `octopus`, `runner`, `shortHammer`, `twoBases`,
   `walker` — all seven approved — item 46.
-- **The kept experiments are in git**, in `experiments/` and `robots/`, and every
+- **The kept experiments are in git**, in `experiments/sigel-1.3/` and `robots/`, and every
   check reads them there. `main` is the working branch; the old `main` is tagged
   `old-main`.
 - **The repo is on GitHub**: `origin` is
@@ -6586,7 +6586,7 @@ without the sanitizers; `make sigel_eval` builds the evaluator, and
 ```
 make sigel_eval
 SIGEL_ROOT=$PWD/sigelApp \
-  ./build/sigel_eval experiments/twoBases.exp 0
+  ./build/sigel_eval experiments/sigel-1.3/twoBases.exp 0
 ```
 
 One evaluation is 0.2 s. **All 14 published experiments run clean under
@@ -10549,7 +10549,7 @@ verified live 2026-08-18:
 
 Both downloaded 2026-08-22 to `data/`, which is untracked, with the two runner
 `.exp` from their own archives. **Since 2026-09-19 the 7 experiments kept are
-tracked** in `experiments/`, and their robots in `robots/<robot>/` with the
+tracked** in `experiments/sigel-1.3/`, and their robots in `robots/<robot>/` with the
 `.rrb`, `.wrl` and `.blend` — §10, after D2's migration note.
 
 The 2003 i386 binary runs on Debian woody libraries; all 12 experiments
@@ -11415,7 +11415,7 @@ holes: the previous version exited 0 on a missing build directory, a missing
 Phase D re-captures this baseline at every step, so a silent short run would
 have overwritten it and reported success.
 
-**The experiments and robots are tracked, in `experiments/` and `robots/`.** All
+**The experiments and robots are tracked, in `experiments/sigel-1.3/` and `robots/`.** All
 14 experiments were judged by eye on 2026-09-19 and kept one per robot, each
 renamed to its robot's name: `hammer`, `insect`, `octopus`, `runner`,
 `shortHammer`, `twoBases`, `walker` — items 40, 44, 45 and 46 in
@@ -11429,7 +11429,7 @@ both trees as they were before the clean-up.
 ### D2 — what the migration actually has to preserve
 
 Names, so this stops being ambiguous: `dictorder-dump.sh` produces the order
-from `experiments/` and `robots/`, and `dictorder-baseline.txt` is the committed
+from `experiments/sigel-1.3/` and `robots/`, and `dictorder-baseline.txt` is the committed
 reference. `dictorder-reorder.py` built **`data-reordered/`** from the download
 tree `data/`, and `robots/` was copied from its result. The script and both
 trees were removed on 2026-09-19; git history keeps the script.

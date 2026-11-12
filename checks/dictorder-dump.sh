@@ -26,7 +26,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 # Run from the repository root, whatever the caller's folder is.
 cd "$ROOT" || exit 1
 B=${1:-build}
-[ $# -le 1 ] || { echo "usage: $0 [build-dir] -- it reads experiments/ and robots/" >&2; exit 1; }
+[ $# -le 1 ] || { echo "usage: $0 [build-dir] -- it reads experiments/sigel-1.3/ and robots/" >&2; exit 1; }
 EVAL=$ROOT/$B/coredrive
 [ -x "$EVAL" ] || { echo "no $EVAL -- make B=$B coredrive" >&2; exit 1; }
 
@@ -43,11 +43,11 @@ export SIGEL_ROOT
 # count is wrong.
 # Tracked files only: an untracked file there must not change what this reads.
 tracked() { git -C "$ROOT" ls-files -- "$1" | sed "s|^|$ROOT/|" | sort; }
-exps=$(tracked 'experiments/*.exp')
+exps=$(tracked 'experiments/sigel-1.3/*.exp')
 rrbs=$(tracked 'robots/*.rrb')
 ne=$(echo "$exps" | grep -c . || true); nr=$(echo "$rrbs" | grep -c . || true)
 [ "$ne" -eq 7 ] && [ "$nr" -eq 7 ] || {
-	echo "expected 7 .exp under experiments/ and 7 .rrb under robots/," >&2
+	echo "expected 7 .exp under experiments/sigel-1.3/ and 7 .rrb under robots/," >&2
 	echo "found $ne and $nr." >&2
 	exit 1
 }
