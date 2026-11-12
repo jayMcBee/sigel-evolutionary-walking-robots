@@ -110,11 +110,6 @@ touched, because changing one changes behaviour against the reference binary.
 
 ## 4 · The interface
 
-- [ ] **186. Remove the `const char *name` constructor parameter from the GUI
-  classes.** It is a Qt 3 leftover; Qt 6 widgets have no such argument. Each
-  `*Base` class passes it on to `setObjectName`, and the object names are in
-  use, for example in the GUI behaviour baseline.
-
 - [ ] **106. Review `SIGEL_MasterGUI::SIG_GPParameter` with the maintainer,**
   the GP Parameters page, method by method, deciding each change before it is
   made. Its long methods, `slotItemDoubleClicked` and `slotDeleteHost` above
