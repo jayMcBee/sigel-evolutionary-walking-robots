@@ -109,10 +109,10 @@
             <item row="0" column="0">
               <widget class="QSlider" name="distanceSlider">
                 <property name="minimum">
-                  <number>2</number>
+                  <number>5</number>
                 </property>
                 <property name="maximum">
-                  <number>200</number>
+                  <number>2000</number>
                 </property>
                 <property name="pageStep">
                   <number>20</number>
