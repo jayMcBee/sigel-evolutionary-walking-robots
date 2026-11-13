@@ -24,6 +24,7 @@
 
 #include "SIGEL_Visualisation/SIG_SimulationVisualisation.h"
 #include "SIGEL_SlaveGUI/SIG_MovieSettingsDialog.h"
+#include "SIGEL_SlaveGUI/SIG_RegisterOverlay.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
 #include <QMessageBox>
@@ -36,6 +37,7 @@
 
 #include <QtMath>
 #include <cmath>
+#include <GL/gl.h>
 
 namespace SIGEL_SlaveGUI
 {
@@ -57,7 +59,8 @@ SIG_SimulationVisualisationWidget::SIG_SimulationVisualisationWidget( QWidget *p
 	  program(nullptr),
 	  startRobotCentre( 0.0, 0.0, 0.0 ),
 	  lastRobotCentre( 0.0, 0.0, 0.0 ),
-	  smoothedVelocity( 0.0, 0.0, 0.0 )
+	  smoothedVelocity( 0.0, 0.0, 0.0 ),
+	  showRegisters(false)
 {
 	simulationTimer = new QTimer( this );
 	simulationTimer->setObjectName( "simulationTimer" );
@@ -211,6 +214,49 @@ void SIG_SimulationVisualisationWidget::setShowShadows( bool show )
 
 	if (automaticRefresh)
 		update();
+}
+
+void SIG_SimulationVisualisationWidget::setShowRegisters( bool show )
+{
+	showRegisters = show;
+
+	if (automaticRefresh)
+		update();
+}
+
+void SIG_SimulationVisualisationWidget::drawRegisterOverlay()
+{
+	SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
+		static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
+
+	QImage const image = SIG_RegisterOverlay::render( simulationVisualisation.getInterpreter(), height(), devicePixelRatioF() );
+
+	// Plain GL, not a QPainter on this widget: Qt's GL paint engine and the scene share GL state and break each other.
+	glPushAttrib( GL_ENABLE_BIT | GL_TRANSFORM_BIT | GL_PIXEL_MODE_BIT );
+	glDisable( GL_DEPTH_TEST );
+	glDisable( GL_LIGHTING );
+	glDisable( GL_FOG );
+	glDisable( GL_TEXTURE_2D );
+	glDisable( GL_BLEND );
+
+	glMatrixMode( GL_PROJECTION );
+	glPushMatrix();
+	glLoadIdentity();
+	glMatrixMode( GL_MODELVIEW );
+	glPushMatrix();
+	glLoadIdentity();
+
+	// GL fills rows from the bottom up; the negative zoom draws the image's top row first, at the top edge.
+	int const frameWidth = qRound( width() * devicePixelRatioF() );
+	glRasterPos2f( 1.0f - 2.0f * image.width() / frameWidth, 1.0f );
+	glPixelZoom( 1.0f, -1.0f );
+	glDrawPixels( image.width(), image.height(), GL_RGBA, GL_UNSIGNED_BYTE, image.constBits() );
+
+	glPopMatrix();
+	glMatrixMode( GL_PROJECTION );
+	glPopMatrix();
+	glMatrixMode( GL_MODELVIEW );
+	glPopAttrib();
 }
 
 void SIG_SimulationVisualisationWidget::makeTimeSteps( int noOfSteps )
@@ -707,6 +753,9 @@ void SIG_SimulationVisualisationWidget::paintGL()
 
 	if (!visualisation)
 		return;
+
+	if (showRegisters)
+		drawRegisterOverlay();
 
 	// The look point lags behind the robot while it follows it.
 	if (traceRobot)

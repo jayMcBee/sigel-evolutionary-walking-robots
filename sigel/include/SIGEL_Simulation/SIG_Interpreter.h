@@ -88,6 +88,12 @@ class SIG_Interpreter
    */
   void interprete(double timeAccount);
 
+  QList<SIG_Register> const &getRegisters() const { return registers; }
+
+  long getProgramCounter() const { return programCounter; }
+
+  bool getCompareFlag() const { return compareFlag; }
+
  private:
 
   /**

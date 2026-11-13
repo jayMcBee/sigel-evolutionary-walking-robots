@@ -233,6 +233,9 @@ namespace SIGEL_SlaveGUI
 
     QObject::connect( showShadowsCheckBox, &QCheckBox::toggled,
 		      visualisationWidget, &SIG_SimulationVisualisationWidget::setShowShadows );
+
+    QObject::connect( showRegistersCheckBox, &QCheckBox::toggled,
+		      visualisationWidget, &SIG_SimulationVisualisationWidget::setShowRegisters );
   }
 
   void SIG_SimulationWidget::slotSetYaw( int yaw )

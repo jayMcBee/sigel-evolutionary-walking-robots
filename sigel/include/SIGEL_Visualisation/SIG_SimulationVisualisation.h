@@ -103,6 +103,8 @@ namespace SIGEL_Visualisation
 
 		double getCurrentSimulationSeconds() const { return renderRecorder.currentSimulationSeconds; }
 
+		SIGEL_Simulation::SIG_Interpreter const &getInterpreter() const { return simulation.getInterpreter(); }
+
 		SIG_Vector getRobotPosition() const;
 
 		SIG_Matrix getRobotRotation() const;

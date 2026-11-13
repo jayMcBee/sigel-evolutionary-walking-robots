@@ -138,6 +138,8 @@ namespace SIGEL_SlaveGUI
 
 		void setShowShadows( bool show );
 
+		void setShowRegisters( bool show );
+
 		/**
 		 * Toggles between playing and pause state of the simulation.
 		 */
@@ -245,6 +247,8 @@ namespace SIGEL_SlaveGUI
 		 */
 		void makeTimeSteps(int noOfSteps);
 
+		void drawRegisterOverlay();
+
 		/**
 		 * Moves the look point a part of the way to the robot's centre.
 		 * The part grows with the elapsed simulation time.
@@ -284,6 +288,8 @@ namespace SIGEL_SlaveGUI
 		 */
 		SIG_Vector lastRobotCentre;
 		SIG_Vector smoothedVelocity;
+
+		bool showRegisters;
 
 	private slots:
 

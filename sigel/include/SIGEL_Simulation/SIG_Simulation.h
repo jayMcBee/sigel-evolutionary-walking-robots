@@ -101,6 +101,8 @@ namespace SIGEL_Simulation
        */
       void makeTimeSteps( int numTimeSteps );
 
+      SIG_Interpreter const &getInterpreter() const { return *interpreter; }
+
       /**
        * Inherited classes override this method to prematurely terminate the
        * simulation before the complete simulation been completly computed.

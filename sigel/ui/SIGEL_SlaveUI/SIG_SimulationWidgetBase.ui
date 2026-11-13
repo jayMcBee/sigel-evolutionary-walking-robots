@@ -652,6 +652,13 @@
                 </widget>
               </item>
               <item row="11" column="0">
+                <widget class="QCheckBox" name="showRegistersCheckBox">
+                  <property name="text">
+                    <string>Show registers</string>
+                  </property>
+                </widget>
+              </item>
+              <item row="12" column="0">
                 <spacer name="Spacer3">
                   <property name="sizeHint">
                     <size>
