@@ -229,7 +229,7 @@ void SIG_SimulationVisualisationWidget::drawRegisterOverlay()
 	SIGEL_Visualisation::SIG_SimulationVisualisation &simulationVisualisation =
 		static_cast< SIGEL_Visualisation::SIG_SimulationVisualisation& >( *visualisation );
 
-	QImage const image = SIG_RegisterOverlay::render( simulationVisualisation.getInterpreter(), height(), devicePixelRatioF() );
+	QImage const image = SIG_RegisterOverlay( simulationVisualisation.getInterpreter() ).render( height(), devicePixelRatioF() );
 
 	// Plain GL, not a QPainter on this widget: Qt's GL paint engine and the scene share GL state and break each other.
 	glPushAttrib( GL_ENABLE_BIT | GL_TRANSFORM_BIT | GL_PIXEL_MODE_BIT );

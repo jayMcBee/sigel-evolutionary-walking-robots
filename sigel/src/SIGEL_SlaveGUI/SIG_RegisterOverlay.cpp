@@ -34,36 +34,34 @@
 namespace SIGEL_SlaveGUI
 {
 
+	SIG_RegisterOverlay::SIG_RegisterOverlay( SIGEL_Simulation::SIG_Interpreter const &interpreter )
+		: interpreter( interpreter ),
+		  minimumValue( interpreter.getRegisters().first().getMinValue() ),
+		  maximumValue( interpreter.getRegisters().first().getMaxValue() ),
+		  font( QFontDatabase::systemFont( QFontDatabase::FixedFont ) )
+	{
+		font.setPointSize( 8 );
+		QFontMetrics const metrics( font );
+
+		QString const widestLabel = QString( "R%1" ).arg( interpreter.getRegisters().size() - 1 );
+		int const valueCharacters = qMax( QString::number( minimumValue ).size(), QString::number( maximumValue ).size() );
+		labelWidth = metrics.horizontalAdvance( widestLabel );
+		valueWidth = metrics.horizontalAdvance( QString( valueCharacters, '0' ) );
+		columnWidth = margin + labelWidth + columnGap + trackWidth + columnGap + valueWidth + margin;
+
+		labelX = margin;
+		trackX = labelX + labelWidth + columnGap;
+		trackMiddle = trackX + trackWidth / 2;
+		valueX = trackX + trackWidth + columnGap;
+	}
+
 	QColor SIG_RegisterOverlay::white( int opacityPercent )
 	{
 		return QColor( 255, 255, 255, 255 * opacityPercent / 100 );
 	}
 
-	QImage SIG_RegisterOverlay::render( SIGEL_Simulation::SIG_Interpreter const &interpreter, int height, qreal devicePixelRatio )
+	QImage SIG_RegisterOverlay::render( int height, qreal devicePixelRatio ) const
 	{
-		QList< SIGEL_Simulation::SIG_Register > const &registers = interpreter.getRegisters();
-
-		int const registersPerGroup = 8;
-		int const groupGap = 6;
-		int const rowHeight = 21;
-		int const margin = 8;
-		int const columnGap = 12;
-		int const trackWidth = 32;
-		int const trackHeight = 9;
-
-		int const minimumValue = registers.first().getMinValue();
-		int const maximumValue = registers.first().getMaxValue();
-
-		QFont font = QFontDatabase::systemFont( QFontDatabase::FixedFont );
-		font.setPointSize( 8 );
-		QFontMetrics const metrics( font );
-
-		QString const widestLabel = QString( "R%1" ).arg( registers.size() - 1 );
-		int const valueCharacters = qMax( QString::number( minimumValue ).size(), QString::number( maximumValue ).size() );
-		int const labelWidth = metrics.horizontalAdvance( widestLabel );
-		int const valueWidth = metrics.horizontalAdvance( QString( valueCharacters, '0' ) );
-		int const columnWidth = margin + labelWidth + columnGap + trackWidth + columnGap + valueWidth + margin;
-
 		QImage image( qRound( columnWidth * devicePixelRatio ), qRound( height * devicePixelRatio ), QImage::Format_RGBA8888 );
 		image.setDevicePixelRatio( devicePixelRatio );
 		image.fill( QColor( 0x2b, 0x2b, 0x2b ) );
@@ -71,25 +69,13 @@ namespace SIGEL_SlaveGUI
 		QPainter painter( &image );
 		painter.setFont( font );
 
-		int const labelX = margin;
-		int const trackX = labelX + labelWidth + columnGap;
-		int const trackMiddle = trackX + trackWidth / 2;
-		int const valueX = trackX + trackWidth + columnGap;
-
-		// The program counter and compare flag have no bar; their values may use the track's width.
-		auto drawTextRow = [&]( QString const &label, QString const &value, int rowTop )
-		{
-			painter.setPen( white( 38 ) );
-			painter.drawText( QRect( labelX, rowTop, labelWidth, rowHeight ), Qt::AlignLeft | Qt::AlignVCenter, label );
-			painter.setPen( white( 80 ) );
-			painter.drawText( QRect( trackX, rowTop, valueX + valueWidth - trackX, rowHeight ), Qt::AlignRight | Qt::AlignVCenter, value );
-		};
-
 		int y = margin;
-		drawTextRow( "PC", QString::number( interpreter.getProgramCounter() ), y );
+		drawTextRow( painter, y, "PC", QString::number( interpreter.getProgramCounter() ) );
 		y += rowHeight;
-		drawTextRow( "CF", interpreter.getCompareFlag() ? "1" : "0", y );
+		drawTextRow( painter, y, "CF", interpreter.getCompareFlag() ? "1" : "0" );
 		y += rowHeight;
+
+		QList< SIGEL_Simulation::SIG_Register > const &registers = interpreter.getRegisters();
 
 		for ( int index = 0; index < registers.size(); index++ )
 		{
@@ -101,41 +87,64 @@ namespace SIGEL_SlaveGUI
 
 			if ( startsGroup )
 			{
-				painter.setPen( white( 10 ) );
-				painter.drawLine( margin, y + groupGap / 2, columnWidth - margin, y + groupGap / 2 );
+				drawGroupLine( painter, y );
 				y += groupGap;
 			}
 
-			int const value = registers[index].getValue();
-			int const middle = y + rowHeight / 2;
-
-			painter.setPen( white( 38 ) );
-			painter.drawText( QRect( labelX, y, labelWidth, rowHeight ), Qt::AlignLeft | Qt::AlignVCenter,
-			                  QString( "R%1" ).arg( index ) );
-
-			int const trackTop = middle - trackHeight / 2;
-			painter.fillRect( trackX, trackTop, trackWidth, trackHeight, white( 6 ) );
-
-			// The bar grows from the middle: right for positive values, left for negative ones.
-			int barWidth = 0;
-			if ( value > 0 )
-				barWidth = static_cast< int >( std::lround( value * ( trackWidth / 2.0 ) / maximumValue ) );
-			if ( value < 0 )
-				barWidth = -static_cast< int >( std::lround( value * ( trackWidth / 2.0 ) / minimumValue ) );
-
-			painter.fillRect( qMin( trackMiddle, trackMiddle + barWidth ), trackTop, qAbs( barWidth ), trackHeight, white( 50 ) );
-
-			painter.setPen( white( 15 ) );
-			painter.drawLine( trackMiddle, trackTop, trackMiddle, trackTop + trackHeight - 1 );
-
-			painter.setPen( white( 80 ) );
-			painter.drawText( QRect( valueX, y, valueWidth, rowHeight ), Qt::AlignRight | Qt::AlignVCenter,
-			                  QString::number( value ) );
-
+			drawRegisterRow( painter, y, index, registers[index].getValue() );
 			y += rowHeight;
 		}
 
 		return image;
+	}
+
+	void SIG_RegisterOverlay::drawTextRow( QPainter &painter, int y, QString const &label, QString const &value ) const
+	{
+		painter.setPen( white( 38 ) );
+		painter.drawText( QRect( labelX, y, labelWidth, rowHeight ), Qt::AlignLeft | Qt::AlignVCenter, label );
+
+		// The program counter and compare flag have no bar; their values may use the track's width.
+		painter.setPen( white( 80 ) );
+		painter.drawText( QRect( trackX, y, valueX + valueWidth - trackX, rowHeight ), Qt::AlignRight | Qt::AlignVCenter, value );
+	}
+
+	void SIG_RegisterOverlay::drawGroupLine( QPainter &painter, int y ) const
+	{
+		painter.setPen( white( 10 ) );
+		painter.drawLine( margin, y + groupGap / 2, columnWidth - margin, y + groupGap / 2 );
+	}
+
+	void SIG_RegisterOverlay::drawRegisterRow( QPainter &painter, int y, int index, int value ) const
+	{
+		int const middle = y + rowHeight / 2;
+
+		painter.setPen( white( 38 ) );
+		painter.drawText( QRect( labelX, y, labelWidth, rowHeight ), Qt::AlignLeft | Qt::AlignVCenter,
+		                  QString( "R%1" ).arg( index ) );
+
+		int const trackTop = middle - trackHeight / 2;
+		painter.fillRect( trackX, trackTop, trackWidth, trackHeight, white( 6 ) );
+
+		int const bar = barWidth( value );
+		painter.fillRect( qMin( trackMiddle, trackMiddle + bar ), trackTop, qAbs( bar ), trackHeight, white( 50 ) );
+
+		painter.setPen( white( 15 ) );
+		painter.drawLine( trackMiddle, trackTop, trackMiddle, trackTop + trackHeight - 1 );
+
+		painter.setPen( white( 80 ) );
+		painter.drawText( QRect( valueX, y, valueWidth, rowHeight ), Qt::AlignRight | Qt::AlignVCenter,
+		                  QString::number( value ) );
+	}
+
+	int SIG_RegisterOverlay::barWidth( int value ) const
+	{
+		if ( value > 0 )
+			return static_cast< int >( std::lround( value * ( trackWidth / 2.0 ) / maximumValue ) );
+
+		if ( value < 0 )
+			return -static_cast< int >( std::lround( value * ( trackWidth / 2.0 ) / minimumValue ) );
+
+		return 0;
 	}
 
 }

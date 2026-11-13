@@ -27,7 +27,11 @@
 #include "SIGEL_Simulation/SIG_Interpreter.h"
 
 #include <QColor>
+#include <QFont>
 #include <QImage>
+#include <QString>
+
+class QPainter;
 
 namespace SIGEL_SlaveGUI
 {
@@ -41,13 +45,49 @@ namespace SIGEL_SlaveGUI
 	public:
 
 		/**
+		 * Measures the column for the registers of the given interpreter.
+		 */
+		SIG_RegisterOverlay( SIGEL_Simulation::SIG_Interpreter const &interpreter );
+
+		/**
 		 * Draws the column for a view of the given height. The image has the device pixel ratio of the view.
 		 */
-		static QImage render( SIGEL_Simulation::SIG_Interpreter const &interpreter, int height, qreal devicePixelRatio );
+		QImage render( int height, qreal devicePixelRatio ) const;
 
 	private:
 
+		static constexpr int registersPerGroup = 8;
+		static constexpr int groupGap = 6;
+		static constexpr int rowHeight = 21;
+		static constexpr int margin = 8;
+		static constexpr int columnGap = 12;
+		static constexpr int trackWidth = 32;
+		static constexpr int trackHeight = 9;
+
 		static QColor white( int opacityPercent );
+
+		void drawTextRow( QPainter &painter, int y, QString const &label, QString const &value ) const;
+
+		void drawGroupLine( QPainter &painter, int y ) const;
+
+		void drawRegisterRow( QPainter &painter, int y, int index, int value ) const;
+
+		/**
+		 * The bar grows from the middle: right for positive values, left for negative ones.
+		 */
+		int barWidth( int value ) const;
+
+		SIGEL_Simulation::SIG_Interpreter const &interpreter;
+		int minimumValue;
+		int maximumValue;
+		QFont font;
+		int labelWidth;
+		int valueWidth;
+		int columnWidth;
+		int labelX;
+		int trackX;
+		int trackMiddle;
+		int valueX;
 	};
 
 }
