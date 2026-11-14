@@ -275,9 +275,7 @@ problem; the choice is made before any code is written.
 - [ ] **166. Ship a second set of experiments that fits today's instructions.**
   The instruction fixes change how saved programs run: the shipped fitness
   values no longer match, and some programs rely on a result that is now
-  fixed. The shipped files stay as the 1.3 set. The second set is each
-  experiment loaded and evolved for 10 to 25 generations, so its fitness
-  values come from today's code and those programs are selected away.
+  fixed. The shipped files stay as the 1.3 set.
   Same pass: less saturated robot colours.
   To decide: the second set's name, and where the two sets live.
   Item 160 waits for this item.
