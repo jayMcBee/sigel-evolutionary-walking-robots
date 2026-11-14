@@ -30,7 +30,6 @@
 
 #include "ui_SIG_RobotBase.h"
 
-#include <QEvent>
 #include <QWidget>
 
 class SIG_RobotBase : public QWidget, public Ui::SIG_RobotBase
@@ -39,14 +38,6 @@ class SIG_RobotBase : public QWidget, public Ui::SIG_RobotBase
 
 public:
     SIG_RobotBase(QWidget* parent = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
-
-protected:
-    // Qt does not call languageChange() itself.
-    // changeEvent calls it on a language change.
-    void changeEvent( QEvent *e ) override;
-
-protected slots:
-    virtual void languageChange();
 };
 
 #endif // SIGEL_MASTERGUI_SIG_ROBOTBASE_H

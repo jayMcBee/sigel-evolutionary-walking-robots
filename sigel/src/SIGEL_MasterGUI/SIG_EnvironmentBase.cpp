@@ -28,15 +28,3 @@ SIG_EnvironmentBase::SIG_EnvironmentBase(QWidget* parent, Qt::WindowFlags fl)
 {
   setupUi( this );
 }
-
-void SIG_EnvironmentBase::changeEvent( QEvent *e )
-{
-  QWidget::changeEvent( e );
-  if ( e->type() == QEvent::LanguageChange )
-    languageChange();
-}
-
-void SIG_EnvironmentBase::languageChange()
-{
-  retranslateUi( this );
-}

@@ -30,7 +30,6 @@
 
 #include "ui_SIG_LanguageParametersBase.h"
 
-#include <QEvent>
 #include <QWidget>
 
 class SIG_LanguageParametersBase : public QWidget, public Ui::SIG_LanguageParametersBase
@@ -44,14 +43,6 @@ public slots:
     virtual void slotPushButtonDisallowAllClicked() = 0;
     virtual void slotPushButtonAllowAllClicked() = 0;
     virtual void slotPushButtonEditClicked() = 0;
-
-protected:
-    // Qt does not call languageChange() itself.
-    // changeEvent calls it on a language change.
-    void changeEvent( QEvent *e ) override;
-
-protected slots:
-    virtual void languageChange();
 };
 
 #endif // SIGEL_MASTERGUI_SIG_LANGUAGEPARAMETERSBASE_H

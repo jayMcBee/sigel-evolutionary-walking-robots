@@ -43,15 +43,3 @@ SIG_IndividualListBase::SIG_IndividualListBase(QWidget* parent, Qt::WindowFlags 
   header->setSectionResizeMode( 2, QHeaderView::ResizeToContents );
   header->setSectionResizeMode( 3, QHeaderView::ResizeToContents );
 }
-
-void SIG_IndividualListBase::changeEvent( QEvent *e )
-{
-  QWidget::changeEvent( e );
-  if ( e->type() == QEvent::LanguageChange )
-    languageChange();
-}
-
-void SIG_IndividualListBase::languageChange()
-{
-  retranslateUi( this );
-}

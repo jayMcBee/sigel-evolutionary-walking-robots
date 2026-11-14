@@ -32,7 +32,6 @@
 
 #include "ui_SIG_GPParameterBase.h"
 
-#include <QEvent>
 #include <QWidget>
 
 class SIG_GPParameterBase : public QWidget, public Ui::SIG_GPParameterBase
@@ -54,13 +53,6 @@ public slots:
     virtual void slotEnableAllHosts() = 0;
     virtual void slotMutationChanged( int ) = 0;
     virtual void slotTournamentsPerGenerationChanged( int ) = 0;
-
-protected:
-    // Drives languageChange; without it the slot never runs.
-    void changeEvent( QEvent *e ) override;
-
-protected slots:
-    virtual void languageChange();
 };
 
 #endif // SIGEL_MASTERGUI_SIG_GPPARAMETERBASE_H

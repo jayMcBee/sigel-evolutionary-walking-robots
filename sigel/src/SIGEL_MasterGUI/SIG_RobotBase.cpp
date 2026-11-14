@@ -28,15 +28,3 @@ SIG_RobotBase::SIG_RobotBase(QWidget* parent, Qt::WindowFlags fl)
 {
   setupUi( this );
 }
-
-void SIG_RobotBase::changeEvent( QEvent *e )
-{
-  QWidget::changeEvent( e );
-  if ( e->type() == QEvent::LanguageChange )
-    languageChange();
-}
-
-void SIG_RobotBase::languageChange()
-{
-  retranslateUi( this );
-}

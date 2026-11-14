@@ -41,19 +41,3 @@ SIG_GPParameterBase::SIG_GPParameterBase( QWidget *parent,
   // of the first click.
   listviewHosts->sortByColumn( 0, Qt::AscendingOrder );
 }
-
-void SIG_GPParameterBase::changeEvent( QEvent *e )
-{
-  QWidget::changeEvent( e );
-  if ( e->type() == QEvent::LanguageChange )
-    languageChange();
-}
-
-/*
- *  Sets the strings of the subwidgets using the current
- *  language.
- */
-void SIG_GPParameterBase::languageChange()
-{
-  retranslateUi( this );
-}
