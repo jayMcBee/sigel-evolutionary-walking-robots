@@ -251,7 +251,7 @@ problem; the choice is made before any code is written.
   | `JLE n` | Jumps n lines when the compare flag is set. Today's `JMP`. |
   | `JMP n` | Jumps n lines always. |
 
-  Do item 166 first. Item 162 waits for this item.
+  Item 162 waits for this item.
 
 - [ ] **162. Two buttons for two sets of default instruction probabilities.**
   On the GP parameters page: one sets all probabilities equal, one sets
@@ -267,18 +267,6 @@ problem; the choice is made before any code is written.
   `MT_Substitute::translatedSIGProg`. A new instruction needs an edit in each
   place. Assess first if one table can serve these places; the call sites
   differ, so the gain is not certain.
-
----
-
-## 8 · Experiments and robot models
-
-- [ ] **166. Ship a second set of experiments that fits today's instructions.**
-  The instruction fixes change how saved programs run: the shipped fitness
-  values no longer match, and some programs rely on a result that is now
-  fixed. The shipped files stay as the 1.3 set.
-  Same pass: less saturated robot colours.
-  To decide: the second set's name, and where the two sets live.
-  Item 160 waits for this item.
 
 ---
 
