@@ -29,15 +29,3 @@ MT_AddIndividualsWidgetBase::MT_AddIndividualsWidgetBase(QWidget* parent, bool m
 
   setupUi( this );
 }
-
-void MT_AddIndividualsWidgetBase::changeEvent( QEvent *e )
-{
-  QDialog::changeEvent( e );
-  if ( e->type() == QEvent::LanguageChange )
-    languageChange();
-}
-
-void MT_AddIndividualsWidgetBase::languageChange()
-{
-  retranslateUi( this );
-}

@@ -29,7 +29,6 @@
 
 #include "ui_MT_SearchWidgetBase.h"
 
-#include <QEvent>
 #include <QWidget>
 
 class MT_SearchWidgetBase : public QWidget, public Ui::MT_SearchWidgetBase
@@ -38,14 +37,6 @@ class MT_SearchWidgetBase : public QWidget, public Ui::MT_SearchWidgetBase
 
 public:
     MT_SearchWidgetBase(QWidget* parent = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
-
-protected:
-    // Qt does not call languageChange() itself.
-    // changeEvent calls it on a language change.
-    void changeEvent( QEvent *e ) override;
-
-protected slots:
-    virtual void languageChange();
 };
 
 #endif // MT_GUI_MT_SEARCHWIDGETBASE_H

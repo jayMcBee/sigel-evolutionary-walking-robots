@@ -29,7 +29,6 @@
 
 #include "ui_MT_AddIndividualsWidget.h"
 
-#include <QEvent>
 #include <QDialog>
 
 class MT_AddIndividualsWidgetBase : public QDialog, public Ui::MT_AddIndividualsWidgetBase
@@ -38,14 +37,6 @@ class MT_AddIndividualsWidgetBase : public QDialog, public Ui::MT_AddIndividuals
 
 public:
     MT_AddIndividualsWidgetBase(QWidget* parent = nullptr, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
-
-protected:
-    // Qt does not call languageChange() itself.
-    // changeEvent calls it on a language change.
-    void changeEvent( QEvent *e ) override;
-
-protected slots:
-    virtual void languageChange();
 };
 
 #endif // MT_GUI_MT_ADDINDIVIDUALSWIDGET_H

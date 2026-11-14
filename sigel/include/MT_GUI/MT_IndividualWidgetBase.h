@@ -29,7 +29,6 @@
 
 #include "ui_MT_IndividualWidgetBase.h"
 
-#include <QEvent>
 #include <QWidget>
 
 class MT_IndividualsWidgetBase : public QWidget, public Ui::MT_IndividualsWidgetBase
@@ -38,14 +37,6 @@ class MT_IndividualsWidgetBase : public QWidget, public Ui::MT_IndividualsWidget
 
 public:
     MT_IndividualsWidgetBase(QWidget* parent = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
-
-protected:
-    // Qt does not call languageChange() itself.
-    // changeEvent calls it on a language change.
-    void changeEvent( QEvent *e ) override;
-
-protected slots:
-    virtual void languageChange();
 };
 
 #endif // MT_GUI_MT_INDIVIDUALWIDGETBASE_H

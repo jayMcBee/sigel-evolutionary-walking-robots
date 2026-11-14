@@ -27,15 +27,3 @@ MT_SearchWidgetBase::MT_SearchWidgetBase(QWidget* parent, Qt::WindowFlags fl)
 {
   setupUi( this );
 }
-
-void MT_SearchWidgetBase::changeEvent( QEvent *e )
-{
-  QWidget::changeEvent( e );
-  if ( e->type() == QEvent::LanguageChange )
-    languageChange();
-}
-
-void MT_SearchWidgetBase::languageChange()
-{
-  retranslateUi( this );
-}

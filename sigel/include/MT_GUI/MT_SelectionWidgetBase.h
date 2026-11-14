@@ -29,7 +29,6 @@
 
 #include "ui_MT_SelectionWidgetBase.h"
 
-#include <QEvent>
 #include <QWidget>
 
 class MT_SelectionWidgetBase : public QWidget, public Ui::MT_SelectionWidgetBase
@@ -38,14 +37,6 @@ class MT_SelectionWidgetBase : public QWidget, public Ui::MT_SelectionWidgetBase
 
 public:
     MT_SelectionWidgetBase(QWidget* parent = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
-
-protected:
-    // Qt does not call languageChange() itself.
-    // changeEvent calls it on a language change.
-    void changeEvent( QEvent *e ) override;
-
-protected slots:
-    virtual void languageChange();
 };
 
 #endif // MT_GUI_MT_SELECTIONWIDGETBASE_H
