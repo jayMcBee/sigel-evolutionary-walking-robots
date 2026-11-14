@@ -277,9 +277,8 @@ problem; the choice is made before any code is written.
   values no longer match, and some programs rely on a result that is now
   fixed. The shipped files stay as the 1.3 set. The second set is each
   experiment loaded and evolved for 10 to 25 generations, so its fitness
-  values come from today's code and those programs are selected away. It has
-  GP seed 0; with the shipped seed 1, every evolution and every restart begins
-  with the same random draws. Same pass: less saturated robot colours.
+  values come from today's code and those programs are selected away.
+  Same pass: less saturated robot colours.
   To decide: the second set's name, and where the two sets live.
   Item 160 waits for this item.
 
