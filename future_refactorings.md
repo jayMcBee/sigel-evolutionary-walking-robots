@@ -270,6 +270,14 @@ problem; the choice is made before any code is written.
 
 ---
 
+## 8 · Toolkit
+
+- [ ] **188. Upgrade to Qt 6.12.** Qt 6.12 is the current long-term-support
+  release; this VM builds with Qt 6.10.2. Check first that the Debian machine
+  can still build and run SIGEL, which has Qt 6.4.2.
+
+---
+
 ## Watch out
 
 Not work. Traps that bite whoever edits these files next.
