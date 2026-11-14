@@ -172,10 +172,6 @@ touched, because changing one changes behaviour against the reference binary.
   loading one. Found in use; the cause is not known yet
   (`MT_PopulationWidget::slotAddInd` and its dialog look complete).
 
-- [ ] **181. Put the copyright banner in every source file.** Most MetaGP
-  files and some others have none, and the repository is public, so the
-  copyright must stand in every file.
-
 ---
 
 ## 6 · GP engine
