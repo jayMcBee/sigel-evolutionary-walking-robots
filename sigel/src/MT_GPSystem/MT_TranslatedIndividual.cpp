@@ -24,11 +24,10 @@
 
 MT_TranslatedIndividual::MT_TranslatedIndividual()
 {
-	//Do not use 
-
-	T_Instruction=nullptr;
+	// Do not use
+	T_Instruction = nullptr;
 	T_Operand1 = nullptr;
-	T_Operand2 =nullptr;
+	T_Operand2 = nullptr;
 	T_length = 0;
 	Boundary = -1;
 	MetaData = nullptr;
@@ -42,124 +41,146 @@ MT_TranslatedIndividual::~MT_TranslatedIndividual()
 	delete MetaData;
 }
 
-MT_TranslatedIndividual::MT_TranslatedIndividual(QList<int> *Instructions, QList<int> *T_OperOne, QList<int> *T_OperTwo, QList<int> *MData )
+MT_TranslatedIndividual::MT_TranslatedIndividual( QList< int > *Instructions, QList< int > *T_OperOne, QList< int > *T_OperTwo, QList< int > *MData )
 {
-	T_Instruction= Instructions;
+	T_Instruction = Instructions;
 	T_Operand1 = T_OperOne;
 	T_Operand2 = T_OperTwo;
 	T_length = T_Instruction->size();
 	MetaData = MData;
-	
+
 	Boundary = -1;
 }
 
-MT_TranslatedIndividual::MT_TranslatedIndividual(QTextStream &File)
+MT_TranslatedIndividual::MT_TranslatedIndividual( QTextStream &File )
 {
-	QString TransIndiString("TranslatedIndividual:" );
+	QString TransIndiString( "TranslatedIndividual:" );
 	QString PresentLine = File.readLine();
 
-	while ((PresentLine != TransIndiString) && !(File.atEnd()))
-		PresentLine = File.readLine();
-
-	if ((PresentLine == TransIndiString) && !(File.atEnd()))
+	while( ( PresentLine != TransIndiString ) && !( File.atEnd() ) )
 	{
-		T_length = (File.readLine()).toInt();
-		Boundary = (File.readLine()).toInt();
+		PresentLine = File.readLine();
+	}
 
-		T_Instruction = new QList<int>;
-		T_Operand1 = new QList<int>;
-		T_Operand2 = new QList<int>;
-		MetaData = new QList<int>;
+	if( ( PresentLine == TransIndiString ) && !( File.atEnd() ) )
+	{
+		T_length = ( File.readLine() ).toInt();
+		Boundary = ( File.readLine() ).toInt();
 
-		if (Boundary <= 0)
-			MetaData->resize(16);
+		T_Instruction = new QList< int >;
+		T_Operand1 = new QList< int >;
+		T_Operand2 = new QList< int >;
+		MetaData = new QList< int >;
+
+		if( Boundary <= 0 )
+		{
+			MetaData->resize( 16 );
+		}
 		else
-			MetaData->resize(32);			
+		{
+			MetaData->resize( 32 );
+		}
 
-		T_Instruction->resize(T_length);
-		T_Operand1->resize(T_length);
-		T_Operand2->resize(T_length);
+		T_Instruction->resize( T_length );
+		T_Operand1->resize( T_length );
+		T_Operand2->resize( T_length );
 
 		QString PartOfLine;
-		// Line layout, e.g. "1234 1234567 1234567" <- length 18  	
-		for (int i=0; i<T_length;i++)
+
+		// Line layout, e.g. "1234 1234567 1234567" <- length 18
+		for( int i = 0; i < T_length; i++ )
 		{
 			PresentLine = File.readLine();
-			PartOfLine = PresentLine.mid(0,4); 
-			(*T_Instruction)[i] = PartOfLine.toInt();
-			PartOfLine = PresentLine.mid(4,7);
-			(*T_Operand1)[i] = PartOfLine.toInt();
-			PartOfLine = PresentLine.mid(11,7);
-			(*T_Operand2)[i] = PartOfLine.toInt();
+			PartOfLine = PresentLine.mid( 0, 4 );
+			( *T_Instruction )[i] = PartOfLine.toInt();
+			PartOfLine = PresentLine.mid( 4, 7 );
+			( *T_Operand1 )[i] = PartOfLine.toInt();
+			PartOfLine = PresentLine.mid( 11, 7 );
+			( *T_Operand2 )[i] = PartOfLine.toInt();
 		}
-		
+
 		PresentLine = File.readLine();
 
-		if( PresentLine == "MetaData:")
-			if(Boundary <=0)
-				for(int k=0; k<16; k++)
-				{
-					PresentLine = File.readLine();
-					(*MetaData)[k] = PresentLine.toInt();
-				}
-			else 
-				for(int k=0; k<32; k++)
-				{
-					PresentLine = File.readLine();
-					(*MetaData)[k] = PresentLine.toInt();
-				}
-					
-		else
-			// Generate metadata .... 
+		if( PresentLine == "MetaData:" )
 		{
-			for (int i=0; i<MetaData->size(); i++)
-				(*MetaData)[i] =0;
-
-			if (Boundary <=0)		// For the evaluator
+			if( Boundary <= 0 )
 			{
-				(*MetaData)[0] = T_length;
-				for (int k=0; k< T_Instruction->size(); k++)
-					(*MetaData)[(*T_Instruction)[k]] ++;		
+				for( int k = 0; k < 16; k++ )
+				{
+					PresentLine = File.readLine();
+					( *MetaData )[k] = PresentLine.toInt();
+				}
 			}
-			else						// For the classifier
+			else
 			{
-				(*MetaData)[0] = Boundary;
-				for (int k=0; k< Boundary; k++)
-					(*MetaData)[(*T_Instruction)[k]] ++;
+				for( int k = 0; k < 32; k++ )
+				{
+					PresentLine = File.readLine();
+					( *MetaData )[k] = PresentLine.toInt();
+				}
+			}
+		}
+		else
+		{
+			// Generate metadata ....
+			for( int i = 0; i < MetaData->size(); i++ )
+			{
+				( *MetaData )[i] = 0;
+			}
 
-				(*MetaData)[16] = T_length-Boundary;
-				for (int k=Boundary; k< T_Instruction->size(); k++)
-					(*MetaData)[16+(*T_Instruction)[k]] ++;
+			if( Boundary <= 0 ) // For the evaluator
+			{
+				( *MetaData )[0] = T_length;
+				for( int k = 0; k < T_Instruction->size(); k++ )
+				{
+					( *MetaData )[( *T_Instruction )[k]]++;
+				}
+			}
+			else // For the classifier
+			{
+				( *MetaData )[0] = Boundary;
+				for( int k = 0; k < Boundary; k++ )
+				{
+					( *MetaData )[( *T_Instruction )[k]]++;
+				}
+
+				( *MetaData )[16] = T_length - Boundary;
+				for( int k = Boundary; k < T_Instruction->size(); k++ )
+				{
+					( *MetaData )[16 + ( *T_Instruction )[k]]++;
+				}
 			}
 		}
 	}
 }
 
-void MT_TranslatedIndividual::writeToFileTransIndi(QTextStream &File)
+void MT_TranslatedIndividual::writeToFileTransIndi( QTextStream &File )
 {
-	File << ("TranslatedIndividual:\n");
+	File << ( "TranslatedIndividual:\n" );
 	File << T_length << Qt::endl;
 	File << Boundary << Qt::endl;
 
 	QString PartOfLine;
 
-	// Line layout, e.g. "123 123456 1234567" <- length 18 
-
-	for (int i=0; i<T_length;i++)
+	// Line layout, e.g. "123 123456 1234567" <- length 18
+	for( int i = 0; i < T_length; i++ )
 	{
-		PartOfLine.setNum((*T_Instruction)[i]);
-		File<<PartOfLine.leftJustified(4,' ', true);
+		PartOfLine.setNum( ( *T_Instruction )[i] );
+		File << PartOfLine.leftJustified( 4, ' ', true );
 
-		PartOfLine.setNum((*T_Operand1)[i]);
-		File<<PartOfLine.leftJustified(7,' ', true);
-		
-		PartOfLine.setNum((*T_Operand2)[i]);
-		File<<PartOfLine.leftJustified(7,' ', true) << Qt::endl;
+		PartOfLine.setNum( ( *T_Operand1 )[i] );
+		File << PartOfLine.leftJustified( 7, ' ', true );
+
+		PartOfLine.setNum( ( *T_Operand2 )[i] );
+		File << PartOfLine.leftJustified( 7, ' ', true ) << Qt::endl;
 	}
+
 	File << "MetaData:" << Qt::endl;
-	
-	for (int i=0; i< MetaData->size(); i++)
-		File << (*MetaData)[i] << Qt::endl;
-	
-	File<<Qt::endl;
+
+	for( int i = 0; i < MetaData->size(); i++ )
+	{
+		File << ( *MetaData )[i] << Qt::endl;
+	}
+
+	File << Qt::endl;
 }
