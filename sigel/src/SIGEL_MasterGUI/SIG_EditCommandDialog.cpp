@@ -60,29 +60,29 @@ SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent, bool modal, Qt::W
 
     setObjectName( "SIG_EditCommandDialog" );
     setMinimumWidth( 400 );
-    setWindowTitle( tr( "Edit Command" ) );
+    setWindowTitle( "Edit Command" );
     SIG_EditCommandDialogLayout = new QVBoxLayout( this ); 
     SIG_EditCommandDialogLayout->setSpacing( 20 );
     SIG_EditCommandDialogLayout->setContentsMargins( 16, 16, 16, 16 );
 
     textlabelCommand = new QLabel( this );
-    textlabelCommand->setText( tr( "Command:" ) );
+    textlabelCommand->setText( "Command:" );
     SIG_EditCommandDialogLayout->addWidget( textlabelCommand );
 
     buttongroupAllowDisallow = new QGroupBox( this );
-    buttongroupAllowDisallow->setTitle( tr( "Availability" ) );
+    buttongroupAllowDisallow->setTitle( "Availability" );
     buttongroupAllowDisallowLayout = new QVBoxLayout( buttongroupAllowDisallow );
     buttongroupAllowDisallowLayout->setAlignment( Qt::AlignTop );
     buttongroupAllowDisallowLayout->setSpacing( 12 );
     buttongroupAllowDisallowLayout->setContentsMargins( 16, 16, 16, 16 );
 
     radiobuttonAllow = new QRadioButton( buttongroupAllowDisallow );
-    radiobuttonAllow->setText( tr( "Allow" ) );
+    radiobuttonAllow->setText( "Allow" );
     radiobuttonAllow->setChecked( true );
     buttongroupAllowDisallowLayout->addWidget( radiobuttonAllow );
 
     radiobuttonDisallow = new QRadioButton( buttongroupAllowDisallow );
-    radiobuttonDisallow->setText( tr( "Disallow" ) );
+    radiobuttonDisallow->setText( "Disallow" );
     buttongroupAllowDisallowLayout->addWidget( radiobuttonDisallow );
     SIG_EditCommandDialogLayout->addWidget( buttongroupAllowDisallow );
 
@@ -91,7 +91,7 @@ SIG_EditCommandDialog::SIG_EditCommandDialog( QWidget* parent, bool modal, Qt::W
     Layout2->setContentsMargins( 0, 0, 0, 0 );
 
     textlabelDuration = new QLabel( this );
-    textlabelDuration->setText( tr( "Duration:" ) );
+    textlabelDuration->setText( "Duration:" );
     Layout2->addWidget( textlabelDuration );
 
     lineeditDuration = new QLineEdit( this );

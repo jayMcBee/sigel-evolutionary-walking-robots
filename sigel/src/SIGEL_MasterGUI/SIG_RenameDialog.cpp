@@ -55,7 +55,7 @@ SIG_RenameDialog::SIG_RenameDialog( QWidget* parent, bool modal, Qt::WindowFlags
 
     setObjectName( "SIG_RenameDialog" );
     resize( 400, 95 ); 
-    setWindowTitle( tr( "Rename" ) );
+    setWindowTitle( "Rename" );
     SIG_RenameDialogLayout = new QVBoxLayout( this ); 
     SIG_RenameDialogLayout->setSpacing( 6 );
     SIG_RenameDialogLayout->setContentsMargins( 11, 11, 11, 11 );
@@ -65,7 +65,7 @@ SIG_RenameDialog::SIG_RenameDialog( QWidget* parent, bool modal, Qt::WindowFlags
     Layout2->setContentsMargins( 0, 0, 0, 0 );
 
     textlabelNewName = new QLabel( this );
-    textlabelNewName->setText( tr( "New name:" ) );
+    textlabelNewName->setText( "New name:" );
     Layout2->addWidget( textlabelNewName );
 
     lineeditNewName = new QLineEdit( this );

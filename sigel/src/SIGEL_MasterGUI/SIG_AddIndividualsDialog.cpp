@@ -56,7 +56,7 @@ SIG_AddIndividualsDialog::SIG_AddIndividualsDialog( QWidget* parent, bool modal,
     setObjectName( "SIG_AddIndividualsDialogBase" );
     resize( 300, 95 ); 
     setSizePolicy( QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Minimum ) );
-    setWindowTitle( tr( "Add Individuals" ) );
+    setWindowTitle( "Add Individuals" );
     SIG_AddIndividualsDialogBaseLayout = new QVBoxLayout( this ); 
     SIG_AddIndividualsDialogBaseLayout->setSpacing( 6 );
     SIG_AddIndividualsDialogBaseLayout->setContentsMargins( 11, 11, 11, 11 );
@@ -66,7 +66,7 @@ SIG_AddIndividualsDialog::SIG_AddIndividualsDialog( QWidget* parent, bool modal,
     Layout4->setContentsMargins( 0, 0, 0, 0 );
 
     textlabelNumber = new QLabel( this );
-    textlabelNumber->setText( tr( "Number to add:" ) );
+    textlabelNumber->setText( "Number to add:" );
     Layout4->addWidget( textlabelNumber );
 
     spinboxNumber = new QSpinBox( this );
