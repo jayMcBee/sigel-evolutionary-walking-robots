@@ -28,15 +28,3 @@ SIG_SimulationWidgetBase::SIG_SimulationWidgetBase(QWidget* parent, Qt::WindowFl
 {
   setupUi( this );
 }
-
-void SIG_SimulationWidgetBase::changeEvent( QEvent *e )
-{
-  QWidget::changeEvent( e );
-  if ( e->type() == QEvent::LanguageChange )
-    languageChange();
-}
-
-void SIG_SimulationWidgetBase::languageChange()
-{
-  retranslateUi( this );
-}

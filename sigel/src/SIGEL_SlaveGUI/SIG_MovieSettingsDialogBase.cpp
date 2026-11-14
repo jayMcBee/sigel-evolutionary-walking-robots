@@ -30,15 +30,3 @@ SIG_MovieSettingsDialogBase::SIG_MovieSettingsDialogBase(QWidget* parent, bool m
 
   setupUi( this );
 }
-
-void SIG_MovieSettingsDialogBase::changeEvent( QEvent *e )
-{
-  QDialog::changeEvent( e );
-  if ( e->type() == QEvent::LanguageChange )
-    languageChange();
-}
-
-void SIG_MovieSettingsDialogBase::languageChange()
-{
-  retranslateUi( this );
-}

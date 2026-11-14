@@ -3741,8 +3741,6 @@ COMMENTS. ITEM 108 IS DONE.**
     be ignored. `MT_AddConstantsWidget`'s float minimum validator has its
     bounds reversed, and its ranges differ between the constructor and
     `slotClicked`.
-  - SIGEL installs no translator, so `changeEvent` probably never calls
-    `languageChange()`.
   - Port history in comments that name no Qt version: the `pthread_create`
     comment in `main`; "That leak is 1.3's." in `SIG_DynaMechsSimulationData.h`;
     "2003" comments in `SIG_Simulation.cpp`; "disable/enable autodelete" in
@@ -7553,7 +7551,7 @@ The three adjustments:
 |---|---|
 | `Qt::WindowFlags fl = 0` | `= Qt::WindowFlags()` — `QFlags` has no converting constructor from `0` |
 | `: QWidget(parent, name, fl)` | `: QWidget(parent, fl)` plus `setObjectName(name)` |
-| `protected slots: languageChange()` | kept, driven from a `changeEvent` override. Qt 3 called it; Qt 6 has no such hook, so without the override the slot is dead code |
+| `protected slots: languageChange()` | dropped. Qt 6 has no such hook, and SIGEL installs no translator, so `setupUi` sets the texts once through `retranslateUi` |
 
 `QDialog` forms take a fourth argument, so the base does `QDialog(parent, fl)`
 then `setObjectName` and `setModal`. **The pair is committed per form and cannot

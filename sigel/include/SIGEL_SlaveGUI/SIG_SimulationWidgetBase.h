@@ -30,7 +30,6 @@
 
 #include "ui_SIG_SimulationWidgetBase.h"
 
-#include <QEvent>
 #include <QWidget>
 
 class SIG_SimulationWidgetBase : public QWidget, public Ui::SIG_SimulationWidgetBase
@@ -39,14 +38,6 @@ class SIG_SimulationWidgetBase : public QWidget, public Ui::SIG_SimulationWidget
 
 public:
     SIG_SimulationWidgetBase(QWidget* parent = nullptr, Qt::WindowFlags fl = Qt::WindowFlags());
-
-protected:
-    // Qt does not call languageChange() itself.
-    // changeEvent calls it on a language change.
-    void changeEvent( QEvent *e ) override;
-
-protected slots:
-    virtual void languageChange();
 };
 
 #endif // SIGEL_SLAVEGUI_SIG_SIMULATIONWIDGETBASE_H
