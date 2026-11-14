@@ -509,7 +509,7 @@ void MT_IndividualsWidget::slotChangeEdit( int value )
 	QLineEdit *receiverObject = findChild<QLineEdit *>( receiverName );
 
 	// transfer value to text and update the widget if necessary
-	QString valText( tr( "%1" ).arg( value ) );
+	QString valText( QString::number( value ) );
 	if( receiverObject && ( receiverObject->text() != valText ) )
 	{
 		receiverObject->setText( valText );
@@ -535,7 +535,7 @@ void MT_IndividualsWidget::slotChangeSlider( const QString &text )
 	// and update the line edit, else update the slider
 	if( value > validator->top() )
 	{
-		senderObject->setText( tr( "%1" ).arg( validator->top() ) );
+		senderObject->setText( QString::number( validator->top() ) );
 	}
 	else if( receiverObject && ( receiverObject->value() != value ) )
 	{

@@ -143,9 +143,9 @@ MT_AddConstantsWidget::MT_AddConstantsWidget(MT_IndividualsWidget *parent, bool 
 		maxValidator = new Qt2DoubleValidator(-100000.0, 100000.0, 4, this);
 	}
 	minValueEdit->setValidator(minValidator);
-	minValueEdit->setText(tr("%1").arg(individualsWidget->minValue));
+	minValueEdit->setText(QString::number(individualsWidget->minValue));
 	maxValueEdit->setValidator(maxValidator);
-	maxValueEdit->setText(tr("%1").arg(individualsWidget->maxValue));
+	maxValueEdit->setText(QString::number(individualsWidget->maxValue));
 
 	// Also called in slotClicked: the type radio deletes and rebuilds both validators.
 	SIGEL_CommonGUI::SIG_WidgetUtils::useDotDecimalNumberFormat(this);
@@ -180,8 +180,8 @@ void MT_AddConstantsWidget::slotClicked(int id)
 			maxValidator = new Qt2IntValidator(-10000, 10000, this);
 			minValueEdit->setValidator(minValidator);
 			maxValueEdit->setValidator(maxValidator);
-			minValueEdit->setText(tr("%1").arg(static_cast<int>(minValueEdit->text().toDouble())));
-			maxValueEdit->setText(tr("%1").arg(static_cast<int>(maxValueEdit->text().toDouble())));
+			minValueEdit->setText(QString::number(static_cast<int>(minValueEdit->text().toDouble())));
+			maxValueEdit->setText(QString::number(static_cast<int>(maxValueEdit->text().toDouble())));
 			SIGEL_CommonGUI::SIG_WidgetUtils::useDotDecimalNumberFormat(this);
 		}
 	} else {
@@ -193,8 +193,8 @@ void MT_AddConstantsWidget::slotClicked(int id)
 			maxValidator = new Qt2DoubleValidator(-10000.0, 10000.0, 4, this);
 			minValueEdit->setValidator(minValidator);
 			maxValueEdit->setValidator(maxValidator);
-			minValueEdit->setText(tr("%1").arg(static_cast<double>(minValueEdit->text().toInt())));
-			maxValueEdit->setText(tr("%1").arg(static_cast<double>(maxValueEdit->text().toInt())));
+			minValueEdit->setText(QString::number(static_cast<double>(minValueEdit->text().toInt())));
+			maxValueEdit->setText(QString::number(static_cast<double>(maxValueEdit->text().toInt())));
 			SIGEL_CommonGUI::SIG_WidgetUtils::useDotDecimalNumberFormat(this);
 		}
 	} 		
