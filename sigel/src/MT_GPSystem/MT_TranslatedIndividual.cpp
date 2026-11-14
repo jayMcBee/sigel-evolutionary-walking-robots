@@ -22,17 +22,6 @@
 */
 #include "MT_GPSystem/MT_TranslatedIndividual.h"
 
-MT_TranslatedIndividual::MT_TranslatedIndividual()
-{
-	// Do not use
-	T_Instruction = nullptr;
-	T_Operand1 = nullptr;
-	T_Operand2 = nullptr;
-	T_length = 0;
-	Boundary = -1;
-	MetaData = nullptr;
-}
-
 MT_TranslatedIndividual::~MT_TranslatedIndividual()
 {
 	delete T_Operand1;

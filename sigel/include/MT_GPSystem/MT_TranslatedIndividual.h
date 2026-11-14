@@ -81,10 +81,6 @@ public:
 	*/
 	QList<int> * MetaData;
 
-	/* constructor
-	*/
-	MT_TranslatedIndividual();
-	
 	/* the constructor receive the three array (per pointers) for 
 	* representing the SIGEL robot control program thought the MT_Translator 
 	* @pre the three arrays must existed 
