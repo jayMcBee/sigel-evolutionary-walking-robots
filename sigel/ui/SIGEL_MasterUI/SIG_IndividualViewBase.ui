@@ -68,7 +68,7 @@
             </layout>
           </item>
           <item>
-            <widget class="QTextEdit" name="multilineeditProgramCode">
+            <widget class="SIGEL_CommonGUI::SIG_ProgramView" name="multilineeditProgramCode">
               <property name="readOnly">
                 <bool>true</bool>
               </property>
@@ -246,4 +246,11 @@
       </item>
     </layout>
   </widget>
+  <customwidgets>
+    <customwidget>
+      <class>SIGEL_CommonGUI::SIG_ProgramView</class>
+      <extends>QPlainTextEdit</extends>
+      <header location="local">SIGEL_CommonGUI/SIG_ProgramView.h</header>
+    </customwidget>
+  </customwidgets>
 </ui>

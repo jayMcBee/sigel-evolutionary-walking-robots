@@ -724,7 +724,7 @@
                 <number>6</number>
               </property>
               <item row="0" column="0">
-                <widget class="QTextEdit" name="robotProgramView">
+                <widget class="SIGEL_CommonGUI::SIG_ProgramView" name="robotProgramView">
                   <property name="readOnly">
                     <bool>true</bool>
                   </property>
@@ -746,6 +746,11 @@
         <height>-1</height>
       </sizehint>
       <container>0</container>
+    </customwidget>
+    <customwidget>
+      <class>SIGEL_CommonGUI::SIG_ProgramView</class>
+      <extends>QPlainTextEdit</extends>
+      <header location="local">SIGEL_CommonGUI/SIG_ProgramView.h</header>
     </customwidget>
   </customwidgets>
   <resources>

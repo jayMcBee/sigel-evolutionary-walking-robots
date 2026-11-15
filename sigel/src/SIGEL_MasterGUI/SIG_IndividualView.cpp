@@ -48,7 +48,7 @@ SIG_IndividualView::SIG_IndividualView( QWidget* parent, Qt::WindowFlags fl, SIG
   textlabelShowFitness->setText( fitness );
   QString programCode;
   theGPIndividual->getProgramPointer()->printToString( programCode );
-  multilineeditProgramCode->setText( programCode );
+  multilineeditProgramCode->setPlainText( programCode );
   QString history = theGPIndividual->getHistory().join( "\n" );
   multilineeditHistory->setText( history );
 }

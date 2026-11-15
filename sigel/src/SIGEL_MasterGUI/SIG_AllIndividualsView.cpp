@@ -390,7 +390,7 @@ namespace SIGEL_MasterGUI
 		individualView->textlabelShowFitness->setText( fitness );
 		QString programCode;
 		theGPIndividual->getProgramPointer()->printToString( programCode );
-		individualView->multilineeditProgramCode->setText( programCode );
+		individualView->multilineeditProgramCode->setPlainText( programCode );
 		QString history = theGPIndividual->getHistory().join( "\n" );
 		individualView->multilineeditHistory->setText( history );
 	}

@@ -131,18 +131,6 @@ touched, because changing one changes behaviour against the reference binary.
   and `SIG_GPRemoteZORCFitnessFunction`. Decide for each whether it belongs in
   the interface or goes through the new error reporter.
 
-- [ ] **9. Syntax-highlight the program view.** New
-  `programToHtml(const SIG_Program &, const SIG_LanguageParameters &)` returning
-  a `QString`, fed to `QTextEdit::setHtml()` wherever a program is shown.
-  `printToString()` stays as the ZORC serial format and must keep serving
-  `SIG_GPRemoteZORCFitnessFunction::evalFitness`.
-  `<pre>` wrapper, one `<span>` per token, a line number per line. Colour
-  opcodes by group: arithmetic `ADD SUB MUL DIV MOD MIN MAX`, data
-  `COPY LOAD`, control `CMP JMP`, robot `MOVE SENSE DELAY`; `NOP` has no
-  group yet. Callers: `SIG_SimulationWidget::visualizeThis`,
-  `SIG_IndividualView::SIG_IndividualView`,
-  `SIG_AllIndividualsView::slotSelectionChanged`.
-
 ---
 
 ## 5 · MetaGP

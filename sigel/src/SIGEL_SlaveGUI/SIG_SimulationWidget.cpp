@@ -303,7 +303,7 @@ namespace SIGEL_SlaveGUI
 
     QString programCode;
     program.printToString( programCode );
-    robotProgramView->setText( programCode );
+    robotProgramView->setPlainText( programCode );
   }
 
   void SIG_SimulationWidget::slotSetTraceRobot( bool newValue )

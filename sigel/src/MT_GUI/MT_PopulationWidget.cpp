@@ -24,6 +24,7 @@
 
 #include "MT_GUI/MT_AddIndividualsWidget.h"
 #include "MT_GUI/MT_PopListViewItem.h"
+#include "MT_GUI/MT_ProgramHighlighter.h"
 #include "MT_GUI/MT_MainWindow.h"
 
 #include "MT_GPSystem/MT_Individual.h"
@@ -51,6 +52,8 @@ MT_PopulationWidget::MT_PopulationWidget(QMainWindow* parent, Qt::WindowFlags fl
 	createActions();
 	createToolBar(parent);
 	createContextMenu();
+
+	individualProgramView->setHighlighter(new MT_ProgramHighlighter(individualProgramView->document()));
 
 	// establish connections
 	individualListView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -150,7 +153,7 @@ void MT_PopulationWidget::onShow(MT_GPManager *manager, MT_EstimationState *esti
 		individualListView->clear();
 		individualListView->blockSignals(wasBlocked);
 	}
-	individualProgramView->setText("");
+	individualProgramView->setPlainText("");
 	individualCountLCD->display(0);
 
 	// get the current population
@@ -270,7 +273,7 @@ void MT_PopulationWidget::slotCurrentChanged(QTreeWidgetItem *item)
 	// display the program
 	for(int i=0; i<currentIndividual->getProgram()->getLength(); i++)
 	{
-		individualProgramView->append(currentIndividual->printProgramLine(i));
+		individualProgramView->appendPlainText(currentIndividual->printProgramLine(i));
 	}
 }
 
