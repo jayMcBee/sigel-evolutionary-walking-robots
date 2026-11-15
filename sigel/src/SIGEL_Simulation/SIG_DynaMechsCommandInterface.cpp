@@ -29,6 +29,7 @@
 #include <dmRevoluteLink.hpp>
 
 #include "SIGEL_Tools/SIG_Vector.h"
+#include <algorithm>
 #include <cmath>
 #include <numbers>
 
@@ -164,15 +165,11 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 			// set new min. limit ! give a minimal freedom of 1 degree to prevent
 			// something shitty happening within our simulation -- but only if the
 			// dest. angle isn't already at our 'natural' joint limits !
-			if (dmDestAngle - onePiDegree > intMin)
-			{	intMin = dmDestAngle-onePiDegree;
-			}
+			intMin = std::max<long double>( intMin, dmDestAngle - onePiDegree );
 		}
 		else
 		{	// set new max. limit !  same stuff as above applies in this case..
-			if (dmDestAngle + onePiDegree < intMax)
-			{	intMax = dmDestAngle+onePiDegree;
-			}
+			intMax = std::min<long double>( intMax, dmDestAngle + onePiDegree );
 		}
 
 		// now fall down on your knees and pray to the lord this really works :-)
@@ -190,8 +187,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 	 // apply (using minForce/maxForce boundaries) to joint
 	 else
 	 {
-	 	if (absoluteRegisterValue<0)
-			absoluteRegisterValue = 0;
+		absoluteRegisterValue = std::max( absoluteRegisterValue, 0.0L );
 
 		long double force = (   ( absoluteRegisterValue / registerValueRange )
 			    * ( 2 * drive->getMaxForce() ) )
