@@ -44,8 +44,7 @@ namespace
 
 	void resizeOwning( QList< SIGEL_GP::SIG_GPIndividual * > &v, qsizetype want )
 	{
-		if (want < 0)
-			want = 0;
+		want = std::max<qsizetype>( want, 0 );
 		for (qsizetype i = want; i < v.size(); i++)
 			delete v[ i ];
 		v.resize( want );
