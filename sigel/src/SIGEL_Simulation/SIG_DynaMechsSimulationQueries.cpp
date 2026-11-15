@@ -118,10 +118,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense( int sensorNo,
 
 	// Keeps a sensorReading of 1 at the register's top value: the mapping gives
 	// one more, and SIG_Register::makeValid would wrap it to the bottom.
-	if( registerValue > registers[0].getMaxValue() )
-	{
-		registerValue = registers[0].getMaxValue();
-	}
+	registerValue = std::min( registerValue, registers[0].getMaxValue() );
 
 #ifdef SIG_DEBUG
 	SIGEL_Tools::SIG_IO::cerr << "minRegisterValue: "
