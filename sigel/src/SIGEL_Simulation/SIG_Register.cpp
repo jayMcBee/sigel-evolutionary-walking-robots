@@ -23,6 +23,7 @@
 
 #include "SIGEL_Simulation/SIG_Register.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
+#include <algorithm>
 #include <cmath> // needed for computing the power of a number
 #include <cstdlib> // std::abs for int
 
@@ -88,14 +89,12 @@ void SIGEL_Simulation::SIG_Register::divReg(SIG_Register const& otherRegister)
 
 void SIGEL_Simulation::SIG_Register::minReg(SIG_Register const& otherRegister)
 {
-  if (otherRegister.getValue()<value)
-    value=otherRegister.getValue();
+  value = std::min( value, otherRegister.getValue() );
 }
 
 void SIGEL_Simulation::SIG_Register::maxReg(SIG_Register const& otherRegister)
 {
-  if (otherRegister.getValue()>value)
-    value=otherRegister.getValue();
+  value = std::max( value, otherRegister.getValue() );
 }
 
 void SIGEL_Simulation::SIG_Register::modReg(SIG_Register const& otherRegister)
