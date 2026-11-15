@@ -27,6 +27,7 @@
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 
 #include <dm.h>
+#include <algorithm>
 #include <cmath>
 #include <numbers>
 #include <newmat.h>
@@ -38,12 +39,7 @@ namespace SIGEL_Robot
 
 	double tolerantACos( double cosInput )
 	{
-		if (cosInput > 1)
-			cosInput= 1;
-		else if (cosInput < -1)
-			cosInput = -1;
-
-		return std::acos( cosInput );
+		return std::acos( std::clamp( cosInput, -1.0, 1.0 ) );
 	}
 
 	SIG_Vector orthogonalVector( SIG_Vector input )
