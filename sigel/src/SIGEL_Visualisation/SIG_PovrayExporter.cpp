@@ -235,20 +235,11 @@ QString SIG_PovrayExporter::robotDeclarations() const
 	       << "#declare sigelAnchorPointRadius = " << anchorPointRadius() << ";\n"
 	       << "\n";
 
-	// A robot file gives a material only a colour. It becomes paint, a little greyer and
-	// darker than the colour, so that pure colours look like paint and not like plastic.
 	for( SIGEL_Robot::SIG_Material *materialPtr : robot.getMaterials() )
 	{
 		SIGEL_Robot::SIG_Material &currentMaterial = *materialPtr;
 
-		NEWMAT::ColumnVector paintColor = SIG_TypeConverter::toColumnVector( currentMaterial.getColour() );
-
-		double const grey = 0.2126 * paintColor( 1 ) + 0.7152 * paintColor( 2 ) + 0.0722 * paintColor( 3 );
-
-		for( int i = 1; i <= 3; i++ )
-		{
-			paintColor( i ) = ( paintColor( i ) + ( grey - paintColor( i ) ) * 0.45 ) * 0.8;
-		}
+		NEWMAT::ColumnVector const paintColor = SIG_TypeConverter::toColumnVector( currentMaterial.getColour() );
 
 		stream << "#declare "
 		       << currentMaterial.getName()
