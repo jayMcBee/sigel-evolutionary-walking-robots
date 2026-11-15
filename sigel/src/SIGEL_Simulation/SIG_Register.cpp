@@ -20,120 +20,132 @@
   along with Sigel; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
-
 #include "SIGEL_Simulation/SIG_Register.h"
-#include "SIGEL_Robot/SIG_LanguageParameters.h"
-#include <algorithm>
-#include <cmath> // needed for computing the power of a number
-#include <cstdlib> // std::abs for int
 
-SIGEL_Simulation::SIG_Register::SIG_Register(int size)
-  : value(0)
+#include "SIGEL_Robot/SIG_LanguageParameters.h"
+
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+
+SIGEL_Simulation::SIG_Register::SIG_Register( int size )
+	: value( 0 )
 {
-  if ( (size>0) && (size<=SIGEL_Robot::SIG_LanguageParameters::maxRegisterWidth) )
-    this->size = size;
-  else 
-    throw SIG_RegisterWrongSizeException(__FILE__,__LINE__,"Size of Register must be between 1 and 16");
+	if( ( size > 0 ) && ( size <= SIGEL_Robot::SIG_LanguageParameters::maxRegisterWidth ) )
+	{
+		this->size = size;
+	}
+	else
+	{
+		throw SIG_RegisterWrongSizeException( __FILE__, __LINE__, "Size of Register must be between 1 and 16" );
+	}
 }
 
 void SIGEL_Simulation::SIG_Register::makeValid()
 {
-  int max= static_cast<int>(std::pow(2,size-1));
+	int max = static_cast<int>( std::pow( 2, size - 1 ) );
 
-  if ( max - 1 < value )
-    {
-      value = -max + ( ( value + max ) % (2*max) );
-    };
+	if( max - 1 < value )
+	{
+		value = -max + ( ( value + max ) % ( 2 * max ) );
+	}
 
-  if ( value < -max )
-    value = max - 1 + ( ( value - ( max - 1) ) % (2*max) );
+	if( value < -max )
+	{
+		value = max - 1 + ( ( value - ( max - 1 ) ) % ( 2 * max ) );
+	}
 }
 
-void SIGEL_Simulation::SIG_Register::copyReg(SIG_Register const& otherRegister)
-{ 
-  value=otherRegister.getValue();
-}
-
-void SIGEL_Simulation::SIG_Register::addReg(SIG_Register const& otherRegister)
+void SIGEL_Simulation::SIG_Register::copyReg( SIG_Register const &otherRegister )
 {
-  value=value+otherRegister.getValue();
-  makeValid();
+	value = otherRegister.getValue();
 }
 
-void SIGEL_Simulation::SIG_Register::subReg(SIG_Register const& otherRegister)
-{ 
-  value=value-otherRegister.getValue();
-  makeValid();
-}
-
-void SIGEL_Simulation::SIG_Register::loadValue(int newValue)
+void SIGEL_Simulation::SIG_Register::addReg( SIG_Register const &otherRegister )
 {
-  value=newValue;
-  makeValid();
+	value = value + otherRegister.getValue();
+	makeValid();
 }
 
-void SIGEL_Simulation::SIG_Register::mulReg(SIG_Register const& otherRegister)
+void SIGEL_Simulation::SIG_Register::subReg( SIG_Register const &otherRegister )
 {
-  value=value*otherRegister.getValue();
-  makeValid();
+	value = value - otherRegister.getValue();
+	makeValid();
 }
 
-void SIGEL_Simulation::SIG_Register::divReg(SIG_Register const& otherRegister)
+void SIGEL_Simulation::SIG_Register::loadValue( int newValue )
 {
-  if( otherRegister.getValue() == 0 )
-    value = 0;
-  else
-    value=value/otherRegister.getValue();
-  makeValid();
+	value = newValue;
+	makeValid();
 }
 
-void SIGEL_Simulation::SIG_Register::minReg(SIG_Register const& otherRegister)
+void SIGEL_Simulation::SIG_Register::mulReg( SIG_Register const &otherRegister )
 {
-  value = std::min( value, otherRegister.getValue() );
+	value = value * otherRegister.getValue();
+	makeValid();
 }
 
-void SIGEL_Simulation::SIG_Register::maxReg(SIG_Register const& otherRegister)
+void SIGEL_Simulation::SIG_Register::divReg( SIG_Register const &otherRegister )
 {
-  value = std::max( value, otherRegister.getValue() );
+	if( otherRegister.getValue() == 0 )
+	{
+		value = 0;
+	}
+	else
+	{
+		value = value / otherRegister.getValue();
+	}
+
+	makeValid();
 }
 
-void SIGEL_Simulation::SIG_Register::modReg(SIG_Register const& otherRegister)
+void SIGEL_Simulation::SIG_Register::minReg( SIG_Register const &otherRegister )
 {
-  int divisor = std::abs( otherRegister.getValue() );
+	value = std::min( value, otherRegister.getValue() );
+}
 
-  if ( divisor == 0 )
-    {
-      value = 0;
-      return;
-    }
+void SIGEL_Simulation::SIG_Register::maxReg( SIG_Register const &otherRegister )
+{
+	value = std::max( value, otherRegister.getValue() );
+}
 
-  int remainder = value % divisor;
+void SIGEL_Simulation::SIG_Register::modReg( SIG_Register const &otherRegister )
+{
+	int divisor = std::abs( otherRegister.getValue() );
 
-  // In C++ the remainder of a negative value is negative or 0.
-  if ( remainder < 0 )
-    {
-      remainder = remainder + divisor;
-    }
+	if( divisor == 0 )
+	{
+		value = 0;
+		return;
+	}
 
-  value = remainder;
+	int remainder = value % divisor;
+
+	// In C++ the remainder of a negative value is negative or 0.
+	if( remainder < 0 )
+	{
+		remainder = remainder + divisor;
+	}
+
+	value = remainder;
 }
 
 int SIGEL_Simulation::SIG_Register::getValue() const
 {
-  return value;
+	return value;
 }
 
 int SIGEL_Simulation::SIG_Register::getSize() const
 {
-  return size;
+	return size;
 }
 
 int SIGEL_Simulation::SIG_Register::getMaxValue() const
 {
-  return static_cast<int>( std::pow(2,size-1) - 1);
+	return static_cast<int>( std::pow( 2, size - 1 ) - 1 );
 }
 
 int SIGEL_Simulation::SIG_Register::getMinValue() const
 {
-  return static_cast<int>( - std::pow(2,size-1));
+	return static_cast<int>( -std::pow( 2, size - 1 ) );
 }

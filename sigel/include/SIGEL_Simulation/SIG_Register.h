@@ -28,180 +28,179 @@
 namespace SIGEL_Simulation
 {
 
-/**
- * This class represents one register.
- *
- * The interpreter holds a QList of Registers. At the moment every
- * register is an integer value that holds the condition
- * @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
- */
-class SIG_Register {
- public:
+	/**
+	 * This class represents one register.
+	 *
+	 * The interpreter holds a QList of Registers. At the moment every
+	 * register is an integer value that holds the condition
+	 * @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
+	 */
+	class SIG_Register
+	{
+	public:
+		/**
+		 * Constructs a register with size bits.
+		 *
+		 * @exception SIG_RegisterWrongSizeException
+		 *            The supplid size parameter was @f$\le 0@f$.
+		 * @exception SIG_RegisterWrongSizeException
+		 *            The supplid size parameter was @f$> 16@f$.
+		 *
+		 * @post size is set to parameter size, if @f$size>0@f$.
+		 * @post value is set to 0.
+		 *
+		 * @param size The desired size of this SIG_Register in Bits.
+		 *             Has to be @f$>0@f$ and @f$\le 16@f$.
+		 */
+		SIG_Register( int size );
 
-  /**
-   * Constructs a register with size bits.
-   *
-   * @exception SIG_RegisterWrongSizeException
-   *            The supplid size parameter was @f$\le 0@f$.
-   * @exception SIG_RegisterWrongSizeException
-   *            The supplid size parameter was @f$> 16@f$.
-   *
-   * @post size is set to parameter size, if @f$size>0@f$.
-   * @post value is set to 0.
-   *
-   * @param size The desired size of this SIG_Register in Bits.
-   *             Has to be @f$>0@f$ and @f$\le 16@f$.
-   */
-  SIG_Register(int size);
+		/**
+		 * Copies the value of the supplied SIG_Register
+		 * into this SIG_Register.
+		 *
+		 * @param otherRegister The SIG_Register object whose
+		 *        value is to be copied.
+		 *
+		 * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
+		 */
+		void copyReg( SIG_Register const &otherRegister );
 
-  /**
-   * Copies the value of the supplied SIG_Register
-   * into this SIG_Register.
-   *
-   * @param otherRegister The SIG_Register object whose
-   *        value is to be copied.
-   *
-   * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
-   */
-  void copyReg(SIG_Register const& otherRegister);
+		/**
+		 * Adds the value of the supplied SIG_Register
+		 * to this SIG_Register's value.
+		 *
+		 * @param otherRegister The SIG_Register object whose value
+		 *                      is to be added.
+		 *
+		 * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
+		 */
+		void addReg( SIG_Register const &otherRegister );
 
-  /**
-   * Adds the value of the supplied SIG_Register
-   * to this SIG_Register's value.
-   *
-   * @param otherRegister The SIG_Register object whose value
-   *                      is to be added.
-   *
-   * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
-   */
-  void addReg(SIG_Register const& otherRegister);
+		/**
+		 * Substracts the value of the supplied SIG_Register
+		 * from this SIG_Register's value.
+		 *
+		 * @param otherRegister The SIG_Register object whose value
+		 *                      is to be substracted.
+		 *
+		 * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
+		 */
+		void subReg( SIG_Register const &otherRegister );
 
-  /**
-   * Substracts the value of the supplied SIG_Register
-   * from this SIG_Register's value.
-   *
-   * @param otherRegister The SIG_Register object whose value
-   *                      is to be substracted.
-   *
-   * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
-   */
-  void subReg(SIG_Register const& otherRegister);
+		/**
+		 * Sets this SIG_Register's value to newValue.
+		 *
+		 * @param newValue The integer-value to which this SIG_Register's
+		 *                 value is to be set.
+		 *
+		 * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
+		 */
+		void loadValue( int newValue );
 
-  /**
-   * Sets this SIG_Register's value to newValue.
-   *
-   * @param newValue The integer-value to which this SIG_Register's
-   *                 value is to be set.
-   *
-   * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
-   */
-  void loadValue(int newValue);
+		/**
+		 * Multiplies this SIG_Register's value with the supplied
+		 * ones.
+		 *
+		 * @param otherRegister The SIG_Register to multiply with.
+		 *
+		 * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
+		 */
+		void mulReg( SIG_Register const &otherRegister );
 
-  /**
-   * Multiplies this SIG_Register's value with the supplied
-   * ones.
-   *
-   * @param otherRegister The SIG_Register to multiply with.
-   *
-   * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
-   */
-  void mulReg(SIG_Register const& otherRegister);
+		/**
+		 * Divides this SIG_Register's value by the supplied ones.
+		 *
+		 * The result is rounded toward zero.
+		 *
+		 * @param otherRegister The SIG_Register to divide by.
+		 *
+		 * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
+		 */
+		void divReg( SIG_Register const &otherRegister );
 
-  /**
-   * Divides this SIG_Register's value by the supplied ones.
-   * 
-   * The result is rounded toward zero.
-   *
-   * @param otherRegister The SIG_Register to divide by.
-   *
-   * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
-   */
-  void divReg(SIG_Register const& otherRegister);
+		/**
+		 * Sets this SIG_Register's value to the minimum of
+		 * value and otherRegister.value.
+		 *
+		 * @param otherRegister The SIG_Register to compare with.
+		 *
+		 * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
+		 */
+		void minReg( SIG_Register const &otherRegister );
 
-  /**
-   * Sets this SIG_Register's value to the minimum of
-   * value and otherRegister.value.
-   *
-   * @param otherRegister The SIG_Register to compare with.
-   *
-   * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
-   */
-  void minReg(SIG_Register const& otherRegister);
+		/**
+		 * Sets this SIG_Register's value to the maximum of
+		 * value and otherRegister.value.
+		 *
+		 * @param otherRegister The SIG_Register to compare with.
+		 *
+		 * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
+		 *
+		 */
+		void maxReg( SIG_Register const &otherRegister );
 
-  /**
-   * Sets this SIG_Register's value to the maximum of
-   * value and otherRegister.value.
-   *
-   * @param otherRegister The SIG_Register to compare with.
-   *
-   * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
-   *
-   */
-  void maxReg(SIG_Register const& otherRegister);
+		/**
+		 * Modulo-divides this SIG_Register's value by the supplied ones.
+		 *
+		 * @param otherRegister The SIG_Register to modulo-divide by.
+		 *
+		 * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
+		 *
+		 */
+		void modReg( SIG_Register const &otherRegister );
 
-  /**
-   * Modulo-divides this SIG_Register's value by the supplied ones.
-   *
-   * @param otherRegister The SIG_Register to modulo-divide by.
-   *
-   * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
-   *  
-   */
-  void modReg(SIG_Register const& otherRegister);
+		/**
+		 * @return This SIG_Register's integer-value.
+		 *
+		 * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
+		 */
+		int getValue() const;
 
-  /**
-   * @return This SIG_Register's integer-value.
-   *
-   * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
-   */
-  int getValue() const;
+		/**
+		 * Returns the size of the register.
+		 * @return The size of the register.
+		 */
+		int getSize() const;
 
-  /**
-   * Returns the size of the register.
-   * @return The size of the register.
-   */
-  int getSize() const;
+		/**
+		 * Returns the maximal value the register is able to hold.
+		 * @return The maximal value the register is able to hold.
+		 */
+		int getMaxValue() const;
 
-  /**
-   * Returns the maximal value the register is able to hold.
-   * @return The maximal value the register is able to hold.
-   */
-  int getMaxValue() const;
+		/**
+		 * Returns the minimal value the register is able to hold.
+		 * @return The minimal value the register is able to hold.
+		 */
+		int getMinValue() const;
 
-  /**
-   * Returns the minimal value the register is able to hold.
-   * @return The minimal value the register is able to hold.
-   */
-  int getMinValue() const;
+	private:
+		/**
+		 * Produces the condition that
+		 * @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
+		 *
+		 * In the case @f$value < -2^{size-1}@f$ value is set to
+		 * @f$-2^{size-1}@f$.
+		 * In the case @f$2^{size-1} - 1 < value@f$ value is set to
+		 * @f$2^{size-1} - 1@f$.
+		 * This method is called by load, add, sub, mul, div and mod.
+		 *
+		 * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
+		 */
+		void makeValid();
 
- private:
+		/**
+		 * The value of the Register.
+		 *
+		 * It is always @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
+		 */
+		int value;
 
-  /**
-   * Produces the condition that
-   * @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
-   *
-   * In the case @f$value < -2^{size-1}@f$ value is set to
-   * @f$-2^{size-1}@f$.
-   * In the case @f$2^{size-1} - 1 < value@f$ value is set to
-   * @f$2^{size-1} - 1@f$.
-   * This method is called by load, add, sub, mul, div and mod.
-   *
-   * @post @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
-   */
-  void makeValid();
-
-  /**
-   * The value of the Register.
-   * 
-   * It is always @f$-2^{size-1} \le value \le 2^{size-1} - 1@f$.
-   */
-  int value;
-
-  /**
-   * The size of this SIG_Register in bits.
-   */
-  int size;
-};
+		/**
+		 * The size of this SIG_Register in bits.
+		 */
+		int size;
+	};
 
 }
 
