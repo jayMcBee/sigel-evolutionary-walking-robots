@@ -22,6 +22,7 @@
 */
 #include "MT_GPSystem/MT_Interpreter.h"
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 
@@ -99,11 +100,9 @@ double MT_Interpreter::interpret(MT_TranslatedIndividual *RobProg)
 
 	int SigProLengthTwo = RobProg->T_length - SigProLengthOne; // 0 or Length of the second SigelProgram
 
-	if (SigProLengthTwo < 0)
-		SigProLengthTwo = 0;
+	SigProLengthTwo = std::max( SigProLengthTwo, 0 );
 
-	if (SigProLengthOne < 0)
-		SigProLengthOne = 0;
+	SigProLengthOne = std::max( SigProLengthOne, 0 );
 
 	int StartPosOfTwo = 0;
 	if (SigProLengthTwo != 0)
