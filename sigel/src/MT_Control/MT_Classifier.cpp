@@ -23,6 +23,7 @@
 #include <QList>
 #include <QString>
 #include <QTextStream>
+#include <algorithm>
 #include <cstdlib>
 #include <memory>
 #include "MT_Control/MT_Classifier.h"
@@ -148,8 +149,7 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 	int NumOfClassi=0; //Number of tournaments to be run with the classifier
 	double Num =0.0;
 	double SigelGeneration = GenerationNumber;
-	if (SigelGeneration <1.0)
-		SigelGeneration =1.0;
+	SigelGeneration = std::max( SigelGeneration, 1.0 );
 
 	if (BestMETAProgram ==nullptr)
 		return NumOfClassi;
@@ -240,8 +240,7 @@ int MT_Classifier::evaluationTactic(int TournamentCount)
 				double Rate = (40.0-Tolerance)/0.9;
 				if (Rate >0.0)
 					ToleranceNew = 40.0 - Rate*ASigelFit;
-				if (ToleranceNew<0.0)
-					ToleranceNew = 0.0;
+				ToleranceNew = std::max( ToleranceNew, 0.0 );
 			}
 
 			if(MetaProgError < ToleranceNew)
