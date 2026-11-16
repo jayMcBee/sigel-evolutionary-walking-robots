@@ -251,9 +251,11 @@ problem; the choice is made before any code is written.
 
 ## 8 · Toolkit
 
-- [ ] **188. Upgrade to Qt 6.12.** Qt 6.12 is the current long-term-support
-  release; this VM builds with Qt 6.10.2. Check first that the Debian machine
-  can still build and run SIGEL, which has Qt 6.4.2.
+- [ ] **188. Upgrade to Qt 6.12.** Wait until Ubuntu ships Qt 6.12 through
+  apt; this VM has Qt 6.10.2 from apt. SIGEL builds with the Qt that each
+  machine's distribution ships, not with a Qt installed by hand. Then upgrade
+  with apt and rebuild. Any code change for 6.12 must still build on the
+  Debian machine, which stays on Qt 6.4.2.
 
 ---
 
