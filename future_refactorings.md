@@ -110,30 +110,22 @@ touched, because changing one changes behaviour against the reference binary.
   first. Still open there: `maxAge`, which the page shows and the file stores
   but nothing reads.
 
-- [ ] **29. Give SIGEL a real logging system.** Qt 6's `QTextStream` does not
-  flush on a newline, so diagnostics written through `SIG_IO` are lost when
-  the process dies, which is exactly when they are wanted.
-  **Do not fix this by adding `Qt::endl` everywhere.** It replaces both
-  `SIG_IO` and the console-warning stopgap.
-  **Decided: build on Qt's logging.** A class `SIG_Logging` in `SIGEL_Tools`
-  holds all of it: one `QLoggingCategory` per module as static members, the
-  default rules (info and above, `QT_LOGGING_RULES` overrides), the message
-  pattern and the GUI message handler. Only the GUI installs that handler; it
-  queues warnings and criticals to the main window. Call sites use one-line
-  macros `SIG_LOG_DEBUG`, `SIG_LOG_INFO`, `SIG_LOG_WARNING` and
-  `SIG_LOG_CRITICAL` in `SIG_Logging.h`, which wrap `qCDebug` and its
-  siblings with `noquote().nospace()`. The macros keep a later swap to one
-  place, skip the arguments of a disabled level, and record file and line
-  (`QT_MESSAGELOGCONTEXT`). The pattern prints file and line on debug lines
-  only, so other output stays as it is.
-  **Review every `SIG_IO::cerr` and `SIG_IO::cout` line** and give it its
-  level; some are plain information. **Replace the `SIG_DEBUG` blocks** with
-  `SIG_LOG_DEBUG`, so debug output is switched at run time. Read each block
-  first: some compute values, not only output.
-  **Review every dialog outside the interface modules as part of this,** for
-  example in `SIG_EnvironmentRenderer`, `MT_Controller`, `SIG_GPPopulation`
-  and `SIG_GPRemoteZORCFitnessFunction`. Decide for each whether it belongs in
-  the interface or goes through the new error reporter.
+- [ ] **29. Give SIGEL a real logging system.** `SIG_IO` output that does not
+  end in `Qt::endl` is lost when the process dies, the GUI shows none of it,
+  and debug output needs a `SIG_DEBUG` rebuild.
+  Add a class `SIG_Logging` in `SIGEL_Tools` on top of Qt's logging: one
+  `QLoggingCategory` per module, info and above by default, the message
+  pattern (file and line on debug lines only), and a GUI message handler that
+  shows warnings and criticals in the main window.
+  Add one-line macros `SIG_LOG_DEBUG`, `SIG_LOG_INFO`, `SIG_LOG_WARNING` and
+  `SIG_LOG_CRITICAL` that wrap `qCDebug` and its siblings.
+  Give every `SIG_IO::cerr` and `SIG_IO::cout` line its level, then remove
+  `SIG_IO`. Replace the `SIG_DEBUG` blocks with `SIG_LOG_DEBUG`; some compute
+  values, not only output.
+  Review every dialog outside the interface modules, for example in
+  `SIG_EnvironmentRenderer`, `MT_Controller`, `SIG_GPPopulation` and
+  `SIG_GPRemoteZORCFitnessFunction`: it belongs in the interface or goes
+  through `SIG_Logging`.
 
 ---
 
