@@ -28,6 +28,7 @@
 #include "SIGEL_GP/SIG_GPExperiment.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
 #include "SIGEL_GP/SIG_GPIndividual.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 #include "SIGEL_GP/SIG_GPFitnessFunctionRegistry.h"
 #ifdef SIG_INCLUDE_ZORC_SUPPORT
@@ -119,6 +120,8 @@ static void dumpOrder(const SIGEL_Robot::SIG_Robot &r, const char *which)
 
 int main(int argc, char *argv[])
 {
+  SIGEL_Tools::SIG_Logging::initializeLogging();
+
   // No result may depend on Qt's random hash seed.
   QHashSeed::setDeterministicGlobalSeed();
 

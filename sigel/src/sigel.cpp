@@ -34,6 +34,7 @@
 #include "SIGEL_GP/SIG_GPManager.h"
 #include "SIGEL_MasterGUI/SIG_MainWindow.h"
 #include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 // The headless run, while it evolves. The first SIGINT or SIGTERM stops it
 // the way the Stop button does, so it saves; a second one ends it at once.
@@ -100,6 +101,7 @@ void installSigelStandardSignalHandler() {
 int main( int argc, char *argv[] ) {
   int arg;
 
+  SIGEL_Tools::SIG_Logging::initializeLogging();
   installSigelStandardSignalHandler();
 
   bool mtEvolve=false;

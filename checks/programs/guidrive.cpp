@@ -140,6 +140,7 @@ extern "C" {
 #include "SIGEL_SlaveGUI/SIG_MovieSettingsDialog.h"
 #include "SIGEL_GP/SIG_GPMetaGPExperiment.h"
 #include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 // sigel.cpp:95 owns this global; anything that pulls MT_Controller needs it.
 bool guiEnabled = true;
@@ -1435,6 +1436,7 @@ static void openExperiment(const QString &path)
 // ---------------------------------------------------------------------- main
 static int guidriveMain(int argc, char **argv)
 {
+    SIGEL_Tools::SIG_Logging::initializeLogging();
     QApplication app(argc, argv);
     // WIDGET FILE DIALOGS, ALWAYS. Under QT_QPA_PLATFORM=offscreen no platform
     // theme offers a native one, so every baseline here was captured against

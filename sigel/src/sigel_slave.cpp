@@ -31,6 +31,7 @@
 #include <memory>
 
 #include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 #include "SIGEL_SlaveGUI/SIG_SimulationWindow.h"
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_Robot/SIG_Robot.h"
@@ -354,6 +355,7 @@ int runPVMJob( int argc, char *argv[] )
 
 int main( int argc, char *argv[] )
 {
+	SIGEL_Tools::SIG_Logging::initializeLogging();
 	installSigelStandardSignalHandler();
 
 	bool standAlone = false;
