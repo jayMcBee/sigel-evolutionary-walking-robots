@@ -115,7 +115,7 @@ touched, because changing one changes behaviour against the reference binary.
   and debug output needs a `SIG_DEBUG` rebuild.
   Add a class `SIG_Logging` in `SIGEL_Tools` on top of Qt's logging: one
   `QLoggingCategory` per module, info and above by default, the message
-  pattern (file and line on debug lines only), and a GUI message handler that
+  pattern `[date and time] [level] [category] message`, and a GUI message handler that
   shows warnings and criticals in the main window.
   Add one-line macros `SIG_LOG_DEBUG`, `SIG_LOG_INFO`, `SIG_LOG_WARNING` and
   `SIG_LOG_CRITICAL` that wrap `qCDebug` and its siblings.
