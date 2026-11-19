@@ -50,7 +50,7 @@ namespace SIGEL_Tools
 	{
 	public:
 
-		/** Sets the message pattern (type first, file and line on debug lines only) and switches debug off; call it first in main. */
+		/** Sets the message pattern ([date and time] [level] [category] message) and switches debug off; call it first in main. */
 		static void initializeLogging();
 	};
 

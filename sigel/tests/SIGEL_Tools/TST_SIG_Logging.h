@@ -76,9 +76,7 @@ namespace SIGEL_Tools
 
     void messageKeepsTheFileAndLineOfTheCall();
 
-    void debugLineStartsWithTypeFileAndLine();
-
-    void infoWarningAndCriticalLinesStartWithTheirType();
+    void everyLineIsDateLevelCategoryAndMessage();
 
     void ruleForACategoryReachesEveryCallSiteOfThatNameOnly();
 

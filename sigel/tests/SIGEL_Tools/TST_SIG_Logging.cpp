@@ -26,6 +26,7 @@
 #include "SIGEL_Tools/SIG_Logging.h"
 
 #include <QLoggingCategory>
+#include <QRegularExpression>
 #include <QtTest>
 
 std::vector<SIGEL_Tools::TST_SIG_LoggedMessage> SIGEL_Tools::TST_SIG_Logging::loggedMessages;
@@ -121,30 +122,23 @@ void SIGEL_Tools::TST_SIG_Logging::messageKeepsTheFileAndLineOfTheCall()
   QCOMPARE( loggedMessages[0].line, line );
 }
 
-void SIGEL_Tools::TST_SIG_Logging::debugLineStartsWithTypeFileAndLine()
+void SIGEL_Tools::TST_SIG_Logging::everyLineIsDateLevelCategoryAndMessage()
 {
+  const QString date = "\\[\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\]";
+
   SIG_Logging::initializeLogging();
   QLoggingCategory::setFilterRules( "SIGEL_Tools.debug=true" );
 
-  const int line = __LINE__ + 1;
-  SIG_LOG_DEBUG( "SIGEL_Tools" ) << "debug";
+  SIG_LOG_DEBUG( "SIGEL_Tools" ) << "debug message";
+  SIG_LOG_INFO( "SIGEL_Tools" ) << "info message";
+  SIG_LOG_WARNING( "SIGEL_GP" ) << "warning message";
+  SIG_LOG_CRITICAL( "SIGEL_Robot" ) << "critical message";
 
-  QCOMPARE( loggedMessages.size(), size_t( 1 ) );
-  QCOMPARE( loggedMessages[0].formattedMessage, QString( "debug: %1:%2 debug" ).arg( __FILE__ ).arg( line ) );
-}
-
-void SIGEL_Tools::TST_SIG_Logging::infoWarningAndCriticalLinesStartWithTheirType()
-{
-  SIG_Logging::initializeLogging();
-
-  SIG_LOG_INFO( "SIGEL_Tools" ) << "info";
-  SIG_LOG_WARNING( "SIGEL_Tools" ) << "warning";
-  SIG_LOG_CRITICAL( "SIGEL_Tools" ) << "critical";
-
-  QCOMPARE( loggedMessages.size(), size_t( 3 ) );
-  QCOMPARE( loggedMessages[0].formattedMessage, QString( "info: info" ) );
-  QCOMPARE( loggedMessages[1].formattedMessage, QString( "warning: warning" ) );
-  QCOMPARE( loggedMessages[2].formattedMessage, QString( "critical: critical" ) );
+  QCOMPARE( loggedMessages.size(), size_t( 4 ) );
+  QVERIFY2( QRegularExpression( "^" + date + " \\[debug\\] \\[SIGEL_Tools\\] debug message$" ).match( loggedMessages[0].formattedMessage ).hasMatch(), qPrintable( loggedMessages[0].formattedMessage ) );
+  QVERIFY2( QRegularExpression( "^" + date + " \\[info\\] \\[SIGEL_Tools\\] info message$" ).match( loggedMessages[1].formattedMessage ).hasMatch(), qPrintable( loggedMessages[1].formattedMessage ) );
+  QVERIFY2( QRegularExpression( "^" + date + " \\[warning\\] \\[SIGEL_GP\\] warning message$" ).match( loggedMessages[2].formattedMessage ).hasMatch(), qPrintable( loggedMessages[2].formattedMessage ) );
+  QVERIFY2( QRegularExpression( "^" + date + " \\[critical\\] \\[SIGEL_Robot\\] critical message$" ).match( loggedMessages[3].formattedMessage ).hasMatch(), qPrintable( loggedMessages[3].formattedMessage ) );
 }
 
 // setFilterRules replaces the rules of initializeLogging, so the rules state "*.debug=false" again.
