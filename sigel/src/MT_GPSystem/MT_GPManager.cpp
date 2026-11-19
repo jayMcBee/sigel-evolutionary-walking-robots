@@ -23,7 +23,7 @@
 #include "MT_GPSystem/MT_GPManager.h"
 #include <unistd.h>
 #include "MT_Control/MT_Substitute.h"
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 // administrative method
 
@@ -457,7 +457,7 @@ void MT_GPManager::startEvolution(MT_Substitute *Substitute)
 				TSetOK = true;
 			}
 			else {
-				SIGEL_Tools::SIG_IO::cerr << "MetaGP: training set below 10 cases or a tenth of the result array; next check in 10000000 s (about 115 days)." << Qt::endl;
+				SIG_LOG_WARNING( "MT_GPSystem" ) << "Training set below 10 cases or a tenth of the result array; next check in 10000000 s (about 115 days).";
 				sleep(10000000);
 			}
 		}
