@@ -121,7 +121,7 @@ void SIGEL_Tools::TST_SIG_Logging::messageKeepsTheFileAndLineOfTheCall()
   QCOMPARE( loggedMessages[0].line, line );
 }
 
-void SIGEL_Tools::TST_SIG_Logging::debugLineStartsWithFileAndLine()
+void SIGEL_Tools::TST_SIG_Logging::debugLineStartsWithTypeFileAndLine()
 {
   SIG_Logging::initializeLogging();
   QLoggingCategory::setFilterRules( "SIGEL_Tools.debug=true" );
@@ -130,10 +130,10 @@ void SIGEL_Tools::TST_SIG_Logging::debugLineStartsWithFileAndLine()
   SIG_LOG_DEBUG( "SIGEL_Tools" ) << "debug";
 
   QCOMPARE( loggedMessages.size(), size_t( 1 ) );
-  QCOMPARE( loggedMessages[0].formattedMessage, QString( "%1:%2 debug" ).arg( __FILE__ ).arg( line ) );
+  QCOMPARE( loggedMessages[0].formattedMessage, QString( "debug: %1:%2 debug" ).arg( __FILE__ ).arg( line ) );
 }
 
-void SIGEL_Tools::TST_SIG_Logging::infoWarningAndCriticalLinesAreTheMessageOnly()
+void SIGEL_Tools::TST_SIG_Logging::infoWarningAndCriticalLinesStartWithTheirType()
 {
   SIG_Logging::initializeLogging();
 
@@ -142,9 +142,9 @@ void SIGEL_Tools::TST_SIG_Logging::infoWarningAndCriticalLinesAreTheMessageOnly(
   SIG_LOG_CRITICAL( "SIGEL_Tools" ) << "critical";
 
   QCOMPARE( loggedMessages.size(), size_t( 3 ) );
-  QCOMPARE( loggedMessages[0].formattedMessage, QString( "info" ) );
-  QCOMPARE( loggedMessages[1].formattedMessage, QString( "warning" ) );
-  QCOMPARE( loggedMessages[2].formattedMessage, QString( "critical" ) );
+  QCOMPARE( loggedMessages[0].formattedMessage, QString( "info: info" ) );
+  QCOMPARE( loggedMessages[1].formattedMessage, QString( "warning: warning" ) );
+  QCOMPARE( loggedMessages[2].formattedMessage, QString( "critical: critical" ) );
 }
 
 // setFilterRules replaces the rules of initializeLogging, so the rules state "*.debug=false" again.

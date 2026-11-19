@@ -25,7 +25,7 @@
 
 void SIGEL_Tools::SIG_Logging::initializeLogging()
 {
-	qSetMessagePattern( "%{if-debug}%{file}:%{line} %{endif}%{message}" );
+	qSetMessagePattern( "%{type}: %{if-debug}%{file}:%{line} %{endif}%{message}" );
 
 	// QT_LOGGING_CONF and QT_LOGGING_RULES are applied after these rules, so they can switch debug back on.
 	QLoggingCategory::setFilterRules( "*.debug=false" );
