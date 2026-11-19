@@ -22,7 +22,7 @@
 */
 #include <QCoreApplication>   // QCoreApplication::exit
 #include "SIGEL_CommonGUI/SIG_DialogParent.h"
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 #include "MT_GUI/MT_MainWindow.h"
 #include "MT_Control/MT_Controller.h"
 #include "MT_Control/MT_Classifier.h"
@@ -176,7 +176,7 @@ bool MT_Controller::startEvolution()
 		{
 			if( guiEnabled )
 			{
-				SIGEL_Tools::SIG_IO::cerr << "Creating Meta GP-System: couldn't create a substituter." << Qt::endl;
+				SIG_LOG_WARNING( "MT_Control" ) << "Creating Meta GP-System: couldn't create a substituter.";
 			}
 			return false;
 		}
@@ -374,7 +374,7 @@ bool MT_Controller::createGPSystem()
 	{
 		if( !( gpManager = new MT_GPManager( confStrm ) ) )
 		{
-			SIGEL_Tools::SIG_IO::cerr << "Creating Meta GP-System: couldn't create GP-Manager." << Qt::endl;
+			SIG_LOG_WARNING( "MT_Control" ) << "Creating Meta GP-System: couldn't create GP-Manager.";
 			return false;
 		}
 		else
@@ -382,8 +382,8 @@ bool MT_Controller::createGPSystem()
 			MT_ErrorCode error = gpManager->getLastError();
 			if( ( error != MT_ErrorCode::None ) && guiEnabled )
 			{
-				SIGEL_Tools::SIG_IO::cerr << "Creating GP-System: error in creating Meta-GP-System. Error no: "
-					<< static_cast< int >( error ) << Qt::endl;
+				SIG_LOG_WARNING( "MT_Control" ) << "Creating GP-System: error in creating Meta-GP-System. Error no: "
+					<< static_cast< int >( error );
 			}
 		}
 	}
@@ -418,7 +418,7 @@ void MT_Controller::configureSystem( QWidget *owner )
 	{
 		if( !createGPSystem() )
 		{
-			SIGEL_Tools::SIG_IO::cerr << "Configure meta system: couldn't create the GP system." << Qt::endl;
+			SIG_LOG_WARNING( "MT_Control" ) << "Configure meta system: couldn't create the GP system.";
 			return;
 		}
 	}
@@ -426,7 +426,7 @@ void MT_Controller::configureSystem( QWidget *owner )
 	{
 		if( !( mainWindow = new MT_MainWindow( this, gpManager, &estimationState, owner ) ) )
 		{
-			SIGEL_Tools::SIG_IO::cerr << "Configure meta system: couldn't open the configuration window." << Qt::endl;
+			SIG_LOG_WARNING( "MT_Control" ) << "Configure meta system: couldn't open the configuration window.";
 			return;
 		}
 	}
@@ -505,8 +505,8 @@ bool MT_Controller::readFromFile( QString fileName )
 				if( !confFile.open( QIODevice::ReadOnly ) )
 				{
 					// oops, couldn't open default configuration file
-					SIGEL_Tools::SIG_IO::cerr << "Loading experiment: couldn't load default settings. "
-						"The meta system will be disabled." << Qt::endl;
+					SIG_LOG_WARNING( "MT_Control" ) << "Loading experiment: couldn't load default settings. "
+						"The meta system will be disabled.";
 				}
 				else
 				{
@@ -567,8 +567,8 @@ bool MT_Controller::readFromFile( QString fileName )
 	{
 		if( guiEnabled )
 		{
-			SIGEL_Tools::SIG_IO::cerr << "Loading experiment: error in loading experiment. "
-				"The meta experiment file is corrupted. Disabling the meta system." << Qt::endl;
+			SIG_LOG_WARNING( "MT_Control" ) << "Loading experiment: error in loading experiment. "
+				"The meta experiment file is corrupted. Disabling the meta system.";
 		}
 		useMeta( false );
 		return false;
@@ -715,7 +715,7 @@ bool MT_Controller::saveSystem( QString sigExpName )
 	// oops, something went wrong
 	if( guiEnabled )
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Saving experiment: couldn't save the experiment." << Qt::endl;
+		SIG_LOG_WARNING( "MT_Control" ) << "Saving experiment: couldn't save the experiment.";
 	}
 	return false;
 }
@@ -957,7 +957,7 @@ void MT_Controller::slotLoadDefault()
 	}
 	else // read error
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Load setup: couldn't load default setup. Aborting operation." << Qt::endl;
+		SIG_LOG_WARNING( "MT_Control" ) << "Load setup: couldn't load default setup. Aborting operation.";
 	}
 }
 
@@ -1008,7 +1008,7 @@ void MT_Controller::slotLoadSetup()
 	}
 	else // read error
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Load setup: couldn't open specified file. Aborting operation." << Qt::endl;
+		SIG_LOG_WARNING( "MT_Control" ) << "Load setup: couldn't open specified file. Aborting operation.";
 	}
 }
 
@@ -1052,6 +1052,6 @@ void MT_Controller::slotSaveSetup()
 	}
 	else
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Load setup: couldn't open specified file. Aborting operation." << Qt::endl;
+		SIG_LOG_WARNING( "MT_Control" ) << "Load setup: couldn't open specified file. Aborting operation.";
 	}
 }
