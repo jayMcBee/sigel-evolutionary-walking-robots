@@ -152,13 +152,6 @@ namespace SIGEL_Visualisation
 		 */
 		static constexpr float shadowFilterRadius = 1.5f;
 
-		/**
-		 * Creates the shadow map, its framebuffer and the program in the
-		 * current OpenGL context and sets shadowProgram. On a failure it
-		 * logs a warning, frees what it created and
-		 * leaves shadowProgram nullptr. A robot without vertices gets no
-		 * shadow and no message.
-		 */
 		void initShadowMapping();
 
 		/**
