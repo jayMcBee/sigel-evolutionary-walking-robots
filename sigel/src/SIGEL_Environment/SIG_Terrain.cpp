@@ -24,7 +24,7 @@
 #include "SIGEL_Environment/SIG_Terrain.h"
 
 #include "SIGEL_Tools/SIG_Exception.h"
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 #include "fparser.h"
 
 #include <QByteArray>
@@ -70,7 +70,7 @@ bool SIGEL_Environment::SIG_Terrain::setFromFunction( const QString &function, i
 	FunctionParser fp;
 	if( fp.Parse( function.toUtf8().constData(), "xz" ) != -1 )
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain function could not be parsed. It must depend on x and z, and contain only valid expressions." << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_Environment" ) << "The specified terrain function could not be parsed. It must depend on x and z, and contain only valid expressions.";
 		return false;
 	}
 
@@ -98,7 +98,7 @@ bool SIGEL_Environment::SIG_Terrain::setFromPictureFile( const QString &pictureF
 	std::ifstream pgm( pictureFile.toUtf8().constData() );
 	if( !pgm )
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Warning: the specified terrain file does not exist." << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_Environment" ) << "The specified terrain file does not exist.";
 		return false;
 	}
 
@@ -124,7 +124,7 @@ bool SIGEL_Environment::SIG_Terrain::setFromPictureFile( const QString &pictureF
 		case 0: // Magic Key
 			if( s.compare( "P2" ) != 0 )
 			{
-				SIGEL_Tools::SIG_IO::cerr << "Warning: the specified picture file is not in PGM format." << Qt::endl;
+				SIG_LOG_WARNING( "SIGEL_Environment" ) << "The specified picture file is not in PGM format.";
 				return false;
 			}
 			++counter;
