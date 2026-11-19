@@ -35,695 +35,798 @@
 namespace SIGEL_MasterGUI
 {
 
-  SIG_ExperimentListView::SIG_ExperimentListView( QWidget * parent, QStackedWidget *theWidgetStack ) : QTreeWidget( parent ), widgetStack( theWidgetStack ), numberOfExperiments(1)
+SIG_ExperimentListView::SIG_ExperimentListView( QWidget *parent, QStackedWidget *theWidgetStack )
+	: QTreeWidget( parent ),
+	  widgetStack( theWidgetStack ),
+	  numberOfExperiments( 1 )
 {
-  setHeaderLabels( QStringList( "Experiments" ) );
-  setContextMenuPolicy( Qt::CustomContextMenu );
-  QObject::connect( this,
-		    SIGNAL( customContextMenuRequested( const QPoint & ) ),
-		    SLOT( slotRightButtonClicked( const QPoint & ) ) );
-  QObject::connect( this,
-		    SIGNAL( currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ) ),
-		    SLOT( slotSelectionChanged( QTreeWidgetItem * ) ));
-  experimentListViewMenu = new QMenu( this );
-  experimentListViewMenu->setObjectName( "SIG_ExperimentListViewPopupMenu" );
+	setHeaderLabels( QStringList( "Experiments" ) );
+	setContextMenuPolicy( Qt::CustomContextMenu );
+	QObject::connect( this,
+	                  SIGNAL( customContextMenuRequested( const QPoint & ) ),
+	                  SLOT( slotRightButtonClicked( const QPoint & ) ) );
+	QObject::connect( this,
+	                  SIGNAL( currentItemChanged( QTreeWidgetItem *, QTreeWidgetItem * ) ),
+	                  SLOT( slotSelectionChanged( QTreeWidgetItem * ) ) );
+	experimentListViewMenu = new QMenu( this );
+	experimentListViewMenu->setObjectName( "SIG_ExperimentListViewPopupMenu" );
 
-  setRootIsDecorated( true );
-  // No sorting: each new experiment goes on top of the list.
-  setSortingEnabled( false );
+	setRootIsDecorated( true );
+
+	// No sorting: each new experiment goes on top of the list.
+	setSortingEnabled( false );
 }
 
 SIG_ExperimentListView::~SIG_ExperimentListView()
 {
-  qDeleteAll( experimentDict );
+	qDeleteAll( experimentDict );
 }
 
 void SIG_ExperimentListView::slotNewExperiment()
 {
-  QString project;
-  project.setNum( numberOfExperiments++ );
-  project.prepend("Experiment-");
-  project.append(".exp");
-  if( experimentExists( project ) )
-    project = getAlternativeName( project );
-  SIG_ExperimentItem *theNewItem = new SIG_ExperimentItem( this, project );
-  SIG_GUIGPExperiment *theNewExperiment = new SIG_GUIGPExperiment( project, widgetStack, theNewItem );
-  QObject::connect( theNewExperiment,
-		    SIGNAL( signalEvolutionNotRunning( bool ) ),
-		    this,
-		    SIGNAL( evolutionNotRunning( bool ) ) );
-  experimentDict.insert( project , theNewExperiment );
-  emit isNotEmpty( true );
-  if ( theNewItem )
-	    setCurrentItem( theNewItem );
+	QString project;
+	project.setNum( numberOfExperiments++ );
+	project.prepend( "Experiment-" );
+	project.append( ".exp" );
+	if( experimentExists( project ) )
+	{
+		project = getAlternativeName( project );
+	}
+	SIG_ExperimentItem *theNewItem = new SIG_ExperimentItem( this, project );
+	SIG_GUIGPExperiment *theNewExperiment = new SIG_GUIGPExperiment( project, widgetStack, theNewItem );
+	QObject::connect( theNewExperiment,
+	                  SIGNAL( signalEvolutionNotRunning( bool ) ),
+	                  this,
+	                  SIGNAL( evolutionNotRunning( bool ) ) );
+	experimentDict.insert( project, theNewExperiment );
+	emit isNotEmpty( true );
+	if( theNewItem )
+	{
+		setCurrentItem( theNewItem );
+	}
 }
 
 void SIG_ExperimentListView::slotRenameExperiment()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      SIG_RenameDialog renameDialog( this, true );
-      QString oldName = currentlySelectedExperimentName();
-      renameDialog.setWindowTitle( "Rename " + oldName );
-      renameDialog.lineeditNewName->setText( oldName );
-      renameDialog.lineeditNewName->selectAll();
-      renameDialog.lineeditNewName->setFocus();
-      switch( renameDialog.exec() )
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
 	{
-	case QDialog::Accepted:
-	  QString newName = renameDialog.lineeditNewName->text();
-	  // we got a real new name so lets do it
-	  if( newName != QString() && newName != oldName && !experimentExists( newName ) )
-	    {
-	      // the string is not empty, was really changed and there is no other experiment with that name, so lets go
+		SIG_RenameDialog renameDialog( this, true );
+		QString oldName = currentlySelectedExperimentName();
+		renameDialog.setWindowTitle( "Rename " + oldName );
+		renameDialog.lineeditNewName->setText( oldName );
+		renameDialog.lineeditNewName->selectAll();
+		renameDialog.lineeditNewName->setFocus();
+		switch( renameDialog.exec() )
+		{
+			case QDialog::Accepted:
+				QString newName = renameDialog.lineeditNewName->text();
 
-	      // append .exp if it wasn't entered
-	      if( newName.right( 4 ) != ".exp")
-		newName.append( ".exp" );
+				// we got a real new name so lets do it
+				if( newName != QString() && newName != oldName && !experimentExists( newName ) )
+				{
+					// the string is not empty, was really changed and there is no other experiment with that name, so lets go
+					// append .exp if it wasn't entered
+					if( newName.right( 4 ) != ".exp" )
+					{
+						newName.append( ".exp" );
+					}
 
-	      // disable autodelete to keep the SIG_GUIGPExperiment object
-	      experimentDict.take( oldName );
+					// disable autodelete to keep the SIG_GUIGPExperiment object
+					experimentDict.take( oldName );
 
-	      theExperiment->setName( newName );
-	      // insert the experiment into the experiment dictionary
-	      experimentDict.insert( newName, theExperiment );
-      
-	      // enable autodelete
-	    } // close if
-	  else
-	    QMessageBox::information( this, "Error", "Either you have entered no name or there is\nalready an experiment under that name." );
-	  break;
-	} // close switch
-    } // close if
+					theExperiment->setName( newName );
+
+					// insert the experiment into the experiment dictionary
+					experimentDict.insert( newName, theExperiment );
+
+					// enable autodelete
+				} // close if
+				else
+				{
+					QMessageBox::information( this, "Error", "Either you have entered no name or there is\nalready an experiment under that name." );
+				}
+				break;
+		} // close switch
+	} // close if
 }
 
 void SIG_ExperimentListView::slotDeleteExperiment()
 {
-  // Find out which experiment is selected...
-  QTreeWidgetItem *current = currentItem();
-  if(current)
-    {
-      while(current->parent() != nullptr)
+	// Find out which experiment is selected...
+	QTreeWidgetItem *current = currentItem();
+	if( current )
 	{
-	  current = current->parent();
+		while( current->parent() != nullptr )
+		{
+			current = current->parent();
+		}
+		QString name = current->text( 0 );
+
+		// lets ask first if we really want to do this
+		switch( QMessageBox::warning( this, "Delete Experiment", "Do you really want to delete\n"
+		                                                         "the experiment " + name + "?",
+		                              QMessageBox::Yes | QMessageBox::Default, QMessageBox::No ) )
+		{
+			case QMessageBox::Yes:
+				delete experimentDict.take( name );
+				takeTopLevelItem( indexOfTopLevelItem( current ) );
+				delete current;
+				if( QTreeWidgetItem *firstItem = topLevelItem( 0 ) )
+				{
+					setCurrentItem( firstItem );
+				}
+				break;
+		};
 	}
-      QString name = current->text(0);
-      // lets ask first if we really want to do this
-      
-      switch( QMessageBox::warning( this, "Delete Experiment", "Do you really want to delete\n"
-				    "the experiment " + name + "?", QMessageBox::Yes | QMessageBox::Default, QMessageBox::No) )
+	else
 	{
-	case QMessageBox::Yes:
-	  delete experimentDict.take( name );
-	  takeTopLevelItem( indexOfTopLevelItem( current ) );
-	  delete current;
-	  if ( QTreeWidgetItem *firstItem = topLevelItem( 0 ) )
-	    setCurrentItem( firstItem );
-	  break;
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
 	};
-    }
-  else
-    {
-      QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
-    };
-  if( topLevelItemCount() == 0 )
-    {
-      emit isNotEmpty( false );
-    }
-  else
-    {
-      emit isNotEmpty( true );
-    }
+	if( topLevelItemCount() == 0 )
+	{
+		emit isNotEmpty( false );
+	}
+	else
+	{
+		emit isNotEmpty( true );
+	}
 }
 
 void SIG_ExperimentListView::slotLoadExperiment()
 {
-  QStringList filesToOpen = QFileDialog::getOpenFileNames( this, "Open Experiments", QString(), "Experiment Files (*.exp);;All Files (*)" );
-  if( !filesToOpen.isEmpty() )
-    {
-      for( int i = 0; i < filesToOpen.count(); i++)
-	openExperimentFile( filesToOpen[i] );
-      if ( QTreeWidgetItem *firstItem = topLevelItem( 0 ) )
-	    setCurrentItem( firstItem );
-    };
+	QStringList filesToOpen = QFileDialog::getOpenFileNames( this, "Open Experiments", QString(), "Experiment Files (*.exp);;All Files (*)" );
+	if( !filesToOpen.isEmpty() )
+	{
+		for( int i = 0; i < filesToOpen.count(); i++ )
+		{
+			openExperimentFile( filesToOpen[i] );
+		}
+		if( QTreeWidgetItem *firstItem = topLevelItem( 0 ) )
+		{
+			setCurrentItem( firstItem );
+		}
+	};
 }
 
 SIG_ExperimentItem *SIG_ExperimentListView::openExperimentFile( const QString &absFileName )
 {
-  int slashPosition = absFileName.lastIndexOf( "/" );
-  QString fileName = absFileName.right( absFileName.length() - (slashPosition + 1) );
-  if ( experimentExists( fileName ) )
-    fileName = getAlternativeName( fileName );
-  SIG_ExperimentItem *theNewItem = new SIG_ExperimentItem( this, fileName );
-
-  // SIG_GPPopulation::readFromFile and SIG_AllIndividualsView::slotCompleteRefreshList
-  // run processEvents below, before this name is in experimentDict. Qt 6
-  // makes even a non-selectable item current on focus-in; a disabled one not.
-  theNewItem->setExpanded(false);
-  theNewItem->setFlags( theNewItem->flags() & ~( Qt::ItemIsSelectable | Qt::ItemIsEnabled ) );
-
-  SIG_GUIGPExperiment *theNewExperiment = new SIG_GUIGPExperiment( fileName, widgetStack, theNewItem );
-  QObject::connect( theNewExperiment,
-		    SIGNAL( signalEvolutionNotRunning( bool ) ),
-		    this,
-		    SIGNAL( evolutionNotRunning( bool ) ) );
-
-  QFile file( absFileName );
-  if( file.open(QIODevice::ReadOnly) )
-    {
-      QTextStream theStream( &file );
-      // this is for the autosave function
-      // so the gpExperiment knows where to save the experiment
-      theNewExperiment->gpExperiment.setPath(absFileName);
-      try
+	int slashPosition = absFileName.lastIndexOf( "/" );
+	QString fileName = absFileName.right( absFileName.length() - ( slashPosition + 1 ) );
+	if( experimentExists( fileName ) )
 	{
-	  theNewExperiment->gpExperiment.loadExperiment( theStream );
+		fileName = getAlternativeName( fileName );
 	}
-      catch ( const SIGEL_Tools::SIG_Exception &e )
-	{
-	  delete theNewExperiment;
-	  delete takeTopLevelItem( indexOfTopLevelItem( theNewItem ) );
-	  QMessageBox::warning( this, "File could not be loaded",
-				"The file " + fileName + " could not be loaded:\n\n" + e.getMessage() );
-	  return nullptr;
-	}
-      theNewExperiment->getAllOutOfExperiment();
-      theNewExperiment->warnIfPoolTooLarge();
-    }
-  else
-    {
-      QMessageBox::warning( this, "File Could Not Be Opened", "The file " + fileName + " could not be opened for reading." );
-    }
-  experimentDict.insert( fileName , theNewExperiment );
-  emit isNotEmpty( true );
+	SIG_ExperimentItem *theNewItem = new SIG_ExperimentItem( this, fileName );
 
-  theNewItem->setFlags( theNewItem->flags() | Qt::ItemIsSelectable | Qt::ItemIsEnabled );
-  theNewItem->setExpanded(true);
-  return theNewItem;
+	// SIG_GPPopulation::readFromFile and SIG_AllIndividualsView::slotCompleteRefreshList
+	// run processEvents below, before this name is in experimentDict. Qt 6
+	// makes even a non-selectable item current on focus-in; a disabled one not.
+	theNewItem->setExpanded( false );
+	theNewItem->setFlags( theNewItem->flags() & ~( Qt::ItemIsSelectable | Qt::ItemIsEnabled ) );
+
+	SIG_GUIGPExperiment *theNewExperiment = new SIG_GUIGPExperiment( fileName, widgetStack, theNewItem );
+	QObject::connect( theNewExperiment,
+	                  SIGNAL( signalEvolutionNotRunning( bool ) ),
+	                  this,
+	                  SIGNAL( evolutionNotRunning( bool ) ) );
+
+	QFile file( absFileName );
+	if( file.open( QIODevice::ReadOnly ) )
+	{
+		QTextStream theStream( &file );
+
+		// this is for the autosave function
+		// so the gpExperiment knows where to save the experiment
+		theNewExperiment->gpExperiment.setPath( absFileName );
+		try
+		{
+			theNewExperiment->gpExperiment.loadExperiment( theStream );
+		}
+		catch( const SIGEL_Tools::SIG_Exception &e )
+		{
+			delete theNewExperiment;
+			delete takeTopLevelItem( indexOfTopLevelItem( theNewItem ) );
+			QMessageBox::warning( this, "File could not be loaded",
+			                      "The file " + fileName + " could not be loaded:\n\n" + e.getMessage() );
+			return nullptr;
+		}
+		theNewExperiment->getAllOutOfExperiment();
+		theNewExperiment->warnIfPoolTooLarge();
+	}
+	else
+	{
+		QMessageBox::warning( this, "File Could Not Be Opened", "The file " + fileName + " could not be opened for reading." );
+	}
+	experimentDict.insert( fileName, theNewExperiment );
+	emit isNotEmpty( true );
+
+	theNewItem->setFlags( theNewItem->flags() | Qt::ItemIsSelectable | Qt::ItemIsEnabled );
+	theNewItem->setExpanded( true );
+	return theNewItem;
 }
 
 void SIG_ExperimentListView::slotCloneExperiment()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( !theExperiment ) {
-      QMessageBox::warning( this, "No Experiment Selected", "Currently there is no experiment selected." );
-      return;
-  }
-  // Saving writes the MetaGP system's own file, and the clone would share it.
-  if( theExperiment->gpExperiment.mtController->IsEnabled() ) {
-      QMessageBox::information( this, "Clone Experiment (Empty Pool)", "An experiment that uses MetaGP cannot be cloned." );
-      return;
-  }
-  QString fileName = QFileDialog::getSaveFileName( this, "Clone Experiment (Empty Pool)", QString(), "Experiment Files (*.exp);;All Files (*)" );
-  if( fileName.isEmpty() )
-    return;
-  fileName = theExperiment->checkEnding( fileName, "exp" );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( !theExperiment )
+	{
+		QMessageBox::warning( this, "No Experiment Selected", "Currently there is no experiment selected." );
+		return;
+	}
 
-  // A copy of everything, made with the same calls as Save and Open, in an
-  // experiment that is never shown. The selected one is only read.
-  theExperiment->putAllIntoExperiment();
-  QString copy;
-  {
-    QTextStream copyOut( &copy, QIODevice::WriteOnly );
-    theExperiment->gpExperiment.saveExperiment( copyOut );
-  }
-  SIGEL_GP::SIG_GPMetaGPExperiment fresh;
-  {
-    QTextStream copyIn( &copy, QIODevice::ReadOnly );
-    try {
-        fresh.loadExperiment( copyIn );
-    }
-    catch ( const SIGEL_Tools::SIG_Exception &e ) {
-        QMessageBox::warning( this, "Clone Experiment (Empty Pool)", "The experiment could not be cloned:\n\n" + e.getMessage() );
-        return;
-    }
-  }
+	// Saving writes the MetaGP system's own file, and the clone would share it.
+	if( theExperiment->gpExperiment.mtController->IsEnabled() )
+	{
+		QMessageBox::information( this, "Clone Experiment (Empty Pool)", "An experiment that uses MetaGP cannot be cloned." );
+		return;
+	}
+	QString fileName = QFileDialog::getSaveFileName( this, "Clone Experiment (Empty Pool)", QString(), "Experiment Files (*.exp);;All Files (*)" );
+	if( fileName.isEmpty() )
+	{
+		return;
+	}
+	fileName = theExperiment->checkEnding( fileName, "exp" );
 
-  // No individuals, generation 0, no history: filled like a new experiment.
-  while( fresh.population.getSize() > 0 )
-    fresh.population.deleteIndividual( fresh.population.getSize() - 1 );
-  fresh.population.setPoolGeneration( 0 );
-  fresh.population.setNextIdentifier( "0" );
-  qDeleteAll( fresh.experimentHistory );
-  fresh.experimentHistory.clear();
+	// A copy of everything, made with the same calls as Save and Open, in an
+	// experiment that is never shown. The selected one is only read.
+	theExperiment->putAllIntoExperiment();
+	QString copy;
+	{
+		QTextStream copyOut( &copy, QIODevice::WriteOnly );
+		theExperiment->gpExperiment.saveExperiment( copyOut );
+	}
+	SIGEL_GP::SIG_GPMetaGPExperiment fresh;
+	{
+		QTextStream copyIn( &copy, QIODevice::ReadOnly );
+		try
+		{
+			fresh.loadExperiment( copyIn );
+		}
+		catch( const SIGEL_Tools::SIG_Exception &e )
+		{
+			QMessageBox::warning( this, "Clone Experiment (Empty Pool)", "The experiment could not be cloned:\n\n" + e.getMessage() );
+			return;
+		}
+	}
 
-  if( !fresh.saveToFile( fileName ) ) {
-      QMessageBox::warning( this, "File Could Not Be Written", "The file " + fileName + " could not be written." );
-      return;
-  }
+	// No individuals, generation 0, no history: filled like a new experiment.
+	while( fresh.population.getSize() > 0 )
+	{
+		fresh.population.deleteIndividual( fresh.population.getSize() - 1 );
+	}
+	fresh.population.setPoolGeneration( 0 );
+	fresh.population.setNextIdentifier( "0" );
+	qDeleteAll( fresh.experimentHistory );
+	fresh.experimentHistory.clear();
 
-  setCurrentItem( openExperimentFile( fileName ) );
+	if( !fresh.saveToFile( fileName ) )
+	{
+		QMessageBox::warning( this, "File Could Not Be Written", "The file " + fileName + " could not be written." );
+		return;
+	}
+
+	setCurrentItem( openExperimentFile( fileName ) );
 }
 
 void SIG_ExperimentListView::slotSaveExperiment()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  // "new" is the path of an experiment that has no file yet
-  if( !theExperiment || theExperiment->gpExperiment.getPath() == "new" ) {
-      slotSaveExperimentAs();
-      return;
-  }
-  theExperiment->putAllIntoExperiment();
-  if( !theExperiment->gpExperiment.saveToFile( theExperiment->gpExperiment.getPath() ) ) {
-      QMessageBox::warning( this, "File Could Not Be Written", "The file " + theExperiment->gpExperiment.getPath() + " could not be written." );
-  }
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+
+	// "new" is the path of an experiment that has no file yet
+	if( !theExperiment || theExperiment->gpExperiment.getPath() == "new" )
+	{
+		slotSaveExperimentAs();
+		return;
+	}
+	theExperiment->putAllIntoExperiment();
+	if( !theExperiment->gpExperiment.saveToFile( theExperiment->gpExperiment.getPath() ) )
+	{
+		QMessageBox::warning( this, "File Could Not Be Written", "The file " + theExperiment->gpExperiment.getPath() + " could not be written." );
+	}
 }
 
 void SIG_ExperimentListView::slotSaveExperimentAs()
 {
-  QString currentExperiment = currentlySelectedExperimentName();
-  if (currentExperiment != QString() ) {
-      SIG_GUIGPExperiment *theExperiment = getByExperimentName( currentExperiment );
-      theExperiment->putAllIntoExperiment();
-      QString fileName = QFileDialog::getSaveFileName( this, "Save Experiment As", theExperiment->getName(), "Experiment Files (*.exp);;All Files (*)" );
-      if( !fileName.isEmpty() ) {
-	  fileName = theExperiment->checkEnding( fileName, "exp" );
-	  if( !theExperiment->gpExperiment.saveToFile( fileName ) ) {
-	      QMessageBox::warning( this, "File Could Not Be Written", "The file " + fileName + " could not be written." );
-	      return;
-	  }
+	QString currentExperiment = currentlySelectedExperimentName();
+	if( currentExperiment != QString() )
+	{
+		SIG_GUIGPExperiment *theExperiment = getByExperimentName( currentExperiment );
+		theExperiment->putAllIntoExperiment();
+		QString fileName = QFileDialog::getSaveFileName( this, "Save Experiment As", theExperiment->getName(), "Experiment Files (*.exp);;All Files (*)" );
+		if( !fileName.isEmpty() )
+		{
+			fileName = theExperiment->checkEnding( fileName, "exp" );
+			if( !theExperiment->gpExperiment.saveToFile( fileName ) )
+			{
+				QMessageBox::warning( this, "File Could Not Be Written", "The file " + fileName + " could not be written." );
+				return;
+			}
 
-	  QFileInfo fileInfo( fileName );
+			QFileInfo fileInfo( fileName );
 
-	  experimentDict.take( currentExperiment );
+			experimentDict.take( currentExperiment );
 
-	  theExperiment->setName( fileInfo.fileName() );
+			theExperiment->setName( fileInfo.fileName() );
 
-	  experimentDict.insert( fileInfo.fileName(), theExperiment );
-	
-	  // this is for the autosave function
-	  // so the gpExperiment knows where to save the experiment
-		theExperiment->gpExperiment.setPath(fileName);
+			experimentDict.insert( fileInfo.fileName(), theExperiment );
+
+			// this is for the autosave function
+			// so the gpExperiment knows where to save the experiment
+			theExperiment->gpExperiment.setPath( fileName );
 		} // filename not empty
-  } // save selected experiment
-  else	{ // no experiment selected
-  	QMessageBox::warning( this, "No Experiment Selected", "Currently there is no experiment selected." );
-  }
-}
-
-void SIG_ExperimentListView::slotRightButtonClicked( const QPoint & pos )
-{
-  QTreeWidgetItem *theItem = itemAt( pos );
-  const QPoint thePoint = viewport()->mapToGlobal( pos );
-  if ( !theItem )
-    {
-      clearSelection();
-      experimentListViewMenu->popup( thePoint ); // the click was outside
-    }
-  else
-    {
-      QString option = theItem->text(0);
-      QString experimentName;
-      while( theItem->parent() != nullptr)
+	} // save selected experiment
+	else
 	{
-	  theItem = theItem->parent();
+		// no experiment selected
+		QMessageBox::warning( this, "No Experiment Selected", "Currently there is no experiment selected." );
 	}
-      experimentName = theItem->text(0);
-      if( SIG_GUIGPExperiment *theExperiment = experimentDict.value( experimentName ) )
-	theExperiment->slotRightClick( option, thePoint );
-    }
 }
 
-void SIG_ExperimentListView::slotSelectionChanged( QTreeWidgetItem * theItem )
+void SIG_ExperimentListView::slotRightButtonClicked( const QPoint &pos )
 {
-  if(theItem)
-    {
-      QString option = theItem->text(0);
-      QString experimentName;
-      while( theItem->parent() != nullptr)
+	QTreeWidgetItem *theItem = itemAt( pos );
+	const QPoint thePoint = viewport()->mapToGlobal( pos );
+	if( !theItem )
 	{
-	  theItem = theItem->parent();
+		clearSelection();
+		experimentListViewMenu->popup( thePoint ); // the click was outside
 	}
-      experimentName = theItem->text(0);
-      // slotLoadExperiment builds the item before the experiment exists.
-      SIG_GUIGPExperiment *theExperiment = experimentDict.value( experimentName );
-      if( !theExperiment )
-	return;
-      theExperiment->slotSelectionChanged( option );
-      // ANY run, not the clicked experiment's. The tree itself is never
-      // locked, so a mid-run click can select a not-running experiment; asking
-      // that one would hand back every locked action.
-      emit evolutionNotRunning( !isRunning() );
- 	  emit currentExperimentChanged();
-      theExperiment->putAllIntoExperiment();
-    }
+	else
+	{
+		QString option = theItem->text( 0 );
+		QString experimentName;
+		while( theItem->parent() != nullptr )
+		{
+			theItem = theItem->parent();
+		}
+		experimentName = theItem->text( 0 );
+		if( SIG_GUIGPExperiment *theExperiment = experimentDict.value( experimentName ) )
+		{
+			theExperiment->slotRightClick( option, thePoint );
+		}
+	}
 }
 
-SIG_GUIGPExperiment* SIG_ExperimentListView::getByExperimentName( QString name )
+void SIG_ExperimentListView::slotSelectionChanged( QTreeWidgetItem *theItem )
 {
-  if( name != QString() )
-    return experimentDict.value( name );
-  return nullptr;
+	if( theItem )
+	{
+		QString option = theItem->text( 0 );
+		QString experimentName;
+		while( theItem->parent() != nullptr )
+		{
+			theItem = theItem->parent();
+		}
+		experimentName = theItem->text( 0 );
+
+		// slotLoadExperiment builds the item before the experiment exists.
+		SIG_GUIGPExperiment *theExperiment = experimentDict.value( experimentName );
+		if( !theExperiment )
+		{
+			return;
+		}
+		theExperiment->slotSelectionChanged( option );
+
+		// ANY run, not the clicked experiment's. The tree itself is never
+		// locked, so a mid-run click can select a not-running experiment; asking
+		// that one would hand back every locked action.
+		emit evolutionNotRunning( !isRunning() );
+		emit currentExperimentChanged();
+		theExperiment->putAllIntoExperiment();
+	}
+}
+
+SIG_GUIGPExperiment *SIG_ExperimentListView::getByExperimentName( QString name )
+{
+	if( name != QString() )
+	{
+		return experimentDict.value( name );
+	}
+	return nullptr;
 }
 
 bool SIG_ExperimentListView::experimentExists( QString name )
 {
-  if( experimentDict.value( name ) )
-    return true;
-  else
-    return false;
+	if( experimentDict.value( name ) )
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 QString SIG_ExperimentListView::getAlternativeName( QString existingName )
 {
-  int number = 1;
-  QString alternativeName = existingName;
-  while ( experimentExists( alternativeName ) )
-    {
-      alternativeName = "(" + QString::number( number++ ) + ")" + existingName;
-    }
-  return alternativeName; // has to be implemented right!
+	int number = 1;
+	QString alternativeName = existingName;
+	while( experimentExists( alternativeName ) )
+	{
+		alternativeName = "(" + QString::number( number++ ) + ")" + existingName;
+	}
+	return alternativeName; // has to be implemented right!
 }
 
-SIG_GUIGPExperiment* SIG_ExperimentListView::currentlySelectedExperiment()
+SIG_GUIGPExperiment *SIG_ExperimentListView::currentlySelectedExperiment()
 {
-  QString experimentName = currentlySelectedExperimentName();
-  if( experimentName != QString() )
-    return experimentDict.value( experimentName );
-  else
-    return nullptr;
+	QString experimentName = currentlySelectedExperimentName();
+	if( experimentName != QString() )
+	{
+		return experimentDict.value( experimentName );
+	}
+	else
+	{
+		return nullptr;
+	}
 }
 
 bool SIG_ExperimentListView::isRunning()
 {
-  for ( SIG_GUIGPExperiment *theExperiment : experimentDict )
-    if ( theExperiment->isRunning() )
-      return true;
-  return false;
+	for( SIG_GUIGPExperiment *theExperiment : experimentDict )
+	{
+		if( theExperiment->isRunning() )
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 QString SIG_ExperimentListView::currentlySelectedExperimentName()
 {
-  QTreeWidgetItem *theCurrentItem = currentItem();
-  if (theCurrentItem)
-    {
-      while( theCurrentItem->parent() != nullptr)
+	QTreeWidgetItem *theCurrentItem = currentItem();
+	if( theCurrentItem )
 	{
-	  theCurrentItem = theCurrentItem->parent();
+		while( theCurrentItem->parent() != nullptr )
+		{
+			theCurrentItem = theCurrentItem->parent();
+		}
+		return theCurrentItem->text( 0 );
 	}
-      return theCurrentItem->text( 0 );
-    }
-  else
-    return QString();
+	else
+	{
+		return QString();
+	}
 }
 
 void SIG_ExperimentListView::selectItem( QString label )
 {
-  QTreeWidgetItem *theItem = currentItem();
-  if( theItem )
-    {
-      while( theItem->parent() != nullptr)
+	QTreeWidgetItem *theItem = currentItem();
+	if( theItem )
 	{
-	  theItem = theItem->parent();
-	}
+		while( theItem->parent() != nullptr )
+		{
+			theItem = theItem->parent();
+		}
 
-      for(; theItem; theItem = itemBelow( theItem ) )
-	{
-	  if( theItem->text( 0 ) == label )
-	    {
-	      if ( theItem )
-	    setCurrentItem( theItem );
-	      break;
-	    }
+		for( ; theItem; theItem = itemBelow( theItem ) )
+		{
+			if( theItem->text( 0 ) == label )
+			{
+				if( theItem )
+				{
+					setCurrentItem( theItem );
+				}
+				break;
+			}
+		}
 	}
-    }
-  else
-    {
-      QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
-    }
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotShowGPParameters()
 {
-  selectItem( "GP Parameters" );
+	selectItem( "GP Parameters" );
 }
 
 void SIG_ExperimentListView::slotShowSimulationParameters()
 {
-  selectItem( "Simulation Parameters" );
+	selectItem( "Simulation Parameters" );
 }
 
 void SIG_ExperimentListView::slotShowLanguageParameters()
 {
-  selectItem( "Language Parameters" );
+	selectItem( "Language Parameters" );
 }
 
 void SIG_ExperimentListView::slotShowRobot()
 {
-  selectItem( "Robot" );
+	selectItem( "Robot" );
 }
 
 void SIG_ExperimentListView::slotShowEnvironment()
 {
-  selectItem( "Environment" );
+	selectItem( "Environment" );
 }
-  
+
 void SIG_ExperimentListView::slotShowIndividuals()
 {
-  selectItem( "Individuals" );
+	selectItem( "Individuals" );
 }
 
 void SIG_ExperimentListView::slotGPParametersImport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowGPParameters();
-      theExperiment->slotGPParameterImport();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowGPParameters();
+		theExperiment->slotGPParameterImport();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
-  
+
 void SIG_ExperimentListView::slotSimulationParametersImport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowSimulationParameters();
-      theExperiment->slotSimulationParameterImport();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowSimulationParameters();
+		theExperiment->slotSimulationParameterImport();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotRobotImport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowRobot();
-      theExperiment->slotRobotImport();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowRobot();
+		theExperiment->slotRobotImport();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotLanguageParametersImport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowLanguageParameters();
-      theExperiment->slotLanguageParameterImport();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowLanguageParameters();
+		theExperiment->slotLanguageParameterImport();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotPopulationImport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowIndividuals();
-      theExperiment->slotPopulationImport();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowIndividuals();
+		theExperiment->slotPopulationImport();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotEnvironmentImport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowEnvironment();
-      theExperiment->slotEnvironmentImport();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowEnvironment();
+		theExperiment->slotEnvironmentImport();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotGPParametersExport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowGPParameters();
-      theExperiment->slotGPParameterExport();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowGPParameters();
+		theExperiment->slotGPParameterExport();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotSimulationParametersExport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowSimulationParameters();
-      theExperiment->slotSimulationParameterExport();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowSimulationParameters();
+		theExperiment->slotSimulationParameterExport();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotLanguageParametersExport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowLanguageParameters();
-      theExperiment->slotLanguageParameterExport();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowLanguageParameters();
+		theExperiment->slotLanguageParameterExport();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotPopulationExport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowIndividuals();
-      theExperiment->slotPopulationExport();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowIndividuals();
+		theExperiment->slotPopulationExport();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotEnvironmentExport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowEnvironment();
-      theExperiment->slotEnvironmentExport();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowEnvironment();
+		theExperiment->slotEnvironmentExport();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotGNUPlotExport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      theExperiment->slotGNUPlotExport();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		theExperiment->slotGNUPlotExport();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotAddIndividuals()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowIndividuals();
-      theExperiment->allIndividualsView->slotAddIndividuals();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowIndividuals();
+		theExperiment->allIndividualsView->slotAddIndividuals();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotDeleteIndividuals()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowIndividuals();
-      theExperiment->allIndividualsView->slotDeleteIndividuals();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowIndividuals();
+		theExperiment->allIndividualsView->slotDeleteIndividuals();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotResetAllFitnessValues()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowIndividuals();
-      theExperiment->allIndividualsView->slotResetAllFitnessValues();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowIndividuals();
+		theExperiment->allIndividualsView->slotResetAllFitnessValues();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotVisualizeIndividuals()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( !theExperiment )
-    {
-      QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
-      return;
-    }
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( !theExperiment )
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+		return;
+	}
 
-  // write all changes back to generate a new dynamechs terrain
-  theExperiment->putAllIntoExperiment();
-  slotShowIndividuals();
-  theExperiment->allIndividualsView->slotVisualize();
+	// write all changes back to generate a new dynamechs terrain
+	theExperiment->putAllIntoExperiment();
+	slotShowIndividuals();
+	theExperiment->allIndividualsView->slotVisualize();
 }
 
 void SIG_ExperimentListView::slotProgramExport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowIndividuals();
-      theExperiment->allIndividualsView->slotExportProgram();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowIndividuals();
+		theExperiment->allIndividualsView->slotExportProgram();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotIndividualExport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowIndividuals();
-      theExperiment->allIndividualsView->slotExportIndividual();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowIndividuals();
+		theExperiment->allIndividualsView->slotExportIndividual();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotProgramImport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowIndividuals();
-      theExperiment->allIndividualsView->slotImportProgram();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowIndividuals();
+		theExperiment->allIndividualsView->slotImportProgram();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 void SIG_ExperimentListView::slotIndividualImport()
 {
-  SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
-  if( theExperiment )
-    {
-      slotShowIndividuals();
-      theExperiment->allIndividualsView->slotImportIndividual();
-    }
-  else
-    QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	SIG_GUIGPExperiment *theExperiment = currentlySelectedExperiment();
+	if( theExperiment )
+	{
+		slotShowIndividuals();
+		theExperiment->allIndividualsView->slotImportIndividual();
+	}
+	else
+	{
+		QMessageBox::information( this, "No Experiment Selected", "Currently there is no experiment selected." );
+	}
 }
 
 } // close namespace
