@@ -24,7 +24,7 @@
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
 #include "SIGEL_Visualisation/SIG_SimulationVisualisation.h"
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 #include <cmath>
 
@@ -126,8 +126,7 @@ namespace SIGEL_Visualisation
 		shadowContext = QOpenGLContext::currentContext();
 		if (!shadowContext)
 		{
-			SIGEL_Tools::SIG_IO::cerr << "Error: shadow mapping failed: there is no current OpenGL context."
-			                          << Qt::endl;
+			SIG_LOG_WARNING( "SIGEL_Visualisation" ) << "Shadow mapping failed: there is no current OpenGL context.";
 			return;
 		};
 
@@ -177,7 +176,7 @@ namespace SIGEL_Visualisation
 
 		if (!failure.isEmpty())
 		{
-			SIGEL_Tools::SIG_IO::cerr << "Error: shadow mapping failed: " << failure << Qt::endl;
+			SIG_LOG_WARNING( "SIGEL_Visualisation" ) << "Shadow mapping failed: " << failure;
 			delete program;
 			glFunctions->glDeleteFramebuffers( 1, &shadowFramebuffer );
 			glDeleteTextures( 1, &shadowTexture );

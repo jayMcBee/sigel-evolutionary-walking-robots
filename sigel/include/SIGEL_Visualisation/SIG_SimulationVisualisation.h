@@ -155,7 +155,7 @@ namespace SIGEL_Visualisation
 		/**
 		 * Creates the shadow map, its framebuffer and the program in the
 		 * current OpenGL context and sets shadowProgram. On a failure it
-		 * prints the error to SIG_IO::cerr, frees what it created and
+		 * logs a warning, frees what it created and
 		 * leaves shadowProgram nullptr. A robot without vertices gets no
 		 * shadow and no message.
 		 */

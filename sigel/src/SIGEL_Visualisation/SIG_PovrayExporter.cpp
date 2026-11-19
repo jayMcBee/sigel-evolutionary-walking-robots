@@ -24,7 +24,7 @@
 #include "SIGEL_Visualisation/SIG_PovrayExporter.h"
 
 #include "SIGEL_Visualisation/SIG_SimulationVisualisation.h"
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 
 #include <QDir>
@@ -526,7 +526,7 @@ bool SIG_PovrayExporter::writeFloorImage( QString fileName, SIG_PovrayFloor cons
 
 	if( texture.isNull() )
 	{
-		SIG_IO::cerr << "Error: cannot read the floor texture " << floor.textureFile << "." << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_Visualisation" ) << "Cannot read the floor texture " << floor.textureFile << ".";
 		return false;
 	}
 
@@ -553,7 +553,7 @@ bool SIG_PovrayExporter::writeFloorImage( QString fileName, SIG_PovrayFloor cons
 
 	if( !image.save( fileName, "PNG" ) )
 	{
-		SIG_IO::cerr << "Error: cannot write the floor image " << fileName << "." << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_Visualisation" ) << "Cannot write the floor image " << fileName << ".";
 		return false;
 	}
 
@@ -634,7 +634,7 @@ bool SIG_PovrayExporter::writeResource( QTextStream &stream, QString fileName )
 
 	if( !file.open( QIODevice::ReadOnly ) )
 	{
-		SIG_IO::cerr << "Error: the POV-Ray text " << fileName << " is missing from the program." << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_Visualisation" ) << "The POV-Ray text " << fileName << " is missing from the program.";
 		return false;
 	}
 
