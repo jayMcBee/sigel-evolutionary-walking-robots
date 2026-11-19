@@ -119,7 +119,8 @@ touched, because changing one changes behaviour against the reference binary.
   shows warnings and criticals in the main window.
   Add one-line macros `SIG_LOG_DEBUG`, `SIG_LOG_INFO`, `SIG_LOG_WARNING` and
   `SIG_LOG_CRITICAL` that wrap `qCDebug` and its siblings.
-  Give every `SIG_IO::cerr` and `SIG_IO::cout` line its level, then remove
+  Give every `SIG_IO::cerr` and `SIG_IO::cout` line its level (anything that
+  is not info or debug is a warning), then remove
   `SIG_IO`. Replace the `SIG_DEBUG` blocks with `SIG_LOG_DEBUG`; some compute
   values, not only output.
   Review every dialog outside the interface modules, for example in
