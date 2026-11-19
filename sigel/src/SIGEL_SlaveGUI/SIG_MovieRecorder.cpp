@@ -25,7 +25,7 @@
 
 #include "SIGEL_Visualisation/SIG_SimulationVisualisation.h"
 #include "SIGEL_Visualisation/SIG_PovrayExporter.h"
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 #include <QDir>
 #include <QFile>
@@ -364,9 +364,7 @@ namespace SIGEL_SlaveGUI
     framesRecorded++;
     // Frames a Fast Forward jumped over are skipped, not caught up.
     nextFrame = static_cast< int >( std::floor( framePosition( simulationSeconds ) ) ) + 1;
-#ifdef SIG_DEBUG
-    SIGEL_Tools::SIG_IO::cerr << "Writing " << lastFileName << " in format " << settings.width << " x " << settings.height << " with PNG compression " << settings.pngCompression << "." << Qt::endl;
-#endif
+    SIG_LOG_DEBUG( "SIGEL_SlaveGUI" ) << "Writing " << lastFileName << " in format " << settings.width << " x " << settings.height << " with PNG compression " << settings.pngCompression << ".";
     makeDirectory();
   }
 

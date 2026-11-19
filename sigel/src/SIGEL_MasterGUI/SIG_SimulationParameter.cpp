@@ -29,8 +29,6 @@
 #include "SIGEL_MasterGUI/SIG_SimulationParameter.h"
 #include "SIGEL_CommonGUI/SIG_WidgetUtils.h"
 
-#include "SIGEL_Tools/SIG_IO.h" // only for DEBUG!
-
 namespace SIGEL_MasterGUI
 {
 

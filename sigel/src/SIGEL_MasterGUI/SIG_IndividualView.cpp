@@ -24,8 +24,6 @@
 
 #include "SIGEL_MasterGUI/SIG_IndividualView.h"
 
-#include "SIGEL_Tools/SIG_IO.h"
-
 namespace SIGEL_MasterGUI
 {
 

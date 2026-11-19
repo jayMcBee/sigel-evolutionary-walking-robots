@@ -31,7 +31,6 @@
 
 #include "SIGEL_MasterGUI/SIG_ExperimentView.h"
 #include "SIGEL_GP/SIG_GPExperimentHistoryEntry.h"
-#include "SIGEL_Tools/SIG_IO.h"
 
 #include <unistd.h>
 

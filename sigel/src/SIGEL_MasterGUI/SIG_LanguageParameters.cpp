@@ -34,8 +34,6 @@
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 #include "SIGEL_Robot/SIG_CommandParameters.h"
 
-#include "SIGEL_Tools/SIG_IO.h"
-
 #include <cstdlib>
 
 namespace SIGEL_MasterGUI

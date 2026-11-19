@@ -44,7 +44,7 @@
 #include "SIGEL_GP/SIG_GPPVMData.h"
 #include "SIGEL_MasterGUI/SIG_GUIGPExperiment.h"
 
-#include <SIGEL_Tools/SIG_IO.h>
+#include "SIGEL_Tools/SIG_Logging.h"
 
 namespace SIGEL_MasterGUI
 {
@@ -242,7 +242,7 @@ namespace SIGEL_MasterGUI
 
 	void SIG_AllIndividualsView::slotStatsClicked()
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Pool Size:" << theExperiment.population.getSize() << Qt::endl;
+		SIG_LOG_INFO( "SIGEL_MasterGUI" ) << "Pool size: " << theExperiment.population.getSize();
 	}
 
 	void SIG_AllIndividualsView::slotRightButtonClicked( const QPoint &pos )
@@ -279,9 +279,7 @@ namespace SIGEL_MasterGUI
 
 	void SIG_AllIndividualsView::slotVisualize()
 	{
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Starting visualization!" << Qt::endl;
-#endif
+		SIG_LOG_DEBUG( "SIGEL_MasterGUI" ) << "Starting visualization.";
 
 		QList< QTreeWidgetItem * > const selectedItems = individualList->listviewIndividuals->selectedItems();
 		if( selectedItems.isEmpty() )

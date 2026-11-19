@@ -36,7 +36,7 @@
 #include "SIGEL_RobotIO/SIG_RobotBuilder.h"
 #include "SIGEL_Robot/SIG_LanguageParameters.h"
 
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 namespace SIGEL_MasterGUI
 {
@@ -368,9 +368,7 @@ void SIG_GUIGPExperiment::slotStartEvolution()
       delete guiGPManager;
       
       guiGPManager = new SIGEL_GP::SIG_GUIGPManager( *this );
-#ifdef SIG_DEBUG
-      SIGEL_Tools::SIG_IO::cout << "Starting Evolution" << Qt::endl;
-#endif
+      SIG_LOG_DEBUG( "SIGEL_MasterGUI" ) << "Starting evolution.";
       
       // The emit locks every experiment through slotEvolutionNotRunning. Stop is
       // not one of the widgets it touches, so it is set here.
@@ -459,9 +457,7 @@ void SIG_GUIGPExperiment::slotStopEvolution()
   // below, start() has not returned, and isRunning() is still true,
   // so the locked actions must stay locked. slotEvolutionStopped() emits it
   // after start() returns.
-#ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cout << "Stopping Evolution" << Qt::endl;
-#endif
+  SIG_LOG_DEBUG( "SIGEL_MasterGUI" ) << "Stopping evolution.";
   experimentView->pushbuttonStop->setEnabled( false );
 
   guiGPManager->userTerminated = true;

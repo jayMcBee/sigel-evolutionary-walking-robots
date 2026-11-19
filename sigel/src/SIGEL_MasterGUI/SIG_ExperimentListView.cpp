@@ -32,8 +32,6 @@
 
 #include "SIGEL_GP/SIG_GUIGPManager.h"
 
-#include <SIGEL_Tools/SIG_IO.h>
-
 namespace SIGEL_MasterGUI
 {
 
