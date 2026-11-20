@@ -34,102 +34,109 @@
 #include <cmath>
 #include <numbers>
 
-
-SIGEL_Simulation::SIG_DynaMechsCommandInterface::SIG_DynaMechsCommandInterface(SIG_DynaMechsSimulationData& theSimulationData)
-  : simulationData(theSimulationData)
-{ }
-
-void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
-								QList<SIG_Register> const& registers)
+SIGEL_Simulation::SIG_DynaMechsCommandInterface::SIG_DynaMechsCommandInterface( SIG_DynaMechsSimulationData &theSimulationData )
+	: simulationData( theSimulationData )
 {
-  SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Entering moveDrive.";
-  SIGEL_Robot::SIG_Drive *drive = nullptr;
-  dmRevoluteLink *intRevLink;
-  double	  q, qd, intMin, intMax, intSpring, intDamper;
-  long double     sigelDestAngle,
-                  destAngle,
-                  dmDestAngle;
-  int 		  driveIndex = 0;
+}
 
-  // determine what drive to use (if any)
-  if (simulationData.drives.size() > 0)
-    {
-      long double minRegisterValue = - std::pow( static_cast<long double>(2),
-						 static_cast<long double>(registers[0].getSize() - 1) );
+void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive( int driveNo,
+                                                                 QList<SIG_Register> const &registers )
+{
+	SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Entering moveDrive.";
+	SIGEL_Robot::SIG_Drive *drive = nullptr;
+	dmRevoluteLink *intRevLink;
+	double q, qd, intMin, intMax, intSpring, intDamper;
+	long double sigelDestAngle,
+		destAngle,
+		dmDestAngle;
+	int driveIndex = 0;
 
-      int absoluteDriveNo = driveNo - static_cast< int >(minRegisterValue);
+	// determine what drive to use (if any)
+	if( simulationData.drives.size() > 0 )
+	{
+		long double minRegisterValue = -std::pow( static_cast<long double>( 2 ),
+		                                          static_cast<long double>( registers[0].getSize() - 1 ) );
 
-      // Unsigned on purpose: a negative absoluteDriveNo must never index
-      // drives[] or driveForcesTimeAccounts[] -- the second is a write.
-      driveIndex = absoluteDriveNo % static_cast< uint >(simulationData.drives.size());
+		int absoluteDriveNo = driveNo - static_cast<int>( minRegisterValue );
 
-      SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Drive index: " << driveIndex << ".";
+		// Unsigned on purpose: a negative absoluteDriveNo must never index
+		// drives[] or driveForcesTimeAccounts[] -- the second is a write.
+		driveIndex = absoluteDriveNo % static_cast<uint>( simulationData.drives.size() );
 
-     drive = simulationData.drives[ driveIndex ];
-    };
+		SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Drive index: " << driveIndex << ".";
 
-  if (!drive)
-  {	return;
-  }
+		drive = simulationData.drives[driveIndex];
+	};
 
-      SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Drive exists.";
+	if( !drive )
+	{
+		return;
+	}
 
-      long double minRegisterValue = - ( std::pow( static_cast<long double>(2),
-						   static_cast<long double>(registers[0].getSize() - 1) )
-	                                 - 1 );
+	SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Drive exists.";
 
-      long double registerValueRange = - minRegisterValue * 2;
+	long double minRegisterValue = -( std::pow( static_cast<long double>( 2 ),
+	                                            static_cast<long double>( registers[0].getSize() - 1 ) ) - 1 );
 
-      int registerValue = registers[0].getValue();
+	long double registerValueRange = -minRegisterValue * 2;
 
-      long double absoluteRegisterValue = registerValue - minRegisterValue;
+	int registerValue = registers[0].getValue();
 
-	  // SERVO-TYPE:  Interprete register value as angle
-	  // THIS IS HOW WE INTERPRETE THIS TYPE OF MOTOR:
-	  // (switching to German from here on...)
-	  // -> a 'push it on its way' motor. We may spend practically no time in the command,
-	  //    so we do not wait until the final angle has been reached.
-	  // The motor is sent on its way, always at maximum force.
-	  // The end position is reached by manipulating the joint's min/max values, i.e.
-	  // by a hard stop. In that position the motor is held partly by the constraint
-	  // and partly by the active motor force ... hope that works..!
-	 if (drive->getMode() == SIGEL_Robot::SIG_Drive::tServoSimpleMode)
-	 {
-		int linkNumber = simulationData.jointIndices[ drive->getJoint()->getNumber() ];
-		SIG_DynaMechsLink *dynaMechsLink = simulationData.dynaMechsLinks[ linkNumber ];
+	long double absoluteRegisterValue = registerValue - minRegisterValue;
+
+	// SERVO-TYPE:  Interprete register value as angle
+	// THIS IS HOW WE INTERPRETE THIS TYPE OF MOTOR:
+	// (switching to German from here on...)
+	// -> a 'push it on its way' motor. We may spend practically no time in the command,
+	//    so we do not wait until the final angle has been reached.
+	// The motor is sent on its way, always at maximum force.
+	// The end position is reached by manipulating the joint's min/max values, i.e.
+	// by a hard stop. In that position the motor is held partly by the constraint
+	// and partly by the active motor force ... hope that works..!
+	if( drive->getMode() == SIGEL_Robot::SIG_Drive::tServoSimpleMode )
+	{
+		int linkNumber = simulationData.jointIndices[drive->getJoint()->getNumber()];
+		SIG_DynaMechsLink *dynaMechsLink = simulationData.dynaMechsLinks[linkNumber];
 
 		// we work on rotational joints only, we do not look at anything else at all!
 		SIGEL_Robot::SIG_Joint const *myJoint = drive->getJoint();
 
-		if (myJoint->getJointType() != SIGEL_Robot::SIG_Joint::tRotationalJoint)
-		{	SIGEL_Tools::SIG_IO::cerr << "tServoSimpleMode type drives can work on rotational joints only !!" << Qt::endl;
+		if( myJoint->getJointType() != SIGEL_Robot::SIG_Joint::tRotationalJoint )
+		{
+			SIGEL_Tools::SIG_IO::cerr << "tServoSimpleMode type drives can work on rotational joints only !!" << Qt::endl;
 			return;
 		}
-		// get the DynaMechs joint for current angle -- joint limits might be manipulated !
-		intRevLink = static_cast<dmRevoluteLink*>(dynaMechsLink->dynaMechsLink);
-		intRevLink->getJointLimits(&intMin, &intMax, &intSpring, &intDamper);
 
-		SIGEL_Robot::SIG_RotationalJoint const *myRotJ = dynamic_cast<SIGEL_Robot::SIG_RotationalJoint const *>(myJoint);
+		// get the DynaMechs joint for current angle -- joint limits might be manipulated !
+		intRevLink = static_cast<dmRevoluteLink *>( dynaMechsLink->dynaMechsLink );
+		intRevLink->getJointLimits( &intMin, &intMax, &intSpring, &intDamper );
+
+		SIGEL_Robot::SIG_RotationalJoint const *myRotJ = dynamic_cast<SIGEL_Robot::SIG_RotationalJoint const *>( myJoint );
 
 		// but restore limits first; don't trust the manipulated values -> use original values stored in SIG_Joint::getMechsMinPos()
 		intMin = myRotJ->getMechsMinPos();
 		intMax = myRotJ->getMechsMaxPos();
 
-    // we want a MOVE -90 in our code turn the servo to
-    // -90 angle (if it is allowed to turn there) for transparent programs !!
-    if (registerValue < myRotJ->getMin())
-    {  destAngle = myRotJ->getMin();
-    }
-    else if (registerValue > myRotJ->getMax())
-    {  destAngle = myRotJ->getMax();
-    }
-    else destAngle = registerValue;
+		// we want a MOVE -90 in our code turn the servo to
+		// -90 angle (if it is allowed to turn there) for transparent programs !!
+		if( registerValue < myRotJ->getMin() )
+		{
+			destAngle = myRotJ->getMin();
+		}
+		else if( registerValue > myRotJ->getMax() )
+		{
+			destAngle = myRotJ->getMax();
+		}
+		else
+		{
+			destAngle = registerValue;
+		}
 
-    // make it relative, i.e. zero means minimal allowed (defined) joint angle
-    sigelDestAngle = destAngle - static_cast<long double>(myRotJ->getMin());
+		// make it relative, i.e. zero means minimal allowed (defined) joint angle
+		sigelDestAngle = destAngle - static_cast<long double>( myRotJ->getMin() );
 
 		// transform to a dynamechs position -> 0..2*pi, please ! Add dm-internal min. joint value here, therefore not above ...
-		dmDestAngle = sigelDestAngle * (std::numbers::pi / 180.0) + intMin;
+		dmDestAngle = sigelDestAngle * ( std::numbers::pi / 180.0 ) + intMin;
 
 		//	q is our current angle
 		intRevLink->getState( &q, &qd );
@@ -139,13 +146,13 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 
 		// NOW FOR THE REALLY BAD PART:
 		//	Manipulate DynaMechs min./max. limits :-)
-
 		// 1 degrees as 0..2*pi
 		const double onePiDegree = std::numbers::pi / 180.0;
 
 		// which direction to turn ?
-		if (q > dmDestAngle)
-		{	jointInput *= -1.0;
+		if( q > dmDestAngle )
+		{
+			jointInput *= -1.0;
 
 			// set new min. limit ! give a minimal freedom of 1 degree to prevent
 			// something shitty happening within our simulation -- but only if the
@@ -153,48 +160,48 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 			intMin = std::max<long double>( intMin, dmDestAngle - onePiDegree );
 		}
 		else
-		{	// set new max. limit !  same stuff as above applies in this case..
+		{
+			// set new max. limit !  same stuff as above applies in this case..
 			intMax = std::min<long double>( intMax, dmDestAngle + onePiDegree );
 		}
 
 		// now fall down on your knees and pray to the lord this really works :-)
-		intRevLink->setJointLimits(intMin, intMax, intSpring, intDamper);
+		intRevLink->setJointLimits( intMin, intMax, intSpring, intDamper );
 
 		// power for some darn large amount of time; meaning our motors are always 'on';
 		// somebody might want to add a 'STOP-MOVE/motor-off' terminal to SIGEL some time.. ?
 		intRevLink->setJointInput( &jointInput );
 
 		double forceDuration = simulationData.robot.getLangParam()->getCommand( "MOVE" )->getDuration();
-		simulationData.driveForcesTimeAccounts[ driveIndex ] = forceDuration * 10000;
-	 }
+		simulationData.driveForcesTimeAccounts[driveIndex] = forceDuration * 10000;
+	}
 
-	 // FORCE-TYPE:  Interprete register value as force and
-	 // apply (using minForce/maxForce boundaries) to joint
-	 else
-	 {
+	// FORCE-TYPE:  Interprete register value as force and
+	// apply (using minForce/maxForce boundaries) to joint
+	else
+	{
 		absoluteRegisterValue = std::max( absoluteRegisterValue, 0.0L );
 
-		long double force = (   ( absoluteRegisterValue / registerValueRange )
-			    * ( 2 * drive->getMaxForce() ) )
-	                  - drive->getMaxForce();
+		long double force = ( ( absoluteRegisterValue / registerValueRange ) * ( 2 * drive->getMaxForce() ) ) - drive->getMaxForce();
 
-		SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "minRegisterValue: " << static_cast< double >(minRegisterValue) << ", registerValueRange: " << static_cast< double >(registerValueRange) << ", registerValue: " << registerValue << ", maxForce: " << drive->getMaxForce() << ".";
+		SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "minRegisterValue: " << static_cast<double>( minRegisterValue ) << ", registerValueRange: " << static_cast<double>( registerValueRange ) << ", registerValue: " << registerValue << ", maxForce: " << drive->getMaxForce() << ".";
 
 		// we act only if the force is >min. force applicable
-		if (std::abs(force) >= drive->getMinForce())	{
-			double jointInput = static_cast< double >(force);
+		if( std::abs( force ) >= drive->getMinForce() )
+		{
+			double jointInput = static_cast<double>( force );
 
 			SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Applying force/torque " << jointInput << " at drive " << drive->getName() << ".";
 
-			int linkNumber = simulationData.jointIndices[ drive->getJoint()->getNumber() ];
+			int linkNumber = simulationData.jointIndices[drive->getJoint()->getNumber()];
 
-			SIG_DynaMechsLink *dynaMechsLink = simulationData.dynaMechsLinks[ linkNumber ];
+			SIG_DynaMechsLink *dynaMechsLink = simulationData.dynaMechsLinks[linkNumber];
 
 			dynaMechsLink->dynaMechsLink->setJointInput( &jointInput );
 
 			double forceDuration = simulationData.robot.getLangParam()->getCommand( "MOVE" )->getDuration();
 
-			simulationData.driveForcesTimeAccounts[ driveIndex ] = forceDuration;
+			simulationData.driveForcesTimeAccounts[driveIndex] = forceDuration;
 		}
-    }
+	}
 }
