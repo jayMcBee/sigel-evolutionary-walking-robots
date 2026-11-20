@@ -24,7 +24,7 @@
 #include "SIGEL_Simulation/SIG_DynaMechsLink.h"
 
 #include "SIGEL_Tools/SIG_TypeConverter.h"
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 #include <dm.h>
 #include <dmMDHLink.hpp>
@@ -73,21 +73,8 @@ namespace SIGEL_Simulation
 		                                  centerOfMass,
 		                                  inertiaTensor );
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Density: " << density << Qt::endl;
-		SIGEL_Tools::SIG_IO::cerr << "Mass: " << mass << Qt::endl;
-		SIGEL_Tools::SIG_IO::cerr << "Center of mass:";
-		for (int i=0; i<3; i++)
-			SIGEL_Tools::SIG_IO::cerr << " " << centerOfMass.get( i );
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		SIGEL_Tools::SIG_IO::cerr << "Inertia tensor:" << Qt::endl;
-		for (int i=0; i<3; i++)
-		{
-			for (int j=0; j<3; j++)
-				SIGEL_Tools::SIG_IO::cerr << inertiaTensor.get( i, j ) << " ";
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		};
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Density: " << density << ".";
+		SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Mass: " << mass << ".";
 
 		CartesianTensor dynaMechsInertiaTensor;
 		CartesianVector dynaMechsCenterOfMass;
@@ -168,21 +155,7 @@ namespace SIGEL_Simulation
 			                  * buildTranslationMatrix( a, 0, d )
 			                  * buildZRotationMatrix( theta );
 
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "theta: "
-			                          << theta
-			                          << ", d: "
-			                          << d
-			                          << Qt::endl;
-
-			SIGEL_Tools::SIG_IO::cerr << "New Transformation:" << Qt::endl;
-			for (int i=1; i<=4; i++)
-			{
-				for (int j=1; j<=4; j++)
-					SIGEL_Tools::SIG_IO::cerr << transformation( i, j ) << " ";
-				SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-			};
-#endif
+			SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Theta: " << theta << ", d: " << d << ".";
 		};
 
 		for (SIG_DynaMechsLink *currentSuccessor : successors)
@@ -201,16 +174,7 @@ namespace SIGEL_Simulation
 		               << 0 << sinAngle << cosAngle << 0
 		               << 0 << 0 << 0 << 1;
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "X-Angle: " << angle << "\n"
-		                          << "Matrix:" << Qt::endl;
-		for (int i=1; i<=4; i++)
-		{
-			for (int j=1; j<=4; j++)
-				SIGEL_Tools::SIG_IO::cerr << transformation( i, j ) << " ";
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		};
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "X-Angle: " << angle << ".";
 
 		return transformation;
 	}
@@ -227,16 +191,7 @@ namespace SIGEL_Simulation
 		               << 0 << 0 << 1 << 0
 		               << 0 << 0 << 0 << 1;
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Z-Angle: " << angle << "\n"
-		                          << "Matrix:" << Qt::endl;
-		for (int i=1; i<=4; i++)
-		{
-			for (int j=1; j<=4; j++)
-				SIGEL_Tools::SIG_IO::cerr << transformation( i, j ) << " ";
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		};
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Z-Angle: " << angle << ".";
 
 		return transformation;
 	}
@@ -250,16 +205,7 @@ namespace SIGEL_Simulation
 		               << 0 << 0 << 1 << z
 		               << 0 << 0 << 0 << 1;
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Move: " << x << " " << y << " " << z << "\n"
-		                          << "Matrix:" << Qt::endl;
-		for (int i=1; i<=4; i++)
-		{
-			for (int j=1; j<=4; j++)
-				SIGEL_Tools::SIG_IO::cerr << transformation( i, j ) << " ";
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		};
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Move: " << x << " " << y << " " << z << ".";
 
 		return transformation;
 	}

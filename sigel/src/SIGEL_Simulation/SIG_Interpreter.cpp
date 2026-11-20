@@ -22,7 +22,7 @@
  */
 #include "SIGEL_Simulation/SIG_Interpreter.h"
 #include "SIGEL_Tools/SIG_Exception.h"
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 #include <algorithm>
 #include <cmath>
 
@@ -63,9 +63,7 @@ namespace SIGEL_Simulation
 		if ( timeAccount <= remainingLastCommandTime )
 		{
 			remainingLastCommandTime = std::round( ( remainingLastCommandTime - timeAccount ) * nanosecondsPerSecond ) / nanosecondsPerSecond;
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "Remaining Last Command Time: " << remainingLastCommandTime << Qt::endl;
-#endif
+			SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Remaining last command time: " << remainingLastCommandTime << ".";
 			return;
 		}
 
@@ -78,10 +76,6 @@ namespace SIGEL_Simulation
 		{
 			// fetch the next command
 			SIGEL_Program::SIG_ProgramLine const &programLine = robotProgram.getLine( programCounter );
-
-#ifdef SIG_DEBUG
-			debugPrintInterpreterState( timeAccount, programLine );
-#endif
 
 			// An instruction type that is not in robotInstructionNames gets an empty name.
 			const QString commandName = SIGEL_Program::robotInstructionNames.value( programLine.getRobotInstructionType() );
@@ -181,9 +175,7 @@ namespace SIGEL_Simulation
 					compareFlag = true;
 				else
 					compareFlag = false;
-#ifdef SIG_DEBUG
-				SIGEL_Tools::SIG_IO::cerr << "Reg0: " << reg0 << "; Reg1: " << reg1 << Qt::endl;
-#endif
+				SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Reg0: " << reg0 << ", Reg1: " << reg1 << ".";
 			}
 			break;
 
@@ -217,9 +209,7 @@ namespace SIGEL_Simulation
 			{
 				int reg0 = getRegisterNumber( programLine.getInstructionElement(0) );
 				int numberOfJoint = registers[reg0].getValue();
-#ifdef SIG_DEBUG
-				SIGEL_Tools::SIG_IO::cerr << "Moving drive " << numberOfJoint << "." << Qt::endl;
-#endif
+				SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Moving drive " << numberOfJoint << ".";
 				commandInterface.moveDrive( numberOfJoint, registers );
 			}
 			break;
@@ -250,32 +240,7 @@ namespace SIGEL_Simulation
 		if ( timeAccount < 0 )
 			remainingLastCommandTime = - timeAccount;
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Remaining Last Command Time: " << remainingLastCommandTime << Qt::endl; // debug! delete!
-#endif
-	}
-
-	void SIG_Interpreter::debugPrintInterpreterState( double timeAccount, SIGEL_Program::SIG_ProgramLine const &programLine ) const
-	{
-		SIGEL_Tools::SIG_IO::cerr << "--------------------------------------------------------" << Qt::endl;
-		SIGEL_Tools::SIG_IO::cerr << "Remaining Time:" << timeAccount<< Qt::endl;
-		SIGEL_Tools::SIG_IO::cerr << "PC: " << programCounter << Qt::endl;
-
-		if( compareFlag )
-			SIGEL_Tools::SIG_IO::cerr << "CF: 1" << Qt::endl;
-		else
-			SIGEL_Tools::SIG_IO::cerr << "CF: 0" << Qt::endl;
-
-		QString theQLine;
-		programLine.printToString( theQLine );
-		SIGEL_Tools::SIG_IO::cerr << theQLine;
-
-		SIGEL_Tools::SIG_IO::cerr << "Registers:" << Qt::endl;
-		for( int loop=0; loop < registers.size(); loop++ )
-		{
-			SIGEL_Tools::SIG_IO::cerr << "R" << loop << ":" << registers[loop].getValue() << "  ";
-		}
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
+		SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Remaining last command time: " << remainingLastCommandTime << ".";
 	}
 
 	int SIG_Interpreter::getRegisterNumber( int operand ) const

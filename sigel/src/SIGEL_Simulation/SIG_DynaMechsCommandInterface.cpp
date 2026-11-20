@@ -23,6 +23,7 @@
 #include <QList>
 #include "SIGEL_Simulation/SIG_DynaMechsCommandInterface.h"
 #include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 #include "SIGEL_Robot/SIG_Joint.h"
 #include "SIGEL_Robot/SIG_RotationalJoint.h"
 
@@ -41,23 +42,14 @@ SIGEL_Simulation::SIG_DynaMechsCommandInterface::SIG_DynaMechsCommandInterface(S
 void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 								QList<SIG_Register> const& registers)
 {
-#ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cerr << "entering method moveDrive" << Qt::endl;
-#endif
+  SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Entering moveDrive.";
   SIGEL_Robot::SIG_Drive *drive = nullptr;
-  dmLink	*internalLink;
   dmRevoluteLink *intRevLink;
   double	  q, qd, intMin, intMax, intSpring, intDamper;
   long double     sigelDestAngle,
                   destAngle,
                   dmDestAngle;
   int 		  driveIndex = 0;
-
-#ifdef SIG_DEBUG
-	for (int iInt=0; iInt<simulationData.drives.size(); iInt++)
-	{	SIGEL_Tools::SIG_IO::cerr << "Drive #" << iInt << ": \"" << simulationData.drives[iInt]->getName() << "\"" << Qt::endl;
-	}
-#endif
 
   // determine what drive to use (if any)
   if (simulationData.drives.size() > 0)
@@ -71,9 +63,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
       // drives[] or driveForcesTimeAccounts[] -- the second is a write.
       driveIndex = absoluteDriveNo % static_cast< uint >(simulationData.drives.size());
 
-#ifdef SIG_DEBUG
-      SIGEL_Tools::SIG_IO::cerr << "Drive index: " << driveIndex << Qt::endl;
-#endif
+      SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Drive index: " << driveIndex << ".";
 
      drive = simulationData.drives[ driveIndex ];
     };
@@ -82,9 +72,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
   {	return;
   }
 
-#ifdef SIG_DEBUG
-      SIGEL_Tools::SIG_IO::cerr << "Drive exists!" << Qt::endl;
-#endif
+      SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Drive exists.";
 
       long double minRegisterValue = - ( std::pow( static_cast<long double>(2),
 						   static_cast<long double>(registers[0].getSize() - 1) )
@@ -121,10 +109,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 		intRevLink = static_cast<dmRevoluteLink*>(dynaMechsLink->dynaMechsLink);
 		intRevLink->getJointLimits(&intMin, &intMax, &intSpring, &intDamper);
 
-		// get rel. position within the min-max range we want to turn
-		// in SIGEL (0..360) notation
 		SIGEL_Robot::SIG_RotationalJoint const *myRotJ = dynamic_cast<SIGEL_Robot::SIG_RotationalJoint const *>(myJoint);
-		long double rjointrange = static_cast<long double>(myRotJ->getMax()) - static_cast<long double>(myRotJ->getMin());
 
 		// but restore limits first; don't trust the manipulated values -> use original values stored in SIG_Joint::getMechsMinPos()
 		intMin = myRotJ->getMechsMinPos();
@@ -193,19 +178,13 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive(int driveNo,
 			    * ( 2 * drive->getMaxForce() ) )
 	                  - drive->getMaxForce();
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "minRegisterValue: " << static_cast< double >(minRegisterValue) << "\n"
-					<< "registerValueRange: " << static_cast< double >(registerValueRange)	<< "\n"
-					<< "registerValue: " << registerValue << "\n" << "maxForce: " << drive->getMaxForce() << Qt::endl;
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "minRegisterValue: " << static_cast< double >(minRegisterValue) << ", registerValueRange: " << static_cast< double >(registerValueRange) << ", registerValue: " << registerValue << ", maxForce: " << drive->getMaxForce() << ".";
 
 		// we act only if the force is >min. force applicable
 		if (std::abs(force) >= drive->getMinForce())	{
 			double jointInput = static_cast< double >(force);
 
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "Applying force/torque " << jointInput << " at drive "	<< drive->getName()	<< "." << Qt::endl;
-#endif
+			SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Applying force/torque " << jointInput << " at drive " << drive->getName() << ".";
 
 			int linkNumber = simulationData.jointIndices[ drive->getJoint()->getNumber() ];
 

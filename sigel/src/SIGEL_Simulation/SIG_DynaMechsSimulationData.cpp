@@ -32,6 +32,7 @@
 #include "SIGEL_Robot/SIG_ContactSensor.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 #include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
 #include <dm.h>
@@ -131,17 +132,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 
 			if (dynaMechsLinks[ linkNumber ])
 			{
-#ifdef SIG_DEBUG
-				SIGEL_Tools::SIG_IO::cerr << "Inserting drive "
-				                          << currentDrive->getName()
-				                          << " at joint "
-				                          << jointNumber
-				                          << " corresponding to link "
-				                          << linkNumber
-				                          << ": "
-				                          << dynaMechsLinks[ linkNumber ]->link->getName()
-				                          << "." << Qt::endl;
-#endif
+				SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Inserting drive " << currentDrive->getName() << " at joint " << jointNumber << " corresponding to link " << linkNumber << ": " << dynaMechsLinks[ linkNumber ]->link->getName() << ".";
 
 				drives[ currentDrive->getNumber() ] = currentDrive;
 			}
@@ -235,23 +226,11 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::simulationProgress()
 		{
 			driveForcesTimeAccounts[ i ] -= simulationParameter.getStepSize();
 
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "driveForcesTimeAccount[ "
-			                          << i
-			                          << " ], drive "
-			                          << currentDrive->getName()
-			                          << ": "
-			                          << driveForcesTimeAccounts[ i ]
-			                          << Qt::endl;
-#endif
+			SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "driveForcesTimeAccount[ " << i << " ], drive " << currentDrive->getName() << ": " << driveForcesTimeAccounts[ i ] << ".";
 
 			if (driveForcesTimeAccounts[ i ] <= 0)
 			{
-#ifdef SIG_DEBUG
-				SIGEL_Tools::SIG_IO::cerr << "Resetting drive "
-				                          << currentDrive->getName()
-				                          << "." << Qt::endl;
-#endif
+				SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Resetting drive " << currentDrive->getName() << ".";
 				driveForcesTimeAccounts[ i ] = 0;
 
 				int jointNumber = currentDrive->getJoint()->getNumber();
@@ -346,20 +325,6 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationData::initializeArticulation()
 	NEWMAT::ColumnVector startPosition =   SIG_TypeConverter::sigelToDynaMechs()
 	                                     * (   SIG_TypeConverter::toColumnVector( environment.getStartPosition() )
 	                                         + SIG_TypeConverter::toColumnVector( robot.initialLocation ) );
-
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "Setting initial robot location: ";
-	for (int i=1; i<=3; i++)
-		SIGEL_Tools::SIG_IO::cerr << " " << startPosition( i );
-	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-	SIGEL_Tools::SIG_IO::cerr << "Setting initial robot orientation:" << Qt::endl;
-	for (int i=1; i<=3; i++)
-	{
-		for (int j=1; j<=3; j++)
-			SIGEL_Tools::SIG_IO::cerr << startRotation( i, j ) << " ";
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-	}
-#endif
 
 	SIG_TypeConverter::toCartesianVector( startPosition, initialState + 4 );
 
@@ -468,28 +433,7 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
 		fflush(stdout);
 	}
 
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "MDH Parameters of joint "
-	                          << joint->getName()
-	                          << ": a: "
-	                          << a
-	                          << " alpha: "
-	                          << alpha
-	                          << " d: "
-	                          << d
-	                          << " theta: "
-	                          << theta
-	                          << " screwD: "
-	                          << screwD
-	                          << " screwTheta: "
-	                          << screwTheta
-	                          << "\n"
-	                          << "Joint limits: Min: "
-	                          << minLimit
-	                          << " Max: "
-	                          << maxLimit
-	                          << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "MDH parameters of joint " << joint->getName() << ": a: " << a << ", alpha: " << alpha << ", d: " << d << ", theta: " << theta << ", screwD: " << screwD << ", screwTheta: " << screwTheta << ", joint limits: min: " << minLimit << ", max: " << maxLimit << ".";
 
 	internalDynaMechsLink->setJointLimits( minLimit,
 	                                       maxLimit,

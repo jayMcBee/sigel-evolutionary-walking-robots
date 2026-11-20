@@ -35,11 +35,11 @@
 #include "SIGEL_Robot/SIG_PitchRollSensor.h"
 #include "SIGEL_Robot/SIG_ContactSensor.h"
 #include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 
 #include <dm.h>
 #include "dmContactModel.hpp"
-#include "dmArticulation.hpp"
 #include "dmRevoluteLink.hpp"
 
 using namespace SIGEL_Tools;
@@ -53,13 +53,6 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense( int sensorNo,
                                                               QList<SIG_Register> &registers ) const
 {
 	SIGEL_Robot::SIG_Sensor *sensor = nullptr;
-
-#ifdef SIG_DEBUG
-	for( int iInt = 0; iInt < simulationData.sensors.size(); iInt++ )
-	{
-		SIGEL_Tools::SIG_IO::cerr << "Sensor #" << iInt << ": \"" << simulationData.sensors[iInt]->getName() << "\"" << Qt::endl;
-	}
-#endif
 
 	if( simulationData.sensors.size() > 0 )
 	{
@@ -120,17 +113,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense( int sensorNo,
 	// one more, and SIG_Register::makeValid would wrap it to the bottom.
 	registerValue = std::min( registerValue, registers[0].getMaxValue() );
 
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "minRegisterValue: "
-	                          << static_cast<double>( minRegisterValue )
-	                          << "\n"
-	                          << "registerValueRange: "
-	                          << static_cast<double>( registerValueRange )
-	                          << "\n"
-	                          << "registerValue: "
-	                          << registerValue
-	                          << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "minRegisterValue: " << static_cast<double>( minRegisterValue ) << ", registerValueRange: " << static_cast<double>( registerValueRange ) << ", registerValue: " << registerValue << ".";
 
 	registers[0].loadValue( registerValue );
 }
@@ -182,29 +165,7 @@ std::optional<double> SIGEL_Simulation::SIG_DynaMechsSimulationQueries::readJoin
 
 	double sensorReading = ( q - minPos ) / posRange;
 
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "Reading sensor value from sensor "
-	                          << jointSensor->getName()
-	                          << " at joint "
-	                          << joint->getName()
-	                          << " corresponding to link "
-	                          << linkNumber
-	                          << ": "
-	                          << sigDMLink->link->getName()
-	                          << "\n"
-	                          << "minPos: "
-	                          << minPos
-	                          << ", maxPos: "
-	                          << maxPos
-	                          << ", posRange: "
-	                          << posRange
-	                          << "\n"
-	                          << "state: "
-	                          << q
-	                          << ", sensorReading: "
-	                          << sensorReading
-	                          << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "SIGEL_Simulation" ) << "Reading sensor value from sensor " << jointSensor->getName() << " at joint " << joint->getName() << " corresponding to link " << linkNumber << ": " << sigDMLink->link->getName() << ", minPos: " << minPos << ", maxPos: " << maxPos << ", posRange: " << posRange << ", state: " << q << ", sensorReading: " << sensorReading << ".";
 
 	return sensorReading;
 }
@@ -284,32 +245,6 @@ SIG_Vector SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkPosition( in
 	{
 		NEWMAT::ColumnVector position = SIG_TypeConverter::dynaMechsToSigel() * dynaMechsLink->transformation.SubMatrix( 1, 3, 4, 4 );
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Position of link "
-		                          << dynaMechsLink->link->getName()
-		                          << ":";
-		for( int i = 1; i <= 3; i++ )
-		{
-			SIGEL_Tools::SIG_IO::cerr << " "
-			                          << dynaMechsLink->transformation( i, 4 );
-		}
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		SIGEL_Tools::SIG_IO::cerr << "Position of link (DynaMechs forward kinematics) "
-		                          << dynaMechsLink->link->getName()
-		                          << ", internal number "
-		                          << dynaMechsLink->dynaMechsLinkNumber
-		                          << ":";
-		dmABForKinStruct const *forKinStruct = simulationData.dynaMechsSystem.getForKinStruct( dynaMechsLink->dynaMechsLinkNumber );
-		NEWMAT::ColumnVector dynaMechsPosition = SIG_TypeConverter::toColumnVector( forKinStruct->p_ICS );
-		for( int i = 1; i <= 3; i++ )
-		{
-			SIGEL_Tools::SIG_IO::cerr << " "
-			                          << dynaMechsPosition( i );
-		}
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
-
 		return SIG_TypeConverter::toSIG_Vector( position );
 	}
 	else
@@ -327,39 +262,6 @@ SIG_Matrix SIGEL_Simulation::SIG_DynaMechsSimulationQueries::getLinkOrientation(
 	if( dynaMechsLink )
 	{
 		NEWMAT::Matrix orientation = SIG_TypeConverter::dynaMechsToSigel() * dynaMechsLink->transformation.SubMatrix( 1, 3, 1, 3 );
-
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "\n-----\n\nOrientation of link "
-		                          << dynaMechsLink->link->getName()
-		                          << ":\n"
-		                          << Qt::endl;
-		for( int i = 1; i <= 3; i++ )
-		{
-			for( int j = 1; j <= 3; j++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << dynaMechsLink->transformation( i, j );
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		}
-
-		SIGEL_Tools::SIG_IO::cerr << "\nOrientation of link (DynaMechs forward kinematics) "
-		                          << dynaMechsLink->link->getName()
-		                          << ", internal number "
-		                          << dynaMechsLink->dynaMechsLinkNumber
-		                          << ":\n"
-		                          << Qt::endl;
-		dmABForKinStruct const *forKinStruct = simulationData.dynaMechsSystem.getForKinStruct( dynaMechsLink->dynaMechsLinkNumber );
-		NEWMAT::Matrix dynaMechsOrientation = SIG_TypeConverter::toMatrix( forKinStruct->R_ICS );
-		for( int i = 1; i <= 3; i++ )
-		{
-			for( int j = 1; j <= 3; j++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << dynaMechsOrientation( i, j );
-			}
-
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		}
-#endif
 
 		return SIG_TypeConverter::toSIG_Matrix( orientation );
 	}
