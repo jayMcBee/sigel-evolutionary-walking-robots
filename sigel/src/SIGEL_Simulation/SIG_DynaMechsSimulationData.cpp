@@ -31,7 +31,6 @@
 #include "SIGEL_Robot/SIG_PitchRollSensor.h"
 #include "SIGEL_Robot/SIG_ContactSensor.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_Logging.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
@@ -160,7 +159,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 			if (dynaMechsLinks[ linkNumber ])
 			{	sensors[ currentSensor->getNumber() ] = currentSensor;
 			}
-			else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (1)" << Qt::endl;
+			else SIG_LOG_WARNING( "SIGEL_Simulation" ) << "Houston, we've got a problem here! No link, no fun (1).";
 		}
 		break;
 
@@ -173,7 +172,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 			if (dynaMechsLinks[ link->getNumber() ])
 			{	sensors[ currentSensor->getNumber() ] = currentSensor;
 			}
-			else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (2)" << Qt::endl;
+			else SIG_LOG_WARNING( "SIGEL_Simulation" ) << "Houston, we've got a problem here! No link, no fun (2).";
 		}
 		break;
 
@@ -186,7 +185,7 @@ SIGEL_Simulation::SIG_DynaMechsSimulationData::SIG_DynaMechsSimulationData( SIGE
 			if (dynaMechsLinks[ link->getNumber() ])
 			{	sensors[ currentSensor->getNumber() ] = currentSensor;
 			}
-			else SIGEL_Tools::SIG_IO::cerr << "Houston, we've got a problem here !  No link, no fun in  SIG_DynaMechsSimulationData (3)" << Qt::endl;
+			else SIG_LOG_WARNING( "SIGEL_Simulation" ) << "Houston, we've got a problem here! No link, no fun (3).";
 		}
 		break;
 		}
@@ -393,7 +392,7 @@ SIGEL_Simulation::SIG_DynaMechsLink *SIGEL_Simulation::SIG_DynaMechsSimulationDa
 		internalDynaMechsLink = new dmRevoluteLink();
 		break;
 	default:
-		SIGEL_Tools::SIG_IO::cerr << "Cannot simulate robot with DynaMechs: Joint type not allowed!" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_Simulation" ) << "Cannot simulate robot with DynaMechs: Joint type not allowed!";
 		exit( 1 );
 	}
 

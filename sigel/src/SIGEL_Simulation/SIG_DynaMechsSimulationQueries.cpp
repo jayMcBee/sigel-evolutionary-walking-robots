@@ -34,7 +34,6 @@
 #include "SIGEL_Robot/SIG_JointSensor.h"
 #include "SIGEL_Robot/SIG_PitchRollSensor.h"
 #include "SIGEL_Robot/SIG_ContactSensor.h"
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_Logging.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
 
@@ -69,7 +68,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense( int sensorNo,
 
 	if( !sensor )
 	{
-		SIGEL_Tools::SIG_IO::cerr << "attempt to read invalid sensor (sensorNo=" << sensorNo << ") in 'SIG_DynaMechsSimulationQueries::sense()'" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_Simulation" ) << "Attempt to read invalid sensor (sensorNo=" << sensorNo << ").";
 		return;
 	}
 
@@ -94,7 +93,7 @@ void SIGEL_Simulation::SIG_DynaMechsSimulationQueries::sense( int sensorNo,
 
 		// dunno this type !
 		default:
-			SIGEL_Tools::SIG_IO::cerr << "\tPANIC !!  UNKNOWN SENSOR TYPE !!\n" << Qt::endl; //	somebody want to change this to this funky throw/catch thingy ?
+			SIG_LOG_WARNING( "SIGEL_Simulation" ) << "Unknown sensor type!"; //	somebody want to change this to this funky throw/catch thingy ?
 	}
 
 	if( !sensorReading )
@@ -146,7 +145,7 @@ std::optional<double> SIGEL_Simulation::SIG_DynaMechsSimulationQueries::readJoin
 	}
 	else if( minPos == maxPos )
 	{
-		SIGEL_Tools::SIG_IO::cerr << "joint sensor " << jointSensor->getName() << ": a translational joint without limits has no range to read" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_Simulation" ) << "Joint sensor " << jointSensor->getName() << ": a translational joint without limits has no range to read.";
 		return std::nullopt;
 	}
 	else
@@ -206,7 +205,7 @@ std::optional<double> SIGEL_Simulation::SIG_DynaMechsSimulationQueries::readCont
 	dmContactModel *contactModel = static_cast<dmContactModel *>( rBody->getForce( 0 ) );
 	if( contactModel == nullptr )
 	{
-		SIGEL_Tools::SIG_IO::cerr << "failed to get the dmContactModel" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_Simulation" ) << "Failed to get the dmContactModel.";
 		return std::nullopt;
 	}
 

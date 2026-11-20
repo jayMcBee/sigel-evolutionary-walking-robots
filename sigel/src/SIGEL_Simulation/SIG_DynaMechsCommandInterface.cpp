@@ -22,7 +22,6 @@
 */
 #include <QList>
 #include "SIGEL_Simulation/SIG_DynaMechsCommandInterface.h"
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_Logging.h"
 #include "SIGEL_Robot/SIG_Joint.h"
 #include "SIGEL_Robot/SIG_RotationalJoint.h"
@@ -103,7 +102,7 @@ void SIGEL_Simulation::SIG_DynaMechsCommandInterface::moveDrive( int driveNo,
 
 		if( myJoint->getJointType() != SIGEL_Robot::SIG_Joint::tRotationalJoint )
 		{
-			SIGEL_Tools::SIG_IO::cerr << "tServoSimpleMode type drives can work on rotational joints only !!" << Qt::endl;
+			SIG_LOG_WARNING( "SIGEL_Simulation" ) << "tServoSimpleMode type drives can work on rotational joints only!";
 			return;
 		}
 

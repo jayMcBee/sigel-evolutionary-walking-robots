@@ -22,8 +22,6 @@
 */
 #include "SIGEL_Simulation/SIG_SimulationParameters.h"
 
-#include "SIGEL_Tools/SIG_IO.h"
-
 SIGEL_Simulation::SIG_SimulationParameters::SIG_SimulationParameters()
   : timeToSimulate(0,0,10),
     stepSize(0.02),
