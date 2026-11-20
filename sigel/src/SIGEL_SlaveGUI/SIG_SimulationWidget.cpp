@@ -40,6 +40,7 @@
 
 #include "SIGEL_SlaveGUI/SIG_SimulationVisualisationWidget.h"
 #include "SIGEL_Visualisation/SIG_Visualisation.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 namespace SIGEL_SlaveGUI
 {
@@ -54,7 +55,7 @@ namespace SIGEL_SlaveGUI
 	     {
 	       QString const line = visualisationWidget->cameraLine();
 	       QApplication::clipboard()->setText( line );
-	       qInfo( "%s", qPrintable( line ) );
+	       SIG_LOG_INFO( "SIGEL_SlaveGUI" ) << line;
 	     } );
     for (QLabel *label : { xPosTextLabel, yPosTextLabel, zPosTextLabel })
       {
