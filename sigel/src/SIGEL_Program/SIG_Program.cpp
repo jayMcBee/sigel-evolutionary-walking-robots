@@ -24,7 +24,7 @@
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_Program/SIG_ProgramLine.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
 #include <algorithm>
@@ -88,9 +88,7 @@ void SIGEL_Program::SIG_Program::readFromFile( QTextStream &file )
 			appendLine( prgLine );
 	}
 
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "Program read with " << getProgramLength() << " lines." << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "SIGEL_Program" ) << "Program read with " << getProgramLength() << " lines.";
 }
 
 SIGEL_Program::SIG_ProgramLine const &SIGEL_Program::SIG_Program::getLine( long no ) const
@@ -143,9 +141,7 @@ void SIGEL_Program::SIG_Program::importProgram( QString& filename )
 	}
 	else
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Could not import program from "
-		                          << filename
-		                          << "!" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_Program" ) << "Could not import program from " << filename << "!";
 	}
 }
 
@@ -161,9 +157,7 @@ void SIGEL_Program::SIG_Program::exportProgram( QString& filename ) const
 	}
 	else
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Could not export program to "
-		                          << filename
-		                          << "!" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_Program" ) << "Could not export program to " << filename << "!";
 	}
 }
 
@@ -179,9 +173,7 @@ void SIGEL_Program::SIG_Program::clampLengthToLimits( SIGEL_GP::SIG_GPParameter 
 
 	if( minimumLength > 0 && prgLength < minimumLength )
 	{
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Program length " << prgLength << " is below the minimum " << minimumLength << "." << Qt::endl;
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Program" ) << "Program length " << prgLength << " is below the minimum " << minimumLength << ".";
 		historyInfo = minimumLength - prgLength;
 
 		for( long i = 0; i < minimumLength - prgLength; i++ )
@@ -193,9 +185,7 @@ void SIGEL_Program::SIG_Program::clampLengthToLimits( SIGEL_GP::SIG_GPParameter 
 			appendLine( newLine );
 		}
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Program padded with NOPs to " << getProgramLength() << " lines." << Qt::endl;
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Program" ) << "Program padded with NOPs to " << getProgramLength() << " lines.";
 	}
 
 	prgLength = getProgramLength();
@@ -203,17 +193,13 @@ void SIGEL_Program::SIG_Program::clampLengthToLimits( SIGEL_GP::SIG_GPParameter 
 	if( gpParameter.isMaxIndLengthLimited() &&
 	    prgLength > maximumLength )
 	{
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Program length " << prgLength << " is above the maximum " << maximumLength << "." << Qt::endl;
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Program" ) << "Program length " << prgLength << " is above the maximum " << maximumLength << ".";
 		historyInfo = maximumLength - prgLength;
 
 		for( long i = prgLength; i >= maximumLength; i-- )
 			deleteLine( i );
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Program truncated to " << getProgramLength() << " lines." << Qt::endl;
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Program" ) << "Program truncated to " << getProgramLength() << " lines.";
 	}
 }
 

@@ -23,7 +23,7 @@
 #include "SIGEL_Program/SIG_ProgramLine.h"
 #include "SIGEL_Tools/SIG_Randomizer.h"
 #include "SIGEL_Tools/SIG_Exception.h"
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 #include "stdlib.h"
 #include <qtextstream.h>
@@ -152,12 +152,7 @@ int SIGEL_Program::SIG_ProgramLine::getInstructionElement( int no ) const
     }
   else
     {
-#ifdef SIG_DEBUG
-
-      SIGEL_Tools::SIG_IO::cerr << "\n[ProgramLine.cpp<getInstructionElement>]: Invalid access, no="
-				<< no << ", elementNo=" 
-				<< getNumberOfElements() << Qt::endl;
-#endif
+      SIG_LOG_DEBUG( "SIGEL_Program" ) << "Invalid access in getInstructionElement: no=" << no << ", elementNo=" << getNumberOfElements();
 
       // ToDo: Exception ???
       return 0;
@@ -177,13 +172,7 @@ int SIGEL_Program::SIG_ProgramLine::getElement( int no ) const
     }
   else
     {
-#ifdef SIG_DEBUG
-
-      SIGEL_Tools::SIG_IO::cerr << "\n[ProgramLine.cpp<getInstructionElement>]: Invalid access, no="
-				<< no << ", elementNo=" 
-				<< getNumberOfElements() << Qt::endl;
-      
-#endif
+      SIG_LOG_DEBUG( "SIGEL_Program" ) << "Invalid access in getElement: no=" << no << ", elementNo=" << getNumberOfElements();
 
       // ToDo: Exception ???
       return 0;
@@ -202,13 +191,7 @@ void SIGEL_Program::SIG_ProgramLine::setElement(int no, int value)
       // no is out of range, so there is no element to set.
       // ToDo: Exception!
 
-#ifdef SIG_DEBUG
-
-      SIGEL_Tools::SIG_IO::cerr << "\n[ProgramLine.cpp<setElement>]: Invalid access, no="
-				<< no << ", elementNo=" 
-				<< getNumberOfElements() << Qt::endl;
-     
-#endif
+      SIG_LOG_DEBUG( "SIGEL_Program" ) << "Invalid access in setElement: no=" << no << ", elementNo=" << getNumberOfElements();
     }
 }
 
@@ -222,7 +205,7 @@ void SIGEL_Program::SIG_ProgramLine::print() const
   QString prgLine = "";
 
   printToString( prgLine );
-  SIGEL_Tools::SIG_IO::cerr << prgLine << Qt::flush;
+  SIG_LOG_DEBUG( "SIGEL_Program" ) << prgLine.trimmed();
 }
 
 void SIGEL_Program::SIG_ProgramLine::printToString(QString &lineStr) const
@@ -607,7 +590,7 @@ void SIGEL_Program::SIG_ProgramLine::randomRobotInstruction(SIGEL_Robot::SIG_Lan
      totalWeight = totalWeightOfAllowedInstructions( languageParameters, prob, hasCommand );
 
      if( totalWeight == 0 )
-        SIGEL_Tools::SIG_IO::cerr << "\nERROR: If no instructions are allowed, no instructions can be used !" << Qt::endl;
+        SIG_LOG_WARNING( "SIGEL_Program" ) << "If no instructions are allowed, no instructions can be used!";
 
      randomValue = randomizer.getRandomLong( totalWeight );
   

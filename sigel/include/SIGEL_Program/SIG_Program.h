@@ -147,7 +147,7 @@ class SIG_Program
 /**
  * This function has only been implemented for test purposes. It is obsolete.
  * @post
- * The program will be printed to SIG_IO::cerr.
+ * The program is logged as debug, one line per program line.
  */
    public:
    void print() const;

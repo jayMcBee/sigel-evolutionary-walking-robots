@@ -138,7 +138,7 @@ namespace SIGEL_Program
 		                             QList< int > &prob );
 
 		/**
-		 * This function is only for test purposes and prints a program line.
+		 * This function is only for test purposes and logs a program line as debug.
 		 */
 		void print() const;
 
