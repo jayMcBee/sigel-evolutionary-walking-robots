@@ -253,6 +253,12 @@ problem; the choice is made before any code is written.
   place. Assess first if one table can serve these places; the call sites
   differ, so the gain is not certain.
 
+- [ ] **189. Throw where `SIG_ProgramLine` marks "ToDo: Exception".**
+  `getInstructionElement` and `getElement` return 0 for an element number
+  out of range, and `setElement` does nothing; only a debug line reports it.
+  A wrong element number is a fault in the caller and should throw a
+  `SIG_Exception`. Do this after item 29.
+
 ---
 
 ## 8 · Toolkit
