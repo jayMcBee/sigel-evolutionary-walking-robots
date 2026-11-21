@@ -62,25 +62,26 @@ bool SIGEL_GP::SIG_GPTournament::classify( MT_Classifier *MetaClassifier )
 
 void SIGEL_GP::SIG_GPTournament::inhume( SIG_GPIndividual &corps )
 {
-	if( gpParameter.getLiveUndead() )
+	if( !gpParameter.getLiveUndead() )
 	{
-		QDir graveYardDir = gpParameter.getGraveYardDirectory();
+		return;
+	}
 
-		QString corpsFileName = graveYardDir.path() + QString( "/" ) + QString( "Individual_" ) + corps.getName() + QString( "_Fitness_" ) + QString::number( corps.getFitness() ) + ".ind";
+	QDir graveYardDir = gpParameter.getGraveYardDirectory();
 
-		SIG_LOG_DEBUG( "SIGEL_GP" ) << "SIG_GPTournament saving dead Individual " << corps.getName();
+	QString corpsFileName = graveYardDir.path() + QString( "/" ) + QString( "Individual_" ) + corps.getName() + QString( "_Fitness_" ) + QString::number( corps.getFitness() ) + ".ind";
 
-		QFile corpsFile( corpsFileName );
+	SIG_LOG_DEBUG( "SIGEL_GP" ) << "SIG_GPTournament saving dead Individual " << corps.getName();
 
-		if( corpsFile.open( QIODeviceBase::WriteOnly ) )
-		{
-			QTextStream buffer( &corpsFile );
-			corps.writeToFile( buffer, true );
-			corpsFile.close();
-		}
-		else
-		{
-			SIG_LOG_WARNING( "SIGEL_GP" ) << "Could not save corps under " << corpsFileName << "!";
-		}
-	};
+	QFile corpsFile( corpsFileName );
+
+	if( !corpsFile.open( QIODeviceBase::WriteOnly ) )
+	{
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "Could not save corps under " << corpsFileName << "!";
+		return;
+	}
+
+	QTextStream buffer( &corpsFile );
+	corps.writeToFile( buffer, true );
+	corpsFile.close();
 }
