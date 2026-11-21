@@ -21,7 +21,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include "SIGEL_Robot/IFunctions.h"
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include "SIGEL_Robot/SIG_Joint.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"

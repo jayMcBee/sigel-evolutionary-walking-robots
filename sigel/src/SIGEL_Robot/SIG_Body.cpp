@@ -21,11 +21,11 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_Robot/SIG_Body.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
 #include "SIGEL_Robot/SIG_RobotExceptions.h"
 #include <QList>
 #include "SIGEL_Tools/SIG_FileUtils.h"
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Robot/SIG_VRMLUtils.h"
 #include "SIGEL_Robot/SIG_VRMLFileError.h"
 
@@ -234,7 +234,7 @@ namespace SIGEL_Robot
 		else if( geometryNode && ( geometryNode->isSphereNode() || geometryNode->isConeNode() ) )
 		{
 			QString const shape = geometryNode->isSphereNode() ? "Sphere" : "Cone";
-			SIGEL_Tools::SIG_IO::cerr << "VRML file \"" << getGeometryFile() << "\": a " << shape << " is not read, the link gets no faces from it." << Qt::endl;
+			SIG_LOG_WARNING( "SIGEL_Robot" ) << "VRML file \"" << getGeometryFile() << "\": a " << shape << " is not read, the link gets no faces from it.";
 		}
 	}
 

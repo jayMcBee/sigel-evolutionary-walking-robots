@@ -27,7 +27,6 @@
 #include "SIGEL_Robot/SIG_Geometry.h"
 #include "SIGEL_Robot/SIG_Polygon.h"
 #include "SIGEL_Robot/SIG_Robot.h"
-#include "SIGEL_Tools/SIG_IO.h"
 #include "TST_FreeWatch.h"
 
 #include <QFile>
@@ -933,7 +932,7 @@ void SIGEL_Robot::TST_SIG_Body::loadWarnsThatASphereOrConeIsNotRead_data()
   QTest::newRow( "Cone" ) << "Cone" << "Cone { bottomRadius 1 height 2 }";
 }
 
-// SIGEL reads no Sphere or Cone; the load says so on SIG_IO::cerr and reads the rest of the file.
+// SIGEL reads no Sphere or Cone; the load logs a warning and reads the rest of the file.
 void SIGEL_Robot::TST_SIG_Body::loadWarnsThatASphereOrConeIsNotRead()
 {
   QFETCH( QString, shape );
@@ -943,17 +942,10 @@ void SIGEL_Robot::TST_SIG_Body::loadWarnsThatASphereOrConeIsNotRead()
   SIG_Robot robot;
   SIG_Body body( &robot, fileName, "" );
 
-  // Replacing the device deletes the stream's own one on stderr, so the stream gets a new one afterwards.
-  QString warned;
-  SIGEL_Tools::SIG_IO::cerr.setString( &warned );
+  QTest::ignoreMessage( QtWarningMsg, qPrintable( "VRML file \"" + fileName + "\": a " + shape + " is not read, the link gets no faces from it." ) );
   const QString thrown = thrownByLoad( body );
-  static QFile standardError;
-  const bool opened = standardError.isOpen() || standardError.open( stderr, QIODevice::WriteOnly );
-  SIGEL_Tools::SIG_IO::cerr.setDevice( &standardError );
 
-  QVERIFY( opened );
   QCOMPARE( thrown, QString() );
-  QCOMPARE( warned, "VRML file \"" + fileName + "\": a " + shape + " is not read, the link gets no faces from it.\n" );
   QVERIFY( body.getGeometry() );
   QCOMPARE( surfaceArea( body.getGeometry() ), besideTheShapeArea );
 }

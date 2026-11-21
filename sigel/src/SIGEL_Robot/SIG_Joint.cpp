@@ -26,7 +26,6 @@
 #include "SIGEL_Robot/SIG_TranslationalJoint.h"
 #include "SIGEL_Robot/SIG_RotationalJoint.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Robot/IFunctions.h"
 
 #include <cmath>

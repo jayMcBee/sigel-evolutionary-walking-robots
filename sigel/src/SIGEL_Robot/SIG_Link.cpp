@@ -29,7 +29,6 @@
 #include "SIGEL_Robot/IFunctions.h"
 #include "SIGEL_Tools/SIG_FileUtils.h"
 #include "SIGEL_Tools/SIG_TypeConverter.h"
-#include "SIGEL_Tools/SIG_IO.h"
 
 #include <cmath>
 #include <numbers>
