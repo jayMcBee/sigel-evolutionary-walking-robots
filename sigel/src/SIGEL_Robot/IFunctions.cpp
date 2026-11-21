@@ -31,6 +31,7 @@
 #include <cmath>
 #include <numbers>
 #include <newmat.h>
+#include "SIGEL_Tools/SIG_Logging.h"
 
 using namespace SIGEL_Tools;
 
@@ -110,27 +111,10 @@ namespace SIGEL_Robot
 		otherB.normalize();
 		otherC.normalize();
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "B:";
-		for (int i=0; i<3; i++)
-			SIGEL_Tools::SIG_IO::cerr << " " << pointB.get( i );
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		SIGEL_Tools::SIG_IO::cerr << "C:";
-		for (int i=0; i<3; i++)
-			SIGEL_Tools::SIG_IO::cerr << " " << pointC.get( i );
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		SIGEL_Tools::SIG_IO::cerr << "otherB:";
-		for (int i=0; i<3; i++)
-			SIGEL_Tools::SIG_IO::cerr << " " << otherB.get( i );
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		SIGEL_Tools::SIG_IO::cerr << "otherC:";
-		for (int i=0; i<3; i++)
-			SIGEL_Tools::SIG_IO::cerr << " " << otherC.get( i );
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "B: " << pointB.get( 0 ) << " " << pointB.get( 1 ) << " " << pointB.get( 2 );
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "C: " << pointC.get( 0 ) << " " << pointC.get( 1 ) << " " << pointC.get( 2 );
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "otherB: " << otherB.get( 0 ) << " " << otherB.get( 1 ) << " " << otherB.get( 2 );
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "otherC: " << otherC.get( 0 ) << " " << otherC.get( 1 ) << " " << otherC.get( 2 );
 
 		SIG_Matrix firstRotation;
 
@@ -164,28 +148,11 @@ namespace SIGEL_Robot
 		bufferVector = otherC;
 		firstRotation.times( &bufferVector, &otherC );
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "otherB and otherC have been rotated." << Qt::endl;
-		SIGEL_Tools::SIG_IO::cerr << "B:";
-		for (int i=0; i<3; i++)
-			SIGEL_Tools::SIG_IO::cerr << " " << pointB.get( i );
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		SIGEL_Tools::SIG_IO::cerr << "C:";
-		for (int i=0; i<3; i++)
-			SIGEL_Tools::SIG_IO::cerr << " " << pointC.get( i );
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		SIGEL_Tools::SIG_IO::cerr << "otherB:";
-		for (int i=0; i<3; i++)
-			SIGEL_Tools::SIG_IO::cerr << " " << otherB.get( i );
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		SIGEL_Tools::SIG_IO::cerr << "otherC:";
-		for (int i=0; i<3; i++)
-			SIGEL_Tools::SIG_IO::cerr << " " << otherC.get( i );
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "otherB and otherC have been rotated.";
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "B: " << pointB.get( 0 ) << " " << pointB.get( 1 ) << " " << pointB.get( 2 );
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "C: " << pointC.get( 0 ) << " " << pointC.get( 1 ) << " " << pointC.get( 2 );
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "otherB: " << otherB.get( 0 ) << " " << otherB.get( 1 ) << " " << otherB.get( 2 );
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "otherC: " << otherC.get( 0 ) << " " << otherC.get( 1 ) << " " << otherC.get( 2 );
 
 		SIG_Matrix secondRotation;
 
@@ -235,33 +202,8 @@ namespace SIGEL_Robot
 		else
 			secondRotation.makeone();
 
-#ifdef SIG_DEBUG
-		bufferVector = otherB;
-		secondRotation.times( &bufferVector, &otherB );
-		bufferVector = otherC;
-		secondRotation.times( &bufferVector, &otherC );
-
-		SIGEL_Tools::SIG_IO::cerr << "otherB and otherC have been rotated." << Qt::endl;
-		SIGEL_Tools::SIG_IO::cerr << "B:";
-		for (int i=0; i<3; i++)
-			SIGEL_Tools::SIG_IO::cerr << " " << pointB.get( i );
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		SIGEL_Tools::SIG_IO::cerr << "C:";
-		for (int i=0; i<3; i++)
-			SIGEL_Tools::SIG_IO::cerr << " " << pointC.get( i );
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		SIGEL_Tools::SIG_IO::cerr << "otherB:";
-		for (int i=0; i<3; i++)
-			SIGEL_Tools::SIG_IO::cerr << " " << otherB.get( i );
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		SIGEL_Tools::SIG_IO::cerr << "otherC:";
-		for (int i=0; i<3; i++)
-			SIGEL_Tools::SIG_IO::cerr << " " << otherC.get( i );
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "B: " << pointB.get( 0 ) << " " << pointB.get( 1 ) << " " << pointB.get( 2 );
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "C: " << pointC.get( 0 ) << " " << pointC.get( 1 ) << " " << pointC.get( 2 );
 
 		NEWMAT::Matrix transformation( 4, 4 );
 
@@ -332,11 +274,7 @@ namespace SIGEL_Robot
 		otherC.plusis (&perpendicularDirection);
 		// End of the covering construction
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Computing the transformation of "
-		                          << debugLabel
-		                          << Qt::endl;
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "Computing the transformation of " << debugLabel;
 
 		NEWMAT::Matrix transformation = phatRockingUpStylinVectorBendingAngleSwingingMasterFunction( pointA,
 		                                                                                             pointB,

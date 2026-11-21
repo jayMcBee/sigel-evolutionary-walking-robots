@@ -34,6 +34,7 @@
 #include <cmath>
 #include <numbers>
 #include <cstdio>
+#include "SIGEL_Tools/SIG_Logging.h"
 
 using namespace SIGEL_Tools;
 
@@ -396,11 +397,7 @@ void SIG_Link::transformToDynaMechs( SIG_Joint *predecessor,
                                      SIG_Vector predDir,
                                      SIG_Vector predHand )
 {
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "\n\nTransforming link "
-	                          << getName()
-	                          << " to DynaMechs!" << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "SIGEL_Robot" ) << "Transforming link " << getName() << " to DynaMechs!";
 
 	mdh_visited = true;
 
@@ -433,22 +430,14 @@ void SIG_Link::transformToDynaMechs( SIG_Joint *predecessor,
 
 	do
 	{
-#ifdef SIG_DEBUG
 		if( currentSuccessor )
 		{
-			SIGEL_Tools::SIG_IO::cerr << "Transforming link "
-			                          << getName()
-			                          << " accordingly to successor "
-			                          << currentSuccessor->getName()
-			                          << "." << Qt::endl;
+			SIG_LOG_DEBUG( "SIGEL_Robot" ) << "Transforming link " << getName() << " accordingly to successor " << currentSuccessor->getName() << ".";
 		}
 		else
 		{
-			SIGEL_Tools::SIG_IO::cerr << "Tansforming link "
-			                          << getName()
-			                          << " without successor." << Qt::endl;
+			SIG_LOG_DEBUG( "SIGEL_Robot" ) << "Tansforming link " << getName() << " without successor.";
 		}
-#endif
 
 		bool processingRealSuccessor = ( currentSuccessor == realSuccessor );
 
@@ -463,14 +452,7 @@ void SIG_Link::transformToDynaMechs( SIG_Joint *predecessor,
 			newZAxis.minusis( &predBase );
 			newZAxis.normalize();
 
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "Z-Axis transformed:";
-			for( int i = 0; i < 3; i++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << newZAxis.get( i );
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
+			SIG_LOG_DEBUG( "SIGEL_Robot" ) << "Z-Axis transformed: " << newZAxis.get( 0 ) << " " << newZAxis.get( 1 ) << " " << newZAxis.get( 2 );
 		}
 
 		if( transformX )
@@ -514,21 +496,8 @@ void SIG_Link::transformToDynaMechs( SIG_Joint *predecessor,
 			                       newOrigin,
 			                       newXAxis );
 
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "X-Axis transformed:";
-			for( int i = 0; i < 3; i++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << newXAxis.get( i );
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-			SIGEL_Tools::SIG_IO::cerr << "Origin transformed:";
-			for( int i = 0; i < 3; i++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << newOrigin.get( i );
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
+			SIG_LOG_DEBUG( "SIGEL_Robot" ) << "X-Axis transformed: " << newXAxis.get( 0 ) << " " << newXAxis.get( 1 ) << " " << newXAxis.get( 2 );
+			SIG_LOG_DEBUG( "SIGEL_Robot" ) << "Origin transformed: " << newOrigin.get( 0 ) << " " << newOrigin.get( 1 ) << " " << newOrigin.get( 2 );
 		}
 		else if( transformZ )
 		{
@@ -553,21 +522,8 @@ void SIG_Link::transformToDynaMechs( SIG_Joint *predecessor,
 
 			newOrigin = predBase;
 
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "X-Axis transformed:";
-			for( int i = 0; i < 3; i++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << newXAxis.get( i );
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-			SIGEL_Tools::SIG_IO::cerr << "Origin transformed:";
-			for( int i = 0; i < 3; i++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << newOrigin.get( i );
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
+			SIG_LOG_DEBUG( "SIGEL_Robot" ) << "X-Axis transformed: " << newXAxis.get( 0 ) << " " << newXAxis.get( 1 ) << " " << newXAxis.get( 2 );
+			SIG_LOG_DEBUG( "SIGEL_Robot" ) << "Origin transformed: " << newOrigin.get( 0 ) << " " << newOrigin.get( 1 ) << " " << newOrigin.get( 2 );
 		}
 
 		newXAxis.normalize();
@@ -620,79 +576,9 @@ void SIG_Link::transformToDynaMechs( SIG_Joint *predecessor,
 				}
 			}
 
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "screwD: " << screwD
-			                          << " screwTheta: " << screwTheta
-			                          << Qt::endl;
-
-			SIG_Vector debugScrewTranslationVector = newZAxis;
-			debugScrewTranslationVector.timesis( screwD );
-
-			SIG_Vector debugTranslatedOrigin = realNewOrigin;
-			debugTranslatedOrigin.plusis( &debugScrewTranslationVector );
-
-			SIG_Matrix debugScrewRotationMatrix = rotationMatrix( newZAxis,
-			                                                      screwTheta );
-
-			SIG_Vector debugHelpXAxis = realNewXAxis;
-			SIG_Vector debugRotatedXAxis;
-
-			debugScrewRotationMatrix.times( &debugHelpXAxis, &debugRotatedXAxis );
-
-			realNewZAxis.crossprod( &realNewXAxis, &realNewYAxis );
-			realNewYAxis.normalize();
-
-			SIG_Vector debugNewYAxis;
-			newZAxis.crossprod( &newXAxis, &debugNewYAxis );
-			debugNewYAxis.normalize();
-
-			SIG_Vector debugHelpYAxis = realNewYAxis;
-			SIG_Vector debugRotatedYAxis;
-
-			debugScrewRotationMatrix.times( &debugHelpYAxis, &debugRotatedYAxis );
-
-			SIGEL_Tools::SIG_IO::cerr << "New origin:";
-			for( int i = 0; i < 3; i++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << newOrigin.get( i );
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-			SIGEL_Tools::SIG_IO::cerr << "Translated real new origin:";
-			for( int i = 0; i < 3; i++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << debugTranslatedOrigin.get( i );
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-			SIGEL_Tools::SIG_IO::cerr << "New X-Axis:";
-			for( int i = 0; i < 3; i++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << newXAxis.get( i );
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-			SIGEL_Tools::SIG_IO::cerr << "Rotated real new X-Axis:";
-			for( int i = 0; i < 3; i++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << debugRotatedXAxis.get( i );
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-			SIGEL_Tools::SIG_IO::cerr << "New Y-Axis:";
-			for( int i = 0; i < 3; i++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << debugNewYAxis.get( i );
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-			SIGEL_Tools::SIG_IO::cerr << "Rotated real new Y-Axis:";
-			for( int i = 0; i < 3; i++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << debugRotatedYAxis.get( i );
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
+			SIG_LOG_DEBUG( "SIGEL_Robot" ) << "screwD: " << screwD << " screwTheta: " << screwTheta;
+			SIG_LOG_DEBUG( "SIGEL_Robot" ) << "New origin: " << newOrigin.get( 0 ) << " " << newOrigin.get( 1 ) << " " << newOrigin.get( 2 );
+			SIG_LOG_DEBUG( "SIGEL_Robot" ) << "New X-Axis: " << newXAxis.get( 0 ) << " " << newXAxis.get( 1 ) << " " << newXAxis.get( 2 );
 		}
 
 		if( currentSuccessor )
@@ -708,14 +594,7 @@ void SIG_Link::transformToDynaMechs( SIG_Joint *predecessor,
 		realNewZAxis.crossprod( &realNewXAxis, &realNewYAxis );
 		realNewYAxis.normalize();
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Y-Axis transformed:";
-		for( int i = 0; i < 3; i++ )
-		{
-			SIGEL_Tools::SIG_IO::cerr << " " << realNewYAxis.get( i );
-		}
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "Y-Axis transformed: " << realNewYAxis.get( 0 ) << " " << realNewYAxis.get( 1 ) << " " << realNewYAxis.get( 2 );
 
 		NEWMAT::Matrix newCoordinates( 3, 3 );
 		newCoordinates.Column( 1 ) = SIG_TypeConverter::toColumnVector( realNewXAxis );
@@ -732,23 +611,7 @@ void SIG_Link::transformToDynaMechs( SIG_Joint *predecessor,
 			parent->initialLocation = SIG_TypeConverter::toSIG_Vector( translation * -1 );
 			parent->initialOrientation = SIG_TypeConverter::toSIG_Matrix( rotation.i() );
 
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "Initial robot location: ";
-			for( int i = 0; i < 3; i++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << parent->initialLocation.get( i );
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-			SIGEL_Tools::SIG_IO::cerr << "Initial robot orientation:" << Qt::endl;
-			for( int i = 0; i < 3; i++ )
-			{
-				for( int j = 0; j < 3; j++ )
-				{
-					SIGEL_Tools::SIG_IO::cerr << parent->initialOrientation.get( i, j ) << " ";
-				}
-				SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-			}
-#endif
+			SIG_LOG_DEBUG( "SIGEL_Robot" ) << "Initial robot location: " << parent->initialLocation.get( 0 ) << " " << parent->initialLocation.get( 1 ) << " " << parent->initialLocation.get( 2 );
 		}
 
 		geometry->translate( SIG_TypeConverter::toSIG_Vector( translation ) );
@@ -757,41 +620,12 @@ void SIG_Link::transformToDynaMechs( SIG_Joint *predecessor,
 		transformPoints( SIG_TypeConverter::toSIG_Vector( translation ),
 		                 SIG_TypeConverter::toSIG_Matrix( rotation ) );
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Rotation matrix:" << Qt::endl;
-		for( int i = 1; i <= 3; i++ )
-		{
-			for( int j = 1; j <= 3; j++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << rotation( i, j ) << " ";
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		}
-		SIGEL_Tools::SIG_IO::cerr << "Translation vector:";
-		for( int i = 1; i <= 3; i++ )
-		{
-			SIGEL_Tools::SIG_IO::cerr << " " << translation( i );
-		}
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		SIGEL_Tools::SIG_IO::cerr << "Transformed points:" << Qt::endl;
-		for( const NamedPoint &p : points )
-		{
-			for( int i = 0; i < 3; i++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << " " << p.value->get( i );
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		}
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "Translation vector: " << translation( 1 ) << " " << translation( 2 ) << " " << translation( 3 );
 
 		mirtich->invalidate();
 	}
 
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "Link "
-	                          << getName()
-	                          << " transformed." << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "SIGEL_Robot" ) << "Link " << getName() << " transformed.";
 }
 
 void SIG_Link::calculateCommonNormal( SIG_Vector a,
@@ -804,33 +638,11 @@ void SIG_Link::calculateCommonNormal( SIG_Vector a,
 	u.normalize();
 	v.normalize();
 
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "Calculating common normal:\n"
-	                          << "a:";
-	for( int i = 0; i < 3; i++ )
-	{
-		SIGEL_Tools::SIG_IO::cerr << " " << a.get( i );
-	}
-	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-	SIGEL_Tools::SIG_IO::cerr << "u:";
-	for( int i = 0; i < 3; i++ )
-	{
-		SIGEL_Tools::SIG_IO::cerr << " " << u.get( i );
-	}
-	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-	SIGEL_Tools::SIG_IO::cerr << "b:";
-	for( int i = 0; i < 3; i++ )
-	{
-		SIGEL_Tools::SIG_IO::cerr << " " << b.get( i );
-	}
-	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-	SIGEL_Tools::SIG_IO::cerr << "v:";
-	for( int i = 0; i < 3; i++ )
-	{
-		SIGEL_Tools::SIG_IO::cerr << " " << v.get( i );
-	}
-	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "SIGEL_Robot" ) << "Calculating common normal.";
+	SIG_LOG_DEBUG( "SIGEL_Robot" ) << "a: " << a.get( 0 ) << " " << a.get( 1 ) << " " << a.get( 2 );
+	SIG_LOG_DEBUG( "SIGEL_Robot" ) << "u: " << u.get( 0 ) << " " << u.get( 1 ) << " " << u.get( 2 );
+	SIG_LOG_DEBUG( "SIGEL_Robot" ) << "b: " << b.get( 0 ) << " " << b.get( 1 ) << " " << b.get( 2 );
+	SIG_LOG_DEBUG( "SIGEL_Robot" ) << "v: " << v.get( 0 ) << " " << v.get( 1 ) << " " << v.get( 2 );
 
 	c.init( 0, 0, 0 );
 	w.init( 0, 0, 0 );
@@ -847,9 +659,7 @@ void SIG_Link::calculateCommonNormal( SIG_Vector a,
 
 	if( uvParallel )
 	{
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "u and v are parallel." << Qt::endl;
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "u and v are parallel.";
 
 		c = a;
 
@@ -872,9 +682,7 @@ void SIG_Link::calculateCommonNormal( SIG_Vector a,
 	}
 	else
 	{
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "u and v are not parallel." << Qt::endl;
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "u and v are not parallel.";
 
 		u.crossprod( &v, &w );
 		w.normalize();
@@ -888,31 +696,8 @@ void SIG_Link::calculateCommonNormal( SIG_Vector a,
 
 		NEWMAT::ColumnVector solutions = linEqSystem.i() * rightSide;
 
-#ifdef SIG_DEBUG
-		SIGEL_Tools::SIG_IO::cerr << "Linear equation system:" << Qt::endl;
-		for( int i = 1; i <= 3; i++ )
-		{
-			for( int j = 1; j <= 3; j++ )
-			{
-				SIGEL_Tools::SIG_IO::cerr << linEqSystem( i, j ) << " ";
-			}
-			SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-		}
-
-		SIGEL_Tools::SIG_IO::cerr << "Right side";
-		for( int i = 1; i <= 3; i++ )
-		{
-			SIGEL_Tools::SIG_IO::cerr << " " << rightSide( i );
-		}
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-		SIGEL_Tools::SIG_IO::cerr << "Solution vector (t0, t1, t2)^T:";
-		for( int i = 1; i <= 3; i++ )
-		{
-			SIGEL_Tools::SIG_IO::cerr << " " << solutions( i );
-		}
-		SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "Right side: " << rightSide( 1 ) << " " << rightSide( 2 ) << " " << rightSide( 3 );
+		SIG_LOG_DEBUG( "SIGEL_Robot" ) << "Solution vector (t0, t1, t2)^T: " << solutions( 1 ) << " " << solutions( 2 ) << " " << solutions( 3 );
 
 		c = u;
 		c.timesis( solutions( 1 ) );
@@ -941,21 +726,8 @@ void SIG_Link::calculateCommonNormal( SIG_Vector a,
 		w.normalize();
 	}
 
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "c:";
-	for( int i = 0; i < 3; i++ )
-	{
-		SIGEL_Tools::SIG_IO::cerr << " " << c.get( i );
-	}
-	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-
-	SIGEL_Tools::SIG_IO::cerr << "w:";
-	for( int i = 0; i < 3; i++ )
-	{
-		SIGEL_Tools::SIG_IO::cerr << " " << w.get( i );
-	}
-	SIGEL_Tools::SIG_IO::cerr << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "SIGEL_Robot" ) << "c: " << c.get( 0 ) << " " << c.get( 1 ) << " " << c.get( 2 );
+	SIG_LOG_DEBUG( "SIGEL_Robot" ) << "w: " << w.get( 0 ) << " " << w.get( 1 ) << " " << w.get( 2 );
 }
 
 }
