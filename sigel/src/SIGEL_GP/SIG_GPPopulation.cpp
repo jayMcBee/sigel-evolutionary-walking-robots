@@ -31,6 +31,7 @@
 
 #include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_Exception.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 SIGEL_GP::SIG_GPPopulation::SIG_GPPopulation()
 	: history( true ),
@@ -226,9 +227,7 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 	QString populationText=file.readAll();
 	long             pos, endPosition;
 
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "\n\nREADING POPULATION DATA FROM FILE:" << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "SIGEL_GP" ) << "Reading population data from file.";
 
 	if( populationText.indexOf("POPULATIONSIZE=", 0, Qt::CaseInsensitive)==-1 )
 		throw SIGEL_Tools::SIG_Exception( __FILE__, __LINE__, "The population has no POPULATIONSIZE field." );
@@ -244,27 +243,21 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 	oldPool.swap( pool );
 	resizeOwning( pool, (populationText.mid(pos+15,endPosition-pos-15)).toLong() );
 
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "<Poolsize loaded:" << populationText.mid(pos+15,endPosition-pos-15).toLong() << ">" << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "SIGEL_GP" ) << "Poolsize loaded: " << populationText.mid(pos+15,endPosition-pos-15).toLong() << ".";
 
 	std::unique_ptr< QProgressDialog > progress = createProgressDialog( "Loading", getSize() );
 
 	endPosition=populationText.indexOf(";", endPosition+1, Qt::CaseInsensitive);
 	pos=populationText.indexOf("NEXTIDENTIFIER=", 0, Qt::CaseInsensitive);
 
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "<Identifier loaded:" << populationText.mid(pos+15,endPosition-pos-15).toLong() << ">" << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "SIGEL_GP" ) << "Identifier loaded: " << populationText.mid(pos+15,endPosition-pos-15).toLong() << ".";
 
 	readNextIdentifier = populationText.mid(pos+15,endPosition-pos-15);
 
 	endPosition=populationText.indexOf(";", endPosition+1, Qt::CaseInsensitive);
 	pos=populationText.indexOf("POOLGENERATION=", 0, Qt::CaseInsensitive);
 
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "<Poolgeneration loaded:" << populationText.mid(pos+15,endPosition-pos-15) << ">\n" << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "SIGEL_GP" ) << "Poolgeneration loaded: " << populationText.mid(pos+15,endPosition-pos-15) << ".";
 
 	readPoolGeneration = (populationText.mid(pos+15,endPosition-pos-15)).toLong();
 
@@ -295,9 +288,7 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 	nextIdentifier = readNextIdentifier;
 	poolGeneration = readPoolGeneration;
 
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "\n\nFINISHED READING POPULATION." << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "SIGEL_GP" ) << "Finished reading population.";
 
 	if( getSize() > maximumSize )
 	{
