@@ -22,7 +22,6 @@
 */
 #include <QList>
 #include "SIGEL_GP/SIG_GPCrossOverTournament.h"
-#include "SIGEL_Tools/SIG_IO.h"
 
 #include "MT_Control/MT_Classifier.h"
 #include "SIGEL_Tools/SIG_Logging.h"

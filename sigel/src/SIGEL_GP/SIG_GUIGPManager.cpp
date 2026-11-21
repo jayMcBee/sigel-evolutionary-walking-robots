@@ -27,7 +27,7 @@
 
 #include <qapplication.h>
 #include <qlcdnumber.h>
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 namespace SIGEL_GP
 {
@@ -77,8 +77,7 @@ namespace SIGEL_GP
     if (item)
       item->setTo( &currentIndividual );
     else
-      SIGEL_Tools::SIG_IO::cerr << "SIG_GUIGPManager: no list item for pool position "
-                                << poolPos << " (size " << individualItems.size() << ")" << Qt::endl;
+      SIG_LOG_WARNING( "SIGEL_GP" ) << "No list item for pool position " << poolPos << " (size " << individualItems.size() << ").";
 
     // update generations display (this line looks cool, doesn't it ?!)
     guiExperiment.experimentView->lcdnumberGenerations->display(currentExperiment.population.getPoolGeneration());

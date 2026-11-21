@@ -28,7 +28,6 @@
 #include "SIGEL_Tools/SIG_Randomizer.h"
 
 #include "SIGEL_Tools/SIG_Exception.h"
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_Logging.h"
 
 SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPMetaGPExperiment& exp)
@@ -53,7 +52,7 @@ SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPMetaGPExper
     modifiedRobot.prepareDynaMechs();
   }
   catch (SIGEL_Tools::SIG_Exception &e) {
-    SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+    SIG_LOG_WARNING( "SIGEL_GP" ) << e.getMessage().trimmed();
     exit( 1 );
   };
 
@@ -240,7 +239,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
           default:
             errorText = QString::asprintf("Unknown error occurred.");
         };
-        SIGEL_Tools::SIG_IO::cerr << "pvm_spawn() failed for individual \"" << ind.getName() << "\" on \"" << hostNameByteArray << "\"   (" << spawnInfo << "/" << taskId << ") - " << errorText.toUtf8() << Qt::endl;
+        SIG_LOG_WARNING( "SIGEL_GP" ) << "pvm_spawn() failed for individual \"" << ind.getName() << "\" on \"" << hostNameByteArray << "\"   (" << spawnInfo << "/" << taskId << ") - " << errorText;
       }
   };
 
@@ -288,12 +287,11 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 	  	// deleted below.
 	  	if (result < 0)
 	  	{
-	  		SIGEL_Tools::SIG_IO::cerr << "Individual \"" << indName
-	  					  << "\" returned " << result << "; it is recorded as fitness 0." << Qt::endl;
+	  		SIG_LOG_WARNING( "SIGEL_GP" ) << "Individual \"" << indName << "\" returned " << result << "; it is recorded as fitness 0.";
 	  		result = 0;
 	  	}
 
-	  	SIGEL_Tools::SIG_IO::cerr << "\tFitness " << result << " for individual \"" << indName << "\" from host \"" << pvmTask->host.name << "\"." << Qt::endl;
+	  	SIG_LOG_INFO( "SIGEL_GP" ) << "Fitness " << result << " for individual \"" << indName << "\" from host \"" << pvmTask->host.name << "\".";
 	  	pvmTask->host.noOfSlaves--;
 	  	delete pvmTasks[ taskId ];   // insert() freed the finished task
 	  	pvmTasks[ taskId ] = nullptr;
@@ -307,11 +305,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 		  if (info == PvmSysErr)
 		    pvmLost = true;
 
-		  SIGEL_Tools::SIG_IO::cerr << "pvm_probe() failed with "
-					    << ( info == PvmSysErr ? "pvmd is not responding"
-								   : "an error" )
-					    << " (" << info << ") -- giving up on the task for individual \"" << indName << "\""
-					    << Qt::endl;
+		  SIG_LOG_WARNING( "SIGEL_GP" ) << "pvm_probe() failed with " << ( info == PvmSysErr ? "pvmd is not responding" : "an error" ) << " (" << info << ") -- giving up on the task for individual \"" << indName << "\"";
 
 		  pvm_kill( pvmTask->pvmTaskId );
 		  pvmTask->host.noOfSlaves--;
@@ -331,7 +325,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 
 	      if (QDateTime::currentDateTime() >= timeOutTime)
 				{
-		      SIGEL_Tools::SIG_IO::cerr << "sigel_slave timed out for individual \"" << indName << "\" -- force quit via 'pvm_kill()'" << Qt::endl;
+		      SIG_LOG_WARNING( "SIGEL_GP" ) << "sigel_slave timed out for individual \"" << indName << "\" -- force quit via 'pvm_kill()'";
 
 		  		pvm_kill( pvmTask->pvmTaskId );
 		  		pvmTask->host.noOfSlaves--;
@@ -361,9 +355,7 @@ bool SIGEL_GP::SIG_GPFitnessTrainer::slaveBuiltFromSameSource(SIG_GPPVMTask cons
   if (slaveHash == ownHash)
     return true;
 
-  SIGEL_Tools::SIG_IO::cerr << "Individual \"" << indName << "\": the sigel_slave on host \"" << pvmTask.host.name
-			    << "\" was built from other source. Its source hash is " << slaveHash << ", this sigel's is " << ownHash
-			    << ". Its fitness is refused." << Qt::endl;
+  SIG_LOG_WARNING( "SIGEL_GP" ) << "Individual \"" << indName << "\": the sigel_slave on host \"" << pvmTask.host.name << "\" was built from other source. Its source hash is " << slaveHash << ", this sigel's is " << ownHash << ". Its fitness is refused.";
   return false;
 }
 
@@ -482,10 +474,10 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
 
     // PvmDupHost: the host is still in PVM from an earlier join.
     if (info < 1 && singleInfo != PvmDupHost) {
-      SIGEL_Tools::SIG_IO::cerr << "\tPVM cannot add the dynamic host \"" << freshHost->name << "\" (error " << singleInfo << "); it is not used." << Qt::endl;
+      SIG_LOG_WARNING( "SIGEL_GP" ) << "PVM cannot add the dynamic host \"" << freshHost->name << "\" (error " << singleInfo << "); it is not used.";
 
       if (singleInfo == PvmCantStart)
-        SIGEL_Tools::SIG_IO::cerr << "\tPVM cannot start its daemon on that host. Check the remote shell in PVM_RSH, that \"ssh " << freshHost->name << "\" logs in without a password, and that PVM_ROOT is set on that host." << Qt::endl;
+        SIG_LOG_WARNING( "SIGEL_GP" ) << "PVM cannot start its daemon on that host. Check the remote shell in PVM_RSH, that \"ssh " << freshHost->name << "\" logs in without a password, and that PVM_ROOT is set on that host.";
 
       continue;
     }

@@ -28,7 +28,6 @@
 #include <pvm3.h>
 
 #include "SIGEL_Tools/SIG_FileUtils.h"
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIG_SourceHash.h"
 
 SIGEL_GP::SIG_GPPVMData::SIG_GPPVMData(SIGEL_Robot::SIG_Robot& robot,

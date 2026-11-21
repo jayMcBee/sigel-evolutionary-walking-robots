@@ -29,7 +29,6 @@
 
 #include<iostream>
 
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_Logging.h"
 
@@ -68,7 +67,7 @@ SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPPopulation::getIndividual(int poolpo
 	else
 	{
 		// Todo: Exception!
-		SIGEL_Tools::SIG_IO::cerr << "Wrong Position requested from Population!" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "Wrong Position requested from Population!";
 		exit( 1 );
 	}
 }
@@ -292,8 +291,8 @@ void SIGEL_GP::SIG_GPPopulation::readFromFile(QTextStream &file)
 
 	if( getSize() > maximumSize )
 	{
-		QString message = QString( "Warning: the pool has %1 individuals; only the first %2 take part in tournaments reliably." ).arg( getSize() ).arg( maximumSize );
-		SIGEL_Tools::SIG_IO::cerr << message << Qt::endl;
+		QString message = QString( "The pool has %1 individuals; only the first %2 take part in tournaments reliably." ).arg( getSize() ).arg( maximumSize );
+		SIG_LOG_WARNING( "SIGEL_GP" ) << message;
 	}
 }
 

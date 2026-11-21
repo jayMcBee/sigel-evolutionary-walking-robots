@@ -23,11 +23,11 @@
 #include "SIGEL_GP/SIG_GPSimpleFitnessFunction.h"
 
 #include "SIGEL_Simulation/SIG_Simulation.h"
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_GP/SIG_GPSimpleRecorder.h"
 #include "SIGEL_Tools/SIG_Exception.h"
 
 #include <qdatetime.h>
+#include "SIGEL_Tools/SIG_Logging.h"
 
 double SIGEL_GP::SIG_GPSimpleFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &program,
                                                            SIGEL_Robot::SIG_Robot &rob,
@@ -50,7 +50,7 @@ double SIGEL_GP::SIG_GPSimpleFitnessFunction::evalFitness( SIGEL_Program::SIG_Pr
 	}
 	catch( SIGEL_Tools::SIG_Exception &e )
 	{
-		SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << e.getMessage().trimmed();
 	}
 
 	SIG_Vector startPosition = normalizeRobotPosition( recorder.start, recorder.startRotation, rob );

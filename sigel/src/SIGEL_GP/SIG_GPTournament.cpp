@@ -79,8 +79,6 @@ void SIGEL_GP::SIG_GPTournament::inhume( SIG_GPIndividual &corps )
 	  corpsFile.close();
 	}
       else
-	SIGEL_Tools::SIG_IO::cerr << "Could not save corps under "
-				  << corpsFileName
-				  << "!" << Qt::endl;
+	SIG_LOG_WARNING( "SIGEL_GP" ) << "Could not save corps under " << corpsFileName << "!";
     };
 }

@@ -26,8 +26,8 @@
 #include <QSaveFile>
 #include <qtextstream.h>
 
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_FileUtils.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 SIGEL_GP::SIG_GPExperiment::SIG_GPExperiment( QString exp )
 {
@@ -174,7 +174,7 @@ void SIGEL_GP::SIG_GPExperiment::exportExperimentHistoryToGNUPlot( QString fileN
 
 	if( !gnuPlotFile.open( QIODeviceBase::WriteOnly ) )
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Could not export experiment history under " << fileName << "!" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "Could not export experiment history under " << fileName << "!";
 		return;
 	}
 

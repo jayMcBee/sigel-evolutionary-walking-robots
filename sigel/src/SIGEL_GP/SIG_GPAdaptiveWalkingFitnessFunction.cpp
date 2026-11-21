@@ -25,7 +25,7 @@
 
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
 #include "SIGEL_Simulation/SIG_EarlyRunTermSimulation.h"
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 namespace SIGEL_GP
 {
@@ -55,7 +55,7 @@ double SIG_GPAdaptiveWalkingFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
 	}
 	catch( SIGEL_Tools::SIG_Exception &e )
 	{
-		SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << e.getMessage().trimmed();
 	}
 
 	// calculate how many steps a complete simulation takes
@@ -117,7 +117,7 @@ double SIG_GPAdaptiveWalkingFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
 			// really hi ?
 			if( currentRealPosition.y > 1.5 * startHeight )
 			{
-				SIGEL_Tools::SIG_IO::cerr << "\to quite high -- " << currentRealPosition.y << Qt::endl;
+				SIG_LOG_WARNING( "SIGEL_GP" ) << "O quite high -- " << currentRealPosition.y;
 			}
 
 			avgHeight += startHeight;
@@ -125,7 +125,7 @@ double SIG_GPAdaptiveWalkingFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
 			// but check for strange effects..
 			if( currentRealPosition.y > 2.0 * startHeight )
 			{
-				SIGEL_Tools::SIG_IO::cerr << "\t## r u ready 2 fly ?  ##  height is > 2*startHeight  (currentRealPosition.y=" << currentRealPosition.y << " ##" << Qt::endl;
+				SIG_LOG_WARNING( "SIGEL_GP" ) << "R u ready 2 fly? Height is > 2*startHeight (currentRealPosition.y=" << currentRealPosition.y << ").";
 			}
 		}
 
@@ -143,7 +143,7 @@ double SIG_GPAdaptiveWalkingFitnessFunction::evalFitness( SIGEL_Program::SIG_Pro
 	fitness = ( 100 * fitness ) * avgHeightPercent;
 
 	// give some information
-	SIGEL_Tools::SIG_IO::cerr << QString::asprintf( "fitness: %5.4f  |  avgHeight: %4.1f%%  |  distance: %4.3f  |  steps (calc./total): %d/%d", fitness, avgHeightPercent * 100.0, distance, perfSteps, steps ) << Qt::endl;
+	SIG_LOG_INFO( "SIGEL_GP" ) << QString::asprintf( "Fitness: %5.4f  |  avgHeight: %4.1f%%  |  distance: %4.3f  |  steps (calc./total): %d/%d", fitness, avgHeightPercent * 100.0, distance, perfSteps, steps );
 
 	return fitness;
 }

@@ -23,7 +23,6 @@
 
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
 #include <exception>
-#include "SIGEL_Tools/SIG_IO.h"
 
 #include <cmath>
 

@@ -24,7 +24,6 @@
 #include "SIGEL_GP/SIG_GPOperations.h"
 #include "SIGEL_Program/SIG_Program.h"
 #include "SIGEL_GP/SIG_GPPopulation.h"
-#include "SIGEL_Tools/SIG_IO.h"
 #include <qstringlist.h>
 #include <cmath>
 #include "SIGEL_Tools/SIG_Logging.h"

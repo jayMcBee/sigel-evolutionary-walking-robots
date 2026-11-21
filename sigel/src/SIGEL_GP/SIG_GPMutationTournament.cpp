@@ -21,7 +21,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_GP/SIG_GPMutationTournament.h"
-#include "SIGEL_Tools/SIG_IO.h"
 
 #include "MT_Control/MT_Classifier.h"
 #include "SIGEL_Tools/SIG_Logging.h"

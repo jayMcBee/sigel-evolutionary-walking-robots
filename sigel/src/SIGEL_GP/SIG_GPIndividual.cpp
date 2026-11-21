@@ -22,6 +22,7 @@
  */
 #include "SIGEL_GP/SIG_GPIndividual.h"
 #include "SIGEL_Tools/SIG_Exception.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 
 SIGEL_GP::SIG_GPIndividual& SIGEL_GP::SIG_GPIndividual::operator =(SIG_GPIndividual const &ind)
@@ -445,9 +446,7 @@ void SIGEL_GP::SIG_GPIndividual::importIndividual( QString& filename )
 		fitnessValue = -1.0;
 	}
 	else
-		SIGEL_Tools::SIG_IO::cerr << "Could not import Individual from "
-		                                   << filename
-		                                   << "!" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "Could not import Individual from " << filename << "!";
 }
 
 void SIGEL_GP::SIG_GPIndividual::exportIndividual( QString& filename )
@@ -461,9 +460,7 @@ void SIGEL_GP::SIG_GPIndividual::exportIndividual( QString& filename )
 		indFile.close();
 	}
 	else
-		SIGEL_Tools::SIG_IO::cerr << "Could not export Individual to "
-		                          << filename
-		                          << "!" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "Could not export Individual to " << filename << "!";
 }
 
 SIGEL_Program::SIG_Program *SIGEL_GP::SIG_GPIndividual::getProgramPointer()
@@ -497,16 +494,7 @@ void SIGEL_GP::SIG_GPIndividual::setNameInfo()
 
 void SIGEL_GP::SIG_GPIndividual::print()
 {
-	SIGEL_Tools::SIG_IO::cerr << "\nCurrent individual's data:\n--------------------------"
-	                          << "\n- Name   : "
-	                          << getName()
-	                          << "\n- Poolpos: "
-	                          << getPoolPos()
-	                          << "\n- Fitness: "
-	                          << getFitness()
-	                          << "\n- Age    : "
-	                          << getAge()
-	                          << "\n- Program:\n" << Qt::endl;
+	SIG_LOG_DEBUG( "SIGEL_GP" ) << "Current individual's data: Name: " << getName() << ", Poolpos: " << getPoolPos() << ", Fitness: " << getFitness() << ", Age: " << getAge() << ", Program:";
 
 	getProgram().print();
 }

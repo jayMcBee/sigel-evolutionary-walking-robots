@@ -29,7 +29,6 @@
 #include <unistd.h>
 #include <qfile.h>
 #include <qdir.h>
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_GP/SIG_GPMutationTournament.h"
 #include "SIGEL_GP/SIG_GPSimpleTournament.h"
 #include "SIGEL_GP/SIG_GPCrossOverTournament.h"
@@ -51,7 +50,7 @@ SIGEL_GP::SIG_GPManager::SIG_GPManager(SIGEL_GP::SIG_GPMetaGPExperiment &experim
 	  runGenerationCounter(0)
 {
 	if (currentExperiment.gpParameter.getTimeOutMinutes() <= 0)
-		SIGEL_Tools::SIG_IO::cerr << "Warning: no slave time-out is set (TIMEOUTMINUTES 0). If a host is lost, the evolution stops until it is back." << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "No slave time-out is set (TIMEOUTMINUTES 0). If a host is lost, the evolution stops until it is back.";
 
 	if(currentExperiment.mtController->IsEnabled() && currentExperiment.mtController->UsedSystem() == MT_SubstituteKind::Evaluator)
 	{
@@ -259,7 +258,7 @@ void SIGEL_GP::SIG_GPManager::createTournaments(int quantity)
 		// ToDo: Throw Exception!
 		if (!totalProbCount)
 		{
-			SIGEL_Tools::SIG_IO::cerr << "Cannot create tournaments - bad probabilities!" << Qt::endl;
+			SIG_LOG_WARNING( "SIGEL_GP" ) << "Cannot create tournaments - bad probabilities!";
 			return;
 		};
 
@@ -673,13 +672,13 @@ void SIGEL_GP::SIG_GPManager::run()
 
 	if (!tournamentsAreEmpty( tournaments ))
 	{
-		SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() was called more than once!" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "SIG_GPManager::run() was called more than once!";
 		messageEvolutionStop();
 	};
 
 	if (currentExperiment.getPopulation().getSize() < 4)
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Population contains less than 4 Individuals, cannot evolve!" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "Population contains less than 4 Individuals, cannot evolve!";
 		messageEvolutionStop();
 	};
 
@@ -730,7 +729,7 @@ void SIGEL_GP::SIG_GPManager::run()
 		// this is the total amount of generations evolved, since the project is created
 		currentExperiment.population.incrementPoolGeneration();
 
-		SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentExperiment.population.getPoolGeneration() << " (" << runGenerationCounter << " in this run)\t(" << (QDateTime::currentDateTime()).toString() << ")" << Qt::endl;
+		SIG_LOG_INFO( "SIGEL_GP" ) << "Computing Generation " << currentExperiment.population.getPoolGeneration() << " (" << runGenerationCounter << " in this run) (" << (QDateTime::currentDateTime()).toString() << ")";
 
 		// increment the age of the individuals
 		for (int i=0; i < currentExperiment.population.getSize(); i++)
@@ -781,9 +780,7 @@ void SIGEL_GP::SIG_GPManager::run()
 			}
 			else
 			{
-				SIGEL_Tools::SIG_IO::cerr << "Could not save Pool under "
-				  << poolImageName
-				  << "!" << Qt::endl;
+				SIG_LOG_WARNING( "SIGEL_GP" ) << "Could not save Pool under " << poolImageName << "!";
 			}
 		};
 
@@ -841,13 +838,13 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 
 	if (!tournamentsAreEmpty( tournaments ))
 	{
-		SIGEL_Tools::SIG_IO::cerr << "SIG_GPManager::run() was called more than once!" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "SIG_GPManager::run() was called more than once!";
 		messageEvolutionStop();
 	};
 
 	if (currentExperiment.getPopulation().getSize() < 4)
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Population contains less than 4 Individuals, cannot evolve!" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "Population contains less than 4 Individuals, cannot evolve!";
 		messageEvolutionStop();
 	};
 
@@ -897,7 +894,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 		runGenerationCounter++;
 		currentExperiment.population.incrementPoolGeneration();
 
-		SIGEL_Tools::SIG_IO::cerr << "Computing Generation " << currentExperiment.population.getPoolGeneration() << " (" << runGenerationCounter << " in this run)\t(" << (QDateTime::currentDateTime()).toString() << ")" << Qt::endl;
+		SIG_LOG_INFO( "SIGEL_GP" ) << "Computing Generation " << currentExperiment.population.getPoolGeneration() << " (" << runGenerationCounter << " in this run) (" << (QDateTime::currentDateTime()).toString() << ")";
 
 		for (int i=0; i < currentExperiment.population.getSize(); i++)
 		{
@@ -963,9 +960,7 @@ void SIGEL_GP::SIG_GPManager::run(MT_Classifier *MetaClassifier)
 			}
 			else
 			{
-				SIGEL_Tools::SIG_IO::cerr << "Could not save Pool under "
-				                          << poolImageName
-				                          << "!" << Qt::endl;
+				SIG_LOG_WARNING( "SIGEL_GP" ) << "Could not save Pool under " << poolImageName << "!";
 			}
 		};
 

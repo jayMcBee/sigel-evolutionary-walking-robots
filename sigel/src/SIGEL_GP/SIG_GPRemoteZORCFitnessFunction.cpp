@@ -25,7 +25,7 @@
 #include "SIGEL_GP/SIG_GPRemoteZORCFitnessFunction.h"
 #include <QInputDialog>
 #include "SIGEL_CommonGUI/SIG_DialogParent.h"
-#include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 namespace SIGEL_GP
 {
@@ -61,7 +61,7 @@ double SIG_GPRemoteZORCFitnessFunction::evalFitness( SIGEL_Program::SIG_Program 
 	fd = open( "/dev/modem", O_RDWR | O_NOCTTY );
 	if( fd < 0 )
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Serial Device can't be opened: The serial device \"/dev/modem\" couldn't be opened to transmit the program to ZORC. Program evaluation was canceled." << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "Serial Device can't be opened: The serial device \"/dev/modem\" couldn't be opened to transmit the program to ZORC. Program evaluation was canceled.";
 		fprintf( stderr, "Serial interface can't be opened" );
 		return -1.0;
 	}
@@ -69,7 +69,7 @@ double SIG_GPRemoteZORCFitnessFunction::evalFitness( SIGEL_Program::SIG_Program 
 	// set parameters for serial device and catch errors
 	if( SetSerial( fd, BaudRate, 1 ) < 0 )
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Error setting Parameters of Serial Device: Failed to set the parameters of serial device \"/dev/modem\". Program evaluation was canceled." << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "Error setting Parameters of Serial Device: Failed to set the parameters of serial device \"/dev/modem\". Program evaluation was canceled.";
 		fprintf( stderr, "Failed to set parameters of serial device" );
 		return -1.0;
 	}
@@ -83,7 +83,7 @@ double SIG_GPRemoteZORCFitnessFunction::evalFitness( SIGEL_Program::SIG_Program 
 	if( !timedSerialWait( fd, 2 ) )
 	{
 		// ZORC didn't respond for 2 seconds -- not connected ?!
-		SIGEL_Tools::SIG_IO::cerr << "Serial Connection Failed: Connection to ZORC can't be established using interface \"/dev/modem\". The RS-232 Ping failed. Possibly the menu on ZORC wasn't reset to the toplevel ? Please check !" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "Serial Connection Failed: Connection to ZORC can't be established using interface \"/dev/modem\". The RS-232 Ping failed. Possibly the menu on ZORC wasn't reset to the toplevel ? Please check !";
 		fprintf( stderr, "Can't establish connection to ZORC -- RS232-Ping failed" );
 
 		return -1.0;
@@ -96,7 +96,7 @@ double SIG_GPRemoteZORCFitnessFunction::evalFitness( SIGEL_Program::SIG_Program 
 		if( recvPrgLen != 8 )
 		{
 			// bad response from ZORC..
-			SIGEL_Tools::SIG_IO::cerr << "Problem with Serial Connection: The connection to ZORC could be established but the response was incorrect. Please check !" << Qt::endl;
+			SIG_LOG_WARNING( "SIGEL_GP" ) << "Problem with Serial Connection: The connection to ZORC could be established but the response was incorrect. Please check !";
 			fprintf( stderr, "The connection to ZORC could be established but the response was incorrect." );
 			return -1.0;
 		}
@@ -108,7 +108,7 @@ double SIG_GPRemoteZORCFitnessFunction::evalFitness( SIGEL_Program::SIG_Program 
 
 	else
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Bad Response from ZORC: Got bad response from ZORC. Evaluation canceled, Please retry.." << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "Bad Response from ZORC: Got bad response from ZORC. Evaluation canceled, Please retry..";
 		fprintf( stderr, "Bad response from ZORC" );
 		return -1.0;
 	}
@@ -125,7 +125,7 @@ double SIG_GPRemoteZORCFitnessFunction::evalFitness( SIGEL_Program::SIG_Program 
 	if( !timedSerialWait( fd, 2 ) )
 	{
 		// ZORC didn't respond for 2 seconds -- not connected ?!
-		SIGEL_Tools::SIG_IO::cerr << "Serial Connection Failed: Connection to ZORC can't be established using interface \"/dev/modem\". Evaluation canceled, Please check !" << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "Serial Connection Failed: Connection to ZORC can't be established using interface \"/dev/modem\". Evaluation canceled, Please check !";
 		fprintf( stderr, "Can't establish connection to ZORC" );
 		return -1.0;
 	}
@@ -140,7 +140,7 @@ double SIG_GPRemoteZORCFitnessFunction::evalFitness( SIGEL_Program::SIG_Program 
 			char errMsg[256];
 
 			snprintf( errMsg, sizeof( errMsg ), "<BIG><B>Program length received by ZORC [%d] doesn't match the original SIGEL-Program length [%ld].</B></BIG><BR><BR>Please retry..", recvPrgLen, program.getProgramLength() );
-			SIGEL_Tools::SIG_IO::cerr << "Error transmitting program: " << errMsg << Qt::endl;
+			SIG_LOG_WARNING( "SIGEL_GP" ) << "Error transmitting program: " << errMsg;
 			fprintf( stderr, "%s", errMsg );
 			return -1.0;
 		}
@@ -148,7 +148,7 @@ double SIG_GPRemoteZORCFitnessFunction::evalFitness( SIGEL_Program::SIG_Program 
 
 	else
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Bad Response from ZORC: Got bad response from ZORC. Bad response after program transmission. Evaluation was canceled, Please retry.." << Qt::endl;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << "Bad Response from ZORC: Got bad response from ZORC. Bad response after program transmission. Evaluation was canceled, Please retry..";
 		fprintf( stderr, "Bad response from ZORC" );
 		return -1.0;
 	}

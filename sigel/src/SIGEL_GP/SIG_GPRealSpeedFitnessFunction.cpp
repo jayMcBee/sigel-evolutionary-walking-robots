@@ -24,7 +24,6 @@
 
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
 #include "SIGEL_Simulation/SIG_Simulation.h"
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_Logging.h"
 
 namespace SIGEL_GP
@@ -55,7 +54,7 @@ double SIG_GPRealSpeedFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &
 	}
 	catch( SIGEL_Tools::SIG_Exception &e )
 	{
-		SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+		SIG_LOG_WARNING( "SIGEL_GP" ) << e.getMessage().trimmed();
 	}
 
 	SIG_Vector *endPosition = new SIG_Vector();
