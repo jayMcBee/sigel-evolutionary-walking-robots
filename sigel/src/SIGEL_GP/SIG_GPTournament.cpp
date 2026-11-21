@@ -23,62 +23,64 @@
 #include "SIGEL_GP/SIG_GPTournament.h"
 #include "SIGEL_Tools/SIG_Logging.h"
 
-SIGEL_GP::SIG_GPTournament::SIG_GPTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
-					     SIG_GPPopulation& currentPool,
-					     SIG_GPParameter& gpParameter,
-					     SIGEL_Robot::SIG_LanguageParameters &languageParameters)
-: languageParameters(languageParameters),
-  randomizer(randomizer),
-  indis(),
-  justWaiting(false),
-  waitCounter(0),
-  gpPool(currentPool),
-  gpParameter(gpParameter)
-{   
+SIGEL_GP::SIG_GPTournament::SIG_GPTournament( SIGEL_Tools::SIG_Randomizer &randomizer,
+                                              SIG_GPPopulation &currentPool,
+                                              SIG_GPParameter &gpParameter,
+                                              SIGEL_Robot::SIG_LanguageParameters &languageParameters )
+	: languageParameters( languageParameters ),
+	  randomizer( randomizer ),
+	  indis(),
+	  justWaiting( false ),
+	  waitCounter( 0 ),
+	  gpPool( currentPool ),
+	  gpParameter( gpParameter )
+{
 }
 
 SIGEL_GP::SIG_GPTournament::~SIG_GPTournament()
 {
-  // This class owns the tournament individuals its subclasses build, and frees
-  // them here.
-  qDeleteAll( indis );
-  indis.clear();
+	// This class owns the tournament individuals its subclasses build, and frees
+	// them here.
+	qDeleteAll( indis );
+	indis.clear();
 }
 
 bool SIGEL_GP::SIG_GPTournament::run()
-{ return true; }
+{
+	return true;
+}
 
-bool SIGEL_GP::SIG_GPTournament::run(MT_Classifier *MetaClassifier)
-{ return true; }
+bool SIGEL_GP::SIG_GPTournament::run( MT_Classifier *MetaClassifier )
+{
+	return true;
+}
 
-bool SIGEL_GP::SIG_GPTournament::classify(MT_Classifier *MetaClassifier)
-{ return true; }
+bool SIGEL_GP::SIG_GPTournament::classify( MT_Classifier *MetaClassifier )
+{
+	return true;
+}
 
 void SIGEL_GP::SIG_GPTournament::inhume( SIG_GPIndividual &corps )
 {
-  if (gpParameter.getLiveUndead())
-    {
-      QDir graveYardDir = gpParameter.getGraveYardDirectory();
-
-      QString corpsFileName =   graveYardDir.path()
-                              + QString( "/" )
-                              + QString( "Individual_" )
-                              + corps.getName()
-                              + QString( "_Fitness_" )
-                              + QString::number( corps.getFitness() )
-                              + ".ind";
-
-      SIG_LOG_DEBUG( "SIGEL_GP" ) << "SIG_GPTournament saving dead Individual " << corps.getName();
-
-      QFile corpsFile( corpsFileName );
-
-      if (corpsFile.open( QIODeviceBase::WriteOnly ))
+	if( gpParameter.getLiveUndead() )
 	{
-	  QTextStream buffer( &corpsFile );
-	  corps.writeToFile( buffer,true );
-	  corpsFile.close();
-	}
-      else
-	SIG_LOG_WARNING( "SIGEL_GP" ) << "Could not save corps under " << corpsFileName << "!";
-    };
+		QDir graveYardDir = gpParameter.getGraveYardDirectory();
+
+		QString corpsFileName = graveYardDir.path() + QString( "/" ) + QString( "Individual_" ) + corps.getName() + QString( "_Fitness_" ) + QString::number( corps.getFitness() ) + ".ind";
+
+		SIG_LOG_DEBUG( "SIGEL_GP" ) << "SIG_GPTournament saving dead Individual " << corps.getName();
+
+		QFile corpsFile( corpsFileName );
+
+		if( corpsFile.open( QIODeviceBase::WriteOnly ) )
+		{
+			QTextStream buffer( &corpsFile );
+			corps.writeToFile( buffer, true );
+			corpsFile.close();
+		}
+		else
+		{
+			SIG_LOG_WARNING( "SIGEL_GP" ) << "Could not save corps under " << corpsFileName << "!";
+		}
+	};
 }
