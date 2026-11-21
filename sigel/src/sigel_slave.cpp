@@ -28,9 +28,9 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <csignal>
+#include <cstdio>
 #include <memory>
 
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_Logging.h"
 #include "SIGEL_SlaveGUI/SIG_SimulationWindow.h"
 #include "SIGEL_Program/SIG_Program.h"
@@ -74,19 +74,19 @@ extern "C"
 		switch ( signal )
 		{
 			case SIGABRT:
-				SIGEL_Tools::SIG_IO::cerr << "Abort" << Qt::endl;
+				SIG_LOG_WARNING( "sigel_slave" ) << "Abort";
 				break;
 			case SIGFPE:
-				SIGEL_Tools::SIG_IO::cerr << "Arithmetic error signal" << Qt::endl;
+				SIG_LOG_WARNING( "sigel_slave" ) << "Arithmetic error signal";
 				break;
 			case SIGILL:
-				SIGEL_Tools::SIG_IO::cerr << "Invalid execution" << Qt::endl;
+				SIG_LOG_WARNING( "sigel_slave" ) << "Invalid execution";
 				break;
 			case SIGINT:
-				SIGEL_Tools::SIG_IO::cerr << "Asynchronous interactive attention" << Qt::endl;
+				SIG_LOG_WARNING( "sigel_slave" ) << "Asynchronous interactive attention";
 				break;
 			case SIGSEGV:
-				SIGEL_Tools::SIG_IO::cerr << "Invalid storage access" << Qt::endl;
+				SIG_LOG_WARNING( "sigel_slave" ) << "Invalid storage access";
 				break;
 			case SIGTERM:
 				result = 0;
@@ -144,7 +144,7 @@ int showSimulation( SIGEL_Robot::SIG_Robot const &robot,
 	}
 	catch (SIGEL_Tools::SIG_Exception &e)
 	{
-		SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+		SIG_LOG_WARNING( "sigel_slave" ) << e.getMessage().trimmed();
 		return 1;
 	}
 
@@ -156,7 +156,7 @@ int showFirstIndividualOfExperimentFile( int argc, char *argv[], QString const &
 	QFile experimentFile( experimentFileName );
 	if (!experimentFile.open( QIODevice::ReadOnly ))
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentFileName << "!" << Qt::endl;
+		SIG_LOG_WARNING( "sigel_slave" ) << "Error opening " << experimentFileName << "!";
 		pvm_halt();
 		return 1;
 	}
@@ -171,15 +171,13 @@ int showFirstIndividualOfExperimentFile( int argc, char *argv[], QString const &
 	}
 	catch (SIGEL_Tools::SIG_Exception &e)
 	{
-		SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+		SIG_LOG_WARNING( "sigel_slave" ) << e.getMessage().trimmed();
 		return 1;
 	}
 
 	experimentFile.close();
 
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "Slave is used to visualize!" << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "sigel_slave" ) << "Slave is used to visualize!";
 
 	SIGEL_Robot::SIG_Robot modifiedRobot( experiment.robot );
 
@@ -189,7 +187,7 @@ int showFirstIndividualOfExperimentFile( int argc, char *argv[], QString const &
 	}
 	catch (SIGEL_Tools::SIG_Exception &e)
 	{
-		SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+		SIG_LOG_WARNING( "sigel_slave" ) << e.getMessage().trimmed();
 		return 1;
 	}
 
@@ -236,7 +234,7 @@ double computeFitness( int argc, char *argv[],
 	const std::optional<int> fitnessIndex = SIGEL_GP::SIG_GPFitnessFunctionRegistry::indexOf( serializedId );
 	if (!fitnessIndex)
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Unknown fitness function \"" << serializedId << "\"; its fitness is 0." << Qt::endl;
+		SIG_LOG_WARNING( "sigel_slave" ) << "Unknown fitness function \"" << serializedId << "\"; its fitness is 0.";
 		return 0;
 	}
 
@@ -253,7 +251,7 @@ double computeFitness( int argc, char *argv[],
 	}
 	catch (SIGEL_Tools::SIG_Exception &e)
 	{
-		SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+		SIG_LOG_WARNING( "sigel_slave" ) << e.getMessage().trimmed();
 		return 0;
 	}
 }
@@ -265,9 +263,7 @@ int showIndividualFromPVM( int argc, char *argv[],
                            SIGEL_Environment::SIG_Environment &environment,
                            SIGEL_Simulation::SIG_SimulationParameters &simulationParameters )
 {
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "Slave is used to visualize!" << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "sigel_slave" ) << "Slave is used to visualize!";
 	QApplication a(argc, argv);
 	QApplication::setStyle( QStyleFactory::create( "Fusion" ) );
 
@@ -306,7 +302,7 @@ int runPVMJob( int argc, char *argv[] )
 
 	if ((masterTaskId==PvmSysErr) || (masterTaskId==PvmNoParent))
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Program hasn't been started as a PVM slave!" << Qt::endl;
+		SIG_LOG_WARNING( "sigel_slave" ) << "Program hasn't been started as a PVM slave!";
 		exit(1);
 	}
 
@@ -326,7 +322,7 @@ int runPVMJob( int argc, char *argv[] )
 	}
 	catch (SIGEL_Tools::SIG_Exception &e)
 	{
-		SIGEL_Tools::SIG_IO::cerr << e.getMessage() << Qt::flush;
+		SIG_LOG_WARNING( "sigel_slave" ) << e.getMessage().trimmed();
 		return 1;
 	}
 
@@ -340,9 +336,7 @@ int runPVMJob( int argc, char *argv[] )
 	}
 
 	// Not visualising: compute the fitness and send it to the master.
-#ifdef SIG_DEBUG
-	SIGEL_Tools::SIG_IO::cerr << "Slave is used to calculate a fitness!" << Qt::endl;
-#endif
+	SIG_LOG_DEBUG( "sigel_slave" ) << "Slave is used to calculate a fitness!";
 
 	double fitnessValue = computeFitness( argc, argv, pvmData.getFitnessFunctionName(), program, robot, environment, simulationParameters );
 
@@ -368,7 +362,7 @@ int main( int argc, char *argv[] )
 			standAlone = true;
 		else
 		{
-			SIGEL_Tools::SIG_IO::cerr << "Options:\n\t-visualize, -v\t...\tstart in visualize mode\n" << Qt::endl;
+			fprintf( stderr, "Options:\n\t-visualize, -v\t...\tstart in visualize mode\n\n" );
 			standAlone = false;
 		}
 	}
@@ -376,11 +370,11 @@ int main( int argc, char *argv[] )
 	// MODE:  StandAlone, just run the slave to visualize robot+program
 	if (standAlone)
 	{
-		SIGEL_Tools::SIG_IO::cerr << "Slave started manually to visualize!" << Qt::endl;
+		SIG_LOG_INFO( "sigel_slave" ) << "Slave started manually to visualize!";
 
 		if (argc < 3)
 		{
-			SIGEL_Tools::SIG_IO::cerr << "No experiment name supplied! Cannot visualize!" << Qt::endl;
+			SIG_LOG_WARNING( "sigel_slave" ) << "No experiment name supplied! Cannot visualize!";
 			return 1;
 		}
 

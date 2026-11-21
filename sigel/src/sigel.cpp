@@ -24,16 +24,17 @@
 #include <QCoreApplication>
 #include <QStyleFactory>
 #include <qdir.h>
+#include <qtextstream.h>
 
 #include <pvm3.h>
 #include <csignal>
+#include <cstdio>
 #include <pthread.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 
 #include "SIGEL_GP/SIG_GPManager.h"
 #include "SIGEL_MasterGUI/SIG_MainWindow.h"
-#include "SIGEL_Tools/SIG_IO.h"
 #include "SIGEL_Tools/SIG_Logging.h"
 
 // The headless run, while it evolves. The first SIGINT or SIGTERM stops it
@@ -56,19 +57,19 @@ extern "C"
 
     switch ( signal ) {
       case SIGABRT:
-        SIGEL_Tools::SIG_IO::cerr << "Abort" << Qt::endl;
+        SIG_LOG_WARNING( "sigel" ) << "Abort";
         break;
       case SIGFPE:
-        SIGEL_Tools::SIG_IO::cerr << "Arithmetic error signal" << Qt::endl;
+        SIG_LOG_WARNING( "sigel" ) << "Arithmetic error signal";
         break;
       case SIGILL:
-        SIGEL_Tools::SIG_IO::cerr << "Invalid execution" << Qt::endl;
+        SIG_LOG_WARNING( "sigel" ) << "Invalid execution";
         break;
       case SIGINT:
-        SIGEL_Tools::SIG_IO::cerr << "Asynchronous interactive attention" << Qt::endl;
+        SIG_LOG_WARNING( "sigel" ) << "Asynchronous interactive attention";
         break;
       case SIGSEGV:
-        SIGEL_Tools::SIG_IO::cerr << "Invalid storage access" << Qt::endl;
+        SIG_LOG_WARNING( "sigel" ) << "Invalid storage access";
         break;
       case SIGTERM:
         result = 0;
@@ -161,10 +162,10 @@ int main( int argc, char *argv[] ) {
   }
   // Start SIGEL w/o GUI to evolve the given experiment
   else {
-    SIGEL_Tools::SIG_IO::cerr << "Master is used to evolve." << Qt::endl;
+    SIG_LOG_INFO( "sigel" ) << "Master is used to evolve.";
 
     if (argc < 3) {
-      SIGEL_Tools::SIG_IO::cerr << "No experiment name supplied! Cannot start evolution loop!" << Qt::endl;
+      SIG_LOG_WARNING( "sigel" ) << "No experiment name supplied! Cannot start evolution loop!";
       pvm_halt();
       return 1;
     }
@@ -172,7 +173,7 @@ int main( int argc, char *argv[] ) {
     QString experimentName( argv[2] );
     QFile experimentFile( experimentName );
     if (!experimentFile.open( QIODevice::ReadOnly )) {
-      SIGEL_Tools::SIG_IO::cerr << "Error opening " << experimentName << "!" << Qt::endl;
+      SIG_LOG_WARNING( "sigel" ) << "Error opening " << experimentName << "!";
       pvm_halt();
       return 1;
     }
@@ -206,14 +207,14 @@ int main( int argc, char *argv[] ) {
 		// start just the meta evolution (w/o sigel)
 		if(argc < 4)
 		{
-			SIGEL_Tools::SIG_IO::cerr << "No time limit supplied. Can't start meta evolution.\nYou have to supply the time limit in minutes after the experiment filename." << Qt::endl;
+			SIG_LOG_WARNING( "sigel" ) << "No time limit supplied. Can't start meta evolution. You have to supply the time limit in minutes after the experiment filename.";
 			pvm_halt();
 			return 1;
 		}
 		int minutes = QString(argv[3]).toInt();
 		if(minutes < 0 || minutes > 34560)
 		{
-			SIGEL_Tools::SIG_IO::cerr << "Minutes must be in the interval [0-34560]." << Qt::endl;
+			SIG_LOG_WARNING( "sigel" ) << "Minutes must be in the interval [0-34560].";
 			pvm_halt();
 			return 1;
 		}
@@ -232,7 +233,7 @@ int main( int argc, char *argv[] ) {
       std::signal( SIGTERM, SIG_IGN );
 
       if (!experiment.saveToFile( experimentName )) {
-        SIGEL_Tools::SIG_IO::cerr << "Error saving " << experimentName << "!" << Qt::endl;
+        SIG_LOG_WARNING( "sigel" ) << "Error saving " << experimentName << "!";
         pvm_halt();
         return 1;
       }
@@ -240,7 +241,7 @@ int main( int argc, char *argv[] ) {
     catch (SIGEL_Tools::SIG_Exception &e) {
       // The manager no longer exists; the signal handler must not use it.
       headlessManager = nullptr;
-      SIGEL_Tools::SIG_IO::cerr << "Error in " << experimentName << ": " << e.getMessage() << Qt::endl;
+      SIG_LOG_WARNING( "sigel" ) << "Error in " << experimentName << ": " << e.getMessage().trimmed();
       pvm_halt();
       return 1;
     }
