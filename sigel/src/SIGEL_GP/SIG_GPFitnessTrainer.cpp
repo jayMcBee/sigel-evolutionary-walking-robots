@@ -29,6 +29,7 @@
 
 #include "SIGEL_Tools/SIG_Exception.h"
 #include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 SIGEL_GP::SIG_GPFitnessTrainer::SIG_GPFitnessTrainer(SIGEL_GP::SIG_GPMetaGPExperiment& exp)
   :pvmLost(false),
@@ -149,11 +150,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::spawnTask(SIGEL_GP::SIG_GPIndividual const& 
 
   bool success = false;
 
-#ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cerr << "Trying to spawn task for individual \""
-			    << ind.getName()
-			    << "\"" << Qt::endl;
-#endif
+  SIG_LOG_DEBUG( "SIGEL_GP" ) << "Trying to spawn task for individual \"" << ind.getName() << "\"";
 
   int oldSize = pvmTasks.size();
   int oldMaxIndex = oldSize - 1;
@@ -347,11 +344,7 @@ double SIGEL_GP::SIG_GPFitnessTrainer::checkTask(int taskId)
 		}
   }
 
-#ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cerr << "Checking task "
-			    << taskId
-			    << Qt::endl;
-#endif
+  SIG_LOG_DEBUG( "SIGEL_GP" ) << "Checking task " << taskId;
 
   return result;
 }
@@ -397,15 +390,11 @@ void SIGEL_GP::SIG_GPFitnessTrainer::sweepToSpawn()
   // is removed.
   qsizetype toSpawnIndex = 0;
 
-#ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cerr << "Sweeping to spawn!" << Qt::endl;
-#endif
+  SIG_LOG_DEBUG( "SIGEL_GP" ) << "Sweeping to spawn!";
 
   while (toSpawnIndex < toSpawnList.size())
     {
-#ifdef SIG_DEBUG
-      SIGEL_Tools::SIG_IO::cerr << "Entering spawn loop!" << Qt::endl;
-#endif
+      SIG_LOG_DEBUG( "SIGEL_GP" ) << "Entering spawn loop!";
 
       int hostNumber = getNextHost();
 
@@ -530,11 +519,7 @@ int SIGEL_GP::SIG_GPFitnessTrainer::getNextHost() {
         break;
   }
 
-#ifdef SIG_DEBUG
-  SIGEL_Tools::SIG_IO::cerr << "Next Host: "
-			    << result
-			    << Qt::endl;
-#endif
+  SIG_LOG_DEBUG( "SIGEL_GP" ) << "Next Host: " << result;
 
   return result;
 }

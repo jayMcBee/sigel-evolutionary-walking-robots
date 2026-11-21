@@ -25,6 +25,7 @@
 #include "SIGEL_Tools/SIG_IO.h"
 
 #include "MT_Control/MT_Classifier.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 SIGEL_GP::SIG_GPCrossOverTournament::SIG_GPCrossOverTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
 							       SIGEL_GP::SIG_GPPopulation& currentPool,
@@ -116,9 +117,7 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run()
        looserPos2 = popos2_1;
      };
 
-#ifdef SIG_DEBUG
-   SIGEL_Tools::SIG_IO::cerr <<"\nthe Individuals " <<winnerPos1<<" and "<<winnerPos2<<" winns the Tournament and will be crossed.." << Qt::endl;
-#endif
+   SIG_LOG_DEBUG( "SIGEL_GP" ) << "The Individuals " <<winnerPos1<<" and "<<winnerPos2<<" winns the Tournament and will be crossed..";
 
    QList< SIG_GPIndividual * > cinds = SIG_GPOperations::crossOver(*winner1,
 								   looserPos1,
@@ -130,9 +129,7 @@ bool SIGEL_GP::SIG_GPCrossOverTournament::run()
 								   gpParameter,
 								   languageParameters);
 
-#ifdef SIG_DEBUG
-   SIGEL_Tools::SIG_IO::cerr <<"the Individuals have been crossed and inserted at the Pool Positions " <<looserPos1<<" and "<<looserPos2<<" ." << Qt::endl;
-#endif
+   SIG_LOG_DEBUG( "SIGEL_GP" ) << "The Individuals have been crossed and inserted at the Pool Positions " <<looserPos1<<" and "<<looserPos2<<" .";
 
    SIG_GPIndividual &looser1 = gpPool.getIndividual( looserPos1 );
    SIG_GPIndividual &looser2 = gpPool.getIndividual( looserPos2 );

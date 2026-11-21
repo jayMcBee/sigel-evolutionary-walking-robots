@@ -24,6 +24,7 @@
 #include "SIGEL_Tools/SIG_IO.h"
 
 #include "MT_Control/MT_Classifier.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 SIGEL_GP::SIG_GPMutationTournament::SIG_GPMutationTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
 							     SIG_GPPopulation& currentPool,
@@ -82,9 +83,7 @@ bool SIGEL_GP::SIG_GPMutationTournament::run()
        winnerPos = popos2;
      };
 
-#ifdef SIG_DEBUG
-   SIGEL_Tools::SIG_IO::cerr <<"\nthe Individual " <<winnerPos<<" winns the Tournament and will be mutated.." << Qt::endl;
-#endif
+   SIG_LOG_DEBUG( "SIGEL_GP" ) << "The Individual " <<winnerPos<<" winns the Tournament and will be mutated..";
 
    SIG_GPIndividual& mind = SIG_GPOperations::mutation(*winner,
 						       looserPos,
@@ -93,9 +92,7 @@ bool SIGEL_GP::SIG_GPMutationTournament::run()
 						       gpParameter,
 						       languageParameters);
 
-#ifdef SIG_DEBUG
-   SIGEL_Tools::SIG_IO::cerr <<"the Individual " <<winnerPos<<" have been mutated and inserted at the Pool Position " << looserPos << " ." << Qt::endl;
-#endif
+   SIG_LOG_DEBUG( "SIGEL_GP" ) << "The Individual " <<winnerPos<<" have been mutated and inserted at the Pool Position " << looserPos << " .";
 
    SIG_GPIndividual &looser = gpPool.getIndividual( looserPos );
 

@@ -21,6 +21,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 #include "SIGEL_GP/SIG_GPTournament.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 SIGEL_GP::SIG_GPTournament::SIG_GPTournament(SIGEL_Tools::SIG_Randomizer& randomizer,
 					     SIG_GPPopulation& currentPool,
@@ -67,11 +68,7 @@ void SIGEL_GP::SIG_GPTournament::inhume( SIG_GPIndividual &corps )
                               + QString::number( corps.getFitness() )
                               + ".ind";
 
-#ifdef SIG_DEBUG
-      SIGEL_Tools::SIG_IO::cerr << "SIG_GPTournament saving dead Individual "
-				<< corps.getName()
-				<< Qt::endl;
-#endif
+      SIG_LOG_DEBUG( "SIGEL_GP" ) << "SIG_GPTournament saving dead Individual " << corps.getName();
 
       QFile corpsFile( corpsFileName );
 

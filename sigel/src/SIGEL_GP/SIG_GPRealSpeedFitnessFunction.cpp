@@ -25,6 +25,7 @@
 #include "SIGEL_GP/SIG_GPFullDataRecorder.h"
 #include "SIGEL_Simulation/SIG_Simulation.h"
 #include "SIGEL_Tools/SIG_IO.h"
+#include "SIGEL_Tools/SIG_Logging.h"
 
 namespace SIGEL_GP
 {
@@ -85,11 +86,7 @@ double SIG_GPRealSpeedFitnessFunction::evalFitness( SIGEL_Program::SIG_Program &
 
 			double localDistance = localDistanceVector.norm();
 
-#ifdef SIG_DEBUG
-			SIGEL_Tools::SIG_IO::cerr << "localDistance: "
-			                          << localDistance
-			                          << Qt::endl;
-#endif
+			SIG_LOG_DEBUG( "SIGEL_GP" ) << "localDistance: " << localDistance;
 
 			totalDistance += localDistance;
 
